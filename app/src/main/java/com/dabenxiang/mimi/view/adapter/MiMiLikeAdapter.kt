@@ -7,33 +7,32 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.MemberLikeViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.MiMiLikeViewHolder
 
 class MiMiLikeAdapter(
     private val listener: EventListener
-) : PagingDataAdapter<MemberFollowItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         private const val VIEW_TYPE_NORMAL = 0
         private const val VIEW_TYPE_DELETED = 1
 
-        private val diffCallback = object : DiffUtil.ItemCallback<MemberFollowItem>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
             override fun areItemsTheSame(
-                oldItem: MemberFollowItem,
-                newItem: MemberFollowItem
+                oldItem: MemberPostItem,
+                newItem: MemberPostItem
             ): Boolean = oldItem.id == newItem.id
 
             override fun areContentsTheSame(
-                oldItem: MemberFollowItem,
-                newItem: MemberFollowItem
+                oldItem: MemberPostItem,
+                newItem: MemberPostItem
             ): Boolean = oldItem == newItem
         }
     }
 
     interface EventListener {
-        fun onDetail(item: MemberFollowItem)
+        fun onDetail(item: MemberPostItem)
         fun onGetAttachment(id: Long, view: ImageView)
         fun onCancelFollow(userId: Long, position: Int)
     }
@@ -52,7 +51,7 @@ class MiMiLikeAdapter(
         return when (viewType) {
             VIEW_TYPE_NORMAL -> MiMiLikeViewHolder(
                 LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_follow_member, parent, false),
+                    .inflate(R.layout.item_clip_post, parent, false),
                 listener
             )
             else -> DeletedItemViewHolder(
@@ -64,7 +63,7 @@ class MiMiLikeAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is MemberLikeViewHolder -> holder.bind(item, position)
+            is MiMiLikeViewHolder -> holder.bind(item, position)
         }
     }
 

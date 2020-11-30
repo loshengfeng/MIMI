@@ -8,10 +8,12 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
+import com.dabenxiang.mimi.callback.MyLikePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -26,8 +28,8 @@ class LikeViewModel : BaseViewModel() {
     private val _memberCount = MutableLiveData<Int>()
     val memberCount: LiveData<Int> = _memberCount
 
-    private val _clubDetail = MutableLiveData<ApiResult<MemberClubItem>>()
-    val clubDetail: LiveData<ApiResult<MemberClubItem>> = _clubDetail
+    private val _clubDetail = MutableLiveData<ApiResult<MemberPostItem>>()
+    val clubDetail: LiveData<ApiResult<MemberPostItem>> = _clubDetail
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
@@ -47,7 +49,7 @@ class LikeViewModel : BaseViewModel() {
     private val _clubIdList = ArrayList<Long>()
     private val _userIdList = ArrayList<Long>()
 
-    fun getMemberList(): Flow<PagingData<MemberFollowItem>> {
+    fun getMemberList(): Flow<PagingData<MemberPostItem>> {
         return Pager(
             config = PagingConfig(pageSize = MemberLikeListDataSource.PER_LIMIT.toInt()),
             pagingSourceFactory = {
@@ -61,7 +63,7 @@ class LikeViewModel : BaseViewModel() {
             .cachedIn(viewModelScope)
     }
 
-    fun getClubList(): Flow<PagingData<ClubFollowItem>> {
+    fun getClubList(): Flow<PagingData<MemberPostItem>> {
         return Pager(
             config = PagingConfig(pageSize = ClubLikeListDataSource.PER_LIMIT.toInt()),
             pagingSourceFactory = {
@@ -75,7 +77,7 @@ class LikeViewModel : BaseViewModel() {
             .cachedIn(viewModelScope)
     }
 
-    private val memberPagingCallback = object : MyFollowPagingCallback {
+    private val memberPagingCallback = object : MyLikePagingCallback {
         override fun onTotalCount(count: Long) {
             _memberCount.postValue(count.toInt())
             _cleanMemberRemovedPosList.postValue(null)
@@ -87,7 +89,7 @@ class LikeViewModel : BaseViewModel() {
         }
     }
 
-    private val clubPagingCallback = object : MyFollowPagingCallback {
+    private val clubPagingCallback = object : MyLikePagingCallback {
         override fun onTotalCount(count: Long) {
             _clubCount.postValue(count.toInt())
             _cleanClubRemovedPosList.postValue(null)
@@ -184,17 +186,17 @@ class LikeViewModel : BaseViewModel() {
         }
     }
 
-    fun getClub(clubId: Long) {
-        viewModelScope.launch {
-            flow {
-                val resp = domainManager.getApiRepository().getMembersClub(clubId)
-                if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _clubDetail.value = it }
-        }
-    }
+//    fun getClub(clubId: Long) {
+//        viewModelScope.launch {
+//            flow {
+//                val resp = domainManager.getApiRepository().getMembersClub(clubId)
+//                if (!resp.isSuccessful) throw HttpException(resp)
+//                emit(ApiResult.success(resp.body()?.content))
+//            }
+//                .flowOn(Dispatchers.IO)
+//                .catch { e -> emit(ApiResult.error(e)) }
+//                .collect { _clubDetail.value = it }
+//        }
+//    }
 
 }

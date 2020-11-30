@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.ClubLikeAdapter
 import com.dabenxiang.mimi.view.adapter.MiMiLikeAdapter
@@ -41,8 +42,8 @@ class LikeFragment : BaseFragment() {
 
     private val clublikeAdapter by lazy { ClubLikeAdapter(clubLikeListener) }
     private val clubLikeListener = object : ClubLikeAdapter.EventListener {
-        override fun onDetail(item: ClubFollowItem) {
-            viewModel.getClub(item.clubId)
+        override fun onDetail(item: MemberPostItem) {
+//            viewModel.getClub(item.clubId)
         }
 
         override fun onGetAttachment(id: Long, view: ImageView) {
@@ -56,9 +57,9 @@ class LikeFragment : BaseFragment() {
 
     private val mimilikeAdapter by lazy { MiMiLikeAdapter(mimiLikeListener) }
     private val mimiLikeListener = object : MiMiLikeAdapter.EventListener {
-        override fun onDetail(item: MemberFollowItem) {
+        override fun onDetail(item: MemberPostItem) {
             val bundle = MyPostFragment.createBundle(
-                item.userId, item.friendlyName,
+                item.creatorId, item.title,
                 isAdult = true,
                 isAdultTheme = true
             )
@@ -95,13 +96,13 @@ class LikeFragment : BaseFragment() {
         viewModel.clubDetail.observe(this, Observer {
             when (it) {
                 is Success -> {
-                    val bundle = TopicDetailFragment.createBundle(it.result)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_myFollowFragment_to_topicDetailFragment,
-                            bundle
-                        )
-                    )
+//                    val bundle = TopicDetailFragment.createBundle(it.result)
+//                    navigateTo(
+//                        NavigateItem.Destination(
+//                            R.id.action_myFollowFragment_to_topicDetailFragment,
+//                            bundle
+//                        )
+//                    )
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -270,7 +271,8 @@ class LikeFragment : BaseFragment() {
                     clublikeAdapter.submitData(PagingData.empty())
                     viewModel.getClubList()
                         .collectLatest {
-                            clublikeAdapter.submitData(it)
+                            //FIXME
+//                            clublikeAdapter.submitData(it)
                         }
                 }
             }
