@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.observe
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -22,6 +23,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -190,7 +192,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     }
 
     private val postListener = object : MyPostListener {
-
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             checkStatus { viewModel.likePost(item, position, isLike) }
         }
@@ -257,6 +258,33 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
                 it as MemberPostItem
+
+                val bundle = Bundle()
+                item.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+
+                when (it.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                            R.id.action_clubTabFragment_to_postArticleFragment,
+                            bundle
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                            R.id.action_clubTabFragment_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                            R.id.action_clubTabFragment_to_postVideoFragment,
+                            bundle
+                        )
+                    }
+                }
             }
         }
 

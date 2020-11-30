@@ -8,32 +8,34 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClubFollowViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClubLikeViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
 
 class ClubLikeAdapter(
     val listener: EventListener
-) : PagingDataAdapter<ClubFollowItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<PostFavoriteItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         private const val VIEW_TYPE_NORMAL = 0
         private const val VIEW_TYPE_DELETED = 1
 
-        private val diffCallback = object : DiffUtil.ItemCallback<ClubFollowItem>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<PostFavoriteItem>() {
             override fun areItemsTheSame(
-                oldItem: ClubFollowItem,
-                newItem: ClubFollowItem
+                oldItem: PostFavoriteItem,
+                newItem: PostFavoriteItem
             ): Boolean = oldItem.id == newItem.id
 
             override fun areContentsTheSame(
-                oldItem: ClubFollowItem,
-                newItem: ClubFollowItem
+                oldItem: PostFavoriteItem,
+                newItem: PostFavoriteItem
             ): Boolean = oldItem == newItem
         }
     }
 
     interface EventListener {
-        fun onDetail(item: ClubFollowItem)
+        fun onDetail(item: PostFavoriteItem)
         fun onGetAttachment(id: Long, view:ImageView)
         fun onCancelFollow(clubId: Long, position: Int)
     }
@@ -52,7 +54,7 @@ class ClubLikeAdapter(
         return when (viewType) {
             VIEW_TYPE_NORMAL -> ClubLikeViewHolder(
                 LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_follow_club, parent, false), listener
+                    .inflate(R.layout.item_clip_post, parent, false), listener
             )
             else -> DeletedItemViewHolder(
                 LayoutInflater.from(parent.context).inflate(R.layout.item_deleted, parent, false)
@@ -63,7 +65,7 @@ class ClubLikeAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is ClubFollowViewHolder -> holder.bind(item, position)
+            is ClubLikeViewHolder -> holder.bind(item, position)
         }
     }
 

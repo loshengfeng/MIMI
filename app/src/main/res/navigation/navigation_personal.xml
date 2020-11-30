@@ -58,6 +58,10 @@
         <action
             android:id="@+id/action_to_inviteVipFragment"
             app:destination="@id/inviteVipFragment" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_favoriteFragment"
+            app:destination="@id/myfavoriteFragment" />
     </fragment>
 
     <fragment
@@ -122,6 +126,11 @@
         android:id="@+id/topUpFragment"
         android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
         android:label="TopUpFragment" />
+
+    <fragment
+        android:id="@+id/myfavoriteFragment"
+        android:name="com.dabenxiang.mimi.view.favroite.FavoriteFragment"
+        android:label="FavoriteFragment" />
     <fragment
         android:id="@+id/myFollowFragmentV2"
         android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragmentV2"

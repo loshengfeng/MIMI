@@ -11,7 +11,8 @@ import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.NO_DATA
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_CLUB
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_MEMBER
-import kotlinx.android.synthetic.main.view_my_follow_pager_content.view.*
+import kotlinx.android.synthetic.main.layout_my_follow_content.view.*
+
 
 class MyFollowViewPagerAdapter(
     val context: Context,
@@ -25,7 +26,7 @@ class MyFollowViewPagerAdapter(
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.view_my_follow_pager_content, container, false)
+            .inflate(R.layout.layout_my_follow_content, container, false)
 
         view.rv_content.adapter = when (position) {
             TYPE_MEMBER -> memberFollowAdapter
@@ -80,17 +81,14 @@ class MyFollowViewPagerAdapter(
         return view == obj
     }
 
-    override fun getCount() = 2
+    override fun getCount() = context.resources.getStringArray(R.array.follow_tabs).size
 
     override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
         container.removeView(obj as View)
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return when (position) {
-            TYPE_MEMBER -> context.getString(R.string.follow_people)
-            TYPE_CLUB -> context.getString(R.string.follow_circle)
-            else -> null
-        }
+        val tabs = context.resources.getStringArray(R.array.follow_tabs)
+        return tabs[position]
     }
 }

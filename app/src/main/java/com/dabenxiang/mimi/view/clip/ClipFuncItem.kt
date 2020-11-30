@@ -12,6 +12,7 @@ data class ClipFuncItem(
     val onFavoriteClick: ((VideoItem, Int, Boolean) -> Unit) = { _, _, _ -> },
     val onLikeClick: ((VideoItem, Int, Boolean) -> Unit) = { _, _, _ -> },
     val onCommentClick: ((VideoItem) -> Unit) = { _ -> },
+    val onMoreClick: ((VideoItem) -> Unit) = { _ -> },
     val onPlayerError: ((String, String) -> Unit) = { _, _ -> },
     val onVipClick: (() -> Unit) = {},
     val onPromoteClick: (() -> Unit) = {},

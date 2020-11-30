@@ -32,6 +32,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
@@ -142,8 +143,36 @@ class SearchPostFragment : BaseFragment() {
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
-                //todo
                 it as MemberPostItem
+
+                val searchPostItem = SearchPostItem(searchType, searchOrderBy, searchTag, searchKeyword)
+                val bundle = Bundle()
+                item.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.SEARCH)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                bundle.putSerializable(KEY_DATA, searchPostItem)
+
+                when(it.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                            R.id.action_searchPostFragment_to_postArticleFragment,
+                            bundle
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                            R.id.action_searchPostFragment_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                            R.id.action_searchPostFragment_to_postVideoFragment,
+                            bundle
+                        )
+                    }
+                }
             }
         }
 
@@ -466,6 +495,33 @@ class SearchPostFragment : BaseFragment() {
             viewModel.getSearchPostAllResult(searchType, keyword, tag, searchOrderBy)
                 .collectLatest { adapter.submitData(it) }
         }
+    }
+
+    override fun navigationToText(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_searchPostFragment_to_clubTextFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToPicture(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_searchPostFragment_to_clubPicFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToClip(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_searchPostFragment_to_clipPlayerFragment,
+                bundle
+            )
+        )
     }
 
 }

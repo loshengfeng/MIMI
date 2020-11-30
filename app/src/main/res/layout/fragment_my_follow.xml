@@ -36,20 +36,7 @@
         app:tabRippleColor="@color/transparent"
         app:tabSelectedTextColor="@color/color_black_1"
         app:tabTextAppearance="@style/favorite_tab_item_text"
-        app:tabTextColor="@color/color_black_1_50">
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_people"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/follow_people" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_circle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/follow_circle" />
-    </com.google.android.material.tabs.TabLayout>
+        app:tabTextColor="@color/color_black_1_50"/>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp"
