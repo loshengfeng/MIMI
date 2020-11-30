@@ -32,6 +32,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -515,7 +516,10 @@ class SearchPostFragment : BaseFragment() {
         )
     }
 
-    override fun navigationToClip(bundle: Bundle) {
+    override fun navigationToClip(b: Bundle) {
+        val item = arguments?.get(MEMBER_DATA) as MemberPostItem
+        val bundle = ClipPlayerFragment.createBundle(item.id)
+
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_searchPostFragment_to_clipPlayerFragment,
