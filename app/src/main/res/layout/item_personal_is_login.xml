@@ -8,12 +8,12 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/tv_follow"
+        android:id="@+id/tv_favorite"
         style="@style/personalStyle"
         android:gravity="center_vertical"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:text="@string/personal_follow"
+        android:text="@string/favorite_title"
         android:textColor="@color/color_black_1"
         android:textSize="14sp"
         app:drawableEndCompat="@drawable/btn_arrow_black_n"
@@ -27,9 +27,9 @@
         android:layout_height="1dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        app:layout_constraintEnd_toEndOf="@id/tv_follow"
-        app:layout_constraintStart_toStartOf="@id/tv_follow"
-        app:layout_constraintTop_toBottomOf="@id/tv_follow" />
+        app:layout_constraintEnd_toEndOf="@id/tv_favorite"
+        app:layout_constraintStart_toStartOf="@id/tv_favorite"
+        app:layout_constraintTop_toBottomOf="@id/tv_favorite" />
 
     <TextView
         android:id="@+id/tv_topup_history"
@@ -41,7 +41,7 @@
         app:drawableEndCompat="@drawable/btn_arrow_black_n"
         app:drawableStartCompat="@drawable/btn_note_n"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_follow" />
+        app:layout_constraintTop_toBottomOf="@id/tv_favorite" />
 
     <View
         android:layout_width="0dp"

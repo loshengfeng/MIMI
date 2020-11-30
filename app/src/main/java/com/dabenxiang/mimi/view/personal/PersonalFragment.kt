@@ -206,10 +206,11 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value =
                     R.id.navigation_topup
 
-                R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+                R.id.tv_favorite-> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_favoriteFragment))
+
                 R.id.follow_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
-                R.id.tv_follow-> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+
 
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
 //                R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
@@ -298,10 +299,11 @@ class PersonalFragment : BaseFragment() {
             fans_count.setOnClickListener(it)
             fans.setOnClickListener(it)
 
-            tv_follow.setOnClickListener(it)
+
             follow_count.setOnClickListener(it)
             follow.setOnClickListener(it)
-            tv_follow.setOnClickListener(it)
+
+            tv_favorite.setOnClickListener(it)
 
             tv_topup_history.setOnClickListener(it)
         }
