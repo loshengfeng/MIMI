@@ -25,6 +25,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -278,13 +279,13 @@ class ClubPostFollowFragment : BaseFragment() {
                     )
                 }
                 AdultTabType.CLIP -> {
-                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
-//                    navigateTo(
-//                            NavigateItem.Destination(
-//                                    R.id.action_myPostFragment_to_clipFragment,
-//                                    bundle
-//                            )
-//                    )
+                    val bundle = ClipPlayerFragment.createBundle(item.id)
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_clubTabFragment_to_clipPlayerFragment,
+                                    bundle
+                            )
+                    )
                 }
                 else -> {
                 }
