@@ -612,9 +612,10 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getPlaylist(
         playlistType: Int,
         isAdult: Boolean,
+        isShortVideo: Boolean,
         offset: String,
         limit: String
-    ) = apiService.getPlaylist(playlistType, isAdult, offset, limit)
+    ) = apiService.getPlaylist(playlistType, isAdult, isShortVideo, offset, limit)
 
     /**
      * 取得我的帖子收藏 1:postText, 2:postPic , 3:PostShortVideo , 7:postOther, 8:postLongVideoSmallVideo

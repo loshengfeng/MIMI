@@ -465,6 +465,7 @@ interface ApiService {
     suspend fun getPlaylist(
         @Path("playlistType") playlistType: Int,
         @Query("isAdult") isAdult: Boolean,
+        @Query("isShortVideo") isShortVideo: Boolean,
         @Query("offset") offset: String,
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<List<PlayItem>>>
