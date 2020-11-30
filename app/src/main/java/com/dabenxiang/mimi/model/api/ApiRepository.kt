@@ -620,19 +620,19 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得我的帖子收藏 1:postText, 2:postPic , 3:PostShortVideo , 7:postOther, 8:postLongVideoSmallVideo
      */
     suspend fun getPostFavorite(
-        offset: String,
-        limit: String,
+        offset: Long,
+        limit: Int,
         postType: Int = 1,
     ) = apiService.getPostFavorite(offset, limit, postType)
 
     suspend fun getPostVideoFavorite(
-        offset: String,
-        limit: String
+        offset: Long,
+        limit: Int
     ) = apiService.getPostFavorite(offset, limit, 8)
 
     suspend fun getPostOtherFavorite(
-        offset: String,
-        limit: String
+        offset: Long,
+        limit: Int
     ) = apiService.getPostFavorite(offset, limit, 7)
 
     /**

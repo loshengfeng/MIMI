@@ -18,7 +18,7 @@ class FavoritePostListDataSource constructor(
 ) : PageKeyedDataSource<Long, Any>() {
 
     companion object {
-        const val PER_LIMIT = "10"
+        const val PER_LIMIT = 10
         val PER_LIMIT_LONG = PER_LIMIT.toLong()
     }
 
@@ -30,7 +30,7 @@ class FavoritePostListDataSource constructor(
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getPostFavorite("0", PER_LIMIT)
+                val result = domainManager.getApiRepository().getPostFavorite(0, PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 result.body()?.also { item ->
                     val postListItems = ArrayList<MemberPostItem>()
@@ -81,7 +81,7 @@ class FavoritePostListDataSource constructor(
         val next = params.key
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getPostFavorite(next.toString(), PER_LIMIT)
+                val result = domainManager.getApiRepository().getPostFavorite(next, PER_LIMIT)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
