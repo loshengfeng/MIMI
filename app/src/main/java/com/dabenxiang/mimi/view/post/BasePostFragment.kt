@@ -79,6 +79,7 @@ open class BasePostFragment : BaseFragment() {
         const val MY_POST = "my_post"
         const val SEARCH = "search"
         const val CLUB = "club"
+        const val TAB = "tab"
     }
 
     override val bottomNavigationVisibility: Int

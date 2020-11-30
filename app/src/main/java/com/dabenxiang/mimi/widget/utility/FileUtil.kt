@@ -19,6 +19,7 @@ import timber.log.Timber
 import tw.gov.president.manager.submanager.update.APKDownloaderManager
 import java.io.*
 import java.nio.charset.StandardCharsets
+import java.util.zip.ZipInputStream
 
 
 object FileUtil {
@@ -285,6 +286,28 @@ object FileUtil {
     private fun toastForDebug(context: Context, msg: String) {
         if (BuildConfig.DEBUG) {
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun unzipSourceToFile(output: ByteArray): String {
+       return File.createTempFile("dbx", ".m3u8").also { file ->
+            ZipInputStream(ByteArrayInputStream(output)).use { inputStream ->
+                var zipEntry = inputStream.nextEntry
+                while (zipEntry != null) {
+                    FileOutputStream(file).use { fout ->
+                        val buf = ByteArray(8192)
+                        var len = inputStream.read(buf)
+                        while (len != -1) {
+                            fout.write(buf, 0, len)
+                            len = inputStream.read(buf)
+                        }
+                        inputStream.closeEntry()
+                    }
+                    zipEntry = inputStream.nextEntry
+                }
+            }
+        }.run {
+            absolutePath
         }
     }
 }

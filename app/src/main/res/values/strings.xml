@@ -146,7 +146,7 @@
     <string name="personal_not_login_tips_3">若尚未成为会员，赶紧注册体验更多内容</string>
     <string name="personal_topup_page">充值</string>
     <string name="personal_topup">充值去 ></string>
-    <string name="personal_follow">我的关注</string>
+    <string name="personal_follow">我的收藏</string>
     <string name="personal_order">充值管理</string>
     <string name="personal_topup_now">现在充值去</string>
     <string name="personal_my_post">我的帖子</string>
@@ -247,6 +247,9 @@
 
     <!-- Follow -->
     <string name="follow_title">我的关注</string>
+    <string name="follow_tab_mimi_video">蜜蜜影视</string>
+    <string name="follow_tab_small_video">小视频</string>
+    <string name="follow_tab_post">帖子</string>
     <string name="follow_people">关注的人</string>
     <string name="follow_circle">关注的圈子</string>
     <string-array name="follow_tabs">
@@ -561,4 +564,6 @@
 
     <string name="error_server">服务器遇到了点意外!</string>
 
+    <string name="great">赞</string>
+    <string name="boo">踩</string>
 </resources>

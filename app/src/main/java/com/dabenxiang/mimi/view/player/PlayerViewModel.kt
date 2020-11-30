@@ -224,9 +224,9 @@ class PlayerViewModel : BaseViewModel() {
                 withContext(Dispatchers.IO) {
                     when (it) {
                         is DownloadResult.Success -> {
-                            if (Uri.parse((it.url)).isHierarchical) {
-                                Timber.d("download success file path ${it.url}")
-                                nextVideoUrl = it.url
+                            if (Uri.parse(((it.data as String))).isHierarchical) {
+                                Timber.d("download success file path ${it.data}")
+                                nextVideoUrl = it.data
                             }
                         }
                         is DownloadResult.Error -> {

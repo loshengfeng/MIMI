@@ -215,6 +215,15 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
         }
     }
 
+    fun stopPlay() {
+        player?.stop()
+        player?.clearVideoDecoderOutputBufferRenderer()
+    }
+
+    fun sendVideoReport() {
+        playerViewModel.sendVideoReport(contentId)
+    }
+
     /**
      *  init player
      */
@@ -469,7 +478,7 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
                 //showErrorDialog("UNKNOWN")
             }
         }
-        playerViewModel.sendVideoReport(contentId)
+        sendVideoReport()
     }
 
     /**
