@@ -21,7 +21,9 @@ class SearchPostAdapter(
     val context: Context,
     private val myPostListener: MyPostListener,
     private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
-    private val attachmentListener: AttachmentListener
+    private val attachmentListener: AttachmentListener,
+    private val getSearchText: () -> String,
+    private val getSearchTag: () -> String
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         const val VIEW_TYPE_CLIP = 0
@@ -110,7 +112,9 @@ class SearchPostAdapter(
                         null,
                         position,
                         myPostListener,
-                        attachmentListener
+                        attachmentListener,
+                        getSearchText.invoke(),
+                        getSearchTag.invoke()
                     )
                 }
                 is MyPostPicturePostHolder -> {
@@ -121,11 +125,21 @@ class SearchPostAdapter(
                         position,
                         myPostListener,
                         attachmentListener,
-                        memberPostFuncItem
+                        memberPostFuncItem,
+                        getSearchText.invoke(),
+                        getSearchTag.invoke()
                     )
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(it, null, position, myPostListener, attachmentListener)
+                    holder.onBind(
+                        it,
+                        null,
+                        position,
+                        myPostListener,
+                        attachmentListener,
+                        getSearchText.invoke(),
+                        getSearchTag.invoke()
+                    )
                 }
             }
         }

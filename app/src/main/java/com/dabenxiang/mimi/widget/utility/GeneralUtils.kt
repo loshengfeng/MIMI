@@ -11,13 +11,18 @@ import android.content.pm.PackageInstaller
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem
@@ -336,5 +341,26 @@ object GeneralUtils {
         val clipData = clipboard.primaryClip
         val clipDataItem = clipData?.getItemAt(0)
         return clipDataItem?.text.toString()
+    }
+
+    fun getSpanString(context: Context, text: String, keyword: String): SpannableString {
+        if (keyword.isBlank()) return SpannableString(text)
+        val result = SpannableString(text)
+        var index = text.toLowerCase().indexOf(keyword.toLowerCase())
+        while (index != -1) {
+            result.setSpan(
+                ForegroundColorSpan(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.color_red_1
+                    )
+                ),
+                index,
+                index + keyword.length,
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+            )
+            index = text.toLowerCase().indexOf(keyword.toLowerCase(), index + keyword.length)
+        }
+        return result
     }
 }
