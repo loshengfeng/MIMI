@@ -244,6 +244,24 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Post
      *
      ***********************************************************/
+    suspend fun searchPostAll(
+        type: PostType,
+        keyword: String? = null,
+        tag: String? = null,
+        orderBy: StatisticsOrderType = StatisticsOrderType.LATEST,
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(
+            type = type.value,
+            keyword = keyword,
+            tag = tag,
+            orderBy = orderBy.value,
+            offset = offset,
+            limit = limit
+        )
+    }
+
     suspend fun getMembersPost(
         type: PostType,
         orderBy: OrderBy,
@@ -619,7 +637,17 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getPostFollow(
         offset: Int,
         limit: Int
-    ) = apiService.getPostFollow(offset, limit)
+    ) = apiService.getPostFollow(offset = offset, limit = limit)
+
+    /**
+     * 搜尋我關注的所有帖子
+     */
+    suspend fun searchPostFollow(
+        keyword: String? = null,
+        tag: String? = null,
+        offset: Int,
+        limit: Int
+    ) = apiService.getPostFollow(keyword = keyword, tag = tag, offset = offset, limit = limit)
 
     /**
      * 取得使用者資訊明細

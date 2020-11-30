@@ -56,7 +56,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         itemList: List<MemberPostItem>?,
         position: Int,
         adultListener: AdultListener,
-        tag: String,
+        tag: String?,
         memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
     ) {
         name.text = item.postFriendlyName
@@ -74,7 +74,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            if (TextUtils.isEmpty(tag)) {
+            if (tag == null || TextUtils.isEmpty(tag)) {
                 chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             } else {
                 if (it == tag) {

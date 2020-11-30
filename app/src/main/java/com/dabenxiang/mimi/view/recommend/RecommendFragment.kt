@@ -93,7 +93,7 @@ class RecommendFragment(
                 // TODO: 跳至播放頁面
                 when (thirdMenuItem.name) {
                     getString(R.string.recommend_today) -> navToRanking()
-                    else -> navToCategory(thirdMenuItem.category, thirdMenuItem.orderByType)
+                    else -> navToCategory(thirdMenuItem.category)
                 }
                 Timber.d("OnMore Click Category: ${thirdMenuItem.category}")
             }
@@ -111,10 +111,9 @@ class RecommendFragment(
     }
 
     private fun navToCategory(
-        category: String = "",
-        orderByType: Int = StatisticsOrderType.LATEST.value
+        category: String = ""
     ) {
-        val bundle = CategoriesFragment.createBundle(category, orderByType)
+        val bundle = CategoriesFragment.createBundle(category = category)
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_to_categoriesFragment,

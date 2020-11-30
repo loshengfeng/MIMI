@@ -18,7 +18,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 class MemberPostPagedAdapter(
     val context: Context,
     private val adultListener: AdultListener,
-    private var mTag: String = "",
+    private var mTag: String?= null,
     private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
     private val isClipList: Boolean = false
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
@@ -191,7 +191,7 @@ class MemberPostPagedAdapter(
         }
     }
 
-    fun setupTag(tag: String) {
+    fun setupTag(tag: String?) {
         mTag = tag
     }
 }

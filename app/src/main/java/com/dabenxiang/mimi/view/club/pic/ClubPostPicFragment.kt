@@ -151,12 +151,15 @@ class ClubPostPicFragment : BaseFragment() {
             getData()
         }
 
-        adapter = ClubLatestAdapter(requireContext(),
+        adapter = ClubLatestAdapter(
+            requireContext(),
             false,
             postListener,
             attachmentListener,
-            memberPostFuncItem)
-        recycler_view.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            memberPostFuncItem
+        )
+        recycler_view.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recycler_view.adapter = adapter
     }
 
@@ -206,7 +209,7 @@ class ClubPostPicFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type, tag)
+            val item = SearchPostItem(type = type, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
@@ -273,7 +276,6 @@ class ClubPostPicFragment : BaseFragment() {
             )
         }
     }
-
 
 
     private val memberPostFuncItem by lazy {

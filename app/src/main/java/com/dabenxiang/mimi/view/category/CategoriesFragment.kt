@@ -30,6 +30,7 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_categories.*
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -41,7 +42,7 @@ class CategoriesFragment : BaseFragment() {
         const val SORT = 0
         const val CATEGORY = 1
 
-        fun createBundle(category: String, orderByType: Int): Bundle {
+        fun createBundle(category: String, orderByType: Int = StatisticsOrderType.LATEST.value): Bundle {
             return Bundle().also {
                 it.putString(KEY_CATEGORY, category)
                 it.putInt(KEY_ORDER_BY, orderByType)
@@ -259,7 +260,14 @@ class CategoriesFragment : BaseFragment() {
     }
 
     private fun getVideos() {
-        viewModel.getVideoFilterList(category, orderByType)
+        lifecycleScope.launch {
+            videoListAdapter.submitData(PagingData.empty())
+            viewModel.getVideo(category, orderByType)
+                .collectLatest {
+                    layout_refresh.isRefreshing = false
+                    videoListAdapter.submitData(it)
+                }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -355,7 +363,7 @@ class CategoriesFragment : BaseFragment() {
     private fun adjustContentRV(notEmptyCount: Int) {
         rv_video.setPadding(
             0,
-            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount,
+            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount + GeneralUtils.dpToPx(requireContext(), 15),
             0,
             0
         )
@@ -377,7 +385,7 @@ class CategoriesFragment : BaseFragment() {
         )
     }
 
-    private fun navToPlayer(item: PlayerItem){
+    private fun navToPlayer(item: PlayerItem) {
         val bundle = PlayerV2Fragment.createBundle(item)
         navigateTo(
             NavigateItem.Destination(
