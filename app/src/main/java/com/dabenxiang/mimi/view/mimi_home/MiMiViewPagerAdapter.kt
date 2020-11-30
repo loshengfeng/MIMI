@@ -1,8 +1,6 @@
 package com.dabenxiang.mimi.view.mimi_home
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
 import com.dabenxiang.mimi.model.enums.LayoutType
@@ -24,7 +22,7 @@ class MiMiViewPagerAdapter(
         return when (item.type) {
             LayoutType.RECOMMEND -> RecommendFragment(item.menus)
             LayoutType.ACTOR -> ActorFragment()
-            else -> GeneralVideoFragment(item.category, item.orderByType)
+            else -> GeneralVideoFragment(item.category)
         }
     }
 }

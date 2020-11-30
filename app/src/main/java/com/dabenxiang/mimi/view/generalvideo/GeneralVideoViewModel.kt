@@ -13,16 +13,15 @@ import kotlinx.coroutines.flow.Flow
 
 class GeneralVideoViewModel : BaseViewModel() {
 
-    fun getVideoByCategory(category: String, orderByType: Int): Flow<PagingData<StatisticsItem>> {
+    fun getVideoByCategory(category: String): Flow<PagingData<StatisticsItem>> {
         return Pager(
             config = PagingConfig(pageSize = NETWORK_PAGE_SIZE, enablePlaceholders = false),
             pagingSourceFactory = {
                 VideoPagingSource(
-                    domainManager,
-                    category,
-                    orderByType,
-                    adWidth,
-                    adHeight
+                    domainManager = domainManager,
+                    category = category,
+                    adWidth = adWidth,
+                    adHeight = adHeight
                 )
             }
         ).flow.cachedIn(viewModelScope)

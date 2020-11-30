@@ -42,7 +42,7 @@ class CategoriesFragment : BaseFragment() {
         const val SORT = 0
         const val CATEGORY = 1
 
-        fun createBundle(category: String, orderByType: Int): Bundle {
+        fun createBundle(category: String, orderByType: Int = StatisticsOrderType.LATEST.value): Bundle {
             return Bundle().also {
                 it.putString(KEY_CATEGORY, category)
                 it.putInt(KEY_ORDER_BY, orderByType)
