@@ -102,6 +102,14 @@ class PlayerV2Fragment: BasePlayerFragment() {
                 viewModel.m3u8SourceUrl = it
             }
         }
+
+        viewModel.stopVideoPlayer.observe(viewLifecycleOwner) {
+            stopPlay()
+        }
+
+        viewModel.sourceNotFound.observe(viewLifecycleOwner) {
+            sendVideoReport()
+        }
     }
 
     override fun getViewPagerCount(): Int {

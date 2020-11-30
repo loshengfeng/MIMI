@@ -61,6 +61,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         GuessLikeVideoAdapter(object : OnGarbageItemClick {
 
             override fun onStatisticsDetail(baseVideoItem: BaseVideoItem) {
+                viewModel.stopVideoPlayer.setNot()
                 viewModel.videoContentId = (baseVideoItem as BaseVideoItem.Video).id!!
                 viewModel.getVideoContent()
             }
