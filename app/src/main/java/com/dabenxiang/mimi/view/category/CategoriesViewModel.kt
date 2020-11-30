@@ -4,12 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.generalvideo.paging.VideoPagingSource
 import com.dabenxiang.mimi.view.home.video.VideoDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -18,39 +20,20 @@ import retrofit2.HttpException
 
 class CategoriesViewModel : BaseViewModel() {
 
-    private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
-    val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
-
     private val _getCategoryResult = MutableLiveData<ApiResult<ArrayList<String>>>()
     val getCategoryResult: LiveData<ApiResult<ArrayList<String>>> = _getCategoryResult
 
-    private val _onTotalCountResult = MutableLiveData<Long>()
-    val onTotalCountResult: LiveData<Long> = _onTotalCountResult
-
-    fun getVideoFilterList(
+    fun getVideo(
         category: String?,
-        sorting: Int
-    ) {
-        viewModelScope.launch {
-            val dataSrc =
-                CategoriesDataSource(
-                    orderByType = sorting,
-                    category = category,
-                    viewModelScope = viewModelScope,
-                    domainManager = domainManager,
-                    pagingCallback = pagingCallback,
-                    adWidth = adWidth,
-                    adHeight = adHeight
-                )
-            val factory = CategoriesFactory(dataSrc)
-            val config = PagedList.Config.Builder()
-                .setPageSize(VideoDataSource.PER_LIMIT.toInt())
-                .build()
-
-            LivePagedListBuilder(factory, config).build().asFlow().collect {
-                _videoList.postValue(it)
-            }
-        }
+        orderByType: Int
+    ): Flow<PagingData<StatisticsItem>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = ApiRepository.NETWORK_PAGE_SIZE,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { VideoPagingSource(domainManager, category, orderByType, adWidth, adHeight) }
+        ).flow.cachedIn(viewModelScope)
     }
 
     fun getCategory() {
@@ -69,23 +52,6 @@ class CategoriesViewModel : BaseViewModel() {
                 .onCompletion { setShowProgress(false) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _getCategoryResult.value = it }
-        }
-    }
-
-    val pagingCallback = object : PagingCallback {
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-        }
-
-        override fun onTotalCount(count: Long) {
-            _onTotalCountResult.postValue(count)
         }
     }
 }
