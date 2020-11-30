@@ -11,7 +11,8 @@ import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.NO_DATA
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_CLUB
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_MEMBER
-import kotlinx.android.synthetic.main.view_my_follow_pager_content.view.*
+import kotlinx.android.synthetic.main.layout_my_follow_content.view.*
+
 
 class MyFollowViewPagerAdapter(
     val context: Context,

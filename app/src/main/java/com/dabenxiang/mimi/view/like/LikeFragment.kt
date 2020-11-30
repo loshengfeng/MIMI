@@ -14,7 +14,7 @@ import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.ClubLikeAdapter
-import com.dabenxiang.mimi.view.adapter.MemberLikeAdapter
+import com.dabenxiang.mimi.view.adapter.MiMiLikeAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
@@ -27,7 +27,6 @@ import kotlinx.android.synthetic.main.item_setting_bar.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 class LikeFragment : BaseFragment() {
@@ -55,8 +54,8 @@ class LikeFragment : BaseFragment() {
         }
     }
 
-    private val memberLikeAdapter by lazy { MemberLikeAdapter(memberLikeListener) }
-    private val memberLikeListener = object : MemberLikeAdapter.EventListener {
+    private val mimilikeAdapter by lazy { MiMiLikeAdapter(mimiLikeListener) }
+    private val mimiLikeListener = object : MiMiLikeAdapter.EventListener {
         override fun onDetail(item: MemberFollowItem) {
             val bundle = MyPostFragment.createBundle(
                 item.userId, item.friendlyName,
@@ -138,15 +137,15 @@ class LikeFragment : BaseFragment() {
                 is Loading -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, true)
                 is Loaded -> vpAdapter?.changeIsRefreshing(layout_tab.selectedTabPosition, false)
                 is Success -> {
-                    memberLikeAdapter.removedPosList.add(it.result)
-                    memberLikeAdapter.notifyItemChanged(it.result)
+                    mimilikeAdapter.removedPosList.add(it.result)
+                    mimilikeAdapter.notifyItemChanged(it.result)
                 }
                 is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.cleanMemberRemovedPosList.observe(this, Observer {
-            memberLikeAdapter.removedPosList.clear()
+            mimilikeAdapter.removedPosList.clear()
         })
     }
 
@@ -214,7 +213,7 @@ class LikeFragment : BaseFragment() {
                 getData()
             }
         })
-        memberLikeAdapter.addLoadStateListener { loadState ->
+        mimilikeAdapter.addLoadStateListener { loadState ->
             handleLoadState(loadState.refresh)
             handleLoadState(loadState.append)
         }
@@ -224,7 +223,7 @@ class LikeFragment : BaseFragment() {
         }
         vpAdapter = LikeViewPagerAdapter(
             requireContext(),
-            memberLikeAdapter,
+            mimilikeAdapter  ,
             clublikeAdapter
         ) {
             getData()
@@ -261,10 +260,10 @@ class LikeFragment : BaseFragment() {
         job = lifecycleScope.launch {
             when (layout_tab.selectedTabPosition) {
                 TYPE_POST -> {
-                    memberLikeAdapter.submitData(PagingData.empty())
+                    mimilikeAdapter.submitData(PagingData.empty())
                     viewModel.getMemberList()
                         .collectLatest {
-                            memberLikeAdapter.submitData(it)
+                            mimilikeAdapter.submitData(it)
                         }
                 }
                 TYPE_MIMI -> {

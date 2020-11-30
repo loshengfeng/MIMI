@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
 import com.dabenxiang.mimi.view.adapter.ClubLikeAdapter
-import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
-import com.dabenxiang.mimi.view.adapter.MemberLikeAdapter
+import com.dabenxiang.mimi.view.adapter.MiMiLikeAdapter
 import com.dabenxiang.mimi.view.like.LikeFragment.Companion.NO_DATA
 import com.dabenxiang.mimi.view.like.LikeFragment.Companion.TYPE_MIMI
 import com.dabenxiang.mimi.view.like.LikeFragment.Companion.TYPE_POST
@@ -17,8 +15,8 @@ import kotlinx.android.synthetic.main.layout_my_like_content.view.*
 
 class LikeViewPagerAdapter(
     val context: Context,
-    private val memberFollowAdapter: MemberLikeAdapter,
-    private val clubFollowAdapter: ClubLikeAdapter,
+    private val mimilikeAdapter: MiMiLikeAdapter,
+    private val clublikeAdapter: ClubLikeAdapter,
     val onSwipeRefresh: () -> Unit
 ) : PagerAdapter() {
 
@@ -30,8 +28,8 @@ class LikeViewPagerAdapter(
             .inflate(R.layout.layout_my_like_content, container, false)
 
         view.rv_content.adapter = when (position) {
-            TYPE_MIMI -> memberFollowAdapter
-            TYPE_POST -> clubFollowAdapter
+            TYPE_MIMI -> mimilikeAdapter
+            TYPE_POST -> clublikeAdapter
             else -> null
         }
 
