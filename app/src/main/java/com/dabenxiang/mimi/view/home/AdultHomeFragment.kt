@@ -372,7 +372,7 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun navigationToText(bundle: Bundle) {
+    override fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_adultHomeFragment_to_textDetailFragment,
@@ -381,7 +381,7 @@ class AdultHomeFragment : BaseFragment() {
         )
     }
 
-    private fun navigationToPicture(bundle: Bundle) {
+    override fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_adultHomeFragment_to_pictureDetailFragment,
@@ -390,7 +390,7 @@ class AdultHomeFragment : BaseFragment() {
         )
     }
 
-    private fun navigationToClip(bundle: Bundle) {
+    override fun navigationToClip(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_adultHomeFragment_to_clipFragment,

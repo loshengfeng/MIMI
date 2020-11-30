@@ -207,6 +207,7 @@
     <string name="btn_register">注册</string>
     <string name="btn_send">送出</string>
     <string name="btn_login">登录</string>
+    <string name="btn_retry">重试</string>
     <string name="login_name">请填写名称</string>
     <string name="login_email">请填写Email</string>
     <string name="login_mobile">请填写手机号</string>
@@ -231,6 +232,10 @@
     <string name="follow_title">我的关注</string>
     <string name="follow_people">关注的人</string>
     <string name="follow_circle">关注的圈子</string>
+    <string-array name="follow_tabs">
+        <item>@string/follow_people</item>
+        <item>@string/follow_circle</item>
+    </string-array>
     <string name="follow_members_total_num">全部关注%s人</string>
     <string name="follow_clubs_total_num">全部关注%s圈子</string>
     <string name="follow_clean">清除</string>
@@ -297,6 +302,13 @@
 
     <!-- like -->
     <string name="like">喜欢</string>
+    <string name="like_title">我喜欢</string>
+    <string name="like_tab1">帖子</string>
+    <string name="like_tab2">蜜蜜影視</string>
+    <string-array name="like_tabs">
+        <item>@string/like_tab1</item>
+        <item>@string/like_tab2</item>
+    </string-array>
     <!-- fans -->
     <string name="fans">粉丝</string>
     <string name="total_count_fans">全部粉丝%s人</string>
@@ -520,6 +532,8 @@
     <string name="empty_video">目前尚无影片</string>
     <string name="load_video">影片载入中...</string>
     <string name="error_video">影片载入失敗</string>
+
+    <string name="error_server">服务器遇到了点意外!</string>
 
     <string name="great">赞</string>
     <string name="boo">踩</string>

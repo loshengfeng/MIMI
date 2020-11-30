@@ -18,10 +18,12 @@ class GeneralVideoViewModel : BaseViewModel() {
             config = PagingConfig(pageSize = NETWORK_PAGE_SIZE, enablePlaceholders = false),
             pagingSourceFactory = {
                 VideoPagingSource(
-                    domainManager = domainManager,
-                    category = category,
-                    adWidth = adWidth,
-                    adHeight = adHeight
+                        domainManager = domainManager,
+                        category = category,
+                        adWidth = adWidth,
+                        adHeight = adHeight,
+                        needAd = true
+
                 )
             }
         ).flow.cachedIn(viewModelScope)
