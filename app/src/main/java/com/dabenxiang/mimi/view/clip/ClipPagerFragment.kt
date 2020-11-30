@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.text.TextUtils
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
@@ -57,6 +58,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             when (loadStatus.refresh) {
                 is LoadState.Error -> {
                     Timber.e("refresh Error:${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                    progressHUD.dismiss()
+                    cl_error?.visibility = View.VISIBLE
                 }
                 is LoadState.Loading -> {
                     Timber.d("refresh Loading endOfPaginationReached:${(loadStatus.refresh as LoadState.Loading).endOfPaginationReached}")
@@ -65,6 +68,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 is LoadState.NotLoading -> {
                     Timber.d("refresh NotLoading endOfPaginationReached:${(loadStatus.refresh as LoadState.NotLoading).endOfPaginationReached}")
                     progressHUD.dismiss()
+                    cl_error?.visibility = View.GONE
                     takeIf { this@ClipPagerFragment.isVisible && adapter.itemCount > 0 }?.let {
                         adapter.getVideoItem(0)
                     }?.run {
@@ -195,6 +199,13 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     override fun resetObservers() {
         viewModel.resetLiveData()
+    }
+
+    override fun setupListeners() {
+        btn_retry.setOnClickListener {
+            progressHUD.show()
+            clipFuncItem.getClips(::setupClips)
+        }
     }
 
     private fun onPromoteClick() {
