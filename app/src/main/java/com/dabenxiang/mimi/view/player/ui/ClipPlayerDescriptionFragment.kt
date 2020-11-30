@@ -12,10 +12,12 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.item_ad.*
@@ -159,12 +161,12 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     }
 
     private fun searchVideo(tag: String) {
-        val bundle = SearchVideoFragment.createBundle(
-            tag = tag
+        val bundle = SearchPostFragment.createBundle(
+            SearchPostItem(PostType.VIDEO, tag = tag)
         )
         bundle.putBoolean(PlayerFragment.KEY_IS_FROM_PLAYER, true)
         findNavController().navigate(
-            R.id.action_playerFragment_to_searchVideoFragment,
+            R.id.action_clipPlayerFragment_to_searchPostFragment,
             bundle
         )
     }

@@ -1,10 +1,12 @@
-package com.dabenxiang.mimi.view.club.recommend
+package com.dabenxiang.mimi.view.club.item
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
+
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -15,19 +17,20 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import timber.log.Timber
 
-class ClubRecommendAdapter(
+class ClubItemAdapter(
         val context: Context,
-        private val isAdultTheme: Boolean,
         private val myPostListener: MyPostListener,
         private val attachmentListener: AttachmentListener,
         private val memberPostFuncItem: MemberPostFuncItem
-) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
+) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
         const val PAYLOAD_UPDATE_FAVORITE = 1
         const val PAYLOAD_UPDATE_FOLLOW = 2
+
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
@@ -51,25 +54,20 @@ class ClubRecommendAdapter(
         }
     }
 
-    val viewHolderMap = hashMapOf<Int, BaseViewHolder>()
-
     var removedPosList = ArrayList<Int>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(position)) {
-            VIEW_TYPE_DELETED
-        } else {
-            when (item?.type) {
-                PostType.VIDEO -> VIEW_TYPE_CLIP
-                PostType.IMAGE -> VIEW_TYPE_PICTURE
-                PostType.AD -> VIEW_TYPE_AD
-                else -> VIEW_TYPE_TEXT
-            }
+        return when (item?.type) {
+            PostType.VIDEO -> VIEW_TYPE_CLIP
+            PostType.IMAGE -> VIEW_TYPE_PICTURE
+            PostType.AD -> VIEW_TYPE_AD
+            else -> VIEW_TYPE_TEXT
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        Timber.d("neo = ${viewType}")
         return when (viewType) {
             VIEW_TYPE_AD -> {
                 AdHolder(
@@ -104,79 +102,41 @@ class ClubRecommendAdapter(
         }
     }
 
-    override fun onBindViewHolder(
-            holder: BaseViewHolder,
-            position: Int,
-            payloads: MutableList<Any>
-    ) {
-        viewHolderMap[position] = holder
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         item?.also {
             when (holder) {
-                is AdHolder->{
+                is AdHolder -> {
                     Glide.with(context).load(item.adItem?.href).into(holder.adImg)
                     holder.adImg.setOnClickListener {
                         GeneralUtils.openWebView(context, item.adItem?.target ?: "")
                     }
                 }
-                is MyPostClipPostHolder -> {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
-                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
-                        }
-                    } ?: run {
-                        holder.onBind(
-                                it,
-                                currentList,
-                                position,
-                                myPostListener,
-                                attachmentListener
-                        )
-                    }
-                }
+
                 is MyPostPicturePostHolder -> {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
-                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
-                        }
-                    } ?: run {
-                        holder.pictureRecycler.tag = position
-                        holder.onBind(
-                                it,
-                                currentList,
-                                position,
-                                myPostListener,
-                                attachmentListener,
-                                memberPostFuncItem
-                        )
-                    }
+                    holder.pictureRecycler.tag = position
+                    holder.onBind(
+                            it,
+                            null,
+                            position,
+                            myPostListener,
+                            attachmentListener,
+                            memberPostFuncItem
+                    )
+
                 }
                 is MyPostTextPostHolder -> {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
-                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
-                        }
-                    } ?: run {
-                        holder.onBind(it, currentList, position, myPostListener, attachmentListener)
-                    }
+                    holder.onBind(it, null, position, myPostListener, attachmentListener)
                 }
-            }
-        }
-    }
-
-    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-    }
-
-    fun updateInternalItem(holder: BaseViewHolder) {
-        when (holder) {
-            is PicturePostHolder -> {
-                holder.pictureRecycler.adapter?.notifyDataSetChanged()
+                is MyPostClipPostHolder -> {
+                    holder.onBind(
+                            it,
+                            null,
+                            position,
+                            myPostListener,
+                            attachmentListener
+                    )
+                }
             }
         }
     }

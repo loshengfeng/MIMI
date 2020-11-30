@@ -87,11 +87,17 @@ data class VideoEpisode(
     @SerializedName("episode")
     val episode: String? = "",
 
+    @SerializedName("episodePublishTime")
+    val episodePublishTime: String?,
+
     @SerializedName("id")
     val id: Long? = 0,
 
     @SerializedName("source")
     val source: String? = "",
+
+    @SerializedName("reported")
+    val reported: Boolean?,
 
     @SerializedName("videoStreams")
     val videoStreams: List<VideoStream>? = arrayListOf()

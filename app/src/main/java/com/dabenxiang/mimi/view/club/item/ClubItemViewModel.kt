@@ -1,52 +1,47 @@
-package com.dabenxiang.mimi.view.club.short
+package com.dabenxiang.mimi.view.club.item
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
 
-class ClubShortVideoViewModel : ClubViewModel() {
+class ClubItemViewModel : ClubViewModel() {
 
     private val _postCount = MutableLiveData<Int>()
     val postCount: LiveData<Int> = _postCount
 
     var totalCount: Int = 0
 
-    fun getData(adapter: ClubShortVideoAdapter) {
+    fun getData(adapter: ClubItemAdapter, type: ClubTabItemType) {
         Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())
-            getPostItemList()
+            getPostItemList(type)
                 .collectLatest {
                     adapter.submitData(it)
                 }
         }
     }
 
-    fun getPostItemList(): Flow<PagingData<MemberPostItem>> {
+    fun getPostItemList(type: ClubTabItemType): Flow<PagingData<MemberPostItem>> {
         return Pager(
-            config = PagingConfig(pageSize = ClubShortListDataSource.PER_LIMIT),
+            config = PagingConfig(pageSize = ClubItemDataSource.PER_LIMIT),
             pagingSourceFactory = {
-                ClubShortListDataSource(
+                ClubItemDataSource(
                     domainManager,
                     pagingCallback,
                     adWidth,
-                    adHeight
-
+                    adHeight,
+                    type
                 )
             }
         )

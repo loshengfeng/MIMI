@@ -153,6 +153,7 @@ class MyPostClipPostHolder(
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
             itemList?.also { myPostListener.onClipCommentClick(it, position) }
+            item.also { myPostListener.onCommentClick(it, AdultTabType.CLIP) }
         }
         ivComment.setOnClickListener(onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)
