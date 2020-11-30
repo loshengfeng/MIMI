@@ -617,12 +617,23 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.getPlaylist(playlistType, isAdult, offset, limit)
 
     /**
-     * 取得我的帖子收藏
+     * 取得我的帖子收藏 1:postText, 2:postPic , 3:PostShortVideo , 7:postOther, 8:postLongVideoSmallVideo
      */
     suspend fun getPostFavorite(
         offset: String,
+        limit: String,
+        postType: Int = 1,
+    ) = apiService.getPostFavorite(offset, limit, postType)
+
+    suspend fun getPostVideoFavorite(
+        offset: String,
         limit: String
-    ) = apiService.getPostFavorite(offset, limit)
+    ) = apiService.getPostFavorite(offset, limit, 8)
+
+    suspend fun getPostOtherFavorite(
+        offset: String,
+        limit: String
+    ) = apiService.getPostFavorite(offset, limit, 7)
 
     /**
      * 移除我的帖子收藏
