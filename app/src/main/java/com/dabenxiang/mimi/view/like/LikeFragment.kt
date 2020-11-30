@@ -10,15 +10,12 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
-import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
-import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.ClubLikeAdapter
 import com.dabenxiang.mimi.view.adapter.MiMiLikeAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -35,15 +32,23 @@ class LikeFragment : BaseFragment() {
     private val viewModel: LikeViewModel by viewModels()
 
     companion object {
-        const val NO_DATA = -1
+        const val NO_DATA = 0
         const val TYPE_POST = 0
         const val TYPE_MIMI = 1
     }
 
     private val clublikeAdapter by lazy { ClubLikeAdapter(clubLikeListener) }
     private val clubLikeListener = object : ClubLikeAdapter.EventListener {
-        override fun onDetail(item: MemberPostItem) {
+        override fun onDetail(item: PostFavoriteItem) {
 //            viewModel.getClub(item.clubId)
+            val bundle = MyPostFragment.createBundle(
+                item.posterId, item.title,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(
+                NavigateItem.Destination(R.id.action_myFollowFragment_to_navigation_my_post, bundle)
+            )
         }
 
         override fun onGetAttachment(id: Long, view: ImageView) {
@@ -57,9 +62,9 @@ class LikeFragment : BaseFragment() {
 
     private val mimilikeAdapter by lazy { MiMiLikeAdapter(mimiLikeListener) }
     private val mimiLikeListener = object : MiMiLikeAdapter.EventListener {
-        override fun onDetail(item: MemberPostItem) {
+        override fun onDetail(item: PostFavoriteItem) {
             val bundle = MyPostFragment.createBundle(
-                item.creatorId, item.title,
+                item.posterId, item.title,
                 isAdult = true,
                 isAdultTheme = true
             )
@@ -86,11 +91,11 @@ class LikeFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
 
         viewModel.clubCount.observe(this, Observer {
-            if (layout_tab.selectedTabPosition == TYPE_MIMI) refreshUi(TYPE_MIMI, it)
+            if (layout_tab.selectedTabPosition == TYPE_POST) refreshUi(TYPE_POST, it)
         })
 
-        viewModel.memberCount.observe(this, Observer {
-            if (layout_tab.selectedTabPosition == TYPE_POST) refreshUi(TYPE_POST, it)
+        viewModel.mimiCount.observe(this, Observer {
+            if (layout_tab.selectedTabPosition == TYPE_MIMI) refreshUi(TYPE_MIMI, it)
         })
 
         viewModel.clubDetail.observe(this, Observer {
@@ -200,7 +205,7 @@ class LikeFragment : BaseFragment() {
 
     override fun initSettings() {
         val tabs = resources.getStringArray(R.array.like_tabs)
-        for(i in tabs){
+        for (i in tabs) {
             layout_tab.addTab(layout_tab.newTab().setText(i))
         }
         layout_tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
@@ -224,7 +229,7 @@ class LikeFragment : BaseFragment() {
         }
         vpAdapter = LikeViewPagerAdapter(
             requireContext(),
-            mimilikeAdapter  ,
+            mimilikeAdapter,
             clublikeAdapter
         ) {
             getData()
@@ -260,19 +265,18 @@ class LikeFragment : BaseFragment() {
         job?.cancel()
         job = lifecycleScope.launch {
             when (layout_tab.selectedTabPosition) {
-                TYPE_POST -> {
+                TYPE_MIMI -> {
                     mimilikeAdapter.submitData(PagingData.empty())
                     viewModel.getMemberList()
                         .collectLatest {
                             mimilikeAdapter.submitData(it)
                         }
                 }
-                TYPE_MIMI -> {
+                TYPE_POST -> {
                     clublikeAdapter.submitData(PagingData.empty())
                     viewModel.getClubList()
                         .collectLatest {
-                            //FIXME
-//                            clublikeAdapter.submitData(it)
+                            clublikeAdapter.submitData(it)
                         }
                 }
             }

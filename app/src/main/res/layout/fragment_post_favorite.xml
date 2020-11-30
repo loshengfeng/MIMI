@@ -38,7 +38,7 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_primary"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
@@ -46,6 +46,8 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/item_fans"
                     tools:ignore="RtlSymmetry" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -75,6 +77,9 @@
                     android:layout_height="0dp"
                     android:visibility="visible"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="10"
+                    android:orientation="vertical"
+                    tools:listitem="@layout/item_fans"
                     tools:visability="visible" />
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

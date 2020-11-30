@@ -8,31 +8,32 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.MiMiLikeViewHolder
 
 class MiMiLikeAdapter(
     private val listener: EventListener
-) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<PostFavoriteItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         private const val VIEW_TYPE_NORMAL = 0
         private const val VIEW_TYPE_DELETED = 1
 
-        private val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<PostFavoriteItem>() {
             override fun areItemsTheSame(
-                oldItem: MemberPostItem,
-                newItem: MemberPostItem
+                oldItem: PostFavoriteItem,
+                newItem: PostFavoriteItem
             ): Boolean = oldItem.id == newItem.id
 
             override fun areContentsTheSame(
-                oldItem: MemberPostItem,
-                newItem: MemberPostItem
+                oldItem: PostFavoriteItem,
+                newItem: PostFavoriteItem
             ): Boolean = oldItem == newItem
         }
     }
 
     interface EventListener {
-        fun onDetail(item: MemberPostItem)
+        fun onDetail(item: PostFavoriteItem)
         fun onGetAttachment(id: Long, view: ImageView)
         fun onCancelFollow(userId: Long, position: Int)
     }

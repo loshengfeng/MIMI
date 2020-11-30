@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
@@ -35,7 +36,7 @@ import java.util.*
 class MiMiLikeViewHolder(
     itemView: View,
     val listener: MiMiLikeAdapter.EventListener
-) : BaseAnyViewHolder<MemberPostItem>(itemView) {
+) : BaseAnyViewHolder<PostFavoriteItem>(itemView) {
     private val clClipPost: ConstraintLayout = itemView.cl_clip_post
     private val ivAvatar: ImageView = itemView.img_avatar
     private val tvName: TextView = itemView.tv_name
@@ -60,9 +61,9 @@ class MiMiLikeViewHolder(
     }
 
     override fun updated(position: Int) {
-        data?.avatarAttachmentId?.let { id -> listener.onGetAttachment(id, ivPhoto) }
-//        tvName.text = data?.friendlyName
-//        tvSubTitle.text = data?.friendlyName
+//        data?.avatarAttachmentId?.let { id -> listener.onGetAttachment(id, ivPhoto) }
+        tvName.text = data?.posterName
+//        tvTime.text = data?.postDate
 //        clFollow.setOnClickListener {
 //            data?.userId?.let { userId ->
 //                listener.onCancelFollow(

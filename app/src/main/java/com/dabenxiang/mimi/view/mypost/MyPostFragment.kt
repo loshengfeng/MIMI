@@ -182,7 +182,7 @@ class MyPostFragment : BaseFragment() {
         })
     }
 
-    private fun navigationToText(bundle: Bundle) {
+    override fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_myPostFragment_to_textDetailFragment,
@@ -191,7 +191,7 @@ class MyPostFragment : BaseFragment() {
         )
     }
 
-    private fun navigationToPicture(bundle: Bundle) {
+    override fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_myPostFragment_to_pictureDetailFragment,

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -94,13 +95,18 @@ class PostPicFragment : BasePostFragment() {
         val title = edt_title.text.toString()
         var page = ""
         var searchPostItem: SearchPostItem? = null
+        var memberClubItem: MemberClubItem? =null
 
         arguments?.let {
             isEdit = it.getBoolean(MyPostFragment.EDIT, false)
             page = it.getString(PAGE, "")
             val data = it.getSerializable(SearchPostFragment.KEY_DATA)
             if (data != null) {
-                searchPostItem = data as SearchPostItem
+                if (data is SearchPostItem) {
+                    searchPostItem = data
+                } else if (data is MemberClubItem){
+                    memberClubItem = data
+                }
             }
         }
 
@@ -129,10 +135,14 @@ class PostPicFragment : BasePostFragment() {
         } else if (isEdit && page == CLUB) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
+            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
             findNavController().navigate(R.id.action_postPicFragment_to_topicDetailFragment, bundle)
+        } else if (isEdit && page == TAB) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         } else {
-            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
+            findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         }
     }
 

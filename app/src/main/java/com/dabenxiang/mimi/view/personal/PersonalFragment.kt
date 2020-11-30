@@ -18,11 +18,9 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
-import com.dabenxiang.mimi.view.invitevip.InviteVipFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
-import com.dabenxiang.mimi.view.orderresult.OrderResultFragment
 import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.appbar.AppBarLayout
@@ -30,7 +28,6 @@ import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import retrofit2.HttpException
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -59,14 +56,15 @@ class PersonalFragment : BaseFragment() {
         super.initSettings()
         tv_version.text = BuildConfig.VERSION_NAME
         Glide.with(this).clear(avatar)
+        layout_vip_unlimit.visibility = View.INVISIBLE
+        layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
         viewModel.getPostDetail()
         //FIXME
         //            ViewCompat.setNestedScrollingEnabled(nestedScroll, true)
         val behavior = appbar_layout.behavior as AppBarLayout.Behavior?
-        layout_vip_unlimit.visibility = View.INVISIBLE
-        layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
+            layout_vip_unlimit.visibility = View.VISIBLE
             tv_logout.visibility = View.VISIBLE
             behavior!!.setDragCallback(object : DragCallback() {
                 override fun canDrag(appBarLayout: AppBarLayout): Boolean {
@@ -88,13 +86,21 @@ class PersonalFragment : BaseFragment() {
             })
             Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
         }
+        layout_refresh.setOnRefreshListener {
+            viewModel.getPostDetail()
+        }
     }
 
     override fun setupObservers() {
+        viewModel.showProgress.observe(this, {
+            layout_refresh.isRefreshing = it
+        })
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
                     val meItem = it.result
+                    layout_vip_unlimit.visibility = View.VISIBLE
+                    layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
                     meItem.friendlyName?.let {
                         id_personal.text = it
                     }
@@ -117,11 +123,11 @@ class PersonalFragment : BaseFragment() {
                     meItem.follows?.let { it ->
                         follow_count.text = it.toString()
                     }
+
                     if (meItem.expiryDate == null) {
                         layout_vip_unlimit_unlogin.visibility = View.VISIBLE
                     } else {
                         meItem.expiryDate?.let { date ->
-                            layout_vip_unlimit.visibility = View.INVISIBLE
                             tv_expiry_date.text = getString(
                                 R.string.vip_expiry_date,
                                 SimpleDateFormat(
@@ -206,10 +212,11 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value =
                     R.id.navigation_topup
 
-                R.id.tv_follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+                R.id.tv_favorite -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_favoriteFragment))
+
                 R.id.follow_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
                 R.id.follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
-                R.id.tv_follow-> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+
 
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
 //                R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
@@ -232,7 +239,7 @@ class PersonalFragment : BaseFragment() {
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_to_inviteVipFragment,
-                               null
+                                null
                             )
                         )
                     } else {
@@ -281,6 +288,7 @@ class PersonalFragment : BaseFragment() {
 
                 R.id.like_count -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
                 R.id.like -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
+                R.id.setting -> navigateTo(NavigateItem.Destination(R.id.action_to_settingFragment))
             }
         }.also {
             layout_vip_unlimit_unlogin.setOnClickListener(it)
@@ -298,10 +306,11 @@ class PersonalFragment : BaseFragment() {
             fans_count.setOnClickListener(it)
             fans.setOnClickListener(it)
 
-            tv_follow.setOnClickListener(it)
+
             follow_count.setOnClickListener(it)
             follow.setOnClickListener(it)
-            tv_follow.setOnClickListener(it)
+
+            tv_favorite.setOnClickListener(it)
 
             tv_topup_history.setOnClickListener(it)
         }

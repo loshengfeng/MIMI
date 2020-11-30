@@ -471,8 +471,15 @@ interface ApiService {
 
     @GET("/v1/Members/Me/PostFavorite")
     suspend fun getPostFavorite(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
+
+    @GET("/v1/Members/Me/PostFavorite")
+    suspend fun getPostFavorite(
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int,
+        @Query("postType") postType: Int
     ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
 
     @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
