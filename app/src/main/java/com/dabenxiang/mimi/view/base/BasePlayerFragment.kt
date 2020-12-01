@@ -234,7 +234,9 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
                 player.volume = PlayerViewModel.volume
                 player.addListener(this)
                 player.addAnalyticsListener(this)
-                playerViewModel.setPlaying(true)
+                playerViewModel.setPlaying(player.playWhenReady)
+                val play_pause_id = if(player.playWhenReady) R.drawable.exo_icon_pause else R.drawable.exo_icon_play
+                exo_play_pause.setImageDrawable(requireContext().getDrawable(play_pause_id))
                 initTouchListener()
             }
         }
