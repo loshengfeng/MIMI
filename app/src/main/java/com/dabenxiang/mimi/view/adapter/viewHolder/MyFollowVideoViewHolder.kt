@@ -32,7 +32,7 @@ import java.util.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 
 class MyFollowVideoViewHolder(
-    itemView: View
+        itemView: View
 ) : BaseViewHolder(itemView), KoinComponent {
 
     private val accountManager: AccountManager by inject()
@@ -56,7 +56,7 @@ class MyFollowVideoViewHolder(
             item: PlayItem,
             itemList: List<MemberPostItem>?,
             position: Int,
-            myPostListener: MyFollowVideoListener,
+            listener: MyFollowVideoListener,
             searchTag: String = ""
     ) {
         Timber.d("neo, item = ${item}")
@@ -70,57 +70,42 @@ class MyFollowVideoViewHolder(
         vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
 
         tvTitle.text = item.title
-//        tvName.text = item.postFriendlyName
-//        tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
-//        tvTitle.text =  if (searchStr.isNotBlank()) getSpanString(
-//            tvTitle.context,
-//            item.title,
-//            searchStr
-//        ) else item.title
-//        tvFollow.visibility =
-//            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
-
-//        attachmentListener.onGetAttachment(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
-//        ivAvatar.setOnClickListener {
-//            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
-//        }
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
-                .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
+                    .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
             if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
             else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
-                myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
+                listener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
             }
             tagChipGroup.addView(chip)
         }
-        
-//        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-
-//        tvLength.text = contentItem.shortVideo?.length
         item.cover?.let { images ->
             Glide.with(ivPhoto.context)
                     .load(images).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+        } ?: kotlin.run {
+            Glide.with(ivPhoto.context)
+                    .load(0).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
         }
-
         ivMore.setOnClickListener {
 //            myPostListener.onMoreClick(item, position)
         }
 
         updateFavorite(item)
         val onFavoriteClickListener = View.OnClickListener {
-//            item.isFavorite = !item.isFavorite
-//            item.favoriteCount =
-//                if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
-//            myPostListener.onFavoriteClick(
-//                item,
-//                position,
-//                item.isFavorite,
-//                AttachmentType.ADULT_HOME_CLIP
-//            )
+            item.favorite = item.favorite != true
+            item.favoriteCount =
+                    if (item.favorite == true) item.favoriteCount ?: 0 + 1 else item.favoriteCount
+                            ?: 0 - 1
+            listener.onFavoriteClick(
+                    item,
+                    position,
+                    item.favorite ?: false,
+                    MyFollowTabItemType.MIMI_VIDEO
+            )
         }
         ivFavorite.setOnClickListener(onFavoriteClickListener)
         tvFavoriteCount.setOnClickListener(onFavoriteClickListener)
@@ -129,32 +114,31 @@ class MyFollowVideoViewHolder(
         val onLikeClickListener = View.OnClickListener {
             item.like = item.like != true
             item.likeCount =
-                if (item.like == true) (item.likeCount?:0 + 1) else (item.likeCount?:0 - 1)
-//            myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
+                    if (item.like == true) (item.likeCount ?: 0 + 1) else (item.likeCount ?: 0 - 1)
+            listener.onLikeClick(item, position, item.like == true)
         }
         ivLike.setOnClickListener(onLikeClickListener)
         tvLikeCount.setOnClickListener(onLikeClickListener)
 
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
-//            itemList?.also { myPostListener.onClipCommentClick(it, position) }
-            item.also {
-//                myPostListener.onCommentClick(it, AdultTabType.CLIP)
-            }
+            listener.onCommentClick(item, MyFollowTabItemType.MIMI_VIDEO)
         }
-        ivComment.setOnClickListener(onCommentClickListener)
+
+        ivComment.setOnClickListener { onCommentClickListener }
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
-            myPostListener.onItemClick(item, MyFollowTabItemType.MIMI_VIDEO)
+            listener.onItemClick(item, MyFollowTabItemType.MIMI_VIDEO)
         }
 
     }
 
     fun updateLike(item: PlayItem) {
+        Timber.d("neo, updateList = ${item.likeCount.toString()}")
         tvLikeCount.text = item.likeCount.toString()
 
-        if (item.like==true) {
+        if (item.like == true) {
             ivLike.setImageResource(R.drawable.ico_nice_s)
         } else {
             ivLike.setImageResource(R.drawable.ico_nice_gray)
@@ -164,7 +148,7 @@ class MyFollowVideoViewHolder(
     fun updateFavorite(item: PlayItem) {
         tvFavoriteCount.text = item.favoriteCount.toString()
 
-        if (item.favorite==true) {
+        if (item.favorite == true) {
             ivFavorite.setImageResource(R.drawable.btn_favorite_white_s)
         } else {
             ivFavorite.setImageResource(R.drawable.btn_favorite_n)

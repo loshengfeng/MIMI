@@ -16,6 +16,6 @@ interface MyFollowVideoListener {
         item: PlayItem,
         position: Int,
         isFavorite: Boolean,
-        type: AttachmentType
+        type: MyFollowTabItemType
     )
 }
