@@ -8,18 +8,26 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
 
 class MyCollectFavoritesViewModel : ClubViewModel() {
 
     private val _postCount = MutableLiveData<Int>()
     val postCount: LiveData<Int> = _postCount
+
+    private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
+    val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
+
+    private val _deleteFavorites = MutableLiveData<Int>()
+    val deleteFavorites: LiveData<Int> = _deleteFavorites
 
     fun getData(adapter: FavoritesAdapter) {
         Timber.i("getData")
@@ -41,7 +49,6 @@ class MyCollectFavoritesViewModel : ClubViewModel() {
                             pagingCallback,
                             adWidth,
                             adHeight
-
                     )
                 }
         )
@@ -58,6 +65,25 @@ class MyCollectFavoritesViewModel : ClubViewModel() {
             _postCount.postValue(count.toInt())
         }
 
+    }
+
+    fun deleteFavorite(items: List<MemberPostItem>) {
+        if (items.isEmpty()) return
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                        .deletePostFavorite(
+                                items.map {it.id}.joinToString(separator = ",")
+                        )
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _cleanResult.value = it }
+        }
     }
 
 }

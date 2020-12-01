@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
@@ -25,7 +26,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -36,6 +37,7 @@ import timber.log.Timber
 
 class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragment() {
     private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
+    private val collectionViewModel: MyCollectionViewModel by activityViewModels()
     private val accountManager: AccountManager by inject()
 
     private val adapter: MyCollectionMimiVideoAdapter by lazy {
@@ -164,6 +166,10 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
+        })
+
+        collectionViewModel.deleteMiMIs.observe(this,  {
+             //Todo
         })
     }
 
