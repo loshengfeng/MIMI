@@ -13,9 +13,9 @@ class MyFollowViewPagerAdapterV2(
         lifecycle: Lifecycle) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            MyFollowFragmentV2.TAB_MiMI_VIDEO to { MyFollowItemFragment(MyFollowTabItemType.MIMI_VIDEO) },
-            MyFollowFragmentV2.TAB_SMALL_VIDEO to { MyFollowItemFragment(MyFollowTabItemType.SMALL_VIDEO) },
-            MyFollowFragmentV2.TAB_POST to {  MyFollowInterestFragment()  },
+            MyFollowFragmentV3.TAB_MiMI_VIDEO to { MyFollowItemFragment(MyFollowTabItemType.MIMI_VIDEO) },
+            MyFollowFragmentV3.TAB_SMALL_VIDEO to { MyFollowItemFragment(MyFollowTabItemType.SMALL_VIDEO) },
+            MyFollowFragmentV3.TAB_POST to {  MyFollowInterestFragment()  },
     )
 
     override fun getItemCount() = tabFragmentsCreators.size
