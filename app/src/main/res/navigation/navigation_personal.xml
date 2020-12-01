@@ -113,7 +113,7 @@
 
     <fragment
         android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
+        android:name="com.dabenxiang.mimi.view.myfollow_old.MyFollowFragment"
         android:label="MyFollowFragment" />
     <fragment
         android:id="@+id/myCollectionFragment"
