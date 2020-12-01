@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.callback.MyFollowVideoListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
@@ -23,6 +22,8 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
+import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -94,10 +95,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
-
-
-
-            checkStatus { viewModel.likePost(MemberPostItem(id=item.videoId!!,likeType = LikeType.LIKE), position, isLike) }
+            checkStatus { viewModel.likePost(MemberPostItem(id = item.videoId!!, likeType = LikeType.LIKE), position, isLike) }
         }
 
         override fun onClipCommentClick(item: List<PlayItem>, position: Int) {
@@ -126,7 +124,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onCommentClick(item: PlayItem, type: MyFollowTabItemType) {
-            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0),true)
+            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0), true)
             navigateTo(
                     NavigateItem.Destination(
                             R.id.action_myFollowFragmentV2_to_playerV2Fragment,
@@ -135,7 +133,17 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyFollowTabItemType) {
-            checkStatus { viewModel.modifyFavorite(VideoItem(id=item.videoId!!), position, isFavorite) }
+//            checkStatus { viewModel.modifyFavorite(VideoItem(id=item.videoId!!), position, isFavorite) }
+            CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+                override fun onClean() {
+                    checkStatus { viewModel.deleteMIMIVideoFavorite(item.videoId.toString()) }
+                }
+            }).also {
+                it.show(
+                        requireActivity().supportFragmentManager,
+                        CleanDialogFragment::class.java.simpleName
+                )
+            }
         }
     }
 
@@ -143,6 +151,10 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         super.onAttach(context)
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+
+        viewModel.deleteFavoriteResult.observe(this) {
+            viewModel.getData(adapter, type)
+        }
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it

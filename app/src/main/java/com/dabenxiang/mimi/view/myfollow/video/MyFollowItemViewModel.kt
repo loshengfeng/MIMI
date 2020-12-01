@@ -3,15 +3,16 @@ package com.dabenxiang.mimi.view.myfollow.video
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
-import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,9 @@ class MyFollowItemViewModel : ClubViewModel() {
 
     private var _videoFavoriteResult = MutableLiveData<ApiResult<Int>>()
     val videoFavoriteResult: LiveData<ApiResult<Int>> = _videoFavoriteResult
+
+    private val _deleteFavoriteResult = MutableLiveData<ApiResult<Boolean>>()
+    val deleteFavoriteResult: LiveData<ApiResult<Boolean>> = _deleteFavoriteResult
 
     var totalCount: Int = 0
 
@@ -58,6 +62,20 @@ class MyFollowItemViewModel : ClubViewModel() {
             .onStart {  setShowProgress(true) }
             .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
+    }
+
+    fun deleteMIMIVideoFavorite(videoId : String){
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.deleteMePlaylist(videoId)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.isSuccessful))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect { _deleteFavoriteResult.value = it }
+        }
     }
 
     private val pagingCallback = object : PagingCallback {
