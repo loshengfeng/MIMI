@@ -9,8 +9,10 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.enums.ClickType
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment
 import com.dabenxiang.mimi.view.myfollow.MyFollowViewModel
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_follow_list.*
 
@@ -25,6 +27,19 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     private val listener: BaseItemListener = object : BaseItemListener {
         override fun onItemClick(item: Any, type: ClickType) {
+            when (type) {
+                ClickType.TYPE_ITEM -> {
+//                    val bundle = MyPostFragment.createBundle(
+//                            userId, name,
+//                            isAdult = true,
+//                            isAdultTheme = false
+//                    )
+//                    navigateTo(NavigateItem.Destination(R.id.action_fansListFragment_to_navigation_my_post, bundle))
+                }
+                ClickType.TYPE_FOLLOW -> {
+                    //todo 取消 follow
+                }
+            }
         }
 
     }
@@ -75,12 +90,10 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
         super.onResume()
         when (type) {
             MyFollowFragment.TAB_FOLLOW_PEOPLE -> {
-                memberAdapter?.let { viewModel.getMemberData() }
+                memberAdapter?.let { viewModel.getMemberData(it) }
             }
             MyFollowFragment.TAB_FOLLOW_CLUB -> {
-                clubAdapter?.let {
-                    viewModel.getClubFollowData()
-                }
+                clubAdapter?.let { viewModel.getClubFollowData(it) }
             }
         }
     }
