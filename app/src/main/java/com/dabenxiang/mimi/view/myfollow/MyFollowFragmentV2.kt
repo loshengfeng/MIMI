@@ -1,9 +1,10 @@
 package com.dabenxiang.mimi.view.myfollow
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -54,23 +55,18 @@ class MyFollowFragmentV2 : BaseFragment() {
         tool_bar.setNavigationOnClickListener {
             navigateTo(NavigateItem.Up)
         }
-    }
+        tool_bar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_clean -> {
+                    Timber.i("onOptionsItemSelected action_clean")
+                    //TODO
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        Timber.i("onOptionsItemSelected")
-        return when (item.itemId) {
-            R.id.action_clean -> {
-                Timber.i("onOptionsItemSelected action_clean")
-               //TODO
-                true
+                }
             }
-            else -> super.onOptionsItemSelected(item)
+            true
         }
     }
+
     override fun onResume() {
         super.onResume()
         Timber.i("ClubTabFragment onResume")
