@@ -7,6 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.error.FansItem
 import com.dabenxiang.mimi.model.enums.ClickType
 import com.dabenxiang.mimi.model.enums.LoadImageType
@@ -72,6 +73,13 @@ class FansListFragment : BaseFragment() {
                 list_fans.visibility = View.VISIBLE
             }
         })
+
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> adapter?.notifyItemChanged(it.result)
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -93,6 +101,13 @@ class FansListFragment : BaseFragment() {
 
         override fun onGetAvatarAttachment(id: Long?, view: ImageView) {
             viewModel.loadImage(id, view, LoadImageType.AVATAR)
+        }
+        override fun onFollow(
+            item: com.dabenxiang.mimi.model.api.vo.FansItem,
+            position: Int,
+            isFollow: Boolean
+        ) {
+            viewModel.followPost(item, position, isFollow)
         }
     }
 }

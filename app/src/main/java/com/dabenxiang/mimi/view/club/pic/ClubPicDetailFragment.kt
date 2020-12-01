@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -59,6 +61,32 @@ class ClubPicDetailFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_club_pic_detail
 
     override fun setupObservers() {
+        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    val item = it.result.content
+                    pictureDetailAdapter?.updateContent(item!!)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    pictureDetailAdapter?.setupAdItem(it.result)
+                    pictureDetailAdapter?.notifyItemChanged(0)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun setupListeners() {

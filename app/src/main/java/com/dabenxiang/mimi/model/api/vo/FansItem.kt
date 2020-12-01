@@ -16,6 +16,6 @@ data class FansItem(
     val avatarAttachmentId: Long? = null,
 
     @SerializedName("isFollow")
-    val isFollow: Boolean
+    var isFollow: Boolean
 )
 

@@ -8,20 +8,25 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.FansItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.adapter.FansListAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
 
 class FansListViewModel : BaseViewModel() {
 
     private val _fansCount = MutableLiveData<Long>()
     val fansCount: LiveData<Long> = _fansCount
+
+    private var _followPostResult = MutableLiveData<ApiResult<Int>>()
+    val followPostResult: LiveData<ApiResult<Int>> = _followPostResult
 
     fun getData(adapter: FansListAdapter) {
         Timber.i("getData")
@@ -33,7 +38,7 @@ class FansListViewModel : BaseViewModel() {
         }
     }
 
-    fun getFansList(): Flow<PagingData<FansItem>> {
+    private fun getFansList(): Flow<PagingData<FansItem>> {
         return Pager(
             config = PagingConfig(pageSize = FansDataSource.PER_LIMIT),
             pagingSourceFactory = {
@@ -67,4 +72,25 @@ class FansListViewModel : BaseViewModel() {
 
         }
     }
+
+    fun followPost(item: FansItem, position: Int, isFollow: Boolean) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFollow -> apiRepository.followPost(item.userId)
+                    else -> apiRepository.cancelFollowPost(item.userId)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFollow = isFollow
+                emit(ApiResult.success(position))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _followPostResult.value = it }
+        }
+    }
+
 }
