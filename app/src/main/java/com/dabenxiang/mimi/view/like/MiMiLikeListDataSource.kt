@@ -21,7 +21,7 @@ class MiMiLikeListDataSource constructor(
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, PostFavoriteItem> {
         val offset = params.key ?: 0
         return try {
-            val result = domainManager.getApiRepository().getPostVideoFavorite( 0, PER_LIMIT  )
+            val result = domainManager.getApiRepository().getPostFavorite( 0, PER_LIMIT,8 )
             if (!result.isSuccessful) throw HttpException(result)
             val items = result.body()?.content
             val hasNext = hasNextPage(

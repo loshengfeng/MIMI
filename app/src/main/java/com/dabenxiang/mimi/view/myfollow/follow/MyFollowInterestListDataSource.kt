@@ -6,6 +6,7 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
+import com.dabenxiang.mimi.view.like.ClubLikeListDataSource
 import retrofit2.HttpException
 
 class MyFollowInterestListDataSource constructor(
@@ -27,12 +28,17 @@ class MyFollowInterestListDataSource constructor(
             val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content ?: AdItem()
 
             val result =
-                domainManager.getApiRepository().getPostFollow(offset.toInt(), PER_LIMIT.toInt())
+                domainManager.getApiRepository().getPostFavorite( 0, ClubLikeListDataSource.PER_LIMIT, 7)
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result.body()
-            val memberPostItems = body?.content
+            val memberPostItems = arrayListOf<MemberPostItem>()
+
             memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+
+            body?.content?.forEachIndexed { index, item ->
+                memberPostItems.add(index, item.toMemberPostItem())
+            }
 
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
