@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.video
+package com.dabenxiang.mimi.view.mycollection.mimi_video
 
 import android.content.Context
 import android.os.Bundle
@@ -31,12 +31,12 @@ import kotlinx.android.synthetic.main.fragment_club_short.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
-    private val viewModel: MyFollowItemViewModel by viewModels()
+class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragment() {
+    private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
     private val accountManager: AccountManager by inject()
 
-    private val adapter: MyFollowItemAdapter by lazy {
-        MyFollowItemAdapter(requireContext(), listener)
+    private val adapter: MyCollectionMimiVideoAdapter by lazy {
+        MyCollectionMimiVideoAdapter(requireContext(), listener)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_tab
@@ -178,7 +178,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            MyFollowItemAdapter.PAYLOAD_UPDATE_LIKE
+                            MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -190,7 +190,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            MyFollowItemAdapter.PAYLOAD_UPDATE_FAVORITE
+                            MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)

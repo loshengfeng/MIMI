@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.follow
+package com.dabenxiang.mimi.view.mycollection.favorites
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.like.ClubLikeListDataSource
 import retrofit2.HttpException
 
-class MyFollowInterestListDataSource constructor(
+class FavoritestListDataSource constructor(
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
     private val adWidth: Int,
