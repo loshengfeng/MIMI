@@ -27,7 +27,6 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:layout_marginTop="20dp"
-        android:fillViewport="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_search"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -62,7 +61,7 @@
                 android:textStyle="bold" />
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="8000dp">
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_all_actresses"
                     android:layout_width="match_parent"
