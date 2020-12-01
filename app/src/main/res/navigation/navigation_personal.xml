@@ -164,6 +164,9 @@
         <action
             android:id="@+id/action_to_clubTextFragment"
             app:destination="@id/clubTextFragment" />
+        <action
+            android:id="@+id/action_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchPostFragment"
@@ -246,5 +249,9 @@
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
         android:label="SearchVideoFragment" />
+    <fragment
+        android:id="@+id/clipSingleFragment"
+        android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
+        android:label="ClipSingleFragment" />
 
 </navigation>

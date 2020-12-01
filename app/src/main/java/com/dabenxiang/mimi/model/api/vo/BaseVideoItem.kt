@@ -71,6 +71,9 @@ data class VideoItem(
     @SerializedName("years")
     val years: Long? = 0,
 
+    @SerializedName("reported")
+    val reported: Boolean? = false,
+
     @SerializedName("videoEpisodes")
     val videoEpisodes: List<VideoEpisode>? = arrayListOf(),
 
