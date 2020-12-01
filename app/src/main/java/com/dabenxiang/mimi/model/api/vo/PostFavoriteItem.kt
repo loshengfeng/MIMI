@@ -89,7 +89,7 @@ data class PostFavoriteItem(
 
     fun toPlayItem(): PlayItem {
         return PlayItem(
-            id = postId,
+            videoId = postId,
             title = title,
             favorite = true,
             likeCount = likeCount,

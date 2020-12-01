@@ -100,7 +100,25 @@
     <fragment
         android:id="@+id/likesListFragment"
         android:name="com.dabenxiang.mimi.view.like.LikeFragment"
-        android:label="LikeFragment" />
+        tools:layout="@layout/fragment_my_collection"
+        android:label="LikeFragment" >
+
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
+        <action
+            android:id="@+id/action_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
+        <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/navigation_clip_player" />
+        <action
+            android:id="@+id/action_to_playerV2Fragment"
+            app:destination="@id/playerV2Fragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/inviteVipFragment"
@@ -120,6 +138,9 @@
         android:name="com.dabenxiang.mimi.view.mycollection.MyCollectionFragment"
         android:label="MyCollectionFragment">
 
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
         <action
             android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
