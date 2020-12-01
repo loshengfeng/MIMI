@@ -206,4 +206,9 @@
         android:name="com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment"
         android:label="PlayerV2Fragment" />
 
+    <fragment
+        android:id="@+id/clipPlayerFragment"
+        android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
+        android:label="ClipPlayerFragment" />
+
 </navigation>
