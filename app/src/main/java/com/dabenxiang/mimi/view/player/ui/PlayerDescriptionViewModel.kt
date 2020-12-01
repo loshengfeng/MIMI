@@ -23,39 +23,20 @@ import timber.log.Timber
 
 class PlayerDescriptionViewModel : BaseViewModel() {
 
-    private var _detailResult = MutableLiveData<ApiResult<MemberPostItem>>()
-    val detailResult: LiveData<ApiResult<MemberPostItem>> = _detailResult
-
     private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
     val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
 
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
-    private var _likeResult = MutableLiveData<ApiResult<MemberPostItem>>()
-    val likeResult: LiveData<ApiResult<MemberPostItem>> = _likeResult
+    private var _likeResult = MutableLiveData<ApiResult<VideoItem>>()
+    val likeResult: LiveData<ApiResult<VideoItem>> = _likeResult
 
-    private var _favoriteResult = MutableLiveData<ApiResult<MemberPostItem>>()
-    val favoriteResult: LiveData<ApiResult<MemberPostItem>> = _favoriteResult
+    private var _favoriteResult = MutableLiveData<ApiResult<VideoItem>>()
+    val favoriteResult: LiveData<ApiResult<VideoItem>> = _favoriteResult
 
     private val _reportResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val reportResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _reportResult
-
-    fun getPostDetail(id: Long) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = apiRepository.getMemberPostDetail(id)
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(result.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _detailResult.value = it }
-        }
-    }
 
     fun getAd(width: Int, height: Int) {
         viewModelScope.launch {
@@ -92,17 +73,17 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         }
     }
 
-    fun favoritePost(item: MemberPostItem) {
+    fun favorite(item: VideoItem) {
         viewModelScope.launch {
             flow {
-                val originFavorite = item.isFavorite
+                val originFavorite = item.favorite
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    !originFavorite -> apiRepository.addFavorite(item.id)
-                    else -> apiRepository.deleteFavorite(item.id)
+                    !originFavorite -> apiRepository.postMePlaylist(PlayListRequest(item.id,1))
+                    else -> apiRepository.deleteMePlaylist(item.id.toString())
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFavorite = !originFavorite
+                item.favorite = !originFavorite
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
@@ -113,7 +94,7 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         }
     }
 
-    fun likePost(item: MemberPostItem, type: LikeType) {
+    fun like(item: VideoItem, type: LikeType) {
         viewModelScope.launch {
             flow {
                 val originType = item.likeType
@@ -147,7 +128,7 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         }
     }
 
-    fun sendVideoReport(id: Long, content: String) {
+    fun report(id: Long, content: String) {
         viewModelScope.launch {
             flow {
                 val resp = domainManager.getApiRepository().sendVideoReport(
