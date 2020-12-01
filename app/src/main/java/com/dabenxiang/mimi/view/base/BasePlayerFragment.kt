@@ -1,12 +1,10 @@
 package com.dabenxiang.mimi.view.base
 
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.hardware.SensorManager
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.Surface
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
@@ -24,6 +22,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
 import kotlinx.android.synthetic.main.fragment_v2_player.*
+import kotlinx.android.synthetic.main.fragment_v2_player.view.*
 import kotlinx.android.synthetic.main.recharge_reminder.*
 import timber.log.Timber
 import kotlin.math.abs
@@ -39,7 +38,6 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
     private var orientationDetector: OrientationDetector? = null
 
     private val playerViewModel: BasePlayerViewModel by activityViewModels()
-
     override val isStatusBarDark: Boolean = true
 
     open var contentId: Long = 0
@@ -52,23 +50,20 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
 
     abstract fun getTabTitle(tab: TabLayout.Tab, position: Int)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        player_pager.adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount(): Int {
-                return getViewPagerCount()
-            }
-
-            override fun createFragment(position: Int): Fragment {
-                return createViewPagerFragment(position)
-            }
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(getLayoutId(), container, false)
+        view.player_pager.adapter = object : FragmentStateAdapter(this) {
+            override fun getItemCount() = getViewPagerCount()
+            override fun createFragment(position: Int) = createViewPagerFragment(position)
         }
-        player_pager.isSaveEnabled = false
-
-        TabLayoutMediator(tabs, player_pager) { tab, position ->
+        TabLayoutMediator(view.tabs, view.player_pager) { tab, position ->
             getTabTitle(tab, position)
         }.attach()
+        return view
     }
 
     override fun onStart() {
@@ -256,6 +251,7 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
         player = null
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initTouchListener() {
         var originX = 0f
         var originY = 0f
