@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.video
+package com.dabenxiang.mimi.view.mycollection.mimi_video
 
 import android.content.Context
 import android.os.Bundle
@@ -13,7 +13,10 @@ import com.dabenxiang.mimi.callback.MyFollowVideoListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.enums.*
+import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -25,18 +28,15 @@ import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
-import kotlinx.android.synthetic.main.fragment_club_short.id_empty_group
-import kotlinx.android.synthetic.main.fragment_club_short.id_not_login_group
-import kotlinx.android.synthetic.main.fragment_club_short.layout_refresh
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
-    private val viewModel: MyFollowItemViewModel by viewModels()
+class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragment() {
+    private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
     private val accountManager: AccountManager by inject()
 
-    private val adapter: MyFollowItemAdapter by lazy {
-        MyFollowItemAdapter(requireContext(), listener)
+    private val adapter: MyCollectionMimiVideoAdapter by lazy {
+        MyCollectionMimiVideoAdapter(requireContext(), listener)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_tab
@@ -86,12 +86,16 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onItemClick(item: PlayItem, type: MyFollowTabItemType) {
-            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
-            navigateTo(
+            if (this@MyCollectionMimiVideoFragment.type == MyFollowTabItemType.MIMI_VIDEO) {
+                val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
+                navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_to_playerV2Fragment,
-                            bundle
+                        R.id.action_to_playerV2Fragment,
+                        bundle
                     ))
+            } else {
+                //TODO Sion ~~~~~~~~
+            }
         }
 
         override fun onCommentClick(item: PlayItem, type: MyFollowTabItemType) {
@@ -150,7 +154,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            MyFollowItemAdapter.PAYLOAD_UPDATE_LIKE
+                            MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -162,7 +166,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            MyFollowItemAdapter.PAYLOAD_UPDATE_FAVORITE
+                            MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)

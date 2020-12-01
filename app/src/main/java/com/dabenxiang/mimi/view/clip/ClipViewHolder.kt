@@ -28,7 +28,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private var btnVip: View = view.btn_vip
     private var btnPromote: View = view.btn_promote
 
-    fun onBind(item: VideoItem) {
+    fun onBind(item: VideoItem, clipFuncItem: ClipFuncItem) {
         reminder.visibility = View.GONE
         ibReplay.visibility = View.GONE
         ibPlay.visibility = View.GONE
@@ -36,8 +36,16 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()
 
-        Glide.with(ivCover.context)
-            .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivCover)
+        clipFuncItem.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
+            ?.let { decryptSettingItem ->
+                clipFuncItem.decryptCover(item.cover?:"", decryptSettingItem) {
+                    Glide.with(ivCover.context)
+                        .load(it).placeholder(R.drawable.img_nopic_03).into(ivCover)
+                }
+            } ?: run {
+            Glide.with(ivCover.context)
+                .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivCover)
+        }
 
         val favoriteRes = takeIf { item.favorite == true }?.let { R.drawable.btn_favorite_forvideo_s }
             ?: let { R.drawable.btn_favorite_forvideo_n }

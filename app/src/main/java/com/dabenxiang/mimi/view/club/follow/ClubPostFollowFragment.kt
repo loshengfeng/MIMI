@@ -37,7 +37,7 @@ import timber.log.Timber
 
 class ClubPostFollowFragment : BaseFragment() {
 
-    private val viewModel: ClubFollowViewModel by viewModels()
+    private val viewModel: ClubPostFollowViewModel by viewModels()
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubPostFollowAdapter by lazy {

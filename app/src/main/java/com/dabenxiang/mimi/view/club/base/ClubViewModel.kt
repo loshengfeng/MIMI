@@ -78,7 +78,7 @@ abstract class ClubViewModel : BaseViewModel(){
         }
     }
 
-    fun favoritePost(
+    open fun favoritePost(
         item: MemberPostItem,
         position: Int,
         isFavorite: Boolean
