@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@color/color_white_1"
-        app:menu="@menu/menu_follow"
+        app:menu="@menu/menu_back_clear"
         app:contentInsetStartWithNavigation="0dp"
         app:layout_collapseMode="pin"
         app:navigationIcon="@drawable/btn_back_black_n"
