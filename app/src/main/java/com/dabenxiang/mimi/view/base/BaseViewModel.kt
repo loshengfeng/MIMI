@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
@@ -20,18 +21,26 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.decryptSource
+import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
+import com.dabenxiang.mimi.model.api.vo.DownloadResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.model.vo.BaseVideoItem
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.google.gson.Gson
+import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -42,6 +51,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
+import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
@@ -207,6 +217,62 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             Glide.with(view.context).load(glideUrl ?: filePath)
                 .apply(options)
                 .into(view)
+        }
+    }
+
+    fun getDecryptSetting(source: String): DecryptSettingItem? {
+        var result: DecryptSettingItem? = null
+        pref.decryptSettingArray.forEach {
+            if (TextUtils.equals(source, it.source)) {
+                result = it
+                return@forEach
+            }
+        }
+        return result
+    }
+
+    fun decryptCover(encryptCover: String, decryptItem: DecryptSettingItem, update: (ByteArray) -> Unit) {
+        viewModelScope.launch {
+            HttpClient().decryptSource(encryptCover, decryptItem.key ?: "".toByteArray())
+                .catch { update("".toByteArray()) }
+                .collect {
+                when(it) {
+                    is DownloadResult.Success -> update(it.data as ByteArray)
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    fun decryptM3U8(encryptM3U8: String, decryptItem: DecryptSettingItem, update: (String?) -> Unit) {
+        viewModelScope.launch {
+            HttpClient().decryptSource(encryptM3U8, decryptItem.key ?: "".toByteArray())
+                .catch { update("") }
+                .collect {
+                    when (it) {
+                        is DownloadResult.Success -> {
+                            val path = FileUtil.unzipSourceToFile(it.data as ByteArray)
+                            update(path)
+                        }
+                        else -> {}
+                    }
+                }
+        }
+    }
+
+    fun decryptM3U8(encryptM3U8: String, decryptItem: DecryptSettingItem, pos: Int, update: (Int, String, Int) -> Unit) {
+        viewModelScope.launch {
+            HttpClient().decryptSource(encryptM3U8, decryptItem.key ?: "".toByteArray())
+                .catch { update(pos, "", -1) }
+                .collect {
+                    when (it) {
+                        is DownloadResult.Success -> {
+                            val path = FileUtil.unzipSourceToFile(it.data as ByteArray)
+                            update(pos, path, -1)
+                        }
+                        else -> {}
+                    }
+                }
         }
     }
 }
