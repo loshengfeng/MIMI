@@ -20,14 +20,14 @@ import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
-import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
-import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.item_ad.view.*
@@ -72,11 +72,10 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: B
 
         override fun onChipClick(type: PostType, tag: String) {
             Timber.d("onChipClick")
-            val item = SearchPostItem(type, tag = tag)
-            val bundle = SearchPostFragment.createBundle(item)
+            val bundle = SearchVideoFragment.createBundle(tag)
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_to_searchPostFragment,
+                            R.id.action_to_searchVideoFragment,
                             bundle
                     )
             )
@@ -91,7 +90,11 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: B
                         bundle
                     ))
             } else {
-                //TODO Sion ~~~~~~~~
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_clipSingleFragment,
+                        ClipSingleFragment.createBundle(item)
+                    ))
             }
         }
 

@@ -122,6 +122,9 @@
         <action
             android:id="@+id/action_to_playerV2Fragment"
             app:destination="@id/playerV2Fragment" />
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
     </fragment>
 
     <fragment
@@ -141,7 +144,7 @@
         android:id="@+id/myCollectionFragment"
         android:name="com.dabenxiang.mimi.view.mycollection.MyCollectionFragment"
         android:label="MyCollectionFragment">
-        
+
         <action
             android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
@@ -155,11 +158,15 @@
         <action
             android:id="@+id/action_to_playerV2Fragment"
             app:destination="@id/playerV2Fragment" />
-
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
         <action
             android:id="@+id/action_to_clubTextFragment"
             app:destination="@id/clubTextFragment" />
-
+        <action
+            android:id="@+id/action_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchPostFragment"
@@ -238,5 +245,13 @@
         android:id="@+id/clipPlayerFragment"
         android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
         android:label="ClipPlayerFragment" />
+    <fragment
+        android:id="@+id/searchVideoFragment"
+        android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
+        android:label="SearchVideoFragment" />
+    <fragment
+        android:id="@+id/clipSingleFragment"
+        android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
+        android:label="ClipSingleFragment" />
 
 </navigation>

@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -35,7 +36,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_clip_description
 
-    private val viewModel: ClipPlayerViewModel by activityViewModels()
+    private val viewModel: ClipPlayerViewModel by viewModels({requireParentFragment()})
 
     private val clipViewModel = ClipPlayerDescriptionViewModel()
 

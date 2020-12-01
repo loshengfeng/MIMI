@@ -47,7 +47,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
                 .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivCover)
         }
 
-        val favoriteRes = takeIf { item.favorite == true }?.let { R.drawable.btn_favorite_forvideo_s }
+        val favoriteRes = takeIf { item.favorite }?.let { R.drawable.btn_favorite_forvideo_s }
             ?: let { R.drawable.btn_favorite_forvideo_n }
         tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
     }
