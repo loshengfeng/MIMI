@@ -13,8 +13,8 @@ class MyFollowViewPagerAdapter(
         lifecycle: Lifecycle) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            TAB_FOLLOW_PEOPLE to { MyFollowFragment() },
-            TAB_FOLLOW_CLUB to { MyFollowListFragment() },
+            TAB_FOLLOW_PEOPLE to { MyFollowListFragment(TAB_FOLLOW_PEOPLE) },
+            TAB_FOLLOW_CLUB to { MyFollowListFragment(TAB_FOLLOW_CLUB) },
 
     )
 

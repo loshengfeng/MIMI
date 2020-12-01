@@ -690,6 +690,17 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getReferrerHistory(offset, limit)
     }
 
+    /**
+     * 我喜歡列表
+     */
+    suspend fun getPostLike(
+        offset: Long,
+        limit: Int,
+        type: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>> {
+        return apiService.getPostLike(offset, limit, type)
+    }
+
     /**********************************************************
      *
      *                  Members/Me/Post

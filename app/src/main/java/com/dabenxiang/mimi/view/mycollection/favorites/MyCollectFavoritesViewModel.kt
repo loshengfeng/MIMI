@@ -29,18 +29,19 @@ class MyCollectFavoritesViewModel : ClubViewModel() {
     private val _deleteFavorites = MutableLiveData<Int>()
     val deleteFavorites: LiveData<Int> = _deleteFavorites
 
-    fun getData(adapter: FavoritesAdapter) {
+    fun getData(adapter: FavoritesAdapter, isLike: Boolean) {
+
         Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())
-            getPostItemList()
+            getPostItemList(isLike)
                     .collectLatest {
                         adapter.submitData(it)
                     }
         }
     }
 
-    fun getPostItemList(): Flow<PagingData<MemberPostItem>> {
+    fun getPostItemList(isLike: Boolean): Flow<PagingData<MemberPostItem>> {
         return Pager(
                 config = PagingConfig(pageSize = FavoritesListDataSource.PER_LIMIT.toInt()),
                 pagingSourceFactory = {
@@ -48,7 +49,8 @@ class MyCollectFavoritesViewModel : ClubViewModel() {
                             domainManager,
                             pagingCallback,
                             adWidth,
-                            adHeight
+                            adHeight,
+                            isLike
                     )
                 }
         )

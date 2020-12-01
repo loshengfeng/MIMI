@@ -13,7 +13,8 @@ class FavoritesListDataSource constructor(
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
     private val adWidth: Int,
-    private val adHeight: Int
+    private val adHeight: Int,
+    private val isLike: Boolean
 ) : PagingSource<Long, MemberPostItem>() {
 
     companion object {
@@ -28,13 +29,17 @@ class FavoritesListDataSource constructor(
             val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content ?: AdItem()
 
             val result =
-                domainManager.getApiRepository().getPostFavorite( 0, PER_LIMIT.toInt(), 7)
+                when(isLike) {
+                    false -> domainManager.getApiRepository().getPostFavorite( 0, ClubLikeListDataSource.PER_LIMIT, 7)
+                    true -> domainManager.getApiRepository().getPostLike(0, ClubLikeListDataSource.PER_LIMIT, 7)
+                }
             if (!result.isSuccessful) throw HttpException(result)
 
             val memberPostItems =  result.body()?.content?.map {
                 it.toMemberPostItem()
             } as ArrayList
-            memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+            if(!isLike)
+                memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
                 result.body()?.paging?.offset ?: 0,

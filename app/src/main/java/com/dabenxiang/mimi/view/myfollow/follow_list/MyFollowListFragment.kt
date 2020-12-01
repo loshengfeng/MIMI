@@ -8,7 +8,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
-class  MyFollowListFragment : BaseFragment() {
+class  MyFollowListFragment(val type: Int) : BaseFragment() {
     private val viewModel: MyFollowListViewModel by viewModels()
     override fun getLayoutId() = R.layout.fragment_my_follow_list
 

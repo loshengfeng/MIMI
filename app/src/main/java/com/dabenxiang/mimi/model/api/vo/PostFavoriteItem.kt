@@ -86,4 +86,16 @@ data class PostFavoriteItem(
             category = category
         )
     }
+
+    fun toPlayItem(): PlayItem {
+        return PlayItem(
+            id = postId,
+            title = title,
+            favorite = true,
+            likeCount = likeCount,
+            favoriteCount = favoriteCount,
+            commentCount = commentCount,
+            tags = tags,
+        )
+    }
 }
