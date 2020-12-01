@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MyFollowVideoListener
@@ -24,7 +25,9 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
@@ -49,16 +52,6 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
             }
         }
     }
-
-//    private val memberPostFuncItem by lazy {
-//        MemberPostFuncItem(
-//                {},
-//                { id, view, type -> },
-//                { item, items, isFollow, func -> },
-//                { item, isLike, func -> },
-//                { item, isFavorite, func -> }
-//        )
-//    }
 
     private val listener = object : MyFollowVideoListener {
         override fun onMoreClick(item: PlayItem, position: Int) {
