@@ -23,10 +23,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
+        android:id="@+id/view1"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:background="@color/color_black_1_05"
         app:layout_constraintEnd_toEndOf="@id/tv_favorite"
         app:layout_constraintStart_toStartOf="@id/tv_favorite"
         app:layout_constraintTop_toBottomOf="@id/tv_favorite" />
@@ -41,13 +43,15 @@
         app:drawableEndCompat="@drawable/btn_arrow_black_n"
         app:drawableStartCompat="@drawable/btn_note_n"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_favorite" />
+        app:layout_constraintTop_toBottomOf="@id/view1" />
 
     <View
+        android:id="@+id/view2"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:background="@color/color_black_1_05"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />
@@ -85,14 +89,16 @@
         app:drawableStartCompat="@drawable/ico_myposts"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_topup_history" />
+        app:layout_constraintTop_toBottomOf="@+id/view2" />
 <!--               app:layout_constraintTop_toBottomOf="@id/tv_chat_history"-->
 
     <View
+        android:id="@+id/view3"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:background="@color/color_black_1_05"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
@@ -107,13 +113,14 @@
         app:drawableEndCompat="@drawable/btn_arrow_black_n"
         app:drawableStartCompat="@drawable/ico_coupon"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_my_post" />
+        app:layout_constraintTop_toBottomOf="@id/view3" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:background="@color/color_black_1_05"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_exchange" />
