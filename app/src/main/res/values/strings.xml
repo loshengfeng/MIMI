@@ -303,6 +303,11 @@
     <string name="reply">回复</string>
     <string name="n_reply">%d个回复</string>
 
+    <string-array name="player_short_video_tabs">
+        <item>@string/video_desc</item>
+        <item>@string/comment</item>
+    </string-array>
+
     <!-- Picture Detail -->
     <string name="picture_detail_title">图片详情</string>
     <string name="picture_detail_comment">评论</string>

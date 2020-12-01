@@ -2,22 +2,19 @@ package com.dabenxiang.mimi.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.MemberFollowViewHolder
 
-class MemberFollowAdapter(
-    private val listener: EventListener
+class FollowPersonalAdapter(
+    private val listener: BaseItemListener
 ) : PagingDataAdapter<MemberFollowItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
-        private const val VIEW_TYPE_NORMAL = 0
-        private const val VIEW_TYPE_DELETED = 1
-
         private val diffCallback = object : DiffUtil.ItemCallback<MemberFollowItem>() {
             override fun areItemsTheSame(
                 oldItem: MemberFollowItem,
@@ -31,43 +28,35 @@ class MemberFollowAdapter(
         }
     }
 
-    interface EventListener {
-        fun onDetail(item: MemberFollowItem)
-        fun onGetAttachment(id: Long, view: ImageView)
-        fun onCancelFollow(userId: Long, position: Int)
-    }
-
     var removedPosList = ArrayList<Int>()
 
     override fun getItemViewType(position: Int): Int {
         return if (removedPosList.contains(position)) {
-            VIEW_TYPE_DELETED
+            R.layout.item_deleted
         } else {
-            VIEW_TYPE_NORMAL
+            R.layout.item_follow_member
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
         return when (viewType) {
-            VIEW_TYPE_NORMAL -> MemberFollowViewHolder(
-                LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_follow_member, parent, false),
-                listener
-            )
-            else -> DeletedItemViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.item_deleted, parent, false)
-            )
+            R.layout.item_follow_member -> MemberFollowViewHolder(view)
+            else -> DeletedItemViewHolder(view)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
-        when (holder) {
-            is MemberFollowViewHolder -> holder.bind(item, position)
+        item?.also {
+            when (holder) {
+                is MemberFollowViewHolder -> {
+                    holder.onBind(
+                        it,
+                        listener
+                    )
+                }
+            }
         }
-    }
-
-    fun update(position: Int) {
-        notifyItemChanged(position)
     }
 }

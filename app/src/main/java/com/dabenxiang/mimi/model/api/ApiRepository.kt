@@ -568,6 +568,14 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.cancelMyMemberFollow(userId)
 
     /**
+     * 取得我的粉絲列表
+     */
+    suspend fun getMyFans(
+        offset: Int,
+        limit: Int
+    ) = apiService.getMyFans(offset, limit)
+
+    /**
      * 取得聊天室列表
      */
     suspend fun getMeChatItem(

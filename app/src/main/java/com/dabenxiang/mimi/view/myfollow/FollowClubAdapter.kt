@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.myfollow
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,24 +6,24 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MyLikeListener
-import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.callback.BaseItemListener
+import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
+import com.dabenxiang.mimi.view.adapter.viewHolder.ClubFollowViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.MiMiLikeViewHolder
 
-class MiMiLikeAdapter(
-    private val listener: MyLikeListener
-) : PagingDataAdapter<PostFavoriteItem, RecyclerView.ViewHolder>(diffCallback) {
+class FollowClubAdapter(
+    val listener: BaseItemListener
+) : PagingDataAdapter<ClubFollowItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<PostFavoriteItem>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<ClubFollowItem>() {
             override fun areItemsTheSame(
-                oldItem: PostFavoriteItem,
-                newItem: PostFavoriteItem
+                oldItem: ClubFollowItem,
+                newItem: ClubFollowItem
             ): Boolean = oldItem.id == newItem.id
 
             override fun areContentsTheSame(
-                oldItem: PostFavoriteItem,
-                newItem: PostFavoriteItem
+                oldItem: ClubFollowItem,
+                newItem: ClubFollowItem
             ): Boolean = oldItem == newItem
         }
     }
@@ -34,19 +34,15 @@ class MiMiLikeAdapter(
         return if (removedPosList.contains(position)) {
             R.layout.item_deleted
         } else {
-            R.layout.item_clip_post
+            R.layout.item_follow_club
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val itemview = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
         return when (viewType) {
-            R.layout.item_clip_post -> MiMiLikeViewHolder(
-                itemview
-            )
-            else -> DeletedItemViewHolder(
-                itemview
-            )
+            R.layout.item_follow_club -> ClubFollowViewHolder(view)
+            else -> DeletedItemViewHolder(view)
         }
     }
 
@@ -54,11 +50,9 @@ class MiMiLikeAdapter(
         val item = getItem(position)
         item?.also {
             when (holder) {
-                is MiMiLikeViewHolder -> {
+                is ClubFollowViewHolder -> {
                     holder.onBind(
                         it,
-                        null,
-                        position,
                         listener
                     )
                 }
