@@ -155,10 +155,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private fun updateAfterM3U8(pos: Int, url: String, errorCode: Int) {
-        val currentPos = (rv_clip?.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
-        takeIf { this@ClipPagerFragment.isVisible && currentPos == pos }?.run {
+        val currentPos = (rv_clip?.layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition()
+        currentPos?.takeIf { this@ClipPagerFragment.isVisible && it == pos }?.run {
             clipAdapter.setM3U8Result(url, errorCode)
-            clipAdapter.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_AFTER_M3U8)
+            clipAdapter.notifyItemChanged(this, ClipAdapter.PAYLOAD_UPDATE_AFTER_M3U8)
         }
     }
 

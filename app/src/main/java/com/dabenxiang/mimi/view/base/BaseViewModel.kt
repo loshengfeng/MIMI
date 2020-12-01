@@ -244,7 +244,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun decryptM3U8(encryptM3U8: String, decryptItem: DecryptSettingItem, update: (String?) -> Unit) {
+    fun decryptM3U8(encryptM3U8: String, decryptItem: DecryptSettingItem, update: (String) -> Unit) {
         viewModelScope.launch {
             HttpClient().decryptSource(encryptM3U8, decryptItem.key ?: "".toByteArray())
                 .catch { update("") }
@@ -253,22 +253,6 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                         is DownloadResult.Success -> {
                             val path = FileUtil.unzipSourceToFile(it.data as ByteArray)
                             update(path)
-                        }
-                        else -> {}
-                    }
-                }
-        }
-    }
-
-    fun decryptM3U8(encryptM3U8: String, decryptItem: DecryptSettingItem, pos: Int, update: (Int, String, Int) -> Unit) {
-        viewModelScope.launch {
-            HttpClient().decryptSource(encryptM3U8, decryptItem.key ?: "".toByteArray())
-                .catch { update(pos, "", -1) }
-                .collect {
-                    when (it) {
-                        is DownloadResult.Success -> {
-                            val path = FileUtil.unzipSourceToFile(it.data as ByteArray)
-                            update(pos, path, -1)
                         }
                         else -> {}
                     }

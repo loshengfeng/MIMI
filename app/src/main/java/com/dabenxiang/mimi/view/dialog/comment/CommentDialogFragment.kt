@@ -68,20 +68,15 @@ class CommentDialogFragment : BaseDialogFragment() {
     }
 
     fun showReportDialog(item: BaseMemberPostItem, isComment: Boolean) {
-        data?.videoEpisodes?.get(0)?.run {
-            Pair(this.videoStreams?.get(0), this.reported ?: false)
-        }?.run {
-            val (videoStream, isReported) = this
-            (requireActivity() as MainActivity).showReportDialog(
-                item,
-                MemberPostItem(
-                    id = videoStream?.id ?: 0,
-                    type = PostType.VIDEO,
-                    reported = isReported
-                ),
-                isComment
-            )
-        }
+        (requireActivity() as MainActivity).showReportDialog(
+            item,
+            MemberPostItem(
+                id = data?.id ?: 0,
+                type = PostType.VIDEO,
+                reported = data?.reported?:false
+            ),
+            isComment
+        )
     }
 
     private val playerInfoAdapter by lazy {

@@ -103,27 +103,13 @@
 
     <fragment
         android:id="@+id/likesListFragment"
-        android:name="com.dabenxiang.mimi.view.like.LikeFragment"
-        android:label="LikeFragment" />
+        android:name="com.dabenxiang.mimi.view.my.like.LikeFragment"
+        tools:layout="@layout/fragment_my_collection"
+        android:label="LikeFragment" >
 
-    <fragment
-        android:id="@+id/inviteVipFragment"
-        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
-        android:label="InviteVipFragment" />
-    <fragment
-        android:id="@+id/topUpFragment"
-        android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
-        android:label="TopUpFragment" />
-
-    <fragment
-        android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.myfollow_old.MyFollowFragment"
-        android:label="MyFollowFragment" />
-    <fragment
-        android:id="@+id/myCollectionFragment"
-        android:name="com.dabenxiang.mimi.view.mycollection.MyCollectionFragment"
-        android:label="MyCollectionFragment">
-
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
         <action
             android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
@@ -136,6 +122,55 @@
         <action
             android:id="@+id/action_to_playerV2Fragment"
             app:destination="@id/playerV2Fragment" />
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment" />
+    <fragment
+        android:id="@+id/topUpFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
+        android:label="TopUpFragment" />
+
+    <fragment
+        android:id="@+id/myFollowFragment"
+        android:name="com.dabenxiang.mimi.view.my.follow.MyFollowFragment"
+        android:label="MyFollowFragment" >
+        <action
+            android:id="@+id/action_myFollowFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
+    <fragment
+        android:id="@+id/myCollectionFragment"
+        android:name="com.dabenxiang.mimi.view.my.collection.MyCollectionFragment"
+        android:label="MyCollectionFragment">
+
+        <action
+            android:id="@+id/action_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
+        <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/navigation_clip_player" />
+
+        <action
+            android:id="@+id/action_to_playerV2Fragment"
+            app:destination="@id/playerV2Fragment" />
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
+        <action
+            android:id="@+id/action_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchPostFragment"
@@ -214,5 +249,13 @@
         android:id="@+id/clipPlayerFragment"
         android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
         android:label="ClipPlayerFragment" />
+    <fragment
+        android:id="@+id/searchVideoFragment"
+        android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
+        android:label="SearchVideoFragment" />
+    <fragment
+        android:id="@+id/clipSingleFragment"
+        android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
+        android:label="ClipSingleFragment" />
 
 </navigation>
