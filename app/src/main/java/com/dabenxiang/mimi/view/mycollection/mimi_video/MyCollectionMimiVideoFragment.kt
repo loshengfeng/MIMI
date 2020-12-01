@@ -59,7 +59,10 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         }
 
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
-            checkStatus { viewModel.likePost(MemberPostItem(id = item.videoId!!, likeType = LikeType.LIKE), position, isLike) }
+            checkStatus {
+                viewModel.likePost(MemberPostItem(id = item.videoId
+                        ?: 0, likeType = LikeType.LIKE), position, isLike)
+            }
         }
 
         override fun onClipCommentClick(item: List<PlayItem>, position: Int) {
