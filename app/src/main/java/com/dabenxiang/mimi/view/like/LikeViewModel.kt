@@ -11,11 +11,15 @@ import com.dabenxiang.mimi.callback.MyLikePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
+import com.dabenxiang.mimi.view.adapter.ClubLikeAdapter
+import com.dabenxiang.mimi.view.adapter.MiMiLikeAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class LikeViewModel : BaseViewModel() {
 
@@ -46,6 +50,25 @@ class LikeViewModel : BaseViewModel() {
     private val _clubIdList = ArrayList<Long>()
     private val _userIdList = ArrayList<Long>()
 
+    fun getData(adapter1: ClubLikeAdapter, adapter2: MiMiLikeAdapter, type: Int) {
+        Timber.i("getData")
+        CoroutineScope(Dispatchers.IO).launch {
+            if (type == LikeFragment.Companion.TYPE_POST) {
+                adapter1.submitData(PagingData.empty())
+                getClubList().collectLatest {
+                    Timber.i("getData  adapter1 get : " + it)
+                    adapter1.submitData(it)
+                }
+            } else {
+                adapter2.submitData(PagingData.empty())
+                getMemberList().collectLatest {
+                    Timber.i("getData  adapter2 get : " + it)
+                    adapter2.submitData(it)
+                }
+            }
+        }
+    }
+
     fun getMemberList(): Flow<PagingData<PostFavoriteItem>> {
         return Pager(
             config = PagingConfig(pageSize = MiMiLikeListDataSource.PER_LIMIT.toInt()),
@@ -57,6 +80,8 @@ class LikeViewModel : BaseViewModel() {
             }
         )
             .flow
+//            .onStart {  setShowProgress(true) }
+//            .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
     }
 
@@ -70,6 +95,8 @@ class LikeViewModel : BaseViewModel() {
                 )
             }
         ).flow
+//            .onStart {  setShowProgress(true) }
+//            .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
     }
 

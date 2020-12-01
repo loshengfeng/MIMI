@@ -28,8 +28,8 @@ class LikeViewPagerAdapter(
             .inflate(R.layout.layout_my_like_content, container, false)
 
         view.rv_content.adapter = when (position) {
-            TYPE_MIMI -> mimilikeAdapter
             TYPE_POST -> clublikeAdapter
+            TYPE_MIMI -> mimilikeAdapter
             else -> null
         }
 
