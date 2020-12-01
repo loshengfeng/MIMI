@@ -127,7 +127,7 @@ class LikeViewModel : BaseViewModel() {
     fun cancelFollowMember(userId: Long, position: Int) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().cancelMyMemberFollow(userId)
+                val result = domainManager.getApiRepository().cancelMyMemberFollow(userId.toString())
                 if (!result.isSuccessful) throw HttpException(result)
                 _userIdList.remove(userId)
                 val count = _mimiCount.value?.minus(1)
@@ -150,7 +150,7 @@ class LikeViewModel : BaseViewModel() {
     ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().cancelMyClubFollow(clubId)
+                val result = domainManager.getApiRepository().cancelMyClubFollow(clubId.toString())
                 if (!result.isSuccessful) throw HttpException(result)
                 _clubIdList.remove(clubId)
                 val count = _clubCount.value?.minus(1)
@@ -172,7 +172,7 @@ class LikeViewModel : BaseViewModel() {
             flow {
                 val tmpList = ArrayList<Long>()
                 _userIdList.forEach { userId ->
-                    val result = domainManager.getApiRepository().cancelMyMemberFollow(userId)
+                    val result = domainManager.getApiRepository().cancelMyMemberFollow(userId.toString())
                     if (result.isSuccessful) tmpList.add(userId)
                 }
                 _userIdList.removeAll(tmpList)
@@ -193,7 +193,7 @@ class LikeViewModel : BaseViewModel() {
             flow {
                 val tmpList = ArrayList<Long>()
                 _clubIdList.forEach { clubId ->
-                    val result = domainManager.getApiRepository().cancelMyClubFollow(clubId)
+                    val result = domainManager.getApiRepository().cancelMyClubFollow(clubId.toString())
                     if (result.isSuccessful) tmpList.add(clubId)
                 }
                 _clubIdList.removeAll(tmpList)

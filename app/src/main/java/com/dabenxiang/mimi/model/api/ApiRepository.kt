@@ -549,7 +549,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 移除我關注的圈子
      */
     suspend fun cancelMyClubFollow(
-        clubId: Long
+        clubId: String
     ) = apiService.cancelMyClubFollow(clubId)
 
     /**
@@ -564,7 +564,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 移除我關注的人
      */
     suspend fun cancelMyMemberFollow(
-        userId: Long
+        userId: String
     ) = apiService.cancelMyMemberFollow(userId)
 
     /**
