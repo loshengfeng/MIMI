@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -22,9 +20,6 @@ import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MyFollowFragment : BaseFragment() {
@@ -165,32 +160,8 @@ class MyFollowFragment : BaseFragment() {
         tv_title.setText(R.string.follow_title)
     }
 
-
     private fun refreshUi(type: Int, size: Int) {
         tv_clean.isEnabled = size != NO_DATA
         vpAdapter?.refreshUi(type, size)
-    }
-
-    private var job: Job? = null
-    private fun getData() {
-        job?.cancel()
-        job = lifecycleScope.launch {
-            when (layout_tab.selectedTabPosition) {
-                TYPE_PERSONAL -> {
-                    memberFollowAdapter.submitData(PagingData.empty())
-                    viewModel.getPersonalList()
-                        .collectLatest {
-                            memberFollowAdapter.submitData(it)
-                        }
-                }
-                TYPE_CLUB -> {
-                    clubFollowAdapter.submitData(PagingData.empty())
-                    viewModel.getClubList()
-                        .collectLatest {
-                            clubFollowAdapter.submitData(it)
-                        }
-                }
-            }
-        }
     }
 }
