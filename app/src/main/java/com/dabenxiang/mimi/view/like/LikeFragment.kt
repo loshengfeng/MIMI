@@ -5,7 +5,6 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
-import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyLikeListener
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -54,7 +53,7 @@ class LikeFragment : BaseFragment() {
             TODO("Not yet implemented")
         }
 
-        override fun onChipClick(type: PostFavoriteItem, tag: String) {
+        override fun onChipClick(item: PostFavoriteItem, tag: String) {
             TODO("Not yet implemented")
         }
 
@@ -183,20 +182,6 @@ class LikeFragment : BaseFragment() {
 
         tv_clean.visibility = View.VISIBLE
         tv_title.setText(R.string.like_title)
-    }
-
-    private fun handleLoadState(loadState: LoadState) {
-        when (loadState) {
-            is LoadState.Loading -> vpAdapter?.changeIsRefreshing(
-                layout_tab.selectedTabPosition,
-                true
-            )
-            is LoadState.NotLoading -> vpAdapter?.changeIsRefreshing(
-                layout_tab.selectedTabPosition,
-                false
-            )
-            is LoadState.Error -> onApiError(loadState.error)
-        }
     }
 
     private fun refreshUi(type: Int, size: Int) {

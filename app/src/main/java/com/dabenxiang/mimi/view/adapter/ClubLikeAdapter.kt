@@ -10,7 +10,6 @@ import com.dabenxiang.mimi.callback.MyLikeListener
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClubLikeViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
-import timber.log.Timber
 
 class ClubLikeAdapter(
     val listener: MyLikeListener
@@ -40,7 +39,6 @@ class ClubLikeAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        Timber.e("Show  ClubLikeAdapter onCreateViewHolder " + itemCount)
         val itemview = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
         return when (viewType) {
             R.layout.item_clip_post -> ClubLikeViewHolder(itemview)

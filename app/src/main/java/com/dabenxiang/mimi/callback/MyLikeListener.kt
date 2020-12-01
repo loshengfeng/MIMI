@@ -7,7 +7,7 @@ interface MyLikeListener {
     fun onMoreClick(item: PostFavoriteItem, position: Int)
     fun onLikeClick(item: PostFavoriteItem, position: Int, isLike: Boolean)
     fun onClipCommentClick(item: List<PlayItem>, position: Int)
-    fun onChipClick(type: PostFavoriteItem, tag: String)
+    fun onChipClick(item: PostFavoriteItem, tag: String)
     fun onItemClick(item: PostFavoriteItem, type: Int)
     fun onCommentClick(item: PostFavoriteItem, type: Int)
     fun onFavoriteClick(

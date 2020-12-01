@@ -1,19 +1,24 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.dabenxiang.mimi.App
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyLikeListener
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import kotlinx.android.synthetic.main.item_clip_post.view.*
 import kotlinx.android.synthetic.main.item_follow_member.view.iv_photo
 import kotlinx.android.synthetic.main.item_follow_member.view.tv_follow
 import kotlinx.android.synthetic.main.item_follow_member.view.tv_name
 import org.koin.core.component.KoinComponent
-import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MiMiLikeViewHolder(
     itemView: View
@@ -41,128 +46,127 @@ class MiMiLikeViewHolder(
         item: PostFavoriteItem,
         itemList: List<PostFavoriteItem>?,
         position: Int,
-        myPostListener: MyLikeListener,
+        listener: MyLikeListener,
         searchTag: String = ""
     ) {
-        Timber.d("YYYY , item = ${item}")
-    }
-//
-//    override fun updated(position: Int) {
-////        data?.avatarAttachmentId?.let { id -> listener.onGetAttachment(id, ivPhoto) }
-////        tvName.text = data?.posterName
-////        tvTime.text = data?.postDate
-////        clFollow.setOnClickListener {
-////            data?.userId?.let { userId ->
-////                listener.onCancelFollow(
-////                    userId,
-////                    position
-////                )
-////            }
-////        }
-//
-//        clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
-//        tvName.setTextColor(App.self.getColor(R.color.color_black_1))
-//        tvTime.setTextColor(App.self.getColor(R.color.color_black_1_50))
-//        tvTitle.setTextColor(App.self.getColor(R.color.color_black_1))
-//        tvLikeCount.setTextColor(App.self.getColor(R.color.color_black_1))
-//        tvFavoriteCount.setTextColor(App.self.getColor(R.color.color_black_1))
-//        tvCommentCount.setTextColor(App.self.getColor(R.color.color_black_1))
-//        ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
-//        ivMore.setImageResource(R.drawable.btn_more_gray_n)
-//        vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
-//
-////        tvName.text = data?.friendlyName
-////        tvTime.text = GeneralUtils.getTimeDiff(data?.creationDate, Date())
-////        tvTitle.text = item.title
-////        tvFollow.visibility =
-////            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
-////
-////        attachmentListener.onGetAttachment(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
-////        ivAvatar.setOnClickListener {
-////            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
-////        }
-////
-////        tagChipGroup.removeAllViews()
-////        item.tags?.forEach {
-////            val chip = LayoutInflater.from(tagChipGroup.context)
-////                .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
-////            chip.text = it
-////            chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
-////            chip.chipBackgroundColor = ColorStateList.valueOf(
-////                ContextCompat.getColor(tagChipGroup.context, R.color.color_black_1_05)
-////            )
-////            chip.setOnClickListener { view ->
-////                myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
-////            }
-////            tagChipGroup.addView(chip)
-////        }
-////
-////        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-////
-////        tvLength.text = contentItem.shortVideo?.length
-////        contentItem.images?.also { images ->
-////            Timber.i("images $images")
-////            if (!TextUtils.isEmpty(images[0].url)) {
-////                Glide.with(ivPhoto.context)
-////                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
-////            } else {
-////                attachmentListener.onGetAttachment(
+        val contex = App.self
+        clClipPost.setBackgroundColor(contex.getColor(R.color.color_white_1))
+        tvName.setTextColor(contex.getColor(R.color.color_black_1))
+        tvTime.setTextColor(contex.getColor(R.color.color_black_1_50))
+        tvTitle.setTextColor(contex.getColor(R.color.color_black_1))
+        tvLikeCount.setTextColor(contex.getColor(R.color.color_black_1))
+        tvFavoriteCount.setTextColor(contex.getColor(R.color.color_black_1))
+        tvCommentCount.setTextColor(contex.getColor(R.color.color_black_1))
+        ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
+        ivMore.setImageResource(R.drawable.btn_more_gray_n)
+        vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
+        tagChipGroup.removeAllViews()
+
+        item.tags?.forEach {
+            val chip = LayoutInflater.from(tagChipGroup.context)
+                .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
+            chip.text = it
+            if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
+            else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
+            chip.setOnClickListener { view ->
+                listener.onChipClick(item, (view as Chip).text.toString())
+            }
+            tagChipGroup.addView(chip)
+        }
+        tagChipGroup.setOnClickListener { view ->
+            //TODO go to search
+//            listener.onChipClick(item, (view as Chip).text.toString())
+
+        }
+        tvTitle.text = item.title
+        tvName.text = item.posterName
+        ivAvatar.setOnClickListener { view ->
+//            listener.onChipClick(item, (view as Chip).text.toString())
+            //TODO go to poster
+        }
+        tvName.setOnClickListener { view ->
+//            listener.onChipClick(item, (view as Chip).text.toString())
+            //TODO go to poster
+        }
+        tvTime.text = item.postDate.let { date ->
+            SimpleDateFormat(
+                "yyyy-MM-dd HH:mm",
+                Locale.getDefault()
+            ).format(date)
+        }
+        ivPhoto.setOnClickListener { view ->
+//            listener.onChipClick(item, (view as Chip).text.toString())
+            //TODO go to video dec & play page
+        }
+
+        ivLike.setOnClickListener { view ->
+            //TODO un-like & re-move item call api
+//            listener.onChipClick(item, (view as Chip).text.toString())
+        }
+        tvLikeCount.setOnClickListener { view ->
+            //TODO un-like & re-move item call api
+//            listener.onChipClick(item, (view as Chip).text.toString())
+        }
+//        val contentItem = Gson().fromJson(item.content , MediaContentItem::class.java)
+//        tvLength.text = contentItem?.shortVideo?.length
+//        contentItem.images?.also {images->
+//            if (!TextUtils.isEmpty(images[0].url)) {
+//                Glide.with(ivPhoto.context)
+//                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+//            } else {
+////                listener.onGetAttachment(
 ////                    images[0].id.toLongOrNull(),
 ////                    ivPhoto,
 ////                    LoadImageType.PICTURE_THUMBNAIL
 ////                )
-////            }
-////        }
-//
-////        if (isMe) {
-////            tvFollow.visibility = View.GONE
-////        } else {
-////            tvFollow.visibility = View.VISIBLE
-////            updateFollow(item)
-////            tvFollow.setOnClickListener {
-////                itemList?.also { myPostListener.onFollowClick(it, position, !item.isFollow) }
-////            }
-////        }
-//
-//        tvFollow.visibility =  View.GONE
-//
-//        ivMore.setOnClickListener {
-////            myPostListener.onMoreClick(item, position)
+//            }
 //        }
-//
-////        updateFavorite(item)
-////        val onFavoriteClickListener = View.OnClickListener {
-////            item.isFavorite = !item.isFavorite
-////            item.favoriteCount =
-////                if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
-////            myPostListener.onFavoriteClick(
-////                item,
-////                position,
-////                item.isFavorite,
-////                AttachmentType.ADULT_HOME_CLIP
-////            )
-////        }
-////        ivFavorite.setOnClickListener(onFavoriteClickListener)
-////        tvFavoriteCount.setOnClickListener(onFavoriteClickListener)
-////
-////        updateLike(item)
-////        val onLikeClickListener = View.OnClickListener {
-////            item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
-////            item.likeCount =
-////                if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
-////            myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
-////        }
-////        ivLike.setOnClickListener(onLikeClickListener)
-////        tvLikeCount.setOnClickListener(onLikeClickListener)
-////
-////        tvCommentCount.text = item.commentCount.toString()
-////        val onCommentClickListener = View.OnClickListener {
-////            itemList?.also { myPostListener.onClipCommentClick(it, position) }
-////        }
-////        ivComment.setOnClickListener(onCommentClickListener)
-////        tvCommentCount.setOnClickListener(onCommentClickListener)
-//    }
-//
-//    override fun updated() {
-//    }
+
+        ivComment.setOnClickListener { view ->
+            //TODO go to Comment
+//            listener.onChipClick(item, (view as Chip).text.toString())
+        }
+        tvCommentCount.setOnClickListener { view ->
+            //TODO go to Comment
+//            listener.onChipClick(item, (view as Chip).text.toString())
+        }
+
+        ivFavorite.setOnClickListener { view ->
+            //TODO popup dialog
+//            listener.onChipClick(item, (view as Chip).text.toString())
+        }
+        tvFavoriteCount.setOnClickListener { view ->
+            //TODO popup dialog
+//            listener.onChipClick(item, (view as Chip).text.toString())
+        }
+
+
+        tvFollow.visibility = View.VISIBLE
+        when (item.isFollow) {
+            true -> {
+                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_black_1_60))
+                tvFollow.setBackgroundResource(R.drawable.bg_gray_6_radius_16)
+                tvFollow.setText(R.string.followed)
+            }
+            else -> {
+                tvFollow.setTextColor(tvFollow.context.getColor(R.color.color_red_1))
+                tvFollow.setBackgroundResource(R.drawable.bg_red_1_stroke_radius_16)
+                tvFollow.setText(R.string.follow)
+            }
+        }
+        tvFollow.setOnClickListener { view ->
+            //TODO Follow poster
+//            listener.onChipClick(item, (view as Chip).text.toString())
+        }
+//        setupChipGroup(data?.tags, data?.type)
+        tvLikeCount.text = item.likeCount.toString()
+//        val res = if (data?.likeType == LikeType.LIKE) {
+//            R.drawable.ico_nice_s
+//        } else {
+//            R.drawable.ico_nice_gray
+//        }
+//        tvLike.setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+        tvFavoriteCount.text = item.favoriteCount.toString()
+        tvCommentCount.text = item.commentCount.toString()
+    }
 }
