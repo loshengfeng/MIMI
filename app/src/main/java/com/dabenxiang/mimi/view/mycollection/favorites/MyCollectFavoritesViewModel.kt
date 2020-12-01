@@ -73,7 +73,7 @@ class MyCollectFavoritesViewModel : ClubViewModel() {
             flow {
                 val result = domainManager.getApiRepository()
                         .deletePostFavorite(
-                                items.map {it.id}.joinToString(separator = ",")
+                                items.map {it.postId}.joinToString(separator = ",")
                         )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))

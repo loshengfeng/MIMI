@@ -77,6 +77,9 @@ data class MemberPostItem(
     val isFullContent: Boolean = false,
 
     @SerializedName("deducted")
-    var deducted: Boolean = false
+    var deducted: Boolean = false,
+
+    @SerializedName("postId")
+    var postId: Long = 0
 
 ) : BaseMemberPostItem()

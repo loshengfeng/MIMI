@@ -216,7 +216,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         })
 
         collectionViewModel.deleteMiMIs.observe(this,  {
-            viewModel.deleteVideos(adapter.snapshot().items)
+            if(type.value == it) viewModel.deleteVideos(adapter.snapshot().items)
         })
     }
 

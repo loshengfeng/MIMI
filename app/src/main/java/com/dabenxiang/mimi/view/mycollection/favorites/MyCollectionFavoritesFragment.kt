@@ -152,7 +152,7 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
         }
 
         collectionViewModel.deleteFavorites?.observe(viewLifecycleOwner,  {
-            Timber.i("mainViewModel deleteFavorites")
+
             viewModel.deleteFavorites(adapter.snapshot().items)
         })
 
