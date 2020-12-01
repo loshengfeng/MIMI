@@ -73,7 +73,7 @@ class ClubTabFragment : BaseFragment() {
                 val bundle = TopicDetailFragment.createBundle(clubItem)
                 navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_clubTabFragment_to_topicDetailFragment,
+                        R.id.action_to_topicDetailFragment,
                         bundle
                     )
                 )
@@ -183,7 +183,7 @@ class ClubTabFragment : BaseFragment() {
         }
 
         override fun onUploadArticle() {
-            findNavController().navigate(R.id.action_clubTabFragment_to_postArticleFragment)
+            findNavController().navigate(R.id.action_to_postArticleFragment)
         }
     }
 
@@ -224,7 +224,7 @@ class ClubTabFragment : BaseFragment() {
         bundle.putStringArrayList(BasePostFragment.BUNDLE_PIC_URI, pciUri)
 
         findNavController().navigate(
-            R.id.action_clubTabFragment_to_postPicFragment,
+                R.id.action_to_postPicFragment,
             bundle
         )
     }
@@ -269,7 +269,7 @@ class ClubTabFragment : BaseFragment() {
                         val bundle = Bundle()
                         bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
                         findNavController().navigate(
-                            R.id.action_clubTabFragment_to_editVideoFragment,
+                                R.id.action_to_editVideoFragment,
                             bundle
                         )
                     } else {
@@ -301,7 +301,7 @@ class ClubTabFragment : BaseFragment() {
         val bundle = SearchPostFragment.createBundle(searchPostItem)
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_clubTabFragment_to_searchPostFragment,
+                R.id.action_to_searchPostFragment,
                 bundle
             )
         )

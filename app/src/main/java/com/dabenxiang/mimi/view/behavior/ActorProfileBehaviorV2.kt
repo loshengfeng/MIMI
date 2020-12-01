@@ -3,23 +3,15 @@ package com.dabenxiang.mimi.view.behavior
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.marginBottom
-import androidx.core.view.marginLeft
-import androidx.core.view.marginRight
-import androidx.core.view.marginTop
-import com.dabenxiang.mimi.R
-import timber.log.Timber
-
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.Interpolator
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.widget.collapsing.*
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
-import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.fragment_actor_videos.view.*
 import kotlinx.android.synthetic.main.item_actor_collapsing.view.*
 
