@@ -74,6 +74,7 @@ class PlayerDescriptionFragment : BaseFragment() {
 
             override fun onStatisticsDetail(baseVideoItem: BaseVideoItem) {
                 viewModel.stopVideoPlayer.setNot()
+                viewModel.isResetPlayer = true
                 if(viewModel.selectEpisodePosition.value != 0) viewModel.selectStreamSourceIndex(0)
                 viewModel.videoContentId = (baseVideoItem as BaseVideoItem.Video).id!!
                 viewModel.getVideoContent()
@@ -179,6 +180,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         viewModel.selectEpisodePosition.observe(viewLifecycleOwner) {
             Timber.w("Select index is $it and old index is ${episodeAdapter.getSelectedPosition()}")
             if (it != episodeAdapter.getSelectedPosition()) {
+                isReported = false
                 episodeAdapter.setLastSelectedIndex(it)
                 viewModel.getVideoContent()
             }

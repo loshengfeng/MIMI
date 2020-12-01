@@ -88,9 +88,10 @@ class PlayerV2Fragment : BasePlayerFragment() {
         }
 
         viewModel.videoStreamingUrl.observe(viewLifecycleOwner) {
-            if (!it.isNullOrEmpty()) {
-                setupPlayUrl(it, (viewModel.m3u8SourceUrl != it))
+            if(!it.isNullOrEmpty()) {
+                setupPlayUrl(it, viewModel.isResetPlayer)
                 viewModel.m3u8SourceUrl = it
+                viewModel.isResetPlayer = false
             }
         }
 
@@ -104,7 +105,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
     }
 
     override fun getViewPagerCount(): Int {
-        return resources.getStringArray(R.array.player_short_video_tabs).size
+        return 2
     }
 
     override fun createViewPagerFragment(position: Int): Fragment {
@@ -121,8 +122,10 @@ class PlayerV2Fragment : BasePlayerFragment() {
     }
 
     override fun getTabTitle(tab: TabLayout.Tab, position: Int) {
-        val tabs = resources.getStringArray(R.array.player_short_video_tabs)
-        tab.text = tabs[position]
+        when(position) {
+            0 -> tab.text = getString(R.string.video_desc)
+            1 -> tab.text = getString(R.string.comment)
+        }
     }
 
     override fun onResume() {
@@ -154,11 +157,14 @@ class PlayerV2Fragment : BasePlayerFragment() {
      * get video or clip content
      */
     private fun getVideoContent() {
-        (arguments?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
-            contentId = it.videoId
-            viewModel.videoContentId = it.videoId
-            viewModel.getVideoContent()
-        }
+        if(arguments?.getSerializable(KEY_PLAYER_SRC) != null) {
+            (arguments?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
+                this.arguments = null
+                contentId = it.videoId
+                viewModel.videoContentId = it.videoId
+                viewModel.getVideoContent()
+            }
+        } else viewModel.getVideoContent()
     }
 
     private fun onApiError(throwable: Throwable) {
