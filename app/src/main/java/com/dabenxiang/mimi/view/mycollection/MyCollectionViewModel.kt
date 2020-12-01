@@ -47,6 +47,8 @@ class MyCollectionViewModel : BaseViewModel() {
     private val _clubIdList = ArrayList<Long>()
     private val _userIdList = ArrayList<Long>()
 
+    var lastTabIndex =0
+
     fun getMemberList(): Flow<PagingData<MemberFollowItem>> {
         return Pager(
             config = PagingConfig(pageSize = MemberFollowListDataSource.PER_LIMIT.toInt()),

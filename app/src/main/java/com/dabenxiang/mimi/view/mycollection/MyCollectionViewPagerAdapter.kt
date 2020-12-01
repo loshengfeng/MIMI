@@ -14,7 +14,7 @@ class MyCollectionViewPagerAdapter(
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
             MyCollectionFragment.TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(MyFollowTabItemType.MIMI_VIDEO) },
-            MyCollectionFragment.TAB_SMALL_VIDEO to { MyCollectionMimiVideoFragment(MyFollowTabItemType.SMALL_VIDEO) },
+            MyCollectionFragment.TAB_SHORT_VIDEO to { MyCollectionMimiVideoFragment(MyFollowTabItemType.SHORT_VIDEO) },
             MyCollectionFragment.TAB_POST to {  MyCollectionFavoritesFragment()  },
     )
 
