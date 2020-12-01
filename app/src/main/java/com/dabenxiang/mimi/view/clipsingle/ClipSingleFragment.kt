@@ -2,17 +2,26 @@ package com.dabenxiang.mimi.view.clipsingle
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.clip.ClipAdapter
+import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
+import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
+import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.PlayerViewModel
-import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
@@ -25,7 +34,6 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.item_clip.*
-import kotlinx.android.synthetic.main.item_clip_pager.*
 import timber.log.Timber
 
 class ClipSingleFragment : BaseFragment() {
@@ -73,6 +81,7 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     fun modifyFavorite() {
+        Timber.d("@@modifyFavorite: ${playItem?.favorite}")
         val favoriteRes =
             takeIf { playItem?.favorite == true }?.let { R.drawable.btn_favorite_forvideo_s }
                 ?: let { R.drawable.btn_favorite_forvideo_n }
@@ -110,11 +119,16 @@ class ClipSingleFragment : BaseFragment() {
         }
 
         tv_more.setOnClickListener {
-
+            viewModel.videoEpisodeItem?.run {
+                Pair(this.videoStreams?.get(0), this.reported ?: false)
+            }?.run {
+                val (videoStream, isReported) = this
+                showMoreDialog(videoStream?.id ?: 0, PostType.VIDEO, isReported)
+            }
         }
 
         tv_comment.setOnClickListener {
-
+            viewModel.videoItem?.run { showCommentDialog(this) }
         }
 
         ib_back.setOnClickListener { findNavController().navigateUp() }
@@ -198,11 +212,11 @@ class ClipSingleFragment : BaseFragment() {
                 }
                 ExoPlayer.STATE_READY -> {
                     progress_video?.visibility = View.GONE
-                    iv_cover.visibility = View.GONE
+                    iv_cover?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
                 }
                 ExoPlayer.STATE_ENDED -> {
-                    ib_replay.visibility = View.VISIBLE
+                    ib_replay?.visibility = View.VISIBLE
                     "ExoPlayer.STATE_ENDED"
                 }
                 else -> "UNKNOWN_STATE"
@@ -284,6 +298,108 @@ class ClipSingleFragment : BaseFragment() {
                 }
             }
             else -> null
+        }
+    }
+
+    private fun showCommentDialog(item: VideoItem) {
+        val listener = object : CommentDialogFragment.CommentListener {
+            override fun onAvatarClick(userId: Long, name: String) {
+                val bundle = MyPostFragment.createBundle(
+                    userId, name,
+                    isAdult = true,
+                    isAdultTheme = true
+                )
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_myPostFragment,
+                        bundle
+                    )
+                )
+            }
+
+            override fun onUpdateCommentCount(count: Int) {
+                tv_comment.text = count.toString()
+            }
+        }
+        CommentDialogFragment.newInstance(item, listener).also {
+            it.isCancelable = true
+            it.show(
+                requireActivity().supportFragmentManager,
+                CommentDialogFragment::class.java.simpleName
+            )
+        }
+    }
+
+    private var moreDialog: MoreDialogFragment? = null
+    private var reportDialog: ReportDialogFragment? = null
+
+    private fun showMoreDialog(
+        id: Long,
+        type: PostType,
+        isReported: Boolean,
+        isComment: Boolean = false
+    ) {
+        Timber.i("id=$id")
+        Timber.i("isReported=$isReported")
+        moreDialog = MoreDialogFragment.newInstance(
+            MemberPostItem(id = id, type = type, reported = isReported),
+            onMoreDialogListener,
+            isComment
+        ).also {
+            it.show(
+                requireActivity().supportFragmentManager,
+                MoreDialogFragment::class.java.simpleName
+            )
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
+            checkStatus {
+                if ((item as MemberPostItem).reported) {
+                    GeneralUtils.showToast(
+                        App.applicationContext(),
+                        getString(R.string.already_reported)
+                    )
+                } else {
+                    reportDialog =
+                        ReportDialogFragment.newInstance(
+                            item = item,
+                            listener = onReportDialogListener,
+                            isComment = isComment
+                        ).also {
+                            it.show(
+                                requireActivity().supportFragmentManager,
+                                ReportDialogFragment::class.java.simpleName
+                            )
+                        }
+                }
+                moreDialog?.dismiss()
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
+    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
+        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
+            if (TextUtils.isEmpty(content)) {
+                GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
+            } else {
+                when (item) {
+                    is MemberPostItem -> {
+                        viewModel.sendVideoReport(item.id.toString())
+                    }
+                }
+            }
+            reportDialog?.dismiss()
+        }
+
+        override fun onCancel() {
+            Timber.i("reportDialog onCancel reportDialog=$reportDialog ")
+            reportDialog?.dismiss()
         }
     }
 }
