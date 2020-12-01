@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.video
+package com.dabenxiang.mimi.view.mycollection.mimi_video
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -8,16 +8,13 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyFollowVideoListener
-import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import timber.log.Timber
 
-class MyFollowItemAdapter(
+class MyCollectionMimiVideoAdapter(
         val context: Context,
         private val listener: MyFollowVideoListener
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {

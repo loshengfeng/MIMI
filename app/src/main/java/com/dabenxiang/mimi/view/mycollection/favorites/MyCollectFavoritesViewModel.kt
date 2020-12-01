@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.follow
+package com.dabenxiang.mimi.view.mycollection.favorites
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,26 +8,20 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
 
-class ClubFollowViewModel : ClubViewModel() {
+class MyCollectFavoritesViewModel : ClubViewModel() {
 
     private val _postCount = MutableLiveData<Int>()
     val postCount: LiveData<Int> = _postCount
 
-    fun getData(adapter: ClubPostFollowAdapter) {
+    fun getData(adapter: FavoritesAdapter) {
         Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())
@@ -40,9 +34,9 @@ class ClubFollowViewModel : ClubViewModel() {
 
     fun getPostItemList(): Flow<PagingData<MemberPostItem>> {
         return Pager(
-                config = PagingConfig(pageSize = ClubPostFollowListDataSource.PER_LIMIT.toInt()),
+                config = PagingConfig(pageSize = FavoritestListDataSource.PER_LIMIT.toInt()),
                 pagingSourceFactory = {
-                    ClubPostFollowListDataSource(
+                    FavoritestListDataSource(
                             domainManager,
                             pagingCallback,
                             adWidth,

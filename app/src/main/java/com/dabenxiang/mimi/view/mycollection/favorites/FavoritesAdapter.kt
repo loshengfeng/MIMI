@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.follow
+package com.dabenxiang.mimi.view.mycollection.favorites
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -17,7 +17,7 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
-class MyFollowInterestAdapter(
+class FavoritesAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
         private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),

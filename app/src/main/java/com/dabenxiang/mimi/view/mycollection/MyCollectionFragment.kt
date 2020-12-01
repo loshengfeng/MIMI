@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow
+package com.dabenxiang.mimi.view.mycollection
 
 import android.content.Context
 import android.os.Bundle
@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.fragment_my_follow_v3.*
 import kotlinx.android.synthetic.main.fragment_my_follow_v3.view.*
 import timber.log.Timber
 
-class MyFollowFragmentV3: BaseFragment() {
+class MyCollectionFragment: BaseFragment() {
 
     companion object {
         const val TAB_MiMI_VIDEO = 0
@@ -37,7 +37,7 @@ class MyFollowFragmentV3: BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
 
-        view.view_pager.adapter = MyFollowViewPagerAdapterV2(childFragmentManager, lifecycle)
+        view.view_pager.adapter = MyCollectionViewPagerAdapter(childFragmentManager, lifecycle)
         view.view_pager.offscreenPageLimit = 2
         tabLayoutMediator = TabLayoutMediator(view.tabs, view.view_pager) { tab, position ->
             tab.text = getTabTitle(position)

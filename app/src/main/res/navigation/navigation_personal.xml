@@ -116,7 +116,7 @@
         android:label="FavoriteFragment" />
     <fragment
         android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragmentV3"
+        android:name="com.dabenxiang.mimi.view.mycollection.MyCollectionFragment"
         android:label="MyFollowFragment">
 
         <action
