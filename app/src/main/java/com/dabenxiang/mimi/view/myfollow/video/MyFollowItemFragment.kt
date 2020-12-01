@@ -5,16 +5,19 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyFollowVideoListener
 import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
+import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -22,6 +25,7 @@ import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
+import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
@@ -60,13 +64,13 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
 //        )
 //    }
 
-    private val listener = object: MyFollowVideoListener{
+    private val listener = object : MyFollowVideoListener {
         override fun onMoreClick(item: PlayItem, position: Int) {
 
         }
 
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
-
+            checkStatus { viewModel.likePost(MemberPostItem(id=item.videoId!!,likeType = LikeType.LIKE), position, isLike) }
         }
 
         override fun onClipCommentClick(item: List<PlayItem>, position: Int) {
@@ -74,32 +78,37 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-
+            Timber.d("onChipClick")
+            val item = SearchPostItem(type, tag = tag)
+            val bundle = SearchPostFragment.createBundle(item)
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_myFollowFragmentV2_to_searchPostFragment,
+                            bundle
+                    )
+            )
         }
 
         override fun onItemClick(item: PlayItem, type: MyFollowTabItemType) {
-            when(type){
-                MyFollowTabItemType.MIMI_VIDEO->{
-                    val bundle = ClipPlayerFragment.createBundle(item.videoId ?: 0)
-                    navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clipPlayerFragment,
-                                    bundle
-                            )
-                    )
-                }
-                MyFollowTabItemType.SMALL_VIDEO->{
-
-                }
-            }
+            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_myFollowFragmentV2_to_playerV2Fragment,
+                            bundle
+                    ))
         }
 
         override fun onCommentClick(item: PlayItem, type: MyFollowTabItemType) {
-            TODO("Not yet implemented")
+            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0),true)
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_myFollowFragmentV2_to_playerV2Fragment,
+                            bundle
+                    ))
         }
 
-        override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
-
+        override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyFollowTabItemType) {
+            checkStatus { viewModel.favoritePost(MemberPostItem(id=item.videoId!!), position, isFavorite) }
         }
     }
 
@@ -107,28 +116,6 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         super.onAttach(context)
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
-
-//        viewModel.adResult.observe(this) {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    it.result?.let { item ->
-//                        Glide.with(requireContext()).load(item.href).into(layout_ad.iv_ad)
-//                        layout_ad.iv_ad.setOnClickListener {
-//                            GeneralUtils.openWebView(requireContext(), item.target ?: "")
-//                        }
-//                    }
-//                }
-//                is ApiResult.Error -> {
-//                    layout_ad.visibility = View.GONE
-//                    onApiError(it.throwable)
-//                }
-//
-//                else -> {
-//                    layout_ad.visibility = View.GONE
-//                    onApiError(Exception("Unknown Error!"))
-//                }
-//            }
-//        }
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it
@@ -146,42 +133,29 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
             layout_refresh.isRefreshing = false
         }
 
-//        viewModel.followResult.observe(this, Observer {
-//            when (it) {
-//                is ApiResult.Empty -> {
-//                    adapter?.notifyItemRangeChanged(
-//                            0,
-//                            viewModel.totalCount,
-//                            MyFollowItemAdapter.PAYLOAD_UPDATE_FOLLOW
-//                    )
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
-//
-//        viewModel.likePostResult.observe(this, Observer {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    adapter?.notifyItemChanged(
-//                            it.result,
-//                            MyFollowItemAdapter.PAYLOAD_UPDATE_LIKE
-//                    )
-//                }
-//                is ApiResult.Error -> Timber.e(it.throwable)
-//            }
-//        })
-//
-//        viewModel.favoriteResult.observe(this, Observer {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    adapter?.notifyItemChanged(
-//                            it.result,
-//                            MyFollowItemAdapter.PAYLOAD_UPDATE_FAVORITE
-//                    )
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
+        viewModel.likePostResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    adapter?.notifyItemChanged(
+                            it.result,
+                            MyFollowItemAdapter.PAYLOAD_UPDATE_LIKE
+                    )
+                }
+                is ApiResult.Error -> Timber.e(it.throwable)
+            }
+        })
+
+        viewModel.favoriteResult.observe(this, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    adapter?.notifyItemChanged(
+                            it.result,
+                            MyFollowItemAdapter.PAYLOAD_UPDATE_FAVORITE
+                    )
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -226,136 +200,6 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-        }
-    }
-
-    private val postListener = object : MyPostListener {
-
-        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-//            checkStatus { viewModel.likePost(item, position, isLike) }
-        }
-
-        override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            Timber.d("onCommentClick = ${adultTabType}")
-            checkStatus {
-                when (adultTabType) {
-                    AdultTabType.PICTURE -> {
-                        val bundle = ClubPicFragment.createBundle(item, 1)
-                        navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clubPicFragment,
-                                        bundle
-                                )
-                        )
-                    }
-                    AdultTabType.TEXT -> {
-                        val bundle = ClubTextFragment.createBundle(item, 1)
-                        navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clubTextFragment,
-                                        bundle
-                                )
-                        )
-                    }
-                    AdultTabType.CLIP -> {
-                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
-                        navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clipPlayerFragment,
-                                        bundle
-                                )
-                        )
-                    }
-                }
-            }
-        }
-
-        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
-            checkStatus {
-//                viewModel.favoritePost(item, position, isFavorite)
-            }
-        }
-
-        override fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean) {
-
-        }
-
-        override fun onAvatarClick(userId: Long, name: String) {
-            val bundle = MyPostFragment.createBundle(
-                    userId, name,
-                    isAdult = true,
-                    isAdultTheme = true
-            )
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_myPostFragment,
-                            bundle
-                    )
-            )
-        }
-
-        override fun onMoreClick(item: MemberPostItem, position: Int) {
-            onMoreClick(item, position) {
-                it as MemberPostItem
-            }
-        }
-
-        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            Timber.i("onItemClick:$item")
-            if (!accountManager.isLogin()) {
-                loginPageToggle(false)
-                return
-            }
-            Timber.d("onItemClick =${adultTabType}")
-            when (adultTabType) {
-//                AdultTabType.TEXT -> {
-//                    val bundle = ClubTextFragment.createBundle(item)
-//                    navigateTo(
-//                            NavigateItem.Destination(
-//                                    R.id.action_clubTabFragment_to_clubTextFragment,
-//                                    bundle
-//                            )
-//                    )
-//                }
-//                AdultTabType.PICTURE -> {
-//                    val bundle = ClubPicFragment.createBundle(item)
-//                    navigateTo(
-//                            NavigateItem.Destination(
-//                                    R.id.action_clubTabFragment_to_clubPicFragment,
-//                                    bundle
-//                            )
-//                    )
-//                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipPlayerFragment.createBundle(item.id)
-                    navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_searchPostFragment,
-                                    bundle
-                            )
-                    )
-                }
-                else -> {
-                }
-            }
-        }
-
-        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            Timber.d("onClipItemClick")
-        }
-
-        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
-
-        override fun onChipClick(type: PostType, tag: String) {
-            Timber.d("onChipClick")
-            val item = SearchPostItem(type, tag = tag)
-            val bundle = SearchPostFragment.createBundle(item)
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_searchPostFragment,
-                            bundle
-                    )
-            )
         }
     }
 }

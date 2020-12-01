@@ -28,7 +28,6 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
-import com.dabenxiang.mimi.view.textdetail.ClubCommentAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_comment.btn_send
 import kotlinx.android.synthetic.main.fragment_club_comment.et_message
@@ -257,7 +256,7 @@ class ClubCommentFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = false
             )
-            navigateTo(NavigateItem.Destination(R.id.action_clubTextDetailFragment_to_myPostFragment, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }
     }
 

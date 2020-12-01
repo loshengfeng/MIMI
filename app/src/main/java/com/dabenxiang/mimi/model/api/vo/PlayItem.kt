@@ -43,13 +43,13 @@ data class PlayItem(
     var likeCount: Int?,
 
     @SerializedName("favorite")
-    val favorite: Boolean?,
+    var favorite: Boolean?,
 
     @SerializedName("favoriteCount")
-    val favoriteCount: Int?,
+    var favoriteCount: Int?,
 
     @SerializedName("commentCount")
-    val commentCount: Int?,
+    var commentCount: Int?,
 
     @SerializedName("tags")
     val tags: List<String>?
