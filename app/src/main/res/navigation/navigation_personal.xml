@@ -210,6 +210,7 @@
             android:id="@+id/action_to_pictureFragment"
             app:destination="@id/pictureFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/clipPlayerFragment"
         android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
