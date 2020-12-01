@@ -21,7 +21,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.fragment_v2_player.*
+import timber.log.Timber
 import java.net.UnknownHostException
 
 class PlayerV2Fragment: BasePlayerFragment() {
@@ -90,8 +90,9 @@ class PlayerV2Fragment: BasePlayerFragment() {
 
         viewModel.videoStreamingUrl.observe(viewLifecycleOwner) {
             if(!it.isNullOrEmpty()) {
-                setupPlayUrl(it, (viewModel.m3u8SourceUrl != it) )
+                setupPlayUrl(it, viewModel.isResetPlayer)
                 viewModel.m3u8SourceUrl = it
+                viewModel.isResetPlayer = false
             }
         }
 
@@ -157,11 +158,14 @@ class PlayerV2Fragment: BasePlayerFragment() {
      * get video or clip content
      */
     private fun getVideoContent() {
-        (arguments?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
-            contentId = it.videoId
-            viewModel.videoContentId = it.videoId
-            viewModel.getVideoContent()
-        }
+        if(arguments?.getSerializable(KEY_PLAYER_SRC) != null) {
+            (arguments?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
+                this.arguments = null
+                contentId = it.videoId
+                viewModel.videoContentId = it.videoId
+                viewModel.getVideoContent()
+            }
+        } else viewModel.getVideoContent()
     }
 
     private fun onApiError(throwable: Throwable) {
