@@ -68,7 +68,7 @@ class MyCollectionMimiVideoAdapter(
 //                                .inflate(R.layout.item_ad, parent, false)
 //                )
 //            }
-        return MyFollowVideoViewHolder(
+        return MyCollectionMIMIVideoViewHolder(
                 LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_my_follow_video, parent, false)
         )
@@ -84,7 +84,7 @@ class MyCollectionMimiVideoAdapter(
 //                        GeneralUtils.openWebView(context, item.adItem?.target ?: "")
 //                    }
 //                }
-                is MyFollowVideoViewHolder -> {
+                is MyCollectionMIMIVideoViewHolder -> {
                     holder.onBind(
                             it,
                             null,

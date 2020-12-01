@@ -31,7 +31,7 @@ import timber.log.Timber
 import java.util.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 
-class MyFollowVideoViewHolder(
+class MyCollectionMIMIVideoViewHolder(
         itemView: View
 ) : BaseViewHolder(itemView), KoinComponent {
 
@@ -113,8 +113,7 @@ class MyFollowVideoViewHolder(
         updateLike(item)
         val onLikeClickListener = View.OnClickListener {
             item.like = item.like != true
-            item.likeCount =
-                    if (item.like == true) (item.likeCount ?: 0 + 1) else (item.likeCount ?: 0 - 1)
+            item.likeCount = if (item.like == true) ((item.likeCount ?: 0) + 1) else ((item.likeCount ?: 0) - 1)
             listener.onLikeClick(item, position, item.like == true)
         }
         ivLike.setOnClickListener(onLikeClickListener)
@@ -125,7 +124,7 @@ class MyFollowVideoViewHolder(
             listener.onCommentClick(item, MyFollowTabItemType.MIMI_VIDEO)
         }
 
-        ivComment.setOnClickListener  (onCommentClickListener)
+        ivComment.setOnClickListener(onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
@@ -135,7 +134,6 @@ class MyFollowVideoViewHolder(
     }
 
     fun updateLike(item: PlayItem) {
-        Timber.d("neo, updateList = ${item.likeCount.toString()}")
         tvLikeCount.text = item.likeCount.toString()
 
         if (item.like == true) {
