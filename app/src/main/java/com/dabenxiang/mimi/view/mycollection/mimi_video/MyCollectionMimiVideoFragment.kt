@@ -34,7 +34,7 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragment() {
+class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: Boolean = false) : BaseFragment() {
     private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
     private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
@@ -149,7 +149,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         }
 
         viewModel.deleteFavoriteResult.observe(this) {
-            viewModel.getData(adapter, type)
+            viewModel.getData(adapter, type, isLike)
         }
 
         viewModel.showProgress.observe(this) {
@@ -200,7 +200,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Empty -> {
-                    viewModel.getData(adapter, type)
+                    viewModel.getData(adapter, type, isLike)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -217,7 +217,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter, type)
+            viewModel.getData(adapter, type, isLike)
         }
     }
 
@@ -241,7 +241,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         loginPageToggle(true)
 
         if (viewModel.postCount.value ?: -1 <= 0) {
-            viewModel.getData(adapter, type)
+            viewModel.getData(adapter, type, isLike)
         }
         viewModel.getAd()
     }

@@ -35,7 +35,7 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class  MyCollectionFavoritesFragment : BaseFragment() {
+class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment() {
 
     private val viewModel: MyCollectFavoritesViewModel by viewModels()
     private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
@@ -119,7 +119,7 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Empty -> {
-                    viewModel.getData(adapter)
+                    viewModel.getData(adapter, isLike)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -148,7 +148,7 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter)
+            viewModel.getData(adapter, isLike)
         }
 
         collectionViewModel.deleteFavorites?.observe(viewLifecycleOwner,  {
@@ -162,7 +162,7 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
         super.onResume()
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
-            viewModel.getData(adapter)
+            viewModel.getData(adapter, isLike)
         }
 //        viewModel.getAd()
     }

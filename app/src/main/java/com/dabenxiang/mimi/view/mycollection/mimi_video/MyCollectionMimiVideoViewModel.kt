@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
+import com.dabenxiang.mimi.view.like.MiMiLikeListDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -37,14 +38,21 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
 
     var totalCount: Int = 0
 
-    fun getData(adapter: MyCollectionMimiVideoAdapter, type: MyFollowTabItemType) {
+    fun getData(adapter: MyCollectionMimiVideoAdapter, type: MyFollowTabItemType, isLike: Boolean) {
         Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())
-            getPostItemList(type)
-                .collectLatest {
-                    adapter.submitData(it)
-                }
+            if(isLike) {
+                getLikeItemList()
+                    .collect {
+                        adapter.submitData(it)
+                    }
+            } else {
+                getPostItemList(type)
+                    .collectLatest {
+                        adapter.submitData(it)
+                    }
+            }
         }
     }
 
@@ -58,6 +66,22 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     adWidth,
                     adHeight,
                     type
+                )
+            }
+        )
+            .flow
+            .onStart {  setShowProgress(true) }
+            .onCompletion { setShowProgress(false) }
+            .cachedIn(viewModelScope)
+    }
+
+    fun getLikeItemList(): Flow<PagingData<PlayItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = MyCollectionMimiVideoDataSource.PER_LIMIT),
+            pagingSourceFactory = {
+                MiMiLikeListDataSource(
+                    domainManager,
+                    pagingCallback,
                 )
             }
         )
