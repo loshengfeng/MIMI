@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
@@ -29,7 +30,7 @@ data class VideoItem(
     val description: String? = "",
 
     @SerializedName("favorite")
-    var favorite: Boolean? = false,
+    var favorite: Boolean = false,
 
     @SerializedName("favoriteCount")
     var favoriteCount: Long? = 0,
@@ -40,8 +41,14 @@ data class VideoItem(
     @SerializedName("like")
     var like: Boolean? = false,
 
+    @SerializedName("likeType")
+    var likeType: LikeType? = null,
+
     @SerializedName("likeCount")
-    var likeCount: Long? = 0,
+    var likeCount: Long = 0,
+
+    @SerializedName("dislikeCount")
+    var dislikeCount: Long = 0,
 
     @SerializedName("point")
     val point: Long? = 0,
