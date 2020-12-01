@@ -25,10 +25,6 @@
             app:destination="@id/myFollowFragment" />
 
         <action
-            android:id="@+id/action_personalFragment_to_myFollowFragmentV2"
-            app:destination="@id/myFollowFragmentV2" />
-
-        <action
             android:id="@+id/action_personalFragment_to_orderFragment"
             app:destination="@id/orderFragment" />
 
@@ -62,19 +58,6 @@
         <action
             android:id="@+id/action_personalFragment_to_favoriteFragment"
             app:destination="@id/myfavoriteFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
-        tools:layout="@layout/fragment_my_follow">
-
-        <action
-            android:id="@+id/action_myFollowFragment_to_topicDetailFragment"
-            app:destination="@id/navigation_club_topic" />
-        <action
-            android:id="@+id/action_myFollowFragment_to_navigation_my_post"
-            app:destination="@id/navigation_my_post" />
     </fragment>
 
     <fragment
@@ -133,9 +116,9 @@
         android:label="FavoriteFragment" />
 
     <fragment
-        android:id="@+id/myFollowFragmentV2"
-        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragmentV2"
-        android:label="MyFollowFragmentV2" >
+        android:id="@+id/myFollowFragment"
+        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragmentV3"
+        android:label="MyFollowFragment" >
 
         <action
             android:id="@+id/action_to_searchPostFragment"

@@ -212,10 +212,10 @@ class PersonalFragment : BaseFragment() {
                 R.id.tv_topup -> mainViewModel?.changeNavigationPosition?.value =
                     R.id.navigation_topup
 
-                R.id.tv_favorite -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragmentV2))
+                R.id.tv_favorite -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
 
-                R.id.follow_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragmentV2))
-                R.id.follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragmentV2))
+                R.id.follow_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
+                R.id.follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
 
 
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))

@@ -9,11 +9,11 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_my_follow_v2.*
-import kotlinx.android.synthetic.main.fragment_my_follow_v2.view.*
+import kotlinx.android.synthetic.main.fragment_my_follow_v3.*
+import kotlinx.android.synthetic.main.fragment_my_follow_v3.view.*
 import timber.log.Timber
 
-class MyFollowFragmentV2 : BaseFragment() {
+class MyFollowFragmentV3: BaseFragment() {
 
     companion object {
         const val TAB_MiMI_VIDEO = 0
@@ -21,9 +21,9 @@ class MyFollowFragmentV2 : BaseFragment() {
         const val TAB_POST = 2
     }
 
-//    private val viewModel: MyFollowViewModel by viewModels()
+    //    private val viewModel: MyFollowViewModel by viewModels()
     private lateinit var tabLayoutMediator: TabLayoutMediator
-    override fun getLayoutId() = R.layout.fragment_my_follow_v2
+    override fun getLayoutId() = R.layout.fragment_my_follow_v3
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -35,11 +35,11 @@ class MyFollowFragmentV2 : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view =  inflater.inflate(getLayoutId(), container, false)
+        val view = inflater.inflate(getLayoutId(), container, false)
 
-        view.viewpager.adapter = MyFollowViewPagerAdapterV2(childFragmentManager, lifecycle)
-        view.viewpager.offscreenPageLimit = 2
-        tabLayoutMediator = TabLayoutMediator(view.layout_tab,  view.viewpager) { tab, position ->
+        view.view_pager.adapter = MyFollowViewPagerAdapterV2(childFragmentManager, lifecycle)
+        view.view_pager.offscreenPageLimit = 2
+        tabLayoutMediator = TabLayoutMediator(view.tabs, view.view_pager) { tab, position ->
             tab.text = getTabTitle(position)
         }
         tabLayoutMediator.attach()
@@ -75,7 +75,7 @@ class MyFollowFragmentV2 : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         Timber.i("ClubTabFragment onDestroy")
-        if(::tabLayoutMediator.isInitialized) tabLayoutMediator.detach()
+        if (::tabLayoutMediator.isInitialized) tabLayoutMediator.detach()
     }
 
     private fun getTabTitle(position: Int): String? {
