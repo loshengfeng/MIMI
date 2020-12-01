@@ -22,7 +22,7 @@
                 android:id="@+id/tool_bar"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:background="@color/normal_color_background"
+                android:background="@color/normal_color_status_bar"
                 android:layout_gravity="center"
                 app:menu="@menu/menu_back_clear"
                 app:navigationIcon="@drawable/btn_back_black_n">
@@ -33,6 +33,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textSize="18sp"
+                    android:layout_marginEnd="10dp"
                     tools:text="Title" />
 
             </androidx.appcompat.widget.Toolbar>

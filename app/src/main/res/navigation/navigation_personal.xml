@@ -103,7 +103,7 @@
 
     <fragment
         android:id="@+id/likesListFragment"
-        android:name="com.dabenxiang.mimi.view.like.LikeFragment"
+        android:name="com.dabenxiang.mimi.view.my.like.LikeFragment"
         tools:layout="@layout/fragment_my_collection"
         android:label="LikeFragment" >
 
@@ -138,11 +138,11 @@
 
     <fragment
         android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
+        android:name="com.dabenxiang.mimi.view.my.follow.MyFollowFragment"
         android:label="MyFollowFragment" />
     <fragment
         android:id="@+id/myCollectionFragment"
-        android:name="com.dabenxiang.mimi.view.mycollection.MyCollectionFragment"
+        android:name="com.dabenxiang.mimi.view.my.collection.MyCollectionFragment"
         android:label="MyCollectionFragment">
 
         <action
