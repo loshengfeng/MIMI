@@ -32,9 +32,6 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
     private var _favoriteResult = MutableLiveData<ApiResult<MemberPostItem>>()
     val favoriteResult: LiveData<ApiResult<MemberPostItem>> = _favoriteResult
 
-    private val _reportResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
-    val reportResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _reportResult
-
     var createId: Long = 0L
 
     fun followPost(postId: Long, isDelete: Boolean) {
@@ -124,20 +121,6 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likeResult.value = it }
-        }
-    }
-
-    fun report(postId: Long, content: String) {
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository().sendPostReport(postId, ReportRequest(content))
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
         }
     }
 

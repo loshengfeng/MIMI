@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -84,8 +85,10 @@ class PlayerDescriptionFragment : BaseFragment() {
         })
     }
 
-    private lateinit var detailItem: MemberPostItem
     private var streamId: Long = 0
+    private var isReported: Boolean = false
+    private lateinit var videoItem: VideoItem
+
     private var reportDialog: ReportDialogFragment? = null
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -93,7 +96,7 @@ class PlayerDescriptionFragment : BaseFragment() {
             if (TextUtils.isEmpty(content)) {
                 GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
             } else {
-                descriptionViewModel.sendVideoReport(streamId, content)
+                descriptionViewModel.report(streamId, content)
             }
             reportDialog?.dismiss()
         }
@@ -116,26 +119,8 @@ class PlayerDescriptionFragment : BaseFragment() {
         viewModel.videoContentSource.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Success -> {
-                    descriptionViewModel.getPostDetail(it.result.id)
-                    setUI(it.result)
-                }
-            }
-        }
-        descriptionViewModel.detailResult.observe(viewLifecycleOwner) {
-            when (it) {
-                is ApiResult.Success -> {
-                    detailItem = it.result
-                    setUILike()
-                    setUIFavorite()
-                    setInteractiveListener()
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        }
-
-        viewModel.m3u8ContentSource.observe(viewLifecycleOwner) {
-            when (it) {
-                is ApiResult.Success -> {
+                    videoItem = it.result
+                    setUI()
                 }
             }
         }
@@ -145,6 +130,7 @@ class PlayerDescriptionFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     updateStreamInfo(it.result)
                     streamId = it.result.videoStreams?.get(0)?.id ?: 0L
+                    isReported = it.result.videoStreams?.get(0)?.reported ?: false
                 }
             }
         }
@@ -174,6 +160,8 @@ class PlayerDescriptionFragment : BaseFragment() {
                     }
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
+                else -> {
+                }
             }
         }
 
@@ -201,7 +189,7 @@ class PlayerDescriptionFragment : BaseFragment() {
                     is ApiResult.Loading -> progressHUD.show()
                     is ApiResult.Loaded -> progressHUD.dismiss()
                     is ApiResult.Empty -> {
-                        detailItem.reported = true
+                        isReported = true
                         GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
                     }
                     is ApiResult.Error -> onApiError(apiResult.throwable)
@@ -214,7 +202,7 @@ class PlayerDescriptionFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
-                    detailItem = it.result
+                    videoItem = it.result
                     setUILike()
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -226,7 +214,7 @@ class PlayerDescriptionFragment : BaseFragment() {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
-                    detailItem = it.result
+                    videoItem = it.result
                     setUIFavorite()
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -242,25 +230,25 @@ class PlayerDescriptionFragment : BaseFragment() {
 
     private fun setInteractiveListener() {
         imgLike.setOnClickListener {
-            checkStatus { descriptionViewModel.likePost(detailItem, LikeType.LIKE) }
+            checkStatus { descriptionViewModel.like(videoItem, LikeType.LIKE) }
         }
         imgDislike.setOnClickListener {
-            checkStatus { descriptionViewModel.likePost(detailItem, LikeType.DISLIKE) }
+            checkStatus { descriptionViewModel.like(videoItem, LikeType.DISLIKE) }
         }
         imgFavorite.setOnClickListener {
-            checkStatus { descriptionViewModel.favoritePost(detailItem) }
+            checkStatus { descriptionViewModel.favorite(videoItem) }
         }
         imgReport.setOnClickListener {
             checkStatus {
-                if (detailItem.reported) {
+                if (isReported) {
                     GeneralUtils.showToast(
-                        App.applicationContext(),
+                        requireContext(),
                         getString(R.string.already_reported)
                     )
                 } else {
                     reportDialog =
                         ReportDialogFragment.newInstance(
-                            item = detailItem,
+                            item = MemberPostItem(type = PostType.VIDEO_ON_DEMAND),
                             listener = onReportDialogListener,
                             isComment = false
                         ).also {
@@ -274,7 +262,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         }
     }
 
-    private fun setUI(videoItem: VideoItem) {
+    private fun setUI() {
         val subTitleColor = requireContext().getColor(R.color.color_black_1_50)
 
         btn_show_introduction.setTextColor(subTitleColor)
@@ -309,13 +297,13 @@ class PlayerDescriptionFragment : BaseFragment() {
         if (videoItem.tags != null)
             setupChipGroup(videoItem.tags as List<String>)
 
-        if (videoItem.sources == null || videoItem.sources.isEmpty()) {
+        if (videoItem.sources == null || videoItem.sources!!.isEmpty()) {
             recyclerview_source_list.visibility = View.GONE
         } else {
-            if (videoItem.sources.size == 1) recyclerview_source_list.visibility = View.GONE
+            if (videoItem.sources!!.size == 1) recyclerview_source_list.visibility = View.GONE
 
             val result = mutableListOf<String>()
-            for (item in videoItem.sources) {
+            for (item in videoItem.sources!!) {
                 item.name?.also {
                     result.add(it)
                 }
@@ -323,36 +311,38 @@ class PlayerDescriptionFragment : BaseFragment() {
             Timber.i("setupSourceList =${result[0]}")
             sourceListAdapter.submitList(result, 0)
         }
+        setUILike()
+        setUIFavorite()
+        setInteractiveListener()
     }
 
     private fun setUILike() {
-        imgLike.setImageResource(if (detailItem.likeType == LikeType.LIKE) R.drawable.ico_nice_s else R.drawable.ico_nice)
+        imgLike.setImageResource(if (videoItem.likeType == LikeType.LIKE) R.drawable.ico_nice_s else R.drawable.ico_nice)
         txtLikeCount.text =
-            String.format(getString(R.string.club_like_count), detailItem.likeCount)
+            String.format(getString(R.string.club_like_count), videoItem.likeCount)
         txtLikeCount.setTextColor(
             resources.getColor(
-                if (detailItem.likeType == LikeType.LIKE) R.color.color_red_1 else R.color.color_black_1_60,
+                if (videoItem.likeType == LikeType.LIKE) R.color.color_red_1 else R.color.color_black_1_60,
                 null
             )
         )
 
-        imgDislike.setImageResource(if (detailItem.likeType == LikeType.DISLIKE) R.drawable.ico_bad_s else R.drawable.ico_bad)
+        imgDislike.setImageResource(if (videoItem.likeType == LikeType.DISLIKE) R.drawable.ico_bad_s else R.drawable.ico_bad)
         txtDisLikeCount.text =
-            String.format(getString(R.string.club_dislike_count), detailItem.dislikeCount)
+            String.format(getString(R.string.club_dislike_count), videoItem.dislikeCount)
         txtDisLikeCount.setTextColor(
             resources.getColor(
-                if (detailItem.likeType == LikeType.DISLIKE) R.color.color_red_1 else R.color.color_black_1_60,
+                if (videoItem.likeType == LikeType.DISLIKE) R.color.color_red_1 else R.color.color_black_1_60,
                 null
             )
         )
-
     }
 
     private fun setUIFavorite() {
-        imgFavorite.setImageResource(if (detailItem.isFavorite) R.drawable.btn_favorite_white_s else R.drawable.btn_favorite_white_n)
+        imgFavorite.setImageResource(if (videoItem.favorite) R.drawable.btn_favorite_white_s else R.drawable.btn_favorite_white_n)
         txtFavorite.setTextColor(
             resources.getColor(
-                if (detailItem.isFavorite) R.color.color_red_1 else R.color.color_black_1_60,
+                if (videoItem.favorite) R.color.color_red_1 else R.color.color_black_1_60,
                 null
             )
         )
