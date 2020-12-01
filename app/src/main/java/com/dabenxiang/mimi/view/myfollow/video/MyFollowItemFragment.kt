@@ -9,29 +9,24 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyFollowVideoListener
-import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.enums.*
+import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
-import com.dabenxiang.mimi.view.club.text.ClubTextFragment
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
-import kotlinx.android.synthetic.main.fragment_club_short.id_empty_group
-import kotlinx.android.synthetic.main.fragment_club_short.id_not_login_group
-import kotlinx.android.synthetic.main.fragment_club_short.layout_refresh
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -54,6 +49,33 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
     }
 
+    override fun setupObservers() {
+        viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> ""
+                is ApiResult.Error -> onApiError(it.throwable)
+                else -> {}
+            }
+        })
+
+        viewModel.likePostResult.observe(viewLifecycleOwner, Observer{
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result?.let { position ->
+                        adapter.notifyItemChanged(position)
+                    }
+                }
+
+                else -> {
+                    onApiError(Exception("Unknown Error!"))
+                }
+            }
+        })
+    }
+
+
 //    private val memberPostFuncItem by lazy {
 //        MemberPostFuncItem(
 //                {},
@@ -64,12 +86,17 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
 //        )
 //    }
 
+
+
     private val listener = object : MyFollowVideoListener {
         override fun onMoreClick(item: PlayItem, position: Int) {
 
         }
 
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
+
+
+
             checkStatus { viewModel.likePost(MemberPostItem(id=item.videoId!!,likeType = LikeType.LIKE), position, isLike) }
         }
 
@@ -108,7 +135,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyFollowTabItemType) {
-            checkStatus { viewModel.favoritePost(MemberPostItem(id=item.videoId!!), position, isFavorite) }
+            checkStatus { viewModel.modifyFavorite(VideoItem(id=item.videoId!!), position, isFavorite) }
         }
     }
 
