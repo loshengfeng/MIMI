@@ -211,7 +211,7 @@ class PlayerFragment : BaseFragment() {
                 bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                 navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_playerFragment_to_myPostFragment,
+                        R.id.action_to_myPostFragment,
                         bundle
                     )
                 )

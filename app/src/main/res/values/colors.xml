@@ -106,14 +106,6 @@
     <color name="gray_600">#FF757575</color>
 
     <!--personal -->
-    <color name="bg_layout_top_personal">#FF757575</color>
-    <color name="bg_layout_vip_personal">#FF757575</color>
-    <color name="bg_layout_every_day_personal">#FF757575</color>
-    <color name="title_personal">@color/color_black_1</color>
-    <color name="bg_layout_vip_unlogin_personal">#FF757575</color>
-    <color name="bg_vip_unlogin_personal">#FF757575</color>
-
-    <!--personal -->
-
+    <color name="title_personal">@color/color_white_1</color>
 
 </resources>

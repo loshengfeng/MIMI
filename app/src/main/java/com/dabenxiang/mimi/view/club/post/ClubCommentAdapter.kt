@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.textdetail
+package com.dabenxiang.mimi.view.club.post
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailAdapter
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentContentViewHolder
 import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
 import com.dabenxiang.mimi.view.player.CommentAdapter
@@ -71,7 +70,7 @@ class ClubCommentAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
-            0 -> PictureDetailAdapter.VIEW_TYPE_AD
+            0 -> VIEW_TYPE_AD
             1 -> VIEW_TYPE_COMMENT_TITLE
             else -> VIEW_TYPE_COMMENT_DATA
         }
