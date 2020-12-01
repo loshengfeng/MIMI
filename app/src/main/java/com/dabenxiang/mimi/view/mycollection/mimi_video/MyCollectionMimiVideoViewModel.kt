@@ -32,6 +32,9 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
     private val _deleteFavoriteResult = MutableLiveData<ApiResult<Boolean>>()
     val deleteFavoriteResult: LiveData<ApiResult<Boolean>> = _deleteFavoriteResult
 
+    private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
+    val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
+
     var totalCount: Int = 0
 
     fun getData(adapter: MyCollectionMimiVideoAdapter, type: MyFollowTabItemType) {
@@ -100,6 +103,25 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _videoFavoriteResult.value = it }
+        }
+    }
+
+    fun deleteVideos(items: List<PlayItem>) {
+        if (items.isEmpty()) return
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                        .deleteMePlaylist(
+                                items.map {it.videoId}.joinToString(separator = ",")
+                        )
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _cleanResult.value = it }
         }
     }
 }

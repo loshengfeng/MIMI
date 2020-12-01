@@ -16,20 +16,13 @@ class MyCollectionViewModel : BaseViewModel() {
     private val _deleteMiMIs = MutableLiveData<Int>()
     val deleteMiMIs: LiveData<Int> = _deleteMiMIs
 
-    private val _deleteShorts = MutableLiveData<Int>()
-    val deleteShorts: LiveData<Int> = _deleteShorts
-
     fun setDeleteNotify(){
         when(lastTabIndex){
-            MyCollectionFragment.TAB_MiMI_VIDEO ->{
-                _deleteMiMIs.value = lastTabIndex
-            }
-            MyCollectionFragment.TAB_SHORT_VIDEO ->{
-                _deleteShorts.value = lastTabIndex
+            MyCollectionFragment.TAB_FAVORITES ->{
+                _deleteFavorites.value = lastTabIndex
             }
             else ->{
-                Timber.i("setDeleteNotify lastTabIndex=${lastTabIndex}")
-                _deleteFavorites.value = lastTabIndex
+                _deleteMiMIs.value = lastTabIndex
             }
         }
     }

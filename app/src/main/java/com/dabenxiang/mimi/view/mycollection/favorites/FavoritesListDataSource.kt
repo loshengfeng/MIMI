@@ -34,9 +34,7 @@ class FavoritesListDataSource constructor(
             val memberPostItems =  result.body()?.content?.map {
                 it.toMemberPostItem()
             } as ArrayList
-
             memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
-            
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
                 result.body()?.paging?.offset ?: 0,

@@ -45,7 +45,7 @@ import timber.log.Timber
 
 class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragment() {
     private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
-    private val collectionViewModel: MyCollectionViewModel by activityViewModels()
+    private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
     private val adapter: MyCollectionMimiVideoAdapter by lazy {
@@ -204,8 +204,19 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
             }
         })
 
+        viewModel.cleanResult.observe(this, {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Empty -> {
+                    viewModel.getData(adapter, type)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         collectionViewModel.deleteMiMIs.observe(this,  {
-             //Todo
+            viewModel.deleteVideos(adapter.snapshot().items)
         })
     }
 
