@@ -197,12 +197,21 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
                     }
                     AdultTabType.TEXT -> {
                         val bundle = TextDetailFragment.createBundle(item, 1)
-                       navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clubTextFragment,
-                                    bundle
-                            )
-                    )
+                        navigateTo(
+                                NavigateItem.Destination(
+                                        R.id.action_to_clubTextFragment,
+                                        bundle
+                                )
+                        )
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
+                        navigateTo(
+                                NavigateItem.Destination(
+                                        R.id.action_to_clipPlayerFragment,
+                                        bundle
+                                )
+                        )
                     }
                 }
             }
