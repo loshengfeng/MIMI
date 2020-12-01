@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.player.ui
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.handleException
@@ -37,7 +38,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
         }
     }
 
-    private val viewModel: PlayerV2ViewModel by activityViewModels()
+    private val viewModel: PlayerV2ViewModel by viewModels()
 
     override fun setupObservers() {
         super.setupObservers()
