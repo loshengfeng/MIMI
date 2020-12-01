@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.fans
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.vo.error.FansItem
@@ -53,7 +54,22 @@ class FansListFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.fansCount.observe(this, Observer {
+            tv_title_count.text = String.format(
+                getString(R.string.total_count_fans),
+                it
+            )
 
+            if (it == 0.toLong()) {
+                img_page_empty.visibility = View.VISIBLE
+                text_page_empty.visibility = View.VISIBLE
+                list_fans.visibility = View.GONE
+            } else {
+                img_page_empty.visibility = View.GONE
+                text_page_empty.visibility = View.GONE
+                list_fans.visibility = View.VISIBLE
+            }
+        })
     }
 
     override fun setupListeners() {

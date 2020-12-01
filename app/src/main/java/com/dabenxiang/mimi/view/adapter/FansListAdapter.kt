@@ -34,76 +34,21 @@ class FansListAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        var realsize = super.getItemCount()
-        if (super.getItemCount() == 0) {
-            return 2
-        } else {
-            return realsize + 1
-        }
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        if (position === 0) {
-            return R.layout.item_club_item_header
-        } else {
-            if (super.getItemCount() == 0) {
-                return R.layout.item_empty
-            } else {
-                return R.layout.item_fans
-            }
-            return R.layout.item_fans
-        }
-    }
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): FansListAdapter.ViewHolder {
-        val itemview = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
-        when (viewType) {
-            R.layout.item_club_item_header -> return HeaderViewHolder(itemview)
-            R.layout.item_empty -> return EmptyViewHolder(itemview)
-            R.layout.item_fans -> return FansViewHolder(itemview)
-        }
-        throw IllegalArgumentException("no such view type...")
+        return FansViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_fans, parent, false))
     }
 
     override fun onBindViewHolder(holder: FansListAdapter.ViewHolder, position: Int) {
         if (holder is FansViewHolder) {
-            if (super.getItemCount() > 0) {
-                holder.onBind(itemCount - 1, getItem(position - 1), listener)
-            }
-        } else if (holder is HeaderViewHolder) {
-            if (super.getItemCount() == 0) {
-                holder.onBind(0, null, listener)
-            } else {
-                holder.onBind(itemCount - 1, null, listener)
-            }
-        } else {
-            holder.onBind(super.getItemCount(), null, listener)
+            holder.onBind(itemCount, getItem(position ), listener)
         }
     }
 
     abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         abstract fun onBind(total: Int, item: FansItem?, listener: BaseItemListener)
-    }
-
-    class HeaderViewHolder(itemView: View) : ViewHolder(itemView) {
-        val total_count_fans: TextView = itemView.findViewById(R.id.tv_title) as TextView
-        override fun onBind(total: Int, item: FansItem?, listener: BaseItemListener) {
-            total_count_fans.text = String.format(
-                itemView.context.getString(R.string.total_count_fans),
-                total.toString()
-            )
-        }
-    }
-
-    class EmptyViewHolder(itemView: View) : ViewHolder(itemView) {
-        val text_empty: TextView = itemView.findViewById(R.id.text_page_empty) as TextView
-        override fun onBind(total: Int, item: FansItem?, listener: BaseItemListener) {
-            text_empty.text = ""
-        }
     }
 
     class FansViewHolder(itemView: View) : ViewHolder(itemView) {

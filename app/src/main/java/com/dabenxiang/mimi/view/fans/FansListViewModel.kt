@@ -19,9 +19,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class FansListViewModel : BaseViewModel() {
-    private val _fansCount = MutableLiveData<Int>()
-    val fansCount: LiveData<Int> = _fansCount
-    private val pagingCallback = object : PagingCallback {}
+
+    private val _fansCount = MutableLiveData<Long>()
+    val fansCount: LiveData<Long> = _fansCount
 
     fun getData(adapter: FansListAdapter) {
         Timber.i("getData")
@@ -47,5 +47,24 @@ class FansListViewModel : BaseViewModel() {
 //            .onStart {  setShowProgress(true) }
 //            .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
+    }
+
+    private val pagingCallback = object : PagingCallback {
+        override fun onLoading() {
+            super.onLoading()
+        }
+
+        override fun onLoaded() {
+            super.onLoaded()
+        }
+
+        override fun onSucceed() {
+            super.onSucceed()
+        }
+
+        override fun onTotalCount(count: Long) {
+            _fansCount.postValue(count)
+
+        }
     }
 }
