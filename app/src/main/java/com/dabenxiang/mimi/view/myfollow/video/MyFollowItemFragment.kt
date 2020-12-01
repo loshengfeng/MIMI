@@ -105,16 +105,18 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyFollowTabItemType) {
-            CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
                     checkStatus { viewModel.deleteMIMIVideoFavorite(item.videoId.toString()) }
                 }
-            }).also {
-                it.show(
+            })
+
+            dialog.setMsg(getString(R.string.follow_delete_favorite_message,item.title))
+            dialog.show(
                         requireActivity().supportFragmentManager,
                         CleanDialogFragment::class.java.simpleName
                 )
-            }
+
         }
     }
 
