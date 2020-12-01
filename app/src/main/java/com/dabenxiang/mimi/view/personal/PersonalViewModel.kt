@@ -24,11 +24,15 @@ class PersonalViewModel : BaseViewModel() {
     private val _unreadResult = MutableLiveData<ApiResult<Int>>()
     val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
 
+    private val _visibleSetting = MutableLiveData<Boolean>()
+    val visibleSetting: LiveData<Boolean> = _visibleSetting
+
     fun getPostDetail() {
         setShowProgress(true)
         viewModelScope.launch {
             setShowProgress(false)
             if (isLogin()) {
+                _visibleSetting.value = true
                 flow {
                     val result = domainManager.getApiRepository().getMe()
                     if (!result.isSuccessful) throw HttpException(result)
@@ -43,6 +47,7 @@ class PersonalViewModel : BaseViewModel() {
                     .onCompletion { emit(ApiResult.loaded()) }
                     .collect { _meItem.value = it }
             } else {
+                _visibleSetting.value = false
                 flow {
                     val result = domainManager.getApiRepository().getGuestInfo()
                     if (!result.isSuccessful) throw HttpException(result)

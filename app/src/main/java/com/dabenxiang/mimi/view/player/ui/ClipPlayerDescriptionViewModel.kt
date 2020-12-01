@@ -32,8 +32,6 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
     private var _favoriteResult = MutableLiveData<ApiResult<MemberPostItem>>()
     val favoriteResult: LiveData<ApiResult<MemberPostItem>> = _favoriteResult
 
-    var createId: Long = 0L
-
     fun followPost(postId: Long, isDelete: Boolean) {
         viewModelScope.launch {
             flow {

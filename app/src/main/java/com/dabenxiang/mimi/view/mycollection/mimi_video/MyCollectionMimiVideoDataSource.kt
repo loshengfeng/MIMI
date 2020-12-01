@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.video
+package com.dabenxiang.mimi.view.mycollection.mimi_video
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -10,7 +10,7 @@ import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import timber.log.Timber
 
-class MyFollowItemDataSource(
+class MyCollectionMimiVideoDataSource(
         private val domainManager: DomainManager,
         private val pagingCallback: PagingCallback,
         private val adWidth: Int,
@@ -35,7 +35,7 @@ class MyFollowItemDataSource(
                         MyFollowTabItemType.MIMI_VIDEO -> {
                             domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value, true, isShortVideo = false, offset = offset.toString(), limit = PER_LIMIT.toString())
                         }
-                        MyFollowTabItemType.SMALL_VIDEO -> {
+                        MyFollowTabItemType.SHORT_VIDEO -> {
                             domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value, true, isShortVideo = true, offset = offset.toString(), limit = PER_LIMIT.toString())
                         }
                         else -> null

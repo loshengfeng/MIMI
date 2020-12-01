@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.video
+package com.dabenxiang.mimi.view.mycollection.mimi_video
 
 import android.content.Context
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MyFollowVideoListener
@@ -24,19 +25,21 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
-    private val viewModel: MyFollowItemViewModel by viewModels()
+class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragment() {
+    private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
     private val accountManager: AccountManager by inject()
 
-    private val adapter: MyFollowItemAdapter by lazy {
-        MyFollowItemAdapter(requireContext(), listener)
+    private val adapter: MyCollectionMimiVideoAdapter by lazy {
+        MyCollectionMimiVideoAdapter(requireContext(), listener)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_tab
@@ -49,45 +52,6 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
             }
         }
     }
-
-    override fun setupObservers() {
-        viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Success -> ""
-                is ApiResult.Error -> onApiError(it.throwable)
-                else -> {}
-            }
-        })
-
-        viewModel.likePostResult.observe(viewLifecycleOwner, Observer{
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result?.let { position ->
-                        adapter.notifyItemChanged(position)
-                    }
-                }
-
-                else -> {
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-        })
-    }
-
-
-//    private val memberPostFuncItem by lazy {
-//        MemberPostFuncItem(
-//                {},
-//                { id, view, type -> },
-//                { item, items, isFollow, func -> },
-//                { item, isLike, func -> },
-//                { item, isFavorite, func -> }
-//        )
-//    }
-
-
 
     private val listener = object : MyFollowVideoListener {
         override fun onMoreClick(item: PlayItem, position: Int) {
@@ -115,12 +79,16 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onItemClick(item: PlayItem, type: MyFollowTabItemType) {
-            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
-            navigateTo(
+            if (this@MyCollectionMimiVideoFragment.type == MyFollowTabItemType.MIMI_VIDEO) {
+                val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
+                navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_to_playerV2Fragment,
-                            bundle
+                        R.id.action_to_playerV2Fragment,
+                        bundle
                     ))
+            } else {
+                //TODO Sion ~~~~~~~~
+            }
         }
 
         override fun onCommentClick(item: PlayItem, type: MyFollowTabItemType) {
@@ -134,17 +102,18 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyFollowTabItemType) {
-//            checkStatus { viewModel.modifyFavorite(VideoItem(id=item.videoId!!), position, isFavorite) }
-            CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
                     checkStatus { viewModel.deleteMIMIVideoFavorite(item.videoId.toString()) }
                 }
-            }).also {
-                it.show(
+            })
+
+            dialog.setMsg(getString(R.string.follow_delete_favorite_message,item.title))
+            dialog.show(
                         requireActivity().supportFragmentManager,
                         CleanDialogFragment::class.java.simpleName
                 )
-            }
+
         }
     }
 
@@ -178,7 +147,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            MyFollowItemAdapter.PAYLOAD_UPDATE_LIKE
+                            MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -190,7 +159,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
                             it.result,
-                            MyFollowItemAdapter.PAYLOAD_UPDATE_FAVORITE
+                            MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)

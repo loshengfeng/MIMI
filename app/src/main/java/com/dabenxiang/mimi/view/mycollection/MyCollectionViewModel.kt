@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow
+package com.dabenxiang.mimi.view.mycollection
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class MyFollowViewModel : BaseViewModel() {
+class MyCollectionViewModel : BaseViewModel() {
 
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
@@ -46,6 +46,8 @@ class MyFollowViewModel : BaseViewModel() {
 
     private val _clubIdList = ArrayList<Long>()
     private val _userIdList = ArrayList<Long>()
+
+    var lastTabIndex =0
 
     fun getMemberList(): Flow<PagingData<MemberFollowItem>> {
         return Pager(

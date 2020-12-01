@@ -197,6 +197,14 @@ class PersonalFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.visibleSetting.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                setting.visibility = View.VISIBLE
+            } else {
+                setting.visibility = View.GONE
+            }
+        })
     }
 
     override fun setupListeners() {
