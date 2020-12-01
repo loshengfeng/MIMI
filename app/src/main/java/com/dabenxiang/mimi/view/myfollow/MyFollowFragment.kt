@@ -5,17 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.myfollow_old.MyFollowFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_my_collection.*
 import kotlinx.android.synthetic.main.fragment_my_collection.view.*
+import kotlinx.android.synthetic.main.fragment_my_follow.*
 import timber.log.Timber
 
 class MyFollowFragment: BaseFragment() {
@@ -71,7 +72,7 @@ class MyFollowFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tool_bar.toolbar_title.text = getString(R.string.personal_follow)
+        tool_bar.toolbar_title.text = getString(R.string.follow_title)
 
         tool_bar.setNavigationOnClickListener {
             navigateTo(NavigateItem.Up)
@@ -108,7 +109,10 @@ class MyFollowFragment: BaseFragment() {
     }
 
     private fun deleteAll(){
-        CleanDialogFragment.newInstance(onCleanDialogListener).also {
+        CleanDialogFragment.newInstance(listener= onCleanDialogListener,
+                msgResId = if (viewModel.lastTabIndex == TAB_FOLLOW_PEOPLE)
+                    R.string.follow_clean_member_dlg_msg else
+                    R.string.follow_clean_club_dlg_msg).also {
             it.show(
                     requireActivity().supportFragmentManager,
                     CleanDialogFragment::class.java.simpleName
