@@ -419,7 +419,7 @@ interface ApiService {
 
     @DELETE("/v1/Members/Me/ClubFollow/{clubId}")
     suspend fun cancelMyClubFollow(
-        @Path("clubId") id: Long
+        @Path("clubId") id: String
     ): Response<Void>
 
     @GET("/v1/Members/Me/MemberFollow")
@@ -430,7 +430,7 @@ interface ApiService {
 
     @DELETE("/v1/Members/Me/MemberFollow/{userId}")
     suspend fun cancelMyMemberFollow(
-        @Path("userId") id: Long
+        @Path("userId") id: String
     ): Response<Void>
 
     @GET("/v1/Members/Me/Fans")
