@@ -22,6 +22,10 @@
             app:destination="@id/navigation_login" />
 
         <action
+            android:id="@+id/action_personalFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment" />
+
+        <action
             android:id="@+id/action_personalFragment_to_myFollowFragment"
             app:destination="@id/myFollowFragment" />
 
@@ -55,10 +59,6 @@
         <action
             android:id="@+id/action_to_inviteVipFragment"
             app:destination="@id/inviteVipFragment" />
-
-        <action
-            android:id="@+id/action_personalFragment_to_favoriteFragment"
-            app:destination="@id/myfavoriteFragment" />
     </fragment>
 
     <fragment
@@ -112,13 +112,13 @@
         android:label="TopUpFragment" />
 
     <fragment
-        android:id="@+id/myfavoriteFragment"
-        android:name="com.dabenxiang.mimi.view.favroite.FavoriteFragment"
-        android:label="FavoriteFragment" />
-    <fragment
         android:id="@+id/myFollowFragment"
+        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
+        android:label="MyFollowFragment" />
+    <fragment
+        android:id="@+id/myCollectionFragment"
         android:name="com.dabenxiang.mimi.view.mycollection.MyCollectionFragment"
-        android:label="MyFollowFragment">
+        android:label="MyCollectionFragment">
 
         <action
             android:id="@+id/action_to_searchPostFragment"
