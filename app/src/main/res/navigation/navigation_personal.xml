@@ -135,13 +135,13 @@
 
     <fragment
         android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.myfollow_old.MyFollowFragment"
+        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
         android:label="MyFollowFragment" />
     <fragment
         android:id="@+id/myCollectionFragment"
         android:name="com.dabenxiang.mimi.view.mycollection.MyCollectionFragment"
         android:label="MyCollectionFragment">
-        
+
         <action
             android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
