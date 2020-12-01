@@ -247,6 +247,7 @@
 
     <!-- Follow -->
     <string name="follow_delete_favorite_message">确定从收藏移除 %s?</string>
+    <string name="follow_empty_msg">尚未收藏影片，快去看片吧！</string>
     <string name="follow_title">我的关注</string>
     <string name="follow_tab_mimi_video">蜜蜜影视</string>
     <string name="follow_tab_small_video">小视频</string>
