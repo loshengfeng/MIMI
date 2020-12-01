@@ -91,7 +91,7 @@ class MyFollowVideoViewHolder(
                     .load(0).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
         }
         ivMore.setOnClickListener {
-//            myPostListener.onMoreClick(item, position)
+            listener.onMoreClick(item, position)
         }
 
         updateFavorite(item)
@@ -125,7 +125,7 @@ class MyFollowVideoViewHolder(
             listener.onCommentClick(item, MyFollowTabItemType.MIMI_VIDEO)
         }
 
-        ivComment.setOnClickListener { onCommentClickListener }
+        ivComment.setOnClickListener  (onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {

@@ -124,6 +124,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
         }
 
         override fun onCommentClick(item: PlayItem, type: MyFollowTabItemType) {
+            Timber.d("onCommentClick, item = ${item}")
             val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0), true)
             navigateTo(
                     NavigateItem.Destination(

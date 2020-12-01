@@ -47,7 +47,7 @@ class LikeFragment : BaseFragment() {
                 isAdultTheme = true
             )
             navigateTo(
-                NavigateItem.Destination(R.id.action_myFollowFragment_to_navigation_my_post, bundle)
+                NavigateItem.Destination(R.id.action_to_myPostFragment, bundle)
             )
         }
 
@@ -69,7 +69,7 @@ class LikeFragment : BaseFragment() {
                 isAdultTheme = true
             )
             navigateTo(
-                NavigateItem.Destination(R.id.action_myFollowFragment_to_navigation_my_post, bundle)
+                NavigateItem.Destination(R.id.action_to_myPostFragment, bundle)
             )
         }
 
