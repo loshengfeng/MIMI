@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.FansListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import kotlinx.android.synthetic.main.fragment_fans.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
 import timber.log.Timber
@@ -96,7 +97,13 @@ class FansListFragment : BaseFragment() {
     }
 
     private val fanListener = object : FansListAdapter.FanListener {
-        override fun onItemClick(item: Any, type: ClickType) {
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = false
+            )
+            navigateTo(NavigateItem.Destination(R.id.action_fansListFragment_to_navigation_my_post, bundle))
         }
 
         override fun onGetAvatarAttachment(id: Long?, view: ImageView) {

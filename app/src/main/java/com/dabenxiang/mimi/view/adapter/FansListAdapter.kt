@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.FansItem
-import com.dabenxiang.mimi.model.enums.ClickType
 import kotlinx.android.synthetic.main.item_fans.view.*
 
 class FansListAdapter(
@@ -46,7 +45,7 @@ class FansListAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is FansViewHolder) {
-            holder.onBind(itemCount, getItem(position), listener, position, mContext)
+            holder.onBind(getItem(position), listener, position, mContext)
         }
     }
 
@@ -57,21 +56,19 @@ class FansListAdapter(
         private val decs_fans: TextView = itemView.decs_fans
         private val follow_fnas: TextView = itemView.follow_fnas
 
-        fun onBind(total: Int, item: FansItem?, listener: FanListener, position: Int, context: Context) {
+        fun onBind(item: FansItem?, listener: FanListener, position: Int, context: Context) {
             name_fans.text = item?.friendlyName
             decs_fans.text = item?.friendlyName
-            val fan = item!!
+
             follow_fnas.setOnClickListener {
-                listener.onFollow(fan, position, !fan.isFollow)
-            }
-            name_fans.setOnClickListener {
-                listener.onItemClick(fan, ClickType.TYPE_AUTHOR)
-            }
-            icon_fans.setOnClickListener {
-                listener.onItemClick(fan, ClickType.TYPE_AUTHOR)
+                listener.onFollow(item!!, position, item.isFollow)
             }
 
-            if (item.isFollow) {
+            itemView.setOnClickListener {
+                listener.onAvatarClick(item!!.userId, item.friendlyName!!)
+            }
+
+            if (item!!.isFollow) {
                 follow_fnas.text = context.getString(R.string.followed)
                 follow_fnas.background =
                     context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
@@ -88,7 +85,7 @@ class FansListAdapter(
     }
 
     interface FanListener {
-        fun onItemClick(item: Any, type: ClickType)
+        fun onAvatarClick(userId: Long, name: String)
         fun onGetAvatarAttachment(id: Long?, view:ImageView)
         fun onFollow(item: FansItem, position: Int, isFollow: Boolean)
     }
