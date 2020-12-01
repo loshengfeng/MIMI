@@ -49,8 +49,8 @@ class MyCollectionMimiVideoDataSource(
             val memberPostItems = body?.content
 
             memberPostItems?.forEachWithIndex { i, _ ->
-//                if (i % AD_GAP == 0)
-//                    memberPostItems.add(i, MemberPostItem(type = PostType.AD, adItem = adItem))
+                if (i % AD_GAP == 0)
+                    memberPostItems.add(i, PlayItem(playlistType = PostType.AD.value.toLong(), adItem = adItem))
             }
 
             val hasNext = hasNextPage(

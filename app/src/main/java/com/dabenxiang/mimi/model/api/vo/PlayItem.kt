@@ -4,54 +4,56 @@ import com.google.gson.annotations.SerializedName
 
 data class PlayItem(
     @SerializedName("id")
-    val id: Long?,
+    val id: Long?=0,
 
     @SerializedName("title")
-    val title: String?,
+    val title: String?="",
 
     @SerializedName("description")
-    val description: String?,
+    val description: String?="",
 
     @SerializedName("subTitle")
-    val subTitle: String?,
+    val subTitle: String?="",
 
     @SerializedName("cover")
-    val cover: String?,
+    val cover: String?="",
 
     @SerializedName("source")
-    val source: String?,
+    val source: String?="",
 
     @SerializedName("videoId")
-    val videoId: Long?,
+    val videoId: Long?=0,
 
     @SerializedName("episode")
-    val episode: String?,
+    val episode: String?="",
 
     @SerializedName("videoEpisodeId")
-    val videoEpisodeId: Long?,
+    val videoEpisodeId: Long?=0,
 
     @SerializedName("playlistType")
-    val playlistType: Long?,
+    val playlistType: Long?=0,
 
     @SerializedName("isAdult")
-    val isAdult: Boolean?,
+    val isAdult: Boolean?=true,
 
     @SerializedName("like")
-    var like: Boolean?,
+    var like: Boolean?=true,
 
     @SerializedName("likeCount")
-    var likeCount: Int?,
+    var likeCount: Int?=0,
 
     @SerializedName("favorite")
-    var favorite: Boolean?,
+    var favorite: Boolean?=false,
 
     @SerializedName("favoriteCount")
-    var favoriteCount: Int?,
+    var favoriteCount: Int?=0,
 
     @SerializedName("commentCount")
-    var commentCount: Int?,
+    var commentCount: Int?=0,
 
     @SerializedName("tags")
-    val tags: List<String>?
+    val tags: List<String>?=null,
+
+    val adItem: AdItem? = null
 
 ) : BaseItem()

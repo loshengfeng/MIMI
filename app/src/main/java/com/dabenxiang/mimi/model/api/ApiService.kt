@@ -474,7 +474,7 @@ interface ApiService {
         @Query("isShortVideo") isShortVideo: Boolean,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<PlayItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<PlayItem>>>
 
     @GET("/v1/Members/Me/PostFavorite")
     suspend fun getPostFavorite(
