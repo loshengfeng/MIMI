@@ -203,7 +203,7 @@ class MyFollowPostFragment() : BaseFragment() {
                         val bundle = ClubPicFragment.createBundle(item, 1)
                         navigateTo(
                                 NavigateItem.Destination(
-                                        R.id.action_clubTabFragment_to_clubPicFragment,
+                                        R.id.action_to_clubPicFragment,
                                         bundle
                                 )
                         )
@@ -212,7 +212,7 @@ class MyFollowPostFragment() : BaseFragment() {
                         val bundle = ClubTextFragment.createBundle(item, 1)
                         navigateTo(
                                 NavigateItem.Destination(
-                                        R.id.action_clubTabFragment_to_clubTextFragment,
+                                        R.id.action_to_clubTextFragment,
                                         bundle
                                 )
                         )
@@ -221,7 +221,7 @@ class MyFollowPostFragment() : BaseFragment() {
                         val bundle = ClipPlayerFragment.createBundle(item.id, 1)
                         navigateTo(
                                 NavigateItem.Destination(
-                                        R.id.action_clubTabFragment_to_clipPlayerFragment,
+                                        R.id.action_to_clipPlayerFragment,
                                         bundle
                                 )
                         )
@@ -248,7 +248,7 @@ class MyFollowPostFragment() : BaseFragment() {
             )
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_myPostFragment,
+                            R.id.action_to_myPostFragment,
                             bundle
                     )
             )
@@ -272,7 +272,7 @@ class MyFollowPostFragment() : BaseFragment() {
                     val bundle = ClubTextFragment.createBundle(item)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubTextFragment,
+                                    R.id.action_to_clubTextFragment,
                                     bundle
                             )
                     )
@@ -281,7 +281,7 @@ class MyFollowPostFragment() : BaseFragment() {
                     val bundle = ClubPicFragment.createBundle(item)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubPicFragment,
+                                    R.id.action_to_clubPicFragment,
                                     bundle
                             )
                     )
@@ -290,7 +290,7 @@ class MyFollowPostFragment() : BaseFragment() {
                     val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clipPlayerFragment,
+                                    R.id.action_to_clipPlayerFragment,
                                     bundle
                             )
                     )
@@ -312,7 +312,7 @@ class MyFollowPostFragment() : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_searchPostFragment,
+                            R.id.action_to_searchPostFragment,
                             bundle
                     )
             )
