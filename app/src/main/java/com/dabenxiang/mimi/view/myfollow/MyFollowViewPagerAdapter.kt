@@ -6,18 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
-import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
+import com.dabenxiang.mimi.view.adapter.FollowClubAdapter
+import com.dabenxiang.mimi.view.adapter.FollowPersonalAdapter
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.NO_DATA
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_CLUB
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_MEMBER
+import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_PERSONAL
 import kotlinx.android.synthetic.main.layout_my_follow_content.view.*
 
 
 class MyFollowViewPagerAdapter(
     val context: Context,
-    private val memberFollowAdapter: MemberFollowAdapter,
-    private val clubFollowAdapter: ClubFollowAdapter,
+    private val personaladapter: FollowPersonalAdapter,
+    private val clubadapter: FollowClubAdapter,
     val onSwipeRefresh: () -> Unit
 ) : PagerAdapter() {
 
@@ -27,10 +27,9 @@ class MyFollowViewPagerAdapter(
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.layout_my_follow_content, container, false)
-
         view.rv_content.adapter = when (position) {
-            TYPE_MEMBER -> memberFollowAdapter
-            TYPE_CLUB -> clubFollowAdapter
+            TYPE_PERSONAL -> personaladapter
+            TYPE_CLUB -> clubadapter
             else -> null
         }
 
@@ -41,7 +40,7 @@ class MyFollowViewPagerAdapter(
 
         container.addView(view)
         when (position) {
-            TYPE_MEMBER -> viewMember = view
+            TYPE_PERSONAL -> viewMember = view
             TYPE_CLUB -> viewClub = view
         }
         return view
@@ -59,7 +58,7 @@ class MyFollowViewPagerAdapter(
             else -> View.GONE
         }
         view?.tv_all?.text =
-            if (position == TYPE_MEMBER)
+            if (position == TYPE_PERSONAL)
                 context.getString(R.string.follow_members_total_num, size.toString())
             else
                 context.getString(R.string.follow_clubs_total_num, size.toString())
@@ -71,7 +70,7 @@ class MyFollowViewPagerAdapter(
 
     private fun getCurrentView(position: Int): View? {
         return when (position) {
-            TYPE_MEMBER -> viewMember
+            TYPE_PERSONAL -> viewMember
             TYPE_CLUB -> viewClub
             else -> null
         }

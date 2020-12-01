@@ -9,9 +9,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyLikeListener
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
-import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.ClubLikeAdapter
 import com.dabenxiang.mimi.view.adapter.MiMiLikeAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -22,13 +20,11 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_club_short.*
 import kotlinx.android.synthetic.main.fragment_my_follow.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 
 class LikeFragment : BaseFragment() {
-
     private val viewModel: LikeViewModel by viewModels()
-    private val accountManager: AccountManager by inject()
 
     companion object {
         const val NO_DATA = 0
@@ -49,16 +45,30 @@ class LikeFragment : BaseFragment() {
             TODO("Not yet implemented")
         }
 
-        override fun onClipCommentClick(item: List<PlayItem>, position: Int) {
+        override fun onClipCommentClick(item: List<PostFavoriteItem>, position: Int) {
             TODO("Not yet implemented")
         }
 
         override fun onChipClick(item: PostFavoriteItem, tag: String) {
-            TODO("Not yet implemented")
+            Timber.i("LikeFragment onChipClick  $item")
+//            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_myFollowFragmentV2_to_playerV2Fragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onItemClick(item: PostFavoriteItem, type: Int) {
-            TODO("Not yet implemented")
+            Timber.i("LikeFragment onItemClick  $item")
+//            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_myFollowFragmentV2_to_playerV2Fragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onCommentClick(item: PostFavoriteItem, type: Int) {
@@ -73,7 +83,6 @@ class LikeFragment : BaseFragment() {
         ) {
             TODO("Not yet implemented")
         }
-
     }
 
     private var vpAdapter: LikeViewPagerAdapter? = null

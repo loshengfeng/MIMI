@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.item_follow_member.view.iv_photo
 import kotlinx.android.synthetic.main.item_follow_member.view.tv_follow
 import kotlinx.android.synthetic.main.item_follow_member.view.tv_name
 import org.koin.core.component.KoinComponent
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -75,12 +76,14 @@ class MiMiLikeViewHolder(
         }
         tagChipGroup.setOnClickListener { view ->
             //TODO go to search
+            Timber.i("MiMiLikeViewHolder tagChipGroup Click  $item")
 //            listener.onChipClick(item, (view as Chip).text.toString())
 
         }
         tvTitle.text = item.title
         tvName.text = item.posterName
         ivAvatar.setOnClickListener { view ->
+            Timber.i("MiMiLikeViewHolder ivAvatar Click  $item")
 //            listener.onChipClick(item, (view as Chip).text.toString())
             //TODO go to poster
         }
@@ -95,6 +98,7 @@ class MiMiLikeViewHolder(
             ).format(date)
         }
         ivPhoto.setOnClickListener { view ->
+            Timber.i("MiMiLikeViewHolder ivPhoto Click  $item")
 //            listener.onChipClick(item, (view as Chip).text.toString())
             //TODO go to video dec & play page
         }

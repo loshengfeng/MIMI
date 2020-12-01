@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.item_follow_club.view.tv_follow
 import kotlinx.android.synthetic.main.item_follow_club.view.tv_name
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -77,12 +78,14 @@ class ClubLikeViewHolder(
         }
         tagChipGroup.setOnClickListener { view ->
             //TODO go to search
+            Timber.i("ClubLikeViewHolder tagChipGroup Click  $item")
 //            listener.onChipClick(item, (view as Chip).text.toString())
 
         }
         tvTitle.text = item.title
         tvName.text = item.posterName
         ivAvatar.setOnClickListener { view ->
+            Timber.i("ClubLikeViewHolder ivAvatar Click  $item")
 //            listener.onChipClick(item, (view as Chip).text.toString())
             //TODO go to poster
         }
@@ -97,6 +100,7 @@ class ClubLikeViewHolder(
             ).format(date)
         }
         ivPhoto.setOnClickListener { view ->
+            Timber.i("ClubLikeViewHolder ivPhoto Click  $item")
 //            listener.onChipClick(item, (view as Chip).text.toString())
             //TODO go to video dec & play page
         }
@@ -141,7 +145,6 @@ class ClubLikeViewHolder(
             //TODO popup dialog
 //            listener.onChipClick(item, (view as Chip).text.toString())
         }
-
 
         tvFollow.visibility = View.VISIBLE
         when (item.isFollow) {

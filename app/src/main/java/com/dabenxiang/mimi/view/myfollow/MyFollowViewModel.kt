@@ -12,11 +12,15 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
+import com.dabenxiang.mimi.view.adapter.FollowClubAdapter
+import com.dabenxiang.mimi.view.adapter.FollowPersonalAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class MyFollowViewModel : BaseViewModel() {
 
@@ -47,7 +51,25 @@ class MyFollowViewModel : BaseViewModel() {
     private val _clubIdList = ArrayList<Long>()
     private val _userIdList = ArrayList<Long>()
 
-    fun getMemberList(): Flow<PagingData<MemberFollowItem>> {
+    fun getData(adapter1: FollowClubAdapter, adapter2: FollowPersonalAdapter, type: Int) {
+        Timber.i("getData")
+        CoroutineScope(Dispatchers.IO).launch {
+            if (type == MyFollowFragment.Companion.TYPE_PERSONAL) {
+                adapter1.submitData(PagingData.empty())
+                getClubList().collectLatest {
+                    adapter1.submitData(it)
+                }
+            } else {
+                adapter2.submitData(PagingData.empty())
+                getPersonalList().collectLatest {
+                    adapter2.submitData(it)
+                }
+            }
+        }
+    }
+
+
+    fun getPersonalList(): Flow<PagingData<MemberFollowItem>> {
         return Pager(
             config = PagingConfig(pageSize = MemberFollowListDataSource.PER_LIMIT.toInt()),
             pagingSourceFactory = {
@@ -58,6 +80,8 @@ class MyFollowViewModel : BaseViewModel() {
             }
         )
             .flow
+//            .onStart {  setShowProgress(true) }
+//            .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
     }
 
@@ -72,6 +96,8 @@ class MyFollowViewModel : BaseViewModel() {
             }
         )
             .flow
+//            .onStart {  setShowProgress(true) }
+//            .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
     }
 
@@ -196,5 +222,4 @@ class MyFollowViewModel : BaseViewModel() {
                 .collect { _clubDetail.value = it }
         }
     }
-
 }
