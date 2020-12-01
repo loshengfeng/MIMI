@@ -113,7 +113,7 @@
 
     <fragment
         android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
+        android:name="com.dabenxiang.mimi.view.myfollow_old.MyFollowFragment"
         android:label="MyFollowFragment" />
     <fragment
         android:id="@+id/myCollectionFragment"
@@ -205,5 +205,10 @@
         android:id="@+id/playerV2Fragment"
         android:name="com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment"
         android:label="PlayerV2Fragment" />
+
+    <fragment
+        android:id="@+id/clipPlayerFragment"
+        android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
+        android:label="ClipPlayerFragment" />
 
 </navigation>

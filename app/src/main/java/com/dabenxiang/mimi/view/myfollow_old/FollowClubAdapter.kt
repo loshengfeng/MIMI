@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow
+package com.dabenxiang.mimi.view.myfollow_old
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -67,7 +67,7 @@
                         app:layout_constraintBottom_toBottomOf="@+id/bg_vippromote"
                         app:layout_constraintEnd_toEndOf="@+id/bg_vippromote"
                         app:layout_constraintTop_toTopOf="@+id/bg_vippromote"
-                        app:srcCompat="@drawable/img_vip_word" />
+                        app:srcCompat="@drawable/img_vip_word_2" />
 
                     <ImageView
                         android:id="@+id/vippromote_top"
@@ -338,7 +338,7 @@
 
         <TextView
             android:id="@+id/every_day_count_hint"
-            android:layout_width="84dp"
+            android:layout_width="0dp"
             android:layout_height="20dp"
             android:layout_marginLeft="14dp"
             android:layout_marginTop="8dp"
@@ -346,6 +346,7 @@
             android:text="@string/every_day_count"
             android:textColor="@color/color_white_1"
             android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -373,7 +374,7 @@
             app:layout_constraintBottom_toTopOf="@+id/video_long"
             app:layout_constraintEnd_toEndOf="@+id/video_long"
             app:layout_constraintStart_toStartOf="@+id/video_long"
-            tools:text="無限" />
+            tools:text="@string/every_day_video_count_unlimit" />
 
         <TextView
             android:id="@+id/video_short"
@@ -399,7 +400,18 @@
             app:layout_constraintBottom_toTopOf="@+id/video_short"
             app:layout_constraintEnd_toEndOf="@+id/video_short"
             app:layout_constraintStart_toStartOf="@+id/video_short"
-            tools:text="無限" />
+            tools:text="@string/every_day_video_count_unlimit" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias="0.73"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@color/color_blue_5"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -417,15 +429,15 @@
         <TextView
             android:id="@+id/vip_unlimit"
             android:layout_width="0dp"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="14dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:layout_marginRight="4dp"
             android:gravity="center_vertical"
             android:text="@string/vip_hint"
             android:textColor="@color/color_white_1"
             android:textSize="14sp"
-            app:drawableEndCompat="@drawable/ico_next_disable"
+            android:drawableEnd="@drawable/btn_arrow_vip"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -433,15 +445,15 @@
         <TextView
             android:id="@+id/tv_expiry_date"
             android:layout_width="0dp"
-            android:layout_height="22dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:gravity="center"
             android:textColor="@color/color_white_1"
             android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/vip_unlimit"
-            app:layout_constraintStart_toStartOf="@+id/vip_unlimit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/vip_unlimit"
-            tools:text="嘗試頻" />
+            tools:text="2021-08-08 过期" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -459,10 +471,10 @@
         <TextView
             android:id="@+id/vip_unlimit_unlogin"
             android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_marginLeft="14dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="4dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
             android:gravity="center_vertical"
             android:text="@string/vip_hint"
             android:textColor="@color/color_white_1"

@@ -7,7 +7,7 @@ import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MyFollowVideoListener
@@ -25,24 +25,25 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
-import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_short.*
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
+import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragment() {
     private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
+    private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
     private val adapter: MyCollectionMimiVideoAdapter by lazy {
         MyCollectionMimiVideoAdapter(requireContext(), listener)
     }
 
-    override fun getLayoutId() = R.layout.fragment_my_follow_tab
+    override fun getLayoutId() = R.layout.fragment_my_collection_videos
 
     companion object {
         const val KEY_DATA = "data"
@@ -59,7 +60,10 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         }
 
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
-            checkStatus { viewModel.likePost(MemberPostItem(id = item.videoId!!, likeType = LikeType.LIKE), position, isLike) }
+            checkStatus {
+                viewModel.likePost(MemberPostItem(id = item.videoId
+                        ?: 0, likeType = LikeType.LIKE), position, isLike)
+            }
         }
 
         override fun onClipCommentClick(item: List<PlayItem>, position: Int) {
@@ -122,6 +126,28 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
+        viewModel.adResult.observe(this) {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result?.let { item ->
+                        Glide.with(requireContext()).load(item.href).into(layout_ad.iv_ad)
+                        layout_ad.iv_ad.setOnClickListener {
+                            GeneralUtils.openWebView(requireContext(), item.target ?: "")
+                        }
+                    }
+                }
+                is ApiResult.Error -> {
+                    layout_ad.visibility = View.GONE
+                    onApiError(it.throwable)
+                }
+
+                else -> {
+                    layout_ad.visibility = View.GONE
+                    onApiError(Exception("Unknown Error!"))
+                }
+            }
+        }
+
         viewModel.deleteFavoriteResult.observe(this) {
             viewModel.getData(adapter, type)
         }
@@ -133,9 +159,12 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         viewModel.postCount.observe(this) {
             Timber.i("postCount= $it")
             if (it == 0) {
+                layout_ad.visibility = View.VISIBLE
+                text_page_empty.text = getString(R.string.follow_empty_msg)
                 id_empty_group.visibility = View.VISIBLE
                 list_short.visibility = View.INVISIBLE
             } else {
+                layout_ad.visibility = View.GONE
                 id_empty_group.visibility = View.GONE
                 list_short.visibility = View.VISIBLE
             }
@@ -164,6 +193,21 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
+        })
+
+        viewModel.cleanResult.observe(this, {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Empty -> {
+                    viewModel.getData(adapter, type)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        collectionViewModel.deleteMiMIs.observe(this,  {
+            if(type.value == it) viewModel.deleteVideos(adapter.snapshot().items)
         })
     }
 
@@ -199,7 +243,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, type)
         }
-//        viewModel.getAd()
+        viewModel.getAd()
     }
 
 

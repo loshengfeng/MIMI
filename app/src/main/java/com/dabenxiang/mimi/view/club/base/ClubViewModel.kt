@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 abstract class ClubViewModel : BaseViewModel(){
 
@@ -101,14 +102,18 @@ abstract class ClubViewModel : BaseViewModel(){
 
     fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
         viewModelScope.launch {
+            Timber.i("likePost item=$item")
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val likeType = when {
                     isLike -> LikeType.LIKE
                     else -> LikeType.DISLIKE
                 }
-                val request = LikeRequest(likeType)
-                val result = apiRepository.like(item.id, request)
+                val request =  LikeRequest(likeType)
+                val result = when {
+                    isLike -> apiRepository.like(item.id, request)
+                    else -> apiRepository.deleteLike(item.id)
+                }
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(position))
             }

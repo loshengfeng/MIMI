@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.personal
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -91,6 +92,7 @@ class PersonalFragment : BaseFragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun setupObservers() {
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
@@ -99,20 +101,30 @@ class PersonalFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     val meItem = it.result
-                    layout_vip_unlimit.visibility = View.VISIBLE
-                    layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
+                    if (meItem.isSubscribed) {
+                        layout_vip_unlimit.visibility = View.VISIBLE
+                        layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
+
+                        video_long_count.text = getString(R.string.every_day_video_count_unlimit)
+                        video_short_count.text = getString(R.string.every_day_video_count_unlimit)
+                    } else {
+                        layout_vip_unlimit.visibility = View.INVISIBLE
+                        layout_vip_unlimit_unlogin.visibility = View.VISIBLE
+
+                        meItem.videoCount?.let { count ->
+                            meItem.videoCountLimit?.let { countLimit ->
+                                video_long_count.text = "$count/$countLimit"
+                            }
+                        }
+                        meItem.videoOnDemandCount?.let { count ->
+                            meItem.videoOnDemandCountLimit?.let { countLimit ->
+                                video_short_count.text = "$count/$countLimit"
+                            }
+                        }
+                    }
+
                     meItem.friendlyName?.let {
                         id_personal.text = it
-                    }
-                    meItem.videoCount?.let { count ->
-                        meItem.videoCountLimit?.let { countlimit ->
-                            video_long_count.text = count.toString() + "/" + countlimit.toString()
-                        }
-                    }
-                    meItem.videoOnDemandCount?.let { count ->
-                        meItem.videoOnDemandCountLimit?.let { countlimit ->
-                            video_short_count.text = count.toString() + "/" + countlimit.toString()
-                        }
                     }
                     meItem.likes?.let { it ->
                         like_count.text = it.toString()
@@ -129,7 +141,7 @@ class PersonalFragment : BaseFragment() {
                     } else {
                         meItem.expiryDate?.let { date ->
                             tv_expiry_date.text = getString(
-                                R.string.vip_expiry_date,
+                                R.string.deadline_vip,
                                 SimpleDateFormat(
                                     "yyyy-MM-dd",
                                     Locale.getDefault()

@@ -67,6 +67,7 @@ data class PostFavoriteItem(
     fun toMemberPostItem(): MemberPostItem {
         return MemberPostItem(
             id = postId,
+            postId = id,
             title = title,
             content = content,
             type = PostType.getTypeByValue(type),

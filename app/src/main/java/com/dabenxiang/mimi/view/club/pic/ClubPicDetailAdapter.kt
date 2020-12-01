@@ -211,6 +211,12 @@ class ClubPicDetailAdapter(
         photoGridAdapter?.notifyItemChanged(position)
     }
 
+    fun updateContent(item: MemberPostItem) {
+        memberPostItem.content = item.content
+        notifyItemChanged(VIEW_TYPE_PICTURE_DETAIL)
+    }
+
+
     fun setupAdItem(item: AdItem) {
         mAdItem = item
     }
