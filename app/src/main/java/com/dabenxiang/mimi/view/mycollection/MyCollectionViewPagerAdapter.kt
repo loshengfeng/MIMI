@@ -15,7 +15,7 @@ class MyCollectionViewPagerAdapter(
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
             MyCollectionFragment.TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(MyFollowTabItemType.MIMI_VIDEO) },
             MyCollectionFragment.TAB_SHORT_VIDEO to { MyCollectionMimiVideoFragment(MyFollowTabItemType.SHORT_VIDEO) },
-            MyCollectionFragment.TAB_POST to {  MyCollectionFavoritesFragment()  },
+            MyCollectionFragment.TAB_FAVORITES to {  MyCollectionFavoritesFragment()  },
     )
 
     override fun getItemCount() = tabFragmentsCreators.size

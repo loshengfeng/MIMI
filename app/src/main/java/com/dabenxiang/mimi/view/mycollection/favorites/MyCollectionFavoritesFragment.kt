@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -21,6 +22,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -36,6 +38,7 @@ import timber.log.Timber
 class  MyCollectionFavoritesFragment : BaseFragment() {
 
     private val viewModel: MyCollectFavoritesViewModel by viewModels()
+    private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
     private val adapter: FavoritesAdapter by lazy {
@@ -111,6 +114,17 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
             }
         })
 
+        viewModel.cleanResult.observe(this, {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Empty -> {
+                    viewModel.getData(adapter)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         mainViewModel?.deletePostResult?.observe(this,  {
             when (it) {
                 is ApiResult.Success -> {
@@ -120,6 +134,7 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
 
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
@@ -135,6 +150,11 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
             layout_refresh.isRefreshing = false
             viewModel.getData(adapter)
         }
+
+        collectionViewModel.deleteFavorites?.observe(viewLifecycleOwner,  {
+            Timber.i("mainViewModel deleteFavorites")
+            viewModel.deleteFavorite(adapter.snapshot().items)
+        })
 
     }
 
