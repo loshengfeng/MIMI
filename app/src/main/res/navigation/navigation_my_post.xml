@@ -57,6 +57,15 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_myPostFragment_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
     </fragment>
 
     <fragment
@@ -237,6 +246,46 @@
         <action
             android:id="@+id/action_editVideoFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clubTextFragment"
+        android:name="com.dabenxiang.mimi.view.club.text.ClubTextFragment"
+        tools:layout="@layout/fragment_club_text">
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clubPicFragment"
+        android:name="com.dabenxiang.mimi.view.club.pic.ClubPicFragment"
+        tools:layout="@layout/fragment_club_pic" >
+        <action
+            android:id="@+id/action_clubPicFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clubPicFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_pictureFragment"
+            app:destination="@id/pictureFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clipPlayerFragment"
+        android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
+        tools:layout="@layout/fragment_v2_player"
+        android:label="ClipPlayerFragment" >
+        <action
+            android:id="@+id/action_clipPlayerFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clipPlayerFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
     </fragment>
 
 </navigation>
