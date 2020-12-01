@@ -95,7 +95,11 @@
     <fragment
         android:id="@+id/fansListFragment"
         android:name="com.dabenxiang.mimi.view.fans.FansListFragment"
-        android:label="FansListFragment" />
+        android:label="FansListFragment" >
+        <action
+            android:id="@+id/action_fansListFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
 
     <fragment
         android:id="@+id/likesListFragment"
