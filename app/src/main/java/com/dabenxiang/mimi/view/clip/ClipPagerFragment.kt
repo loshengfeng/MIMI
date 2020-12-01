@@ -48,7 +48,9 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             { onPromoteClick() },
             { update -> getClips(update) },
             { item, pos, update -> getM3U8(item, pos, update) },
-            { pos -> scrollToNext(pos) }
+            { pos -> scrollToNext(pos) },
+            { source -> viewModel.getDecryptSetting(source) },
+            { videoItem, decryptSettingItem, function -> viewModel.decryptCover(videoItem, decryptSettingItem, function) }
         )
     }
 

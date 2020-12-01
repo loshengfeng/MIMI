@@ -959,5 +959,10 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
+
+    /**
+     * 取得各來源解碼key
+     */
+    suspend fun getDecryptSetting() = apiService.getDecryptSetting()
 }
 
