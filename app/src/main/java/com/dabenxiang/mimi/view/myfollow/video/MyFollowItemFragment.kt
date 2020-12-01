@@ -79,7 +79,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_myFollowFragmentV2_to_searchPostFragment,
+                            R.id.action_to_searchPostFragment,
                             bundle
                     )
             )
@@ -89,7 +89,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
             val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_myFollowFragmentV2_to_playerV2Fragment,
+                            R.id.action_to_playerV2Fragment,
                             bundle
                     ))
         }
@@ -99,7 +99,7 @@ class MyFollowItemFragment(val type: MyFollowTabItemType) : BaseFragment() {
             val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0), true)
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_myFollowFragmentV2_to_playerV2Fragment,
+                            R.id.action_to_playerV2Fragment,
                             bundle
                     ))
         }
