@@ -96,7 +96,6 @@ class MyCollectionMIMIVideoViewHolder(
 
         updateFavorite(item)
         val onFavoriteClickListener = View.OnClickListener {
-            item.favorite = item.favorite != true
             item.favoriteCount =
                     if (item.favorite == true) item.favoriteCount ?: 0 + 1 else item.favoriteCount
                             ?: 0 - 1
