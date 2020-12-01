@@ -1,8 +1,6 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
-import android.view.Surface
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
@@ -22,14 +20,8 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.google.android.exoplayer2.ExoPlaybackException
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Timeline
-import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_v2_player.*
-import timber.log.Timber
 import java.net.UnknownHostException
 
 class PlayerV2Fragment: BasePlayerFragment() {
@@ -131,8 +123,8 @@ class PlayerV2Fragment: BasePlayerFragment() {
 
     override fun getTabTitle(tab: TabLayout.Tab, position: Int) {
         when(position) {
-            0 -> tab.text = "视频简介"
-            1 -> tab.text = "评论"
+            0 -> tab.text = getString(R.string.video_desc)
+            1 -> tab.text = getString(R.string.comment)
         }
     }
 

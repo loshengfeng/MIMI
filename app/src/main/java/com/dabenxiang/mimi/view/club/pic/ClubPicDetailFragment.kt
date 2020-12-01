@@ -130,7 +130,7 @@ class ClubPicDetailFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = false
             )
-            navigateTo(NavigateItem.Destination(R.id.action_clubTextDetailFragment_to_myPostFragment, bundle))
+            navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }
     }
 
@@ -236,7 +236,7 @@ class ClubPicDetailFragment : BaseFragment() {
             val bundle = FullPictureFragment.createBundle(position, imageItems)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubPicFragment_to_pictureFragment,
+                    R.id.action_to_pictureFragment,
                     bundle
                 )
             )

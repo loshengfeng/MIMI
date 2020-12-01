@@ -4,7 +4,6 @@
 
     <item
         android:id="@+id/action_clean"
-        android:title="@string/favorite_clean"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:title="@string/follow_clean"
         app:showAsAction="always" />
 </menu>

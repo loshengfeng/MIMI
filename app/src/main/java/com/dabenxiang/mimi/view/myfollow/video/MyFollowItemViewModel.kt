@@ -8,13 +8,14 @@ import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class MyFollowItemViewModel : BaseViewModel() {
+class MyFollowItemViewModel : ClubViewModel() {
 
     private val _postCount = MutableLiveData<Int>()
     val postCount: LiveData<Int> = _postCount
