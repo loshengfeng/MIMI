@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/normal_color_background"
-    android:fitsSystemWindows="true"
     tools:context=".view.main.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -23,7 +22,7 @@
                 android:id="@+id/tool_bar"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:background="@color/transparent"
+                android:background="@color/normal_color_background"
                 android:layout_gravity="center"
                 app:menu="@menu/menu_back_clear"
                 app:navigationIcon="@drawable/btn_back_black_n">

@@ -75,6 +75,9 @@ class MainViewModel : BaseViewModel() {
     private val _uploadCoverItem = MutableLiveData<PicParameter>()
     val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
 
+    private val _uploadVideoParameter = MutableLiveData<String>()
+    val uploadVideoParameter: LiveData<String> = _uploadVideoParameter
+
     private val _postPicResult = MutableLiveData<ApiResult<Long>>()
     val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
 
@@ -413,6 +416,7 @@ class MainViewModel : BaseViewModel() {
                     val picParameter = PicParameter(ext = ext)
                     _uploadCoverItem.postValue(picParameter)
                 } else if (type == HomeViewModel.TYPE_VIDEO) {
+                    _uploadVideoParameter.postValue(ext)
                     val mmr = MediaMetadataRetriever()
                     mmr.setDataSource(realPath)
                     mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);

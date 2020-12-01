@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.follow
+package com.dabenxiang.mimi.view.mycollection.favorites
 
 import android.content.Context
 import android.os.Bundle
@@ -33,13 +33,13 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class  MyFollowInterestFragment : BaseFragment() {
+class  MyCollectionFavoritesFragment : BaseFragment() {
 
-    private val viewModel: MyFollowInterestViewModel by viewModels()
+    private val viewModel: MyCollectFavoritesViewModel by viewModels()
     private val accountManager: AccountManager by inject()
 
-    private val adapter: MyFollowInterestAdapter by lazy {
-        MyFollowInterestAdapter(requireActivity(), postListener,  memberPostFuncItem, attachmentListener)
+    private val adapter: FavoritesAdapter by lazy {
+        FavoritesAdapter(requireActivity(), postListener,  memberPostFuncItem, attachmentListener)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_interest

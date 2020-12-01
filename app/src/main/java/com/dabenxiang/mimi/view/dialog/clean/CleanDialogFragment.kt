@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.view.dialog.clean
 
+import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
@@ -9,6 +11,7 @@ class CleanDialogFragment : BaseDialogFragment() {
 
     private var onCleanDialogListener: OnCleanDialogListener? = null
     private var msgResId: Int? = 0
+    private var msg:String = ""
 
     companion object {
 
@@ -33,6 +36,16 @@ class CleanDialogFragment : BaseDialogFragment() {
 
     override fun setupView() {
         msgResId?.let { tv_msg.setText(it) }
+    }
+
+    fun setMsg(msg:String){
+        this.msg = msg
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (!TextUtils.isEmpty(msg))
+            tv_msg.text = msg
     }
 
     override fun setupListeners() {
