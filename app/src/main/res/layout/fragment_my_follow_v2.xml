@@ -5,11 +5,15 @@
     android:layout_height="match_parent"
     android:background="@color/color_white_1">
 
-    <include
-        android:id="@+id/layout_title"
-        layout="@layout/item_setting_bar"
-        android:layout_width="0dp"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tool_bar"
+        android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:background="@color/color_white_1"
+        app:menu="@menu/menu_follow"
+        app:contentInsetStartWithNavigation="0dp"
+        app:layout_collapseMode="pin"
+        app:navigationIcon="@drawable/btn_back_black_n"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -30,7 +34,7 @@
         android:layout_height="@dimen/app_bar_height"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_title"
+        app:layout_constraintTop_toBottomOf="@id/tool_bar"
         app:tabIndicator="@drawable/bg_tab_my_follow"
         app:tabIndicatorColor="@color/color_red_1"
         app:tabRippleColor="@color/transparent"
