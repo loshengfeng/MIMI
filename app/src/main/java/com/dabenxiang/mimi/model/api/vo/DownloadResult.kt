@@ -1,7 +1,7 @@
 package com.dabenxiang.mimi.model.api.vo
 
 sealed class DownloadResult {
-    data class Success(val url: String) : DownloadResult()
+    data class Success(val data: Any) : DownloadResult()
 
     data class Error(val message: String, val cause: Any? = null) : DownloadResult()
 

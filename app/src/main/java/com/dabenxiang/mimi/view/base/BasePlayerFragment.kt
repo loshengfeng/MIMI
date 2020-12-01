@@ -64,6 +64,7 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
             }
 
         }
+        player_pager.isSaveEnabled = false
 
         TabLayoutMediator(tabs, player_pager) { tab, position ->
             getTabTitle(tab, position)
@@ -212,6 +213,15 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
             Timber.d("player ready confirmed")
             player?.prepare(it, isReset, isReset)
         }
+    }
+
+    fun stopPlay() {
+        player?.stop()
+        player?.clearVideoDecoderOutputBufferRenderer()
+    }
+
+    fun sendVideoReport() {
+        playerViewModel.sendVideoReport(contentId)
     }
 
     /**
@@ -468,7 +478,7 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
                 //showErrorDialog("UNKNOWN")
             }
         }
-        playerViewModel.sendVideoReport(contentId)
+        sendVideoReport()
     }
 
     /**

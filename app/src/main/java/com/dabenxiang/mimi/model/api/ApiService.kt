@@ -177,6 +177,18 @@ interface ApiService {
     @GET("/v1/Members/Post")
     suspend fun getMembersPost(
         @Query("type") type: Int,
+        @Query("tag") tag: String? = null,
+        @Query("key") keyword: String? = null,
+        @Query("orderBy") orderBy: Int,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
+
+    @GET("/v1/Members/Post")
+    suspend fun getMembersPost(
+        @Query("type") type: Int,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("isAdult") isAdult: Boolean = true,
@@ -453,14 +465,22 @@ interface ApiService {
     suspend fun getPlaylist(
         @Path("playlistType") playlistType: Int,
         @Query("isAdult") isAdult: Boolean,
+        @Query("isShortVideo") isShortVideo: Boolean,
         @Query("offset") offset: String,
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<List<PlayItem>>>
 
     @GET("/v1/Members/Me/PostFavorite")
     suspend fun getPostFavorite(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
+
+    @GET("/v1/Members/Me/PostFavorite")
+    suspend fun getPostFavorite(
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int,
+        @Query("postType") postType: Int
     ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
 
     @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
@@ -470,6 +490,8 @@ interface ApiService {
 
     @GET("/v1/Members/Me/PostFollow")
     suspend fun getPostFollow(
+        @Query("keyword") keyword: String? = null,
+        @Query("tag") tag: String? = null,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("status") status: Int = 1

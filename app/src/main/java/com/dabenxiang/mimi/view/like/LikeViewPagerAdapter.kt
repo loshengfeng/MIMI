@@ -6,19 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.adapter.ClubFollowAdapter
 import com.dabenxiang.mimi.view.adapter.ClubLikeAdapter
-import com.dabenxiang.mimi.view.adapter.MemberFollowAdapter
-import com.dabenxiang.mimi.view.adapter.MemberLikeAdapter
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.NO_DATA
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_CLUB
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_MEMBER
-import kotlinx.android.synthetic.main.view_my_follow_pager_content.view.*
+import com.dabenxiang.mimi.view.adapter.MiMiLikeAdapter
+import com.dabenxiang.mimi.view.like.LikeFragment.Companion.NO_DATA
+import com.dabenxiang.mimi.view.like.LikeFragment.Companion.TYPE_MIMI
+import com.dabenxiang.mimi.view.like.LikeFragment.Companion.TYPE_POST
+import kotlinx.android.synthetic.main.layout_my_like_content.view.*
 
 class LikeViewPagerAdapter(
     val context: Context,
-    private val memberFollowAdapter: MemberLikeAdapter,
-    private val clubFollowAdapter: ClubLikeAdapter,
+    private val mimilikeAdapter: MiMiLikeAdapter,
+    private val clublikeAdapter: ClubLikeAdapter,
     val onSwipeRefresh: () -> Unit
 ) : PagerAdapter() {
 
@@ -27,11 +25,11 @@ class LikeViewPagerAdapter(
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.view_my_follow_pager_content, container, false)
+            .inflate(R.layout.layout_my_like_content, container, false)
 
         view.rv_content.adapter = when (position) {
-            TYPE_MEMBER -> memberFollowAdapter
-            TYPE_CLUB -> clubFollowAdapter
+            TYPE_MIMI -> mimilikeAdapter
+            TYPE_POST -> clublikeAdapter
             else -> null
         }
 
@@ -42,8 +40,8 @@ class LikeViewPagerAdapter(
 
         container.addView(view)
         when (position) {
-            TYPE_MEMBER -> viewMember = view
-            TYPE_CLUB -> viewClub = view
+            TYPE_MIMI -> viewMember = view
+            TYPE_POST -> viewClub = view
         }
         return view
     }
@@ -60,7 +58,7 @@ class LikeViewPagerAdapter(
             else -> View.GONE
         }
         view?.tv_all?.text =
-            if (position == TYPE_MEMBER)
+            if (position == TYPE_POST)
                 context.getString(R.string.follow_members_total_num, size.toString())
             else
                 context.getString(R.string.follow_clubs_total_num, size.toString())
@@ -72,8 +70,8 @@ class LikeViewPagerAdapter(
 
     private fun getCurrentView(position: Int): View? {
         return when (position) {
-            TYPE_MEMBER -> viewMember
-            TYPE_CLUB -> viewClub
+            TYPE_MIMI -> viewMember
+            TYPE_POST -> viewClub
             else -> null
         }
     }
@@ -82,17 +80,14 @@ class LikeViewPagerAdapter(
         return view == obj
     }
 
-    override fun getCount() = 2
+    override fun getCount() = context.resources.getStringArray(R.array.like_tabs).size
 
     override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
         container.removeView(obj as View)
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return when (position) {
-            TYPE_MEMBER -> context.getString(R.string.follow_people)
-            TYPE_CLUB -> context.getString(R.string.follow_circle)
-            else -> null
-        }
+        val tabs = context.resources.getStringArray(R.array.like_tabs)
+        return tabs[position]
     }
 }

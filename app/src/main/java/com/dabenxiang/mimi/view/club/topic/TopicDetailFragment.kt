@@ -26,6 +26,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
@@ -182,6 +183,36 @@ class TopicDetailFragment : BaseFragment() {
         }
     }
 
+    override fun navigationToText(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_topicDetailFragment_to_clubTextFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToPicture(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_topicDetailFragment_to_clubPicFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToClip(b: Bundle) {
+        val item = arguments?.get(MyPostFragment.MEMBER_DATA) as MemberPostItem
+        val bundle = ClipPlayerFragment.createBundle(item.id)
+
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_topicDetailFragment_to_clipPlayerFragment,
+                bundle
+            )
+        )
+    }
+
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {}
 
@@ -225,28 +256,31 @@ class TopicDetailFragment : BaseFragment() {
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
+
+                val searchPostItem = arguments?.getSerializable(KEY_DATA)
+
                 val bundle = Bundle()
                 bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putString(BasePostFragment.PAGE, BasePostFragment.ADULT)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.CLUB)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
 
                 it as MemberPostItem
                 when (item.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_clubTextFragment,
+                                R.id.action_topicDetailFragment_to_postArticleFragment,
                                 bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_clubPicFragment,
+                                R.id.action_topicDetailFragment_to_postPicFragment,
                                 bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                                //TODO
                                 R.id.action_topicDetailFragment_to_postVideoFragment,
                                 bundle
                         )
@@ -314,7 +348,7 @@ class TopicDetailFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type, tag)
+            val item = SearchPostItem(type = type, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(

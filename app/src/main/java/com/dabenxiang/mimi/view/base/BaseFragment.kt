@@ -52,7 +52,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.kaopiz.kprogresshud.KProgressHUD
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.fragment_tab_club.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
@@ -147,6 +147,11 @@ abstract class BaseFragment : Fragment() {
         }
 
         handleBackStackData()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        resetObservers()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -358,7 +363,9 @@ abstract class BaseFragment : Fragment() {
 
         mainViewModel?.postDeleteVideoAttachment?.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is ApiResult.Success -> setSnackBarPostStatus(postId)
+                is ApiResult.Success -> {
+                    setSnackBarPostStatus(postId)
+                }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
@@ -366,6 +373,9 @@ abstract class BaseFragment : Fragment() {
 
     private fun deleteTempFile() {
         try {
+            if (uploadVideoList.isEmpty()) {
+                return
+            }
             val picPath = UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].picUrl))
 
             val videoFile = File(uploadVideoList[0].videoUrl)
@@ -550,6 +560,8 @@ abstract class BaseFragment : Fragment() {
     abstract fun getLayoutId(): Int
 
     open fun setupObservers() {}
+
+    open fun resetObservers() {}
 
     open fun setupListeners() {}
 
@@ -781,6 +793,10 @@ abstract class BaseFragment : Fragment() {
     }
 
     private fun setSnackBarPostStatus(postId: Long = 0) {
+        if (snackBar == null) {
+            return
+        }
+
         PostManager().dismissSnackBar(
             snackBar!!,
             postId,
@@ -815,25 +831,25 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    private fun navigationToText(bundle: Bundle) {
+    open fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_textDetailFragment,
+                R.id.action_to_clubTextFragment,
                 bundle
             )
         )
     }
 
-    private fun navigationToPicture(bundle: Bundle) {
+    open fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_pictureDetailFragment,
+                R.id.action_to_clubPicFragment,
                 bundle
             )
         )
     }
 
-    private fun navigationToClip(bundle: Bundle) {
+    open fun navigationToClip(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_adultHomeFragment_to_clipFragment,

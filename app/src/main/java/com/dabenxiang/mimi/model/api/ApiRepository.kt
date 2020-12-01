@@ -244,6 +244,24 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Post
      *
      ***********************************************************/
+    suspend fun searchPostAll(
+        type: PostType,
+        keyword: String? = null,
+        tag: String? = null,
+        orderBy: StatisticsOrderType = StatisticsOrderType.LATEST,
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(
+            type = type.value,
+            keyword = keyword,
+            tag = tag,
+            orderBy = orderBy.value,
+            offset = offset,
+            limit = limit
+        )
+    }
+
     suspend fun getMembersPost(
         type: PostType,
         orderBy: OrderBy,
@@ -594,17 +612,29 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getPlaylist(
         playlistType: Int,
         isAdult: Boolean,
+        isShortVideo: Boolean,
         offset: String,
         limit: String
-    ) = apiService.getPlaylist(playlistType, isAdult, offset, limit)
+    ) = apiService.getPlaylist(playlistType, isAdult, isShortVideo, offset, limit)
 
     /**
-     * 取得我的帖子收藏
+     * 取得我的帖子收藏 1:postText, 2:postPic , 3:PostShortVideo , 7:postOther, 8:postLongVideoSmallVideo
      */
     suspend fun getPostFavorite(
-        offset: String,
-        limit: String
-    ) = apiService.getPostFavorite(offset, limit)
+        offset: Long,
+        limit: Int,
+        postType: Int = 1,
+    ) = apiService.getPostFavorite(offset, limit, postType)
+
+    suspend fun getPostVideoFavorite(
+        offset: Long,
+        limit: Int
+    ) = apiService.getPostFavorite(offset, limit, 8)
+
+    suspend fun getPostOtherFavorite(
+        offset: Long,
+        limit: Int
+    ) = apiService.getPostFavorite(offset, limit, 7)
 
     /**
      * 移除我的帖子收藏
@@ -619,7 +649,17 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getPostFollow(
         offset: Int,
         limit: Int
-    ) = apiService.getPostFollow(offset, limit)
+    ) = apiService.getPostFollow(offset = offset, limit = limit)
+
+    /**
+     * 搜尋我關注的所有帖子
+     */
+    suspend fun searchPostFollow(
+        keyword: String? = null,
+        tag: String? = null,
+        offset: Int,
+        limit: Int
+    ) = apiService.getPostFollow(keyword = keyword, tag = tag, offset = offset, limit = limit)
 
     /**
      * 取得使用者資訊明細

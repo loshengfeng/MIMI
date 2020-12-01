@@ -27,6 +27,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 
 class MyPostClipPostHolder(
     itemView: View
@@ -58,10 +59,10 @@ class MyPostClipPostHolder(
         itemList: List<MemberPostItem>?,
         position: Int,
         myPostListener: MyPostListener,
-        attachmentListener: AttachmentListener
+        attachmentListener: AttachmentListener,
+        searchStr: String = "",
+        searchTag: String = ""
     ) {
-        val isMe = accountManager.getProfile().userId == item.creatorId
-
         clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(R.color.color_black_1))
         tvTime.setTextColor(App.self.getColor(R.color.color_black_1_50))
@@ -75,7 +76,11 @@ class MyPostClipPostHolder(
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
-        tvTitle.text = item.title
+        tvTitle.text =  if (searchStr.isNotBlank()) getSpanString(
+            tvTitle.context,
+            item.title,
+            searchStr
+        ) else item.title
         tvFollow.visibility =
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
@@ -89,10 +94,8 @@ class MyPostClipPostHolder(
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(tagChipGroup.context, R.color.color_black_1_05)
-            )
+            if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
+            else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
                 myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
             }
@@ -115,16 +118,6 @@ class MyPostClipPostHolder(
                 )
             }
         }
-
-//        if (isMe) {
-//            tvFollow.visibility = View.GONE
-//        } else {
-//            tvFollow.visibility = View.VISIBLE
-//            updateFollow(item)
-//            tvFollow.setOnClickListener {
-//                itemList?.also { myPostListener.onFollowClick(it, position, !item.isFollow) }
-//            }
-//        }
 
         tvFollow.visibility =  View.GONE
 
@@ -160,6 +153,7 @@ class MyPostClipPostHolder(
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
             itemList?.also { myPostListener.onClipCommentClick(it, position) }
+            item.also { myPostListener.onCommentClick(it, AdultTabType.CLIP) }
         }
         ivComment.setOnClickListener(onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)

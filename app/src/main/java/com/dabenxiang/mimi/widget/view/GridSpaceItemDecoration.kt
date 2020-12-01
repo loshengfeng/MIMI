@@ -25,14 +25,17 @@ class GridSpaceItemDecoration(
             ignoreFirst && position == 0 -> {
             }
             position % span == lEdgeRule -> {
+                outRect.top = edgePadding
                 outRect.left = edgePadding
                 outRect.right = spacing / 2
             }
             position % span == rEdgeRule -> {
+                outRect.top = edgePadding
                 outRect.left = spacing / 2
                 outRect.right = edgePadding
             }
             else -> {
+                outRect.top = edgePadding
                 outRect.left = spacing / 2
                 outRect.right = spacing / 2
             }

@@ -154,15 +154,9 @@ class FavoriteFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
-        val primaryList = listOf(
-            getString(R.string.favorite_tab_mimi),
-            getString(R.string.favorite_tab_short)
-        )
-
+        val primaryList = resources.getStringArray(R.array.favorite_tabs).toMutableList()
         primaryAdapter.submitList(primaryList, lastPrimaryIndex)
-
         rv_content.adapter = favoriteAdapter
-
         viewModel.initData(lastPrimaryIndex)
     }
 
@@ -445,8 +439,8 @@ class FavoriteFragment : BaseFragment() {
             } else {
                 val bundle = SearchPostFragment.createBundle(
                     SearchPostItem(
-                        PostType.getTypeByValue(type),
-                        text
+                        type = PostType.getTypeByValue(type),
+                        tag = text
                     )
                 )
                 navigateTo(

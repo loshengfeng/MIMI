@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_actor_videos.*
+import kotlinx.android.synthetic.main.item_actor_collapsing.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -70,7 +71,6 @@ class ActorVideosFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-//        tv_title.text = getString(R.string.actor_videos_title)
         actor_toolbar_title.text = getString(R.string.actor_videos_title)
             arguments?.getSerializable(KEY_DATA)?.let { id ->
                 id as Long
@@ -108,8 +108,9 @@ class ActorVideosFragment : BaseFragment() {
                     tv_total_click.text = item.totalClick.toString() + getString(R.string.actor_hot_unit)
                     tv_total_video.text = item.totalVideo.toString() + getString(R.string.actor_videos_unit)
                     viewModel.loadImage(item.attachmentId, iv_avatar, LoadImageType.AVATAR_CS)
-                    viewModel.loadImage(item.attachmentId, actor_toolbar_avatar, LoadImageType.AVATAR_CS)
                     actorName = item.name
+                    tv_name.text = actorName
+                    tvCollapsedTop.text = actorName
                     getVideoData(actorName)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -137,13 +138,11 @@ class ActorVideosFragment : BaseFragment() {
 
             when {
                 verticalOffset == 0 -> {
-                    actor_toolbar_avatar.visibility = View.GONE
-                    actor_toolbar_title.text = getString(R.string.actor_videos_title)
+                    actor_toolbar_title.visibility =View.VISIBLE
                 }
 
-                abs(verticalOffset) >= appBarLayout.totalScrollRange -> {
-                    actor_toolbar_avatar.visibility =View.VISIBLE
-                    actor_toolbar_title.text = actorName
+                abs(verticalOffset) > 10 -> {
+                    actor_toolbar_title.visibility =View.GONE
                 }
             }
 

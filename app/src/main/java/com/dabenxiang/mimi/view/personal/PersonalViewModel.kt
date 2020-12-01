@@ -25,7 +25,9 @@ class PersonalViewModel : BaseViewModel() {
     val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
 
     fun getPostDetail() {
+        setShowProgress(true)
         viewModelScope.launch {
+            setShowProgress(false)
             if (isLogin()) {
                 flow {
                     val result = domainManager.getApiRepository().getMe()
@@ -86,23 +88,23 @@ class PersonalViewModel : BaseViewModel() {
     val totalUnreadResult: LiveData<ApiResult<Int>> = _totalUnreadResult
 
     fun getTotalUnread() {
-//        viewModelScope.launch {
-//            flow {
-//                val apiRepository = domainManager.getApiRepository()
-//                val chatUnreadResult = apiRepository.getUnread()
-//                val chatUnread =
-//                    if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content ?: 0
-//                val orderUnreadResult = apiRepository.getUnReadOrderCount()
-//                val orderUnread =
-//                    if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content
-//                        ?: 0
-//                emit(ApiResult.success(chatUnread + orderUnread))
-//            }
-//                .onStart { emit(ApiResult.loading()) }
-//                .catch { e -> emit(ApiResult.error(e)) }
-//                .onCompletion { emit(ApiResult.loaded()) }
-//                .collect { _totalUnreadResult.value = it }
-//        }
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val chatUnreadResult = apiRepository.getUnread()
+                val chatUnread =
+                    if (!chatUnreadResult.isSuccessful) 0 else chatUnreadResult.body()?.content ?: 0
+                val orderUnreadResult = apiRepository.getUnReadOrderCount()
+                val orderUnread =
+                    if (!orderUnreadResult.isSuccessful) 0 else orderUnreadResult.body()?.content
+                        ?: 0
+                emit(ApiResult.success(chatUnread + orderUnread))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _totalUnreadResult.value = it }
+        }
     }
 
     fun getOldDriverUrl(): String {

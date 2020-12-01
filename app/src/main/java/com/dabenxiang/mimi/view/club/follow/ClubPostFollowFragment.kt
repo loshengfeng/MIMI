@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -20,10 +21,11 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -189,7 +191,7 @@ class ClubPostFollowFragment : BaseFragment() {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
                         navigateTo(
                                 NavigateItem.Destination(
-                                        R.id.action_clubTabFragment_to_clubPicFragment,
+                                        R.id.action_to_clubPicFragment,
                                         bundle
                                 )
                         )
@@ -198,7 +200,7 @@ class ClubPostFollowFragment : BaseFragment() {
                         val bundle = TextDetailFragment.createBundle(item, 1)
                        navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubTextFragment,
+                                    R.id.action_to_clubTextFragment,
                                     bundle
                             )
                     )
@@ -220,6 +222,33 @@ class ClubPostFollowFragment : BaseFragment() {
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
                 it as MemberPostItem
+
+                val bundle = Bundle()
+                item.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+
+                when(it.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                                R.id.action_to_postArticleFragment,
+                            bundle
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                                R.id.action_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                                R.id.action_to_postVideoFragment,
+                            bundle
+                        )
+                    }
+                }
             }
         }
 
@@ -234,7 +263,7 @@ class ClubPostFollowFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubPicFragment,
+                                    R.id.action_to_clubPicFragment,
                                     bundle
                             )
                     )
@@ -243,19 +272,19 @@ class ClubPostFollowFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_clubTabFragment_to_clubTextFragment,
+                                    R.id.action_to_clubTextFragment,
                                     bundle
                             )
                     )
                 }
                 AdultTabType.CLIP -> {
-                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
-//                    navigateTo(
-//                            NavigateItem.Destination(
-//                                    R.id.action_myPostFragment_to_clipFragment,
-//                                    bundle
-//                            )
-//                    )
+                    val bundle = ClipPlayerFragment.createBundle(item.id)
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_to_clipPlayerFragment,
+                                    bundle
+                            )
+                    )
                 }
                 else -> {
                 }
@@ -267,11 +296,11 @@ class ClubPostFollowFragment : BaseFragment() {
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type, tag)
+            val item = SearchPostItem(type = PostType.FOLLOWED, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_searchPostFragment,
+                            R.id.action_to_searchPostFragment,
                             bundle
                     )
             )
@@ -285,7 +314,7 @@ class ClubPostFollowFragment : BaseFragment() {
             )
             navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_clubTabFragment_to_myPostFragment,
+                            R.id.action_to_myPostFragment,
                             bundle
                     )
             )

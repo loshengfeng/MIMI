@@ -110,7 +110,7 @@ class ClubPicDetailFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type, tag)
+            val item = SearchPostItem(type = type, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
@@ -207,7 +207,7 @@ class ClubPicDetailFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type, tag)
+            val item = SearchPostItem(type = type, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
@@ -236,7 +236,7 @@ class ClubPicDetailFragment : BaseFragment() {
             val bundle = FullPictureFragment.createBundle(position, imageItems)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubPicFragment_to_pictureFragment,
+                    R.id.action_to_pictureFragment,
                     bundle
                 )
             )

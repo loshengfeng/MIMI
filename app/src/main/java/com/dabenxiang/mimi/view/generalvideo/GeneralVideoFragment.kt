@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFragment() {
+class GeneralVideoFragment(val category: String) : BaseFragment() {
 
     private val viewModel: GeneralVideoViewModel by viewModels()
 
@@ -73,7 +73,7 @@ class GeneralVideoFragment(val category: String, val orderByType: Int) : BaseFra
         }
 
         lifecycleScope.launch {
-            viewModel.getVideoByCategory(category, orderByType)
+            viewModel.getVideoByCategory(category)
                 .collectLatest {
                     generalVideoAdapter.submitData(it)
                 }

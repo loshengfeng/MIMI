@@ -21,8 +21,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var ibPlay: ImageButton = view.ib_play
     var tvTitle: TextView = view.tv_title
     var tvFavorite: TextView = view.iv_favorite
-    var tvLike: TextView = view.tv_like
     var tvComment: TextView = view.tv_comment
+    var tvMore: TextView = view.tv_more
     var progress: ProgressBar = view.progress_video
     var reminder: View = view.recharge_reminder
     private var btnVip: View = view.btn_vip
@@ -34,15 +34,10 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         ibPlay.visibility = View.GONE
         tvTitle.text = item.title
         tvFavorite.text = item.favoriteCount.toString()
-        tvLike.text = item.likeCount.toString()
         tvComment.text = item.commentCount.toString()
 
         Glide.with(ivCover.context)
             .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivCover)
-
-        val likeRes = takeIf { item.like == true }?.let { R.drawable.ico_nice_forvideo_s }
-            ?: let { R.drawable.ico_nice_forvideo }
-        tvLike.setCompoundDrawablesRelativeWithIntrinsicBounds(0, likeRes, 0, 0)
 
         val favoriteRes = takeIf { item.favorite == true }?.let { R.drawable.btn_favorite_forvideo_s }
             ?: let { R.drawable.btn_favorite_forvideo_n }
@@ -60,17 +55,11 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             reminder.visibility = View.VISIBLE
             progress.visibility = View.GONE
         } else {
-            tvLike.setOnClickListener {
-                clipFuncItem.onLikeClick(item, pos, item.like != true)
-            }
             tvFavorite.setOnClickListener {
-                clipFuncItem.onFavoriteClick(
-                    item,
-                    pos,
-                    item.favorite != true
-                )
+                clipFuncItem.onFavoriteClick(item, pos, item.favorite != true)
             }
             tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
+            tvMore.setOnClickListener { clipFuncItem.onMoreClick(item) }
 
             reminder.visibility = View.GONE
         }

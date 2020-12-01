@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.player.ui
 
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -8,8 +7,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.GuessLikePagingCallBack
+import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.player.GuessLikeDataSource
@@ -18,8 +19,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
-class PlayerDescriptionViewModel: BaseViewModel() {
+class PlayerDescriptionViewModel : BaseViewModel() {
+
+    private var _detailResult = MutableLiveData<ApiResult<MemberPostItem>>()
+    val detailResult: LiveData<ApiResult<MemberPostItem>> = _detailResult
 
     private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
     val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
@@ -27,11 +32,30 @@ class PlayerDescriptionViewModel: BaseViewModel() {
     private val _videoList = MutableLiveData<PagedList<BaseVideoItem>>()
     val videoList: LiveData<PagedList<BaseVideoItem>> = _videoList
 
-    private val _recyclerViewGuessLikeVisible = MutableLiveData<Int>()
-    val recyclerViewGuessLikeVisible: LiveData<Int> = _recyclerViewGuessLikeVisible
+    private var _likeResult = MutableLiveData<ApiResult<MemberPostItem>>()
+    val likeResult: LiveData<ApiResult<MemberPostItem>> = _likeResult
 
-    private val _isPageCallback = MutableLiveData<Boolean>()
-    val isPageCallback: LiveData<Boolean> = _isPageCallback
+    private var _favoriteResult = MutableLiveData<ApiResult<MemberPostItem>>()
+    val favoriteResult: LiveData<ApiResult<MemberPostItem>> = _favoriteResult
+
+    private val _reportResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
+    val reportResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _reportResult
+
+    fun getPostDetail(id: Long) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getMemberPostDetail(id)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _detailResult.value = it }
+        }
+    }
 
     fun getAd(width: Int, height: Int) {
         viewModelScope.launch {
@@ -68,28 +92,97 @@ class PlayerDescriptionViewModel: BaseViewModel() {
         }
     }
 
+    fun favoritePost(item: MemberPostItem) {
+        viewModelScope.launch {
+            flow {
+                val originFavorite = item.isFavorite
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    !originFavorite -> apiRepository.addFavorite(item.id)
+                    else -> apiRepository.deleteFavorite(item.id)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFavorite = !originFavorite
+                emit(ApiResult.success(item))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _favoriteResult.value = it }
+        }
+    }
+
+    fun likePost(item: MemberPostItem, type: LikeType) {
+        viewModelScope.launch {
+            flow {
+                val originType = item.likeType
+                val apiRepository = domainManager.getApiRepository()
+                if (type != originType) {
+                    val request = LikeRequest(type)
+                    val result = apiRepository.like(item.id, request)
+                    if (!result.isSuccessful) throw HttpException(result)
+                    item.likeType = type
+                    if (type == LikeType.LIKE) {
+                        if (originType == LikeType.DISLIKE) item.dislikeCount -= 1
+                        item.likeCount += 1
+                    } else {
+                        if (originType == LikeType.LIKE) item.likeCount -= 1
+                        item.dislikeCount += 1
+                    }
+                } else {
+                    val result = apiRepository.deleteLike(item.id)
+                    if (!result.isSuccessful) throw HttpException(result)
+                    item.likeType = null
+                    if (type == LikeType.LIKE) item.likeCount -= 1
+                    else item.dislikeCount -= 1
+                }
+                emit(ApiResult.success(item))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _likeResult.value = it }
+        }
+    }
+
+    fun sendVideoReport(id: Long, content: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().sendVideoReport(
+                    ReportRequest(content, id)
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    emit(ApiResult.error(e))
+                }
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    Timber.i("sentReport =$it")
+                    _reportResult.value = SingleLiveEvent(it)
+                }
+        }
+    }
+
     private val pagingCallback = object : GuessLikePagingCallBack {
         override fun onLoadInit(initCount: Int) {
-            _recyclerViewGuessLikeVisible.value =
-                if (initCount == 0) {
-                    View.GONE
-                } else {
-                    View.VISIBLE
-                }
-            _isPageCallback.value = true
         }
 
         override fun onLoading() {
-            _isPageCallback.value = true
         }
 
         override fun onLoaded() {
-            _isPageCallback.value = true
         }
 
         override fun onThrowable(throwable: Throwable) {
-            _isPageCallback.value = true
         }
     }
+
 
 }
