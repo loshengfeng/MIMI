@@ -29,10 +29,10 @@ class ClubFollowViewHolder(
             listener.onItemClick(item, ClickType.TYPE_FOLLOW)
         }
         tvName.setOnClickListener {
-            listener.onItemClick(item, ClickType.TYPE_AUTHOR)
+            listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
         ivPhoto.setOnClickListener {
-            listener.onItemClick(item, ClickType.TYPE_AUTHOR)
+            listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
     }
 }
