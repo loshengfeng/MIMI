@@ -1,11 +1,9 @@
-package com.dabenxiang.mimi.view.myfollow
+package com.dabenxiang.mimi.view.my.follow
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TAB_FOLLOW_PEOPLE
-import timber.log.Timber
+import com.dabenxiang.mimi.view.my.follow.MyFollowFragment.Companion.TAB_FOLLOW_PEOPLE
 
 class MyFollowViewModel : BaseViewModel() {
 

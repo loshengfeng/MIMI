@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.follow_list
+package com.dabenxiang.mimi.view.my.follow.follow_list
 
 import android.content.Context
 import android.os.Bundle
@@ -7,8 +7,8 @@ import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseFragment
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment
-import com.dabenxiang.mimi.view.myfollow.MyFollowViewModel
+import com.dabenxiang.mimi.view.my.follow.MyFollowFragment
+import com.dabenxiang.mimi.view.my.follow.MyFollowViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class  MyFollowListFragment(val type: Int) : BaseFragment() {

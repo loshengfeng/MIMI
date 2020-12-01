@@ -1,12 +1,12 @@
-package com.dabenxiang.mimi.view.myfollow
+package com.dabenxiang.mimi.view.my.follow
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TAB_FOLLOW_CLUB
-import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TAB_FOLLOW_PEOPLE
-import com.dabenxiang.mimi.view.myfollow.follow_list.MyFollowListFragment
+import com.dabenxiang.mimi.view.my.follow.MyFollowFragment.Companion.TAB_FOLLOW_CLUB
+import com.dabenxiang.mimi.view.my.follow.MyFollowFragment.Companion.TAB_FOLLOW_PEOPLE
+import com.dabenxiang.mimi.view.my.follow.follow_list.MyFollowListFragment
 
 class MyFollowViewPagerAdapter(
         fragmentManager: FragmentManager,

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.mycollection.favorites
+package com.dabenxiang.mimi.view.my.collection.favorites
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

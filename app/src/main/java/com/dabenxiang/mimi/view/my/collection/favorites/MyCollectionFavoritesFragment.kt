@@ -1,10 +1,9 @@
-package com.dabenxiang.mimi.view.mycollection.favorites
+package com.dabenxiang.mimi.view.my.collection.favorites
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -22,7 +21,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
+import com.dabenxiang.mimi.view.my.collection.MyCollectionViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment

@@ -1,26 +1,11 @@
-package com.dabenxiang.mimi.view.like
+package com.dabenxiang.mimi.view.my.like
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback
-import com.dabenxiang.mimi.callback.MyLikePagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
-import com.dabenxiang.mimi.view.adapter.ClubLikeAdapter
-import com.dabenxiang.mimi.view.adapter.MiMiLikeAdapter
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import timber.log.Timber
 
 class LikeViewModel : BaseViewModel() {
 

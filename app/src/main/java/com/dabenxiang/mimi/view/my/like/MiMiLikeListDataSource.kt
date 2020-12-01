@@ -1,15 +1,10 @@
-package com.dabenxiang.mimi.view.like
+package com.dabenxiang.mimi.view.my.like
 
 import androidx.paging.PagingSource
-import com.dabenxiang.mimi.callback.MyLikePagingCallback
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
-import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MiMiLikeListDataSource constructor(
     private val domainManager: DomainManager,

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.mycollection.mimi_video
+package com.dabenxiang.mimi.view.my.collection.mimi_video
 
 import android.content.Context
 import android.view.LayoutInflater

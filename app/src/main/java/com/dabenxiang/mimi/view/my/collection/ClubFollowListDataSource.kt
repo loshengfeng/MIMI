@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.mycollection
+package com.dabenxiang.mimi.view.my.collection
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.MyFollowPagingCallback

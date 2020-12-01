@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.follow_list
+package com.dabenxiang.mimi.view.my.follow.follow_list
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -6,13 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import kotlin.collections.forEach
 
 class MyFollowListViewModel : ClubViewModel() {
 

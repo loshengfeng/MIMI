@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.mycollection.favorites
+package com.dabenxiang.mimi.view.my.collection.favorites
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -6,7 +6,7 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.view.like.ClubLikeListDataSource
+import com.dabenxiang.mimi.view.my.like.ClubLikeListDataSource
 import retrofit2.HttpException
 
 class FavoritesListDataSource constructor(

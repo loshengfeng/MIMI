@@ -1,48 +1,48 @@
-package com.dabenxiang.mimi.view.mycollection
+package com.dabenxiang.mimi.view.my.like
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.my.collection.MyCollectionFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_my_collection.*
 import kotlinx.android.synthetic.main.fragment_my_collection.view.*
 import timber.log.Timber
 
-class MyCollectionFragment: BaseFragment() {
+
+class LikeFragment : BaseFragment() {
+    private val viewModel: LikeViewModel by viewModels()
 
     companion object {
         const val TAB_MiMI_VIDEO = 0
-        const val TAB_SHORT_VIDEO = 1
-        const val TAB_FAVORITES = 2
+        const val TAB_POST = 1
     }
 
-    private val viewModel: MyCollectionViewModel by viewModels()
     private lateinit var tabLayoutMediator: TabLayoutMediator
+
     override fun getLayoutId() = R.layout.fragment_my_collection
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
+    private var vpAdapter: LikeViewPagerAdapter? = null
 
-    }
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
 
-        view.view_pager.adapter = MyCollectionViewPagerAdapter(childFragmentManager, lifecycle)
+        view.view_pager.adapter = LikeViewPagerAdapter(childFragmentManager, lifecycle)
         view.view_pager.offscreenPageLimit = 2
         tabLayoutMediator = TabLayoutMediator(view.tabs, view.view_pager) { tab, position ->
             tab.text = getTabTitle(position)
@@ -72,7 +72,7 @@ class MyCollectionFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tool_bar.toolbar_title.text = getString(R.string.personal_follow)
+        tool_bar.toolbar_title.text = getString(R.string.like_title)
 
         tool_bar.setNavigationOnClickListener {
             navigateTo(NavigateItem.Up)
@@ -88,23 +88,15 @@ class MyCollectionFragment: BaseFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        Timber.i("ClubTabFragment onResume")
-
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        Timber.i("ClubTabFragment onDestroy")
         if (::tabLayoutMediator.isInitialized) tabLayoutMediator.detach()
     }
 
     private fun getTabTitle(position: Int): String? {
         return when (position) {
             TAB_MiMI_VIDEO -> getString(R.string.follow_tab_mimi_video)
-            TAB_SHORT_VIDEO -> getString(R.string.follow_tab_small_video)
-            TAB_FAVORITES -> getString(R.string.follow_tab_post)
+            TAB_POST -> getString(R.string.follow_tab_post)
             else -> null
         }
     }
@@ -112,16 +104,26 @@ class MyCollectionFragment: BaseFragment() {
     private fun deleteAll(){
         CleanDialogFragment.newInstance(onCleanDialogListener).also {
             it.show(
-                    requireActivity().supportFragmentManager,
-                    CleanDialogFragment::class.java.simpleName
+                requireActivity().supportFragmentManager,
+                CleanDialogFragment::class.java.simpleName
             )
         }
     }
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-            Timber.i("onCleanDialogListener lastTabIndex=${viewModel.lastTabIndex}")
-           viewModel.setDeleteNotify()
+
+            when(viewModel.lastTabIndex){
+                MyCollectionFragment.TAB_MiMI_VIDEO ->{
+                    //TODO
+                }
+                MyCollectionFragment.TAB_SHORT_VIDEO ->{
+                    //TODO
+                }
+                else ->{
+                    //TODO
+                }
+            }
         }
     }
 }

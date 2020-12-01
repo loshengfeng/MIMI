@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.mycollection.mimi_video
+package com.dabenxiang.mimi.view.my.collection.mimi_video
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,7 +14,7 @@ import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
-import com.dabenxiang.mimi.view.like.MiMiLikeListDataSource
+import com.dabenxiang.mimi.view.my.like.MiMiLikeListDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

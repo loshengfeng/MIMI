@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.mycollection.mimi_video
+package com.dabenxiang.mimi.view.my.collection.mimi_video
 
 import android.content.Context
 import android.os.Bundle
@@ -26,7 +26,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
+import com.dabenxiang.mimi.view.my.collection.MyCollectionViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils

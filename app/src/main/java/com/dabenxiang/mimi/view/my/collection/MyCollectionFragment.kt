@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow
+package com.dabenxiang.mimi.view.my.collection
 
 import android.content.Context
 import android.os.Bundle
@@ -11,24 +11,23 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.myfollow_old.MyFollowFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_my_collection.*
 import kotlinx.android.synthetic.main.fragment_my_collection.view.*
-import kotlinx.android.synthetic.main.fragment_my_follow.*
 import timber.log.Timber
 
-class MyFollowFragment: BaseFragment() {
+class MyCollectionFragment: BaseFragment() {
 
     companion object {
-        const val TAB_FOLLOW_PEOPLE = 0
-        const val TAB_FOLLOW_CLUB = 1
+        const val TAB_MiMI_VIDEO = 0
+        const val TAB_SHORT_VIDEO = 1
+        const val TAB_FAVORITES = 2
     }
 
-    private val viewModel: MyFollowViewModel by viewModels()
+    private val viewModel: MyCollectionViewModel by viewModels()
     private lateinit var tabLayoutMediator: TabLayoutMediator
-    override fun getLayoutId() = R.layout.fragment_my_follow_tab
+    override fun getLayoutId() = R.layout.fragment_my_collection
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -42,7 +41,7 @@ class MyFollowFragment: BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
 
-        view.view_pager.adapter = MyFollowViewPagerAdapter(childFragmentManager, lifecycle)
+        view.view_pager.adapter = MyCollectionViewPagerAdapter(childFragmentManager, lifecycle)
         view.view_pager.offscreenPageLimit = 2
         tabLayoutMediator = TabLayoutMediator(view.tabs, view.view_pager) { tab, position ->
             tab.text = getTabTitle(position)
@@ -72,7 +71,7 @@ class MyFollowFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tool_bar.toolbar_title.text = getString(R.string.follow_title)
+        tool_bar.toolbar_title.text = getString(R.string.personal_follow)
 
         tool_bar.setNavigationOnClickListener {
             navigateTo(NavigateItem.Up)
@@ -102,17 +101,15 @@ class MyFollowFragment: BaseFragment() {
 
     private fun getTabTitle(position: Int): String? {
         return when (position) {
-            TAB_FOLLOW_PEOPLE -> getString(R.string.follow_people)
-            TAB_FOLLOW_CLUB -> getString(R.string.follow_circle)
+            TAB_MiMI_VIDEO -> getString(R.string.follow_tab_mimi_video)
+            TAB_SHORT_VIDEO -> getString(R.string.follow_tab_small_video)
+            TAB_FAVORITES -> getString(R.string.follow_tab_post)
             else -> null
         }
     }
 
     private fun deleteAll(){
-        CleanDialogFragment.newInstance(listener= onCleanDialogListener,
-                msgResId = if (viewModel.lastTabIndex == TAB_FOLLOW_PEOPLE)
-                    R.string.follow_clean_member_dlg_msg else
-                    R.string.follow_clean_club_dlg_msg).also {
+        CleanDialogFragment.newInstance(onCleanDialogListener).also {
             it.show(
                     requireActivity().supportFragmentManager,
                     CleanDialogFragment::class.java.simpleName

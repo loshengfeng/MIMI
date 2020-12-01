@@ -1,10 +1,8 @@
-package com.dabenxiang.mimi.view.mycollection
+package com.dabenxiang.mimi.view.my.collection
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import timber.log.Timber
 
 class MyCollectionViewModel : BaseViewModel() {
 

@@ -1,12 +1,12 @@
-package com.dabenxiang.mimi.view.like
+package com.dabenxiang.mimi.view.my.like
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
-import com.dabenxiang.mimi.view.mycollection.favorites.MyCollectionFavoritesFragment
-import com.dabenxiang.mimi.view.mycollection.mimi_video.MyCollectionMimiVideoFragment
+import com.dabenxiang.mimi.view.my.collection.favorites.MyCollectionFavoritesFragment
+import com.dabenxiang.mimi.view.my.collection.mimi_video.MyCollectionMimiVideoFragment
 
 class LikeViewPagerAdapter(
     fragmentManager: FragmentManager,
