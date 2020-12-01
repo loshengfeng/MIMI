@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.PostType
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -510,6 +511,13 @@ interface ApiService {
     suspend fun updateProfile(
         @Body body: ProfileRequest
     ): Response<Void>
+
+    @GET("/v1/Members/Me/PostLike")
+    suspend fun getPostLike(
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int,
+        @Query("postType") postType: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
 
     /**********************************************************
      *
