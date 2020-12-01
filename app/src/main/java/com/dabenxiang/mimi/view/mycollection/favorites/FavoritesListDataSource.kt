@@ -28,7 +28,7 @@ class FavoritesListDataSource constructor(
             val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content ?: AdItem()
 
             val result =
-                domainManager.getApiRepository().getPostFavorite( 0, ClubLikeListDataSource.PER_LIMIT, 7)
+                domainManager.getApiRepository().getPostFavorite( 0, PER_LIMIT.toInt(), 7)
             if (!result.isSuccessful) throw HttpException(result)
 
             val memberPostItems =  result.body()?.content?.map {
