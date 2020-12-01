@@ -31,7 +31,7 @@ import timber.log.Timber
 import java.util.*
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 
-class MyFollowVideoViewHolder(
+class MyCollectionMIMIVideoViewHolder(
         itemView: View
 ) : BaseViewHolder(itemView), KoinComponent {
 
