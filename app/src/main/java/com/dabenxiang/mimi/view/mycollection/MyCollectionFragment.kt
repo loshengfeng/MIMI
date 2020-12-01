@@ -5,25 +5,35 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.GeneralDialog
+import com.dabenxiang.mimi.view.dialog.GeneralDialogData
+import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
+import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.dialog.show
+import com.dabenxiang.mimi.view.favroite.FavoriteFragment
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_my_follow_v3.*
-import kotlinx.android.synthetic.main.fragment_my_follow_v3.view.*
+import kotlinx.android.synthetic.main.fragment_my_collection.*
+import kotlinx.android.synthetic.main.fragment_my_collection.view.*
 import timber.log.Timber
 
 class MyCollectionFragment: BaseFragment() {
 
     companion object {
         const val TAB_MiMI_VIDEO = 0
-        const val TAB_SMALL_VIDEO = 1
+        const val TAB_SHORT_VIDEO = 1
         const val TAB_POST = 2
     }
 
-    //    private val viewModel: MyFollowViewModel by viewModels()
+    private val viewModel: MyCollectionViewModel by viewModels()
     private lateinit var tabLayoutMediator: TabLayoutMediator
-    override fun getLayoutId() = R.layout.fragment_my_follow_v3
+    override fun getLayoutId() = R.layout.fragment_my_collection
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -43,6 +53,24 @@ class MyCollectionFragment: BaseFragment() {
             tab.text = getTabTitle(position)
         }
         tabLayoutMediator.attach()
+
+        view.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.apply{
+                    viewModel.lastTabIndex = position
+                }
+
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+        })
         return view
     }
 
@@ -58,8 +86,7 @@ class MyCollectionFragment: BaseFragment() {
             when (it.itemId) {
                 R.id.action_clean -> {
                     Timber.i("onOptionsItemSelected action_clean")
-                    //TODO
-
+                    deleteAll()
                 }
             }
             true
@@ -81,9 +108,35 @@ class MyCollectionFragment: BaseFragment() {
     private fun getTabTitle(position: Int): String? {
         return when (position) {
             TAB_MiMI_VIDEO -> getString(R.string.follow_tab_mimi_video)
-            TAB_SMALL_VIDEO -> getString(R.string.follow_tab_small_video)
+            TAB_SHORT_VIDEO -> getString(R.string.follow_tab_small_video)
             TAB_POST -> getString(R.string.follow_tab_post)
             else -> null
+        }
+    }
+
+    private fun deleteAll(){
+        CleanDialogFragment.newInstance(onCleanDialogListener).also {
+            it.show(
+                    requireActivity().supportFragmentManager,
+                    CleanDialogFragment::class.java.simpleName
+            )
+        }
+    }
+
+    private val onCleanDialogListener = object : OnCleanDialogListener {
+        override fun onClean() {
+
+            when(viewModel.lastTabIndex){
+                TAB_MiMI_VIDEO ->{
+                    //TODO
+                }
+                TAB_SHORT_VIDEO->{
+                    //TODO
+                }
+                else ->{
+                    //TODO
+                }
+            }
         }
     }
 }

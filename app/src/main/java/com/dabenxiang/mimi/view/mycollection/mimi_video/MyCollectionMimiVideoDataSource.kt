@@ -35,7 +35,7 @@ class MyCollectionMimiVideoDataSource(
                         MyFollowTabItemType.MIMI_VIDEO -> {
                             domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value, true, isShortVideo = false, offset = offset.toString(), limit = PER_LIMIT.toString())
                         }
-                        MyFollowTabItemType.SMALL_VIDEO -> {
+                        MyFollowTabItemType.SHORT_VIDEO -> {
                             domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value, true, isShortVideo = true, offset = offset.toString(), limit = PER_LIMIT.toString())
                         }
                         else -> null
