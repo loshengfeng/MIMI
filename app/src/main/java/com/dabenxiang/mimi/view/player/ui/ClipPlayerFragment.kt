@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.view.base.BasePlayerFragment
 import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.fragment_v2_player.*
 
 class ClipPlayerFragment: BasePlayerFragment() {
@@ -81,10 +80,7 @@ class ClipPlayerFragment: BasePlayerFragment() {
 
     private fun getPostContent() {
         (arguments?.getLong(KEY_PLAYER_SRC))?.also {
-
             contentId = it
-
-            Log.d("neo","contentId = ${contentId}")
             viewModel.videoContentId = it
             viewModel.getPostDetail()
         }
