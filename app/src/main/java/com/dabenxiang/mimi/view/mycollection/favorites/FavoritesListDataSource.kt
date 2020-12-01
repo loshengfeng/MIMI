@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.like.ClubLikeListDataSource
 import retrofit2.HttpException
 
-class FavoritestListDataSource constructor(
+class FavoritesListDataSource constructor(
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
     private val adWidth: Int,
@@ -31,15 +31,12 @@ class FavoritestListDataSource constructor(
                 domainManager.getApiRepository().getPostFavorite( 0, ClubLikeListDataSource.PER_LIMIT, 7)
             if (!result.isSuccessful) throw HttpException(result)
 
-            val body = result.body()
-            val memberPostItems = arrayListOf<MemberPostItem>()
+            val memberPostItems =  result.body()?.content?.map {
+                it.toMemberPostItem()
+            } as ArrayList
 
             memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
-
-            body?.content?.forEachIndexed { index, item ->
-                memberPostItems.add(index, item.toMemberPostItem())
-            }
-
+            
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
                 result.body()?.paging?.offset ?: 0,
@@ -47,7 +44,7 @@ class FavoritestListDataSource constructor(
             )
             val nextKey = if (hasNext) offset + PER_LIMIT_LONG else null
             if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
-            pagingCallback.onTotalCount(body?.paging?.count ?: 0)
+            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
             LoadResult.Page(memberPostItems ?: listOf(), null, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)

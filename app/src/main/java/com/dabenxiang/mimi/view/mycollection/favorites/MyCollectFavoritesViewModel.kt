@@ -42,9 +42,9 @@ class MyCollectFavoritesViewModel : ClubViewModel() {
 
     fun getPostItemList(): Flow<PagingData<MemberPostItem>> {
         return Pager(
-                config = PagingConfig(pageSize = FavoritestListDataSource.PER_LIMIT.toInt()),
+                config = PagingConfig(pageSize = FavoritesListDataSource.PER_LIMIT.toInt()),
                 pagingSourceFactory = {
-                    FavoritestListDataSource(
+                    FavoritesListDataSource(
                             domainManager,
                             pagingCallback,
                             adWidth,
