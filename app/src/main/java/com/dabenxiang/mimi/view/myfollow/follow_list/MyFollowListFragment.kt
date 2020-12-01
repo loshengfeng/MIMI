@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.myfollow.follow_people
+package com.dabenxiang.mimi.view.myfollow.follow_list
 
 import android.content.Context
 import android.os.Bundle
@@ -8,9 +8,9 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
-class  MyFollowPeopleFragment : BaseFragment() {
-    private val viewModel: MyFollowPeopleViewModel by viewModels()
-    override fun getLayoutId() = R.layout.fragment_my_follow
+class  MyFollowListFragment : BaseFragment() {
+    private val viewModel: MyFollowListViewModel by viewModels()
+    override fun getLayoutId() = R.layout.fragment_my_follow_list
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

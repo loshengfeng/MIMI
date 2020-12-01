@@ -30,7 +30,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_my_follow_favorites.*
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
 import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -45,7 +45,7 @@ class  MyCollectionFavoritesFragment : BaseFragment() {
         FavoritesAdapter(requireActivity(), postListener,  memberPostFuncItem, attachmentListener)
     }
 
-    override fun getLayoutId() = R.layout.fragment_my_follow_favorites
+    override fun getLayoutId() = R.layout.fragment_my_collection_favorites
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

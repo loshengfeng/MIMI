@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TAB_FOLLOW_CLUB
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TAB_FOLLOW_PEOPLE
-import com.dabenxiang.mimi.view.myfollow.follow_club.MyFollowClubFragment
+import com.dabenxiang.mimi.view.myfollow.follow_list.MyFollowListFragment
 
 class MyFollowViewPagerAdapter(
         fragmentManager: FragmentManager,
@@ -14,7 +14,7 @@ class MyFollowViewPagerAdapter(
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
             TAB_FOLLOW_PEOPLE to { MyFollowFragment() },
-            TAB_FOLLOW_CLUB to { MyFollowClubFragment() },
+            TAB_FOLLOW_CLUB to { MyFollowListFragment() },
 
     )
 
