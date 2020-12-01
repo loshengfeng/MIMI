@@ -2,11 +2,14 @@ package com.dabenxiang.mimi.view.fans
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.vo.error.FansItem
 import com.dabenxiang.mimi.model.enums.ClickType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.FansListAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -17,7 +20,7 @@ import timber.log.Timber
 class FansListFragment : BaseFragment() {
 
     private val viewModel: FansListViewModel by viewModels()
-    private val adapter by lazy { FansListAdapter(listener) }
+    private val adapter by lazy { FansListAdapter(fanListener) }
     private val listener = object : BaseItemListener {
         override fun onItemClick(item: Any, type: ClickType) {
             Timber.i("FansListFragment onItemClick $item")
@@ -53,7 +56,22 @@ class FansListFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.fansCount.observe(this, Observer {
+            tv_title_count.text = String.format(
+                getString(R.string.total_count_fans),
+                it
+            )
 
+            if (it == 0.toLong()) {
+                img_page_empty.visibility = View.VISIBLE
+                text_page_empty.visibility = View.VISIBLE
+                list_fans.visibility = View.GONE
+            } else {
+                img_page_empty.visibility = View.GONE
+                text_page_empty.visibility = View.GONE
+                list_fans.visibility = View.VISIBLE
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -66,6 +84,15 @@ class FansListFragment : BaseFragment() {
         }
 
         layout_refresh.setOnRefreshListener {
+        }
+    }
+
+    private val fanListener = object : FansListAdapter.FanListener {
+        override fun onItemClick(item: Any, type: ClickType) {
+        }
+
+        override fun onGetAvatarAttachment(id: Long?, view: ImageView) {
+            viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
     }
 }
