@@ -67,7 +67,7 @@ class MyCollectFavoritesViewModel : ClubViewModel() {
 
     }
 
-    fun deleteFavorite(items: List<MemberPostItem>) {
+    fun deleteFavorites(items: List<MemberPostItem>) {
         if (items.isEmpty()) return
         viewModelScope.launch {
             flow {

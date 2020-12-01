@@ -8,7 +8,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MyFollowVideoListener
@@ -28,7 +27,6 @@ import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
-import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_short.*
@@ -37,7 +35,7 @@ import timber.log.Timber
 
 class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragment() {
     private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
-    private val collectionViewModel: MyCollectionViewModel by activityViewModels()
+    private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
     private val adapter: MyCollectionMimiVideoAdapter by lazy {
@@ -168,8 +166,19 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
             }
         })
 
+        viewModel.cleanResult.observe(this, {
+            when (it) {
+                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Empty -> {
+                    viewModel.getData(adapter, type)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         collectionViewModel.deleteMiMIs.observe(this,  {
-             //Todo
+            viewModel.deleteVideos(adapter.snapshot().items)
         })
     }
 
