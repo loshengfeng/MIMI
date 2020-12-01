@@ -51,7 +51,13 @@ class ClipViewModel : BaseViewModel() {
                     val errorCode = if (e is HttpException) e.code() else -1
                     update(position, "", errorCode)
                 }
-                .collect { update(position, it, -1) }
+                .collect {
+                    getDecryptSetting(item.source?:"")?.takeIf { it.isVideoDecrypt }?.also { decryptItem ->
+                        decryptM3U8(it, decryptItem, position, update)
+                    } ?: run {
+                        update(position, it, -1)
+                    }
+                }
         }
     }
 

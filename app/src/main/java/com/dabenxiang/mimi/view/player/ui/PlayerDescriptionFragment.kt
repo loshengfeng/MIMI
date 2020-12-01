@@ -74,6 +74,7 @@ class PlayerDescriptionFragment : BaseFragment() {
 
             override fun onStatisticsDetail(baseVideoItem: BaseVideoItem) {
                 viewModel.stopVideoPlayer.setNot()
+                if(viewModel.selectEpisodePosition.value != 0) viewModel.selectStreamSourceIndex(0)
                 viewModel.videoContentId = (baseVideoItem as BaseVideoItem.Video).id!!
                 viewModel.getVideoContent()
             }

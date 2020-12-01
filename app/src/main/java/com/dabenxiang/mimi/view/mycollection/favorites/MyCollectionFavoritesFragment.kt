@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.follow
+package com.dabenxiang.mimi.view.mycollection.favorites
 
 import android.content.Context
 import android.os.Bundle
@@ -21,7 +21,6 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -29,26 +28,25 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_follow.*
+import kotlinx.android.synthetic.main.fragment_my_follow_interest.*
 import kotlinx.android.synthetic.main.item_ad.view.*
-import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class ClubPostFollowFragment : BaseFragment() {
+class  MyCollectionFavoritesFragment : BaseFragment() {
 
-    private val viewModel: ClubPostFollowViewModel by viewModels()
+    private val viewModel: MyCollectFavoritesViewModel by viewModels()
     private val accountManager: AccountManager by inject()
 
-    private val adapter: ClubPostFollowAdapter by lazy {
-        ClubPostFollowAdapter(requireActivity(), postListener,  memberPostFuncItem, attachmentListener)
+    private val adapter: FavoritesAdapter by lazy {
+        FavoritesAdapter(requireActivity(), postListener,  memberPostFuncItem, attachmentListener)
     }
 
-    override fun getLayoutId() = R.layout.fragment_club_follow
+    override fun getLayoutId() = R.layout.fragment_my_follow_interest
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Timber.i("ClubPostFollowFragment onAttach")
+        Timber.i("MyFollowInterestFragment onAttach")
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })
@@ -138,34 +136,15 @@ class ClubPostFollowFragment : BaseFragment() {
             viewModel.getData(adapter)
         }
 
-        tv_register.setOnClickListener {
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_loginFragment,
-                            LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
-                    )
-            )
-        }
-
-        tv_login.setOnClickListener {
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_loginFragment,
-                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
-                    )
-            )
-        }
-
     }
 
     override fun onResume() {
         super.onResume()
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
-        loginPageToggle(accountManager.isLogin())
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter)
         }
-        viewModel.getAd()
+//        viewModel.getAd()
     }
 
     private val memberPostFuncItem by lazy {
@@ -253,10 +232,6 @@ class ClubPostFollowFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            if (!accountManager.isLogin()) {
-                loginPageToggle(false)
-                return
-            }
 
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
@@ -327,16 +302,6 @@ class ClubPostFollowFragment : BaseFragment() {
         }
 
         override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-        }
-    }
-
-    private fun loginPageToggle(isLogin: Boolean) {
-        if (isLogin) {
-            id_not_login_group.visibility = View.GONE
-            layout_refresh.visibility = View.VISIBLE
-        } else {
-            id_not_login_group.visibility = View.VISIBLE
-            layout_refresh.visibility = View.INVISIBLE
         }
     }
 }

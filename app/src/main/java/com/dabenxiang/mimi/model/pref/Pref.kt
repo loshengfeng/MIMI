@@ -1,10 +1,13 @@
 package com.dabenxiang.mimi.model.pref
 
 import com.blankj.utilcode.util.ConvertUtils
+import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.model.vo.TokenItem
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
 class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean) :
     AbstractPref(preferenceFileName, isDebug) {
@@ -15,9 +18,27 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
     private val keepAccountPref = BooleanPref("KEEP_ACCOUNT")
     private var searchHistoryPref = StringPref("SEARCH_HISTORY")
     private var meAvatarPref = StringPref("ME_AVATAR")
+    private var decryptSettingPref = StringPref("DECRYPT_SETTING")
 
     private var cachedPublicToken: TokenItem? = null
     private var cachedMemberToken: TokenItem? = null
+    private var cachedDecryptSettingArray: ArrayList<DecryptSettingItem> = arrayListOf()
+
+    var decryptSettingArray: ArrayList<DecryptSettingItem>
+        get() =
+            try {
+                if (cachedDecryptSettingArray.size == 0) {
+                    val listType: Type = object : TypeToken<List<DecryptSettingItem?>?>() {}.type
+                    cachedDecryptSettingArray = gson.fromJson(decryptSettingPref.get(), listType)
+                }
+                cachedDecryptSettingArray
+            } catch (e: Exception) {
+                arrayListOf()
+            }
+        set(value) {
+            cachedDecryptSettingArray.addAll(value)
+            decryptSettingPref.set(gson.toJson(value))
+        }
 
     var publicToken: TokenItem
         get() =

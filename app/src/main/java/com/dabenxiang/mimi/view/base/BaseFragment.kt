@@ -25,7 +25,8 @@ import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
-import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
@@ -36,7 +37,6 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
@@ -46,7 +46,6 @@ import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_ARTICLE
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_PIC
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_VIDEO
 import com.dabenxiang.mimi.view.post.utility.PostManager
-import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
@@ -103,6 +102,7 @@ abstract class BaseFragment : Fragment() {
     private var memberPostItem = MemberPostItem()
     private var postMemberRequest = PostMemberRequest()
     private var picParameter = PicParameter()
+    private var videoParameter = VideoParameter()
 
     private var postId: Long = 0
 
@@ -236,6 +236,7 @@ abstract class BaseFragment : Fragment() {
             when (it) {
                 is ApiResult.Success -> {
                     deleteTempFile()
+                    videoParameter = VideoParameter()
 
                     if (deletePicList.isNotEmpty()) {
                         mainViewModel?.deleteAttachment(deletePicList[deleteCurrentPicPosition])
@@ -294,11 +295,10 @@ abstract class BaseFragment : Fragment() {
                         val id = bundle.getLong(BasePostFragment.POST_ID, 0)
 
                         if (id.toInt() == 0) {
+                            videoParameter.id = it.result.toString()
+                            videoParameter.length = uploadVideoList[0].length
+
                             val mediaItem = MediaItem()
-                            val videoParameter = VideoParameter(
-                                id = it.result.toString(),
-                                length = uploadVideoList[0].length
-                            )
                             mediaItem.picParameter.add(picParameter)
                             mediaItem.videoParameter = videoParameter
                             mediaItem.textContent = postMemberRequest.content
@@ -314,21 +314,20 @@ abstract class BaseFragment : Fragment() {
 
                             val postId = arguments?.getLong(BasePostFragment.POST_ID)
 
-                            val mediaItem = MediaItem()
-                            val videoParameter = VideoParameter(
-                                id = uploadVideoList[0].videoAttachmentId,
-                                length = uploadVideoList[0].length
-                            )
+                            videoParameter.id = uploadVideoList[0].videoAttachmentId
+                            videoParameter.length = uploadVideoList[0].length
 
                             val picParameter = PicParameter(
                                 id = uploadVideoList[0].picAttachmentId,
                                 ext = uploadVideoList[0].ext
                             )
 
+                            val mediaItem = MediaItem()
                             mediaItem.picParameter.add(picParameter)
                             mediaItem.videoParameter = videoParameter
                             mediaItem.textContent = postMemberRequest.content
                             val content = Gson().toJson(mediaItem)
+
                             memberPostItem.content = content
                             Timber.d("Post id : $postId")
                             Timber.d("Request : $postMemberRequest")
@@ -369,6 +368,10 @@ abstract class BaseFragment : Fragment() {
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
+        })
+
+        mainViewModel?.uploadVideoParameter?.observe(viewLifecycleOwner, Observer {
+            videoParameter.ext = it
         })
     }
 
@@ -816,12 +819,12 @@ abstract class BaseFragment : Fragment() {
     private fun postNavigation(memberPostItem: MemberPostItem) {
         when (postType) {
             PostType.TEXT -> {
-                val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
+                val bundle = ClubTextFragment.createBundle(memberPostItem)
                 navigationToText(bundle)
             }
 
             PostType.IMAGE -> {
-                val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
+                val bundle = ClubPicFragment.createBundle(memberPostItem)
                 navigationToPicture(bundle)
             }
 
@@ -853,7 +856,7 @@ abstract class BaseFragment : Fragment() {
     open fun navigationToClip(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_clipFragment,
+                R.id.action_to_clipPlayerFragment,
                 bundle
             )
         )
