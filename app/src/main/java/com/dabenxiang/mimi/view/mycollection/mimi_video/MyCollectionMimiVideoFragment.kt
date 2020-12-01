@@ -4,11 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
@@ -31,14 +29,7 @@ import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_short.*
-import kotlinx.android.synthetic.main.fragment_my_follow_tab.*
-import kotlinx.android.synthetic.main.fragment_my_follow_tab.id_empty_group
-import kotlinx.android.synthetic.main.fragment_my_follow_tab.id_not_login_group
-import kotlinx.android.synthetic.main.fragment_my_follow_tab.layout_ad
-import kotlinx.android.synthetic.main.fragment_my_follow_tab.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_follow_tab.list_short
-import kotlinx.android.synthetic.main.fragment_my_follow_tab.text_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -52,7 +43,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         MyCollectionMimiVideoAdapter(requireContext(), listener)
     }
 
-    override fun getLayoutId() = R.layout.fragment_my_follow_tab
+    override fun getLayoutId() = R.layout.fragment_my_collection_videos
 
     companion object {
         const val KEY_DATA = "data"
