@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.mypost
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -23,12 +22,13 @@ import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MY_POST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
-import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_follow_no_data.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -185,7 +185,7 @@ class MyPostFragment : BaseFragment() {
     override fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_myPostFragment_to_textDetailFragment,
+                R.id.action_myPostFragment_to_clubTextFragment,
                 bundle
             )
         )
@@ -194,7 +194,7 @@ class MyPostFragment : BaseFragment() {
     override fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_myPostFragment_to_pictureDetailFragment,
+                R.id.action_myPostFragment_to_clubPicFragment,
                 bundle
             )
         )
@@ -203,7 +203,7 @@ class MyPostFragment : BaseFragment() {
     private fun navigationToVideo(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_myPostFragment_to_clipFragment,
+                R.id.action_myPostFragment_to_clipPlayerFragment,
                 bundle
             )
         )
@@ -308,27 +308,33 @@ class MyPostFragment : BaseFragment() {
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
+                    val bundle = ClubPicFragment.createBundle(item)
                     navigationToPicture(bundle)
                 }
                 AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    val bundle = ClubTextFragment.createBundle(item)
                     navigationToText(bundle)
+                }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipPlayerFragment.createBundle(item.id)
+                    navigationToVideo(bundle)
                 }
             }
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkStatus {
-                when (adultTabType) {
-                    AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 1)
-                        navigationToPicture(bundle)
-                    }
-                    AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 1)
-                        navigationToText(bundle)
-                    }
+            when (adultTabType) {
+                AdultTabType.PICTURE -> {
+                    val bundle = ClubPicFragment.createBundle(item, 1)
+                    navigationToPicture(bundle)
+                }
+                AdultTabType.TEXT -> {
+                    val bundle = ClubTextFragment.createBundle(item, 1)
+                    navigationToText(bundle)
+                }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipPlayerFragment.createBundle(item.id, 1)
+                    navigationToVideo(bundle)
                 }
             }
         }
