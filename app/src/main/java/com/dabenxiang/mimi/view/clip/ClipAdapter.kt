@@ -122,11 +122,11 @@ class ClipAdapter(
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
-                    holder.onBind(item)
+                    holder.onBind(item, clipFuncItem)
                 }
                 PAYLOAD_UPDATE_SCROLL_AWAY -> {
                     holder.ivCover.visibility = View.VISIBLE
-                    holder.onBind(item)
+                    holder.onBind(item, clipFuncItem)
                 }
                 PAYLOAD_UPDATE_AFTER_M3U8 -> {
                     holder.progress.visibility = View.GONE
@@ -169,7 +169,7 @@ class ClipAdapter(
                 }
             }
         } ?: run {
-            holder.onBind(item)
+            holder.onBind(item, clipFuncItem)
             holder.progress.visibility = View.VISIBLE
         }
     }

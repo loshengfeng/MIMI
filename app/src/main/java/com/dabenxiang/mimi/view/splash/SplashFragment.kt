@@ -144,6 +144,8 @@ class SplashFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.getDecryptSettingResult()
         viewModel.autoLogin()
     }
 

@@ -626,16 +626,6 @@ class ApiRepository(private val apiService: ApiService) {
         postType: Int = 1,
     ) = apiService.getPostFavorite(offset, limit, postType)
 
-    suspend fun getPostVideoFavorite(
-        offset: Long,
-        limit: Int
-    ) = apiService.getPostFavorite(offset, limit, 8)
-
-    suspend fun getPostOtherFavorite(
-        offset: Long,
-        limit: Int
-    ) = apiService.getPostFavorite(offset, limit, 7)
-
     /**
      * 移除我的帖子收藏
      */
@@ -960,5 +950,10 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
+
+    /**
+     * 取得各來源解碼key
+     */
+    suspend fun getDecryptSetting() = apiService.getDecryptSetting()
 }
 

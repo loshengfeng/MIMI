@@ -768,4 +768,13 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Menu")
     suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
+
+
+    /**********************************************************
+     *
+     *         Operators/DecryptSetting 取得各來源解碼key
+     *
+     ***********************************************************/
+    @GET("/v1/Operators/DecryptSetting")
+    suspend fun getDecryptSetting(): Response<ApiBaseItem<List<DecryptSettingItem>>>
 }

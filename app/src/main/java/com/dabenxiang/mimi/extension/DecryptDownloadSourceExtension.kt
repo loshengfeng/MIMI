@@ -22,8 +22,8 @@ suspend fun HttpClient.decryptSource(url: String, key: ByteArray): Flow<Download
 
             emit(DownloadResult.Success(CryptUtils.decryptWithCEBNoPadding(response.readBytes(), key)))
         } catch (e: Exception) {
-            Timber.d("e ${e.printStackTrace()}")
-            emit(DownloadResult.Success(""))
+            e.printStackTrace()
+            emit(DownloadResult.Error(e.message?:"", e.cause))
         }
     }
 }
