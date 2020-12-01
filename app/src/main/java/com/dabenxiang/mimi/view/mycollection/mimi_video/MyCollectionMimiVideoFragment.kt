@@ -115,12 +115,16 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         }
 
         override fun onItemClick(item: PlayItem, type: MyFollowTabItemType) {
-            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
-            navigateTo(
+            if (this@MyCollectionMimiVideoFragment.type == MyFollowTabItemType.MIMI_VIDEO) {
+                val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
+                navigateTo(
                     NavigateItem.Destination(
-                            R.id.action_to_playerV2Fragment,
-                            bundle
+                        R.id.action_to_playerV2Fragment,
+                        bundle
                     ))
+            } else {
+                //TODO Sion ~~~~~~~~
+            }
         }
 
         override fun onCommentClick(item: PlayItem, type: MyFollowTabItemType) {
