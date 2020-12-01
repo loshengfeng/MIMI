@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.adapter.FollowClubAdapter
 import com.dabenxiang.mimi.view.adapter.FollowPersonalAdapter
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.NO_DATA
 import com.dabenxiang.mimi.view.myfollow.MyFollowFragment.Companion.TYPE_CLUB

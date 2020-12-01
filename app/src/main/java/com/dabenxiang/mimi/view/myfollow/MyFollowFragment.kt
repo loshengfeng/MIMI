@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.enums.ClickType
+import com.dabenxiang.mimi.view.adapter.FollowClubAdapter
 import com.dabenxiang.mimi.view.adapter.FollowPersonalAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem

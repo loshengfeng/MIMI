@@ -432,6 +432,12 @@ interface ApiService {
         @Path("userId") id: Long
     ): Response<Void>
 
+    @GET("/v1/Members/Me/Fans")
+    suspend fun getMyFans(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<FansItem>>>
+
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
         @Query("offset") offset: Int,
