@@ -90,21 +90,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         }
 
         clipViewModel.updateFollow.observe(viewLifecycleOwner) {
-            updataFollow(!(tv_follow.text != getText(R.string.follow)))
-        }
-
-        clipViewModel.reportResult.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.also { apiResult ->
-                when (apiResult) {
-                    is ApiResult.Loading -> progressHUD.show()
-                    is ApiResult.Loaded -> progressHUD.dismiss()
-                    is ApiResult.Empty -> {
-                        detailItem.reported = true
-                        GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
-                    }
-                    is ApiResult.Error -> onApiError(apiResult.throwable)
-                }
-            }
+            updataFollow(tv_follow.text == getText(R.string.follow))
         }
 
         clipViewModel.likeResult.observe(viewLifecycleOwner) {
