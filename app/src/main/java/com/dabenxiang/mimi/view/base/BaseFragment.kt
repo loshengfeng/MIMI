@@ -37,6 +37,7 @@ import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
@@ -825,7 +826,7 @@ abstract class BaseFragment : Fragment() {
             }
 
             PostType.VIDEO -> {
-                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), 0, false)
+                val bundle = ClipPlayerFragment.createBundle(memberPostItem.id)
                 navigationToClip(bundle)
             }
         }
