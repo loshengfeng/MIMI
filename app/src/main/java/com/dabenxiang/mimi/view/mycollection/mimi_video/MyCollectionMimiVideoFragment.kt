@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.mycollection.MyCollectionViewModel
@@ -89,7 +90,11 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: B
                         bundle
                     ))
             } else {
-                //TODO Sion ~~~~~~~~
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_clipSingleFragment,
+                        ClipSingleFragment.createBundle(item)
+                    ))
             }
         }
 
