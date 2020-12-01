@@ -50,33 +50,6 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         }
     }
 
-    override fun setupObservers() {
-        viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Success -> ""
-                is ApiResult.Error -> onApiError(it.throwable)
-                else -> {}
-            }
-        })
-
-        viewModel.likePostResult.observe(viewLifecycleOwner, Observer{
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result?.let { position ->
-                        adapter.notifyItemChanged(position)
-                    }
-                }
-
-                else -> {
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-        })
-    }
-
-
 //    private val memberPostFuncItem by lazy {
 //        MemberPostFuncItem(
 //                {},
@@ -86,8 +59,6 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
 //                { item, isFavorite, func -> }
 //        )
 //    }
-
-
 
     private val listener = object : MyFollowVideoListener {
         override fun onMoreClick(item: PlayItem, position: Int) {
@@ -138,17 +109,18 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType) : BaseFragmen
         }
 
         override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyFollowTabItemType) {
-//            checkStatus { viewModel.modifyFavorite(VideoItem(id=item.videoId!!), position, isFavorite) }
-            CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
                     checkStatus { viewModel.deleteMIMIVideoFavorite(item.videoId.toString()) }
                 }
-            }).also {
-                it.show(
+            })
+
+            dialog.setMsg(getString(R.string.follow_delete_favorite_message,item.title))
+            dialog.show(
                         requireActivity().supportFragmentManager,
                         CleanDialogFragment::class.java.simpleName
                 )
-            }
+
         }
     }
 
