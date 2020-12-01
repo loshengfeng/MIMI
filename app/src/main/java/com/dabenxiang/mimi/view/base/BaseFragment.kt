@@ -26,6 +26,8 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
@@ -37,6 +39,7 @@ import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
@@ -815,17 +818,17 @@ abstract class BaseFragment : Fragment() {
     private fun postNavigation(memberPostItem: MemberPostItem) {
         when (postType) {
             PostType.TEXT -> {
-                val bundle = TextDetailFragment.createBundle(memberPostItem, -1)
+                val bundle = ClubTextFragment.createBundle(memberPostItem)
                 navigationToText(bundle)
             }
 
             PostType.IMAGE -> {
-                val bundle = PictureDetailFragment.createBundle(memberPostItem, -1)
+                val bundle = ClubPicFragment.createBundle(memberPostItem)
                 navigationToPicture(bundle)
             }
 
             PostType.VIDEO -> {
-                val bundle = ClipFragment.createBundle(arrayListOf(memberPostItem), 0, false)
+                val bundle = ClipPlayerFragment.createBundle(memberPostItem.id)
                 navigationToClip(bundle)
             }
         }
@@ -852,7 +855,7 @@ abstract class BaseFragment : Fragment() {
     open fun navigationToClip(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_clipFragment,
+                R.id.action_to_clipPlayerFragment,
                 bundle
             )
         )
