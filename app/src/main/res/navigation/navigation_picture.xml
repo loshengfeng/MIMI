@@ -20,7 +20,7 @@
             android:id="@+id/action_clubPicFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
         <action
-            android:id="@+id/action_clubPicFragment_to_pictureFragment"
+            android:id="@+id/action_to_pictureFragment"
             app:destination="@id/pictureFragment" />
     </fragment>
 
