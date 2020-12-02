@@ -11,6 +11,7 @@
     <include app:graph="@navigation/navigation_setting" />
     <include app:graph="@navigation/navigation_topup" />
     <include app:graph="@navigation/navigation_clip_player" />
+    <include app:graph="@navigation/navigation_player" />
 
     <fragment
         android:id="@+id/personalFragment"
@@ -127,10 +128,6 @@
             app:destination="@id/searchVideoFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/inviteVipFragment"
-        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
-        android:label="InviteVipFragment" />
     <fragment
         android:id="@+id/topUpFragment"
         android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
@@ -253,10 +250,37 @@
         android:id="@+id/clipPlayerFragment"
         android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
         android:label="ClipPlayerFragment" />
+
     <fragment
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
-        android:label="SearchVideoFragment" />
+        tools:layout="@layout/fragment_search_video">
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/inviteVipRecordFragment"
+        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
+        android:label="InviteVipRecordFragment" />
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment">
+        <action
+            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
+            app:destination="@id/inviteVipRecordFragment" />
+        <action
+            android:id="@+id/action_inviteVipFragment_to_navigation_login"
+            app:destination="@id/navigation_login" />
+    </fragment>
     <fragment
         android:id="@+id/clipSingleFragment"
         android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
