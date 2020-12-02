@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MyFollowVideoListener
+import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
@@ -18,7 +18,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class MyCollectionMimiVideoAdapter(
         val context: Context,
-        private val listener: MyFollowVideoListener
+        private val listener: MyCollectionVideoListener
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
