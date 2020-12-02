@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.my.collection.mimi_video.CollectionFuncItem
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import kotlinx.android.synthetic.main.item_my_follow_video.view.*
@@ -44,9 +45,9 @@ class MyCollectionMIMIVideoViewHolder(
 
     fun onBind(
             item: PlayItem,
-            itemList: List<MemberPostItem>?,
             position: Int,
             listener: MyCollectionVideoListener,
+            funcItem: CollectionFuncItem,
             searchTag: String = ""
     ) {
         Timber.d("neo, item = ${item}")
@@ -73,12 +74,24 @@ class MyCollectionMIMIVideoViewHolder(
             }
             tagChipGroup.addView(chip)
         }
-        item.cover?.let { images ->
+
+//        item.cover?.let { images ->
+//            Glide.with(ivPhoto.context)
+//                    .load(images).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+//        } ?: kotlin.run {
+//            Glide.with(ivPhoto.context)
+//                    .load(0).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+//        }
+
+        funcItem.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
+                ?.let { decryptSettingItem ->
+                    funcItem.decryptCover(item.cover?:"", decryptSettingItem) {
+                        Glide.with(ivPhoto.context)
+                                .load(it).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+                    }
+                } ?: run {
             Glide.with(ivPhoto.context)
-                    .load(images).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
-        } ?: kotlin.run {
-            Glide.with(ivPhoto.context)
-                    .load(0).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+                    .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
         }
         ivMore.setOnClickListener {
             listener.onMoreClick(item, position)

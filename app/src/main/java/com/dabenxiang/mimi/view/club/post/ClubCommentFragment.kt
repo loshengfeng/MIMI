@@ -39,9 +39,6 @@ class ClubCommentFragment : BaseFragment() {
 
     private val viewModel: ClubTextDetailViewModel by viewModels()
 
-    override val bottomNavigationVisibility: Int
-        get() = View.GONE
-
     private var memberPostItem: MemberPostItem? = null
 
     private var textDetailAdapter: ClubCommentAdapter? = null
@@ -69,6 +66,9 @@ class ClubCommentFragment : BaseFragment() {
             return fragment
         }
     }
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     override fun getLayoutId() = R.layout.fragment_club_comment
 

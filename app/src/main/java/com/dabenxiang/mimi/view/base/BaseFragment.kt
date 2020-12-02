@@ -147,7 +147,7 @@ abstract class BaseFragment : Fragment() {
             mainViewModel?.isFromPlayer = true
         }
 
-        handleBackStackData()
+        handlePostClub()
     }
 
     override fun onDestroyView() {
@@ -161,7 +161,6 @@ abstract class BaseFragment : Fragment() {
         mainViewModel?.postArticleResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    postType = PostType.TEXT
                     setSnackBarPostStatus(it.result)
                     mainViewModel?.clearLiveDataValue()
 
@@ -406,17 +405,18 @@ abstract class BaseFragment : Fragment() {
         val tags = bundle.getStringArrayList(BasePostFragment.TAG)
         val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
 
+        if (data != null) {
+            memberPostItem = data as MemberPostItem
+        }
+
         memberPostItem.title = title!!
         memberPostItem.content = request!!
         memberPostItem.tags = tags
 
-        if (data != null) {
-            memberPostItem = data as MemberPostItem
-        }
         mainViewModel?.postArticle(title, request, tags!!, memberPostItem)
     }
 
-    fun handleBackStackData() {
+    fun handlePostClub() {
         arguments?.let {
             val isNeedArticleUpload = it.getBoolean(UPLOAD_ARTICLE, false)
             val isNeedPicUpload = it.getBoolean(UPLOAD_PIC, false)

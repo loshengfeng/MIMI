@@ -57,11 +57,11 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
-                {},
-                { id, view, type -> },
-                { item, items, isFollow, func -> },
-                { item, isLike, func -> },
-                { item, isFavorite, func -> }
+            {},
+            { id, view, type -> },
+            { item, items, isFollow, func -> },
+            { item, isLike, func -> },
+            { item, isFavorite, func -> }
         )
     }
 
@@ -112,9 +112,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             when (it) {
                 is ApiResult.Empty -> {
                     adapter?.notifyItemRangeChanged(
-                            0,
-                            viewModel.totalCount,
-                            ClubItemAdapter.PAYLOAD_UPDATE_FOLLOW
+                        0,
+                        viewModel.totalCount,
+                        ClubItemAdapter.PAYLOAD_UPDATE_FOLLOW
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -125,8 +125,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
-                            it.result,
-                            ClubItemAdapter.PAYLOAD_UPDATE_LIKE
+                        it.result,
+                        ClubItemAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -137,8 +137,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     adapter?.notifyItemChanged(
-                            it.result,
-                            ClubItemAdapter.PAYLOAD_UPDATE_FAVORITE
+                        it.result,
+                        ClubItemAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -203,35 +203,40 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                     AdultTabType.PICTURE -> {
                         val bundle = ClubPicFragment.createBundle(item, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clubPicFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clubPicFragment,
+                                bundle
+                            )
                         )
                     }
                     AdultTabType.TEXT -> {
                         val bundle = ClubTextFragment.createBundle(item, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clubTextFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clubTextFragment,
+                                bundle
+                            )
                         )
                     }
                     AdultTabType.CLIP -> {
                         val bundle = ClipPlayerFragment.createBundle(item.id, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clipPlayerFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
+                            )
                         )
                     }
                 }
             }
         }
 
-        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
+        override fun onFavoriteClick(
+            item: MemberPostItem,
+            position: Int,
+            isFavorite: Boolean,
+            type: AttachmentType
+        ) {
             checkStatus {
                 viewModel.favoritePost(item, position, isFavorite)
             }
@@ -243,15 +248,15 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         override fun onAvatarClick(userId: Long, name: String) {
             val bundle = MyPostFragment.createBundle(
-                    userId, name,
-                    isAdult = true,
-                    isAdultTheme = true
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
             )
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_myPostFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_myPostFragment,
+                    bundle
+                )
             )
         }
 
@@ -269,19 +274,19 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 when (it.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                                R.id.action_to_postArticleFragment,
+                            R.id.action_to_postArticleFragment,
                             bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                                R.id.action_to_postPicFragment,
+                            R.id.action_to_postPicFragment,
                             bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                                R.id.action_to_postVideoFragment,
+                            R.id.action_to_postVideoFragment,
                             bundle
                         )
                     }
@@ -300,28 +305,28 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 AdultTabType.TEXT -> {
                     val bundle = ClubTextFragment.createBundle(item)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clubTextFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clubTextFragment,
+                            bundle
+                        )
                     )
                 }
                 AdultTabType.PICTURE -> {
                     val bundle = ClubPicFragment.createBundle(item)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clubPicFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clubPicFragment,
+                            bundle
+                        )
                     )
                 }
                 AdultTabType.CLIP -> {
                     val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clipPlayerFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clipPlayerFragment,
+                            bundle
+                        )
                     )
                 }
                 else -> {
@@ -335,15 +340,18 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
 
-        override fun onChipClick(type: PostType, tag: String) {
+        override fun onChipClick(postType: PostType, tag: String) {
             Timber.d("onChipClick")
-            val item = SearchPostItem(type, tag = tag)
+            val item = SearchPostItem(
+                if (type == ClubTabItemType.RECOMMEND || type == ClubTabItemType.LATEST) PostType.TEXT_IMAGE_VIDEO
+                else postType, tag = tag
+            )
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_searchPostFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_searchPostFragment,
+                    bundle
+                )
             )
         }
     }

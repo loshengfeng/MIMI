@@ -76,7 +76,7 @@ class PostArticleFragment : BasePostFragment() {
         var isEdit = false
         var page = ""
         var searchPostItem: SearchPostItem? = null
-        var memberClubItem: MemberClubItem? =null
+        var memberClubItem: MemberClubItem? = null
 
         arguments?.let {
             isEdit = it.getBoolean(EDIT, false)
@@ -100,11 +100,7 @@ class PostArticleFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_myPostFragment, bundle)
-        } else if (isEdit && page == ADULT) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
-        } else if (isEdit && page == SEARCH) {
+        }  else if (isEdit && page == SEARCH) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)
             bundle.putSerializable(KEY_DATA, searchPostItem)

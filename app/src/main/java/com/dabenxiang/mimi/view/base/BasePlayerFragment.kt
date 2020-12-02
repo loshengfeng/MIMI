@@ -49,6 +49,9 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
 
     abstract fun getTabTitle(tab: TabLayout.Tab, position: Int)
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
