@@ -51,7 +51,7 @@ platform :android do
       file_path = lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
       file_name = file_path.gsub(/\/.*\//,"")
       sh "echo Uploading " + file_name + " to Slack"
-      "curl https://slack.com/api/files.upload -H \"Authorization: Bearer xoxp-437838910263-806188384230-1509855476614-bc5b3bfb2cb4f2ecfe7615d42eba51ef\" -F channels=\"C01F2TZQC4B\" -F title=\"" + file_name + "\" -F filename=\"" + file_name + "\" -F file=@" + file_path
+      sh "curl https://slack.com/api/files.upload -H \"Authorization: Bearer xoxp-437838910263-806188384230-1509855476614-bc5b3bfb2cb4f2ecfe7615d42eba51ef\" -F channels=\"C01F2TZQC4B\" -F title=\"" + file_name + "\" -F filename=\"" + file_name + "\" -F file=@" + file_path
       on_success()
     rescue => exception
       on_error(exception)
