@@ -153,8 +153,8 @@ class MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment(
         }
 
         collectionViewModel.deleteFavorites?.observe(viewLifecycleOwner, {
-
-            viewModel.deleteFavorites(adapter.snapshot().items)
+            if(isLike) viewModel.deleteAllLike(adapter.snapshot().items)
+            else viewModel.deleteFavorites(adapter.snapshot().items)
         })
 
         img_page_empty.setImageDrawable(

@@ -219,7 +219,8 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
         })
 
         collectionViewModel.deleteMiMIs.observe(this,  {
-            if(type.value == it) viewModel.deleteVideos(adapter.snapshot().items)
+            if(isLike) viewModel.deleteAllLike(adapter.snapshot().items)
+            else if(type.value == it) viewModel.deleteVideos(adapter.snapshot().items)
         })
     }
 
@@ -262,7 +263,8 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, type, isLike)
         }
-        viewModel.getAd()
+        if(!isLike)
+            viewModel.getAd()
     }
 
 
