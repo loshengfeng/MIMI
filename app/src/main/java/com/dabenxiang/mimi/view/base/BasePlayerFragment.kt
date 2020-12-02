@@ -28,7 +28,7 @@ import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.round
 
-abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.EventListener {
+abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.EventListener {
 
     private val JUMP_TIME = 1000
     private val SWIPE_DISTANCE_UNIT = 25
@@ -87,7 +87,7 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
         Timber.d("player activity onPause")
         super.onPause()
 
-        orientationDetector?.apply {disable()}
+        orientationDetector?.apply { disable() }
         player_view.onPause()
         releasePlayer()
     }
@@ -97,7 +97,7 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
         player_view.onPause()
         releasePlayer()
 
-        if(requireActivity().requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+        if (requireActivity().requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             playerViewModel.lockFullScreen = !playerViewModel.lockFullScreen
             switchScreenOrientation()
         }
@@ -235,7 +235,8 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
                 player.addListener(this)
                 player.addAnalyticsListener(this)
                 playerViewModel.setPlaying(player.playWhenReady)
-                val play_pause_id = if(player.playWhenReady) R.drawable.exo_icon_pause else R.drawable.exo_icon_play
+                val play_pause_id =
+                    if (player.playWhenReady) R.drawable.exo_icon_pause else R.drawable.exo_icon_play
                 exo_play_pause.setImageDrawable(requireContext().getDrawable(play_pause_id))
                 initTouchListener()
             }
@@ -343,8 +344,10 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
         Timber.i("fastForward rewind=$rewindMs")
         player?.takeIf { it.isCurrentWindowSeekable && rewindMs > 0 }?.apply {
             playerViewModel.setRewindTime(rewindMs)
-            seekTo(currentWindowIndex,
-                if (currentPosition > rewindMs) currentPosition - rewindMs else 0)
+            seekTo(
+                currentWindowIndex,
+                if (currentPosition > rewindMs) currentPosition - rewindMs else 0
+            )
         }
 
     }
@@ -358,11 +361,11 @@ abstract class BasePlayerFragment: BaseFragment(), AnalyticsListener, Player.Eve
     }
 
     private fun soundUp() {
-        player?.apply { volume += 0.1f}
+        player?.apply { volume += 0.1f }
     }
 
     private fun soundDown() {
-        player?.apply {volume -= 0.1f}
+        player?.apply { volume -= 0.1f }
     }
 
     /**
