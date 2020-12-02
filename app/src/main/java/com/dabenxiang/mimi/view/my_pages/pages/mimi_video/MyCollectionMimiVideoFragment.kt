@@ -123,7 +123,11 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
                 }
             })
 
-            dialog.setMsg(getString(R.string.follow_delete_favorite_message))
+            dialog.setMsg(getString(
+                when(isLike) {
+                    true -> R.string.like_delete_favorite_message
+                    false -> R.string.follow_delete_favorite_message
+            }))
             dialog.show(
                         requireActivity().supportFragmentManager,
                         CleanDialogFragment::class.java.simpleName
