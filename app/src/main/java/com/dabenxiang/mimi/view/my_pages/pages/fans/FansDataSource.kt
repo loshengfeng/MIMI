@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.fans
+package com.dabenxiang.mimi.view.my_pages.pages.fans
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback

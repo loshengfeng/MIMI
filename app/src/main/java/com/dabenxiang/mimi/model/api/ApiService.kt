@@ -387,9 +387,9 @@ interface ApiService {
 
     @GET("/v1/Members/Home/Actors/ActorsList")
     suspend fun getActorsList(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
-    ): Response<ApiBaseItem<ActorsItem>>
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<ActorCategoriesItem>>>
 
 
     @GET("/v1/Members/Home/Actors/ActorsList/{id}")
@@ -561,6 +561,11 @@ interface ApiService {
     @DELETE("/v1/Members/Post/{postId}/Like")
     suspend fun deleteLike(
         @Path("postId") postId: Long
+    ): Response<Void>
+
+    @DELETE("/v1/Members/Post/{postId}/Like")
+    suspend fun deleteAllLike(
+        @Path("postId") postId: String
     ): Response<Void>
 
     @POST("/v1/Members/Post/{postId}/PostReport")

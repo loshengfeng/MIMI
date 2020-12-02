@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.fans
+package com.dabenxiang.mimi.view.my_pages.pages.fans
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

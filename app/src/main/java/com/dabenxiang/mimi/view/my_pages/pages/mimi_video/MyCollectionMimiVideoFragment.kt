@@ -1,9 +1,10 @@
-package com.dabenxiang.mimi.view.my_pages.collection.mimi_video
+package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
@@ -25,7 +26,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
-import com.dabenxiang.mimi.view.my_pages.collection.MyCollectionViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -34,9 +35,9 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLike: Boolean = false) : BaseFragment() {
+class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemType, val isLike: Boolean = false) : BaseFragment() {
     private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
-    private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
+    private val myPagesViewModel: MyPagesViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
     private val clipFuncItem by lazy {
@@ -216,8 +217,11 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
             }
         })
 
-        collectionViewModel.deleteAll.observe(this,  {
-            if(type.value == it) viewModel.deleteVideos(adapter.snapshot().items)
+        myPagesViewModel.deleteAll.observe(this,  {
+            if(tab == it){
+                if(isLike) viewModel.deleteAllLike(adapter.snapshot().items)
+                else viewModel.deleteVideos(adapter.snapshot().items)
+            }
         })
     }
 
@@ -229,6 +233,13 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
             layout_refresh.isRefreshing = false
             viewModel.getData(adapter, type, isLike)
         }
+
+        img_page_empty.setImageDrawable(ContextCompat.getDrawable(requireContext(),
+            when(isLike) {
+                false -> R.drawable.img_history_empty_2
+                true -> R.drawable.img_love_empty
+            }
+        ))
     }
 
     override fun initSettings() {
@@ -253,7 +264,8 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, type, isLike)
         }
-        viewModel.getAd()
+        if(!isLike)
+            viewModel.getAd()
     }
 
 

@@ -34,13 +34,15 @@ class AccountManager(
 
     fun setupProfile(meItem: MeItem) {
         pref.profileItem = getProfile().copy(
-            userId = meItem.id ?: 0,
+            userId = meItem.id,
             avatarAttachmentId = meItem.avatarAttachmentId ?: 0,
             friendlyName = meItem.friendlyName ?: "",
             point = meItem.availablePoint ?: 0,
             isEmailConfirmed = meItem.isEmailConfirmed ?: false,
             videoCount = meItem.videoCount ?: 0,
-            videoOnDemandCount = meItem.videoOnDemandCount ?: 0
+            videoCountLimit = meItem.videoCountLimit ?: 0,
+            videoOnDemandCount = meItem.videoOnDemandCount ?: 0,
+            videoOnDemandCountLimit = meItem.videoOnDemandCountLimit ?: 0
         )
     }
 

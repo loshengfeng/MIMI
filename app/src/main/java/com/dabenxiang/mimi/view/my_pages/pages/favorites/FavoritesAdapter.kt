@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.collection.favorites
+package com.dabenxiang.mimi.view.my_pages.pages.favorites
 
 import android.content.Context
 import android.view.LayoutInflater

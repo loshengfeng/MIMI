@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.collection.mimi_video
+package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -18,7 +18,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class MyCollectionMimiVideoAdapter(
         val context: Context,
-        val funcItem:CollectionFuncItem,
+        val funcItem: CollectionFuncItem,
         private val listener: MyCollectionVideoListener
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {
 

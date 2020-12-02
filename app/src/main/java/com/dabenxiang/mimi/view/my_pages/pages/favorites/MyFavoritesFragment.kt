@@ -1,9 +1,10 @@
-package com.dabenxiang.mimi.view.my_pages.collection.favorites
+package com.dabenxiang.mimi.view.my_pages.pages.favorites
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -18,7 +19,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.my_pages.collection.MyCollectionViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -31,10 +32,10 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyCollectionFavoritesFragment(val type: MyCollectionTabItemType, val isLike: Boolean = false) : BaseFragment() {
+class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val isLike: Boolean = false) : BaseFragment() {
 
-    private val viewModel: MyCollectFavoritesViewModel by viewModels()
-    private val collectionViewModel: MyCollectionViewModel by viewModels({ requireParentFragment() })
+    private val viewModel: MyFavoritesViewModel by viewModels()
+    private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
     private val adapter: FavoritesAdapter by lazy {
@@ -148,9 +149,20 @@ class MyCollectionFavoritesFragment(val type: MyCollectionTabItemType, val isLik
             viewModel.getData(adapter, isLike)
         }
 
-        collectionViewModel.deleteAll.observe(viewLifecycleOwner, {
-            if(it == type.value ) viewModel.deleteFavorites(adapter.snapshot().items)
+        myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
+            if (it == tab) {
+                if(isLike) viewModel.deleteAllLike(adapter.snapshot().items)
+                else viewModel.deleteFavorites(adapter.snapshot().items)
+            }
         })
+
+        img_page_empty.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(),
+            when(isLike) {
+                false -> R.drawable.img_history_empty_2
+                true -> R.drawable.img_love_empty
+            }
+        ))
     }
 
     override fun onResume() {

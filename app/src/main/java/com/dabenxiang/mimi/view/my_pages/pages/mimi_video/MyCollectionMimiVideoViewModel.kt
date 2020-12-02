@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.collection.mimi_video
+package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
-import com.dabenxiang.mimi.view.my_pages.like.MiMiLikeListDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -146,6 +145,25 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     .catch { e -> emit(ApiResult.error(e)) }
                     .onCompletion { emit(ApiResult.loaded()) }
                     .collect { _cleanResult.value = it }
+        }
+    }
+
+    fun deleteAllLike(items: List<PlayItem>) {
+        if (items.isEmpty()) return
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                    .deleteAllLike(
+                        items.map {it.videoId}.joinToString(separator = ",")
+                    )
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _cleanResult.value = it }
         }
     }
 }

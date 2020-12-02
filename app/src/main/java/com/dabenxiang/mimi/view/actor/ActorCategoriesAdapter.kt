@@ -31,7 +31,7 @@ class ActorCategoriesAdapter(
         holder.name.text = item?.name
         actorCategoriesFuncItem.getActorAvatarAttachment.invoke(item?.attachmentId,holder.ivAvatar)
         if(item != null)
-            holder.item.setOnClickListener { actorCategoriesFuncItem.onActorClickListener(item.id, position) }
+            holder.clCategory.setOnClickListener { actorCategoriesFuncItem.onActorClickListener(item.id, position) }
     }
 
     fun setupData(data: ArrayList<ActorCategoriesItem>) {

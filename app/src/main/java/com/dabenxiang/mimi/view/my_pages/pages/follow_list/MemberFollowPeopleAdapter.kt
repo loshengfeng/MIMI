@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.follow.follow_list
+package com.dabenxiang.mimi.view.my_pages.pages.follow_list
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,27 +9,27 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
-import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
+import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 
-class ClubFollowPeopleAdapter(
+class MemberFollowPeopleAdapter(
         val context: Context,
         private val listener: BaseItemListener
-) : PagingDataAdapter<ClubFollowItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<MemberFollowItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
-        val diffCallback = object : DiffUtil.ItemCallback<ClubFollowItem>() {
+        val diffCallback = object : DiffUtil.ItemCallback<MemberFollowItem>() {
             override fun areItemsTheSame(
-                    oldItem: ClubFollowItem,
-                    newItem: ClubFollowItem
+                    oldItem: MemberFollowItem,
+                    newItem: MemberFollowItem
             ): Boolean {
                 return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
-                    oldItem: ClubFollowItem,
-                    newItem: ClubFollowItem
+                    oldItem: MemberFollowItem,
+                    newItem: MemberFollowItem
             ): Boolean {
                 return oldItem == newItem
             }
@@ -38,8 +38,18 @@ class ClubFollowPeopleAdapter(
 
     var removedPosList = ArrayList<Int>()
 
+//    override fun getItemViewType(position: Int): Int {
+//        val item = getItem(position)
+//        return when (item?.type) {
+//            PostType.VIDEO -> VIEW_TYPE_CLIP
+//            PostType.IMAGE -> VIEW_TYPE_PICTURE
+//            PostType.AD -> VIEW_TYPE_AD
+//            else -> VIEW_TYPE_TEXT
+//        }
+//    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return ClubFollowViewHolder(
+        return MemberFollowViewHolder(
                 LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_follow_club, parent, false)
         )
@@ -49,7 +59,7 @@ class ClubFollowPeopleAdapter(
         val item = getItem(position)
         item?.also {
 
-            (holder as ClubFollowViewHolder)
+            (holder as MemberFollowViewHolder)
 //                    holder.pictureRecycler.tag = position
             holder.onBind(
                     it, listener

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.like
+package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -19,7 +19,7 @@ class MiMiLikeListDataSource constructor(
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, PlayItem> {
         val offset = params.key ?: 0
         return try {
-            val result = domainManager.getApiRepository().getPostFavorite( 0, PER_LIMIT,8 )
+            val result = domainManager.getApiRepository().getPostLike(offset, PER_LIMIT,8 )
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result?.body()

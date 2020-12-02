@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment.Companion.TAB_FOLLOW_CLUB
 import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment.Companion.TAB_FOLLOW_PEOPLE
-import com.dabenxiang.mimi.view.my_pages.follow.follow_list.MyFollowListFragment
+import com.dabenxiang.mimi.view.my_pages.pages.follow_list.MyFollowListFragment
 
 class MyFollowViewPagerAdapter(
         fragmentManager: FragmentManager,

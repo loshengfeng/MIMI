@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.collection.mimi_video
+package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback

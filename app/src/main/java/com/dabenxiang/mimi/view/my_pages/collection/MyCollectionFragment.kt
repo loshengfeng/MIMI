@@ -1,13 +1,14 @@
 package com.dabenxiang.mimi.view.my_pages.collection
 
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.my_pages.base.BaseMyPagesTabFragment
-import com.dabenxiang.mimi.view.my_pages.base.MyViewPagerAdapter
-import com.dabenxiang.mimi.view.my_pages.collection.favorites.MyCollectionFavoritesFragment
-import com.dabenxiang.mimi.view.my_pages.collection.mimi_video.MyCollectionMimiVideoFragment
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
+import com.dabenxiang.mimi.view.my_pages.pages.favorites.MyFavoritesFragment
+import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoFragment
 import kotlinx.android.synthetic.main.fragment_my.*
 import kotlinx.android.synthetic.main.fragment_my.view.*
 
@@ -19,20 +20,15 @@ class MyCollectionFragment: BaseMyPagesTabFragment() {
         const val TAB_FAVORITES = 2
     }
 
-    override val viewModel: MyCollectionViewModel by viewModels()
+    override val viewModel: MyPagesViewModel by viewModels()
 
     override val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(MyCollectionTabItemType.MIMI_VIDEO) },
-            TAB_SHORT_VIDEO to { MyCollectionMimiVideoFragment(MyCollectionTabItemType.SHORT_VIDEO) },
-            TAB_FAVORITES to {  MyCollectionFavoritesFragment(MyCollectionTabItemType.POST)  }
+            TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(TAB_MiMI_VIDEO, MyCollectionTabItemType.MIMI_VIDEO) },
+            TAB_SHORT_VIDEO to { MyCollectionMimiVideoFragment(TAB_SHORT_VIDEO, MyCollectionTabItemType.SHORT_VIDEO) },
+            TAB_FAVORITES to {  MyFavoritesFragment(TAB_FAVORITES, MyCollectionTabItemType.POST)  }
     )
 
-    override val viewPagerAdapter: MyViewPagerAdapter by lazy {
-        MyViewPagerAdapter(
-                tabFragmentsCreators,
-                childFragmentManager,
-                lifecycle)
-    }
+
 
     override fun setFragmentTitle() {
         tool_bar.toolbar_title.text = getString(R.string.personal_follow)
@@ -46,4 +42,8 @@ class MyCollectionFragment: BaseMyPagesTabFragment() {
             else -> null
         }
     }
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
 }

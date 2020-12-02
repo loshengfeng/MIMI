@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.fans
+package com.dabenxiang.mimi.view.my_pages.pages.fans
 
 import android.os.Bundle
 import android.view.View

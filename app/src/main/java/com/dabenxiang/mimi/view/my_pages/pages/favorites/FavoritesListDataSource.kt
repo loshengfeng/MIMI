@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.collection.favorites
+package com.dabenxiang.mimi.view.my_pages.pages.favorites
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -6,7 +6,6 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.view.my_pages.like.ClubLikeListDataSource
 import retrofit2.HttpException
 
 class FavoritesListDataSource constructor(
@@ -30,8 +29,8 @@ class FavoritesListDataSource constructor(
 
             val result =
                 when(isLike) {
-                    false -> domainManager.getApiRepository().getPostFavorite( 0, ClubLikeListDataSource.PER_LIMIT, 7)
-                    true -> domainManager.getApiRepository().getPostLike(0, ClubLikeListDataSource.PER_LIMIT, 7)
+                    false -> domainManager.getApiRepository().getPostFavorite( offset, LikeListDataSource.PER_LIMIT, 7)
+                    true -> domainManager.getApiRepository().getPostLike(offset, LikeListDataSource.PER_LIMIT, 7)
                 }
             if (!result.isSuccessful) throw HttpException(result)
 

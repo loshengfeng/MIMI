@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.follow.follow_list
+package com.dabenxiang.mimi.view.my_pages.pages.follow_list
 
 import android.content.Context
 import android.os.Bundle
@@ -15,16 +15,17 @@ import com.dabenxiang.mimi.model.enums.ClickType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment
-import com.dabenxiang.mimi.view.my_pages.follow.MyFollowViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_follow_list.*
+import kotlinx.android.synthetic.main.fragment_my_follow_list.layout_refresh
 
 class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     private val viewModel: MyFollowListViewModel by viewModels()
-    private val myFollowViewModel: MyFollowViewModel by viewModels({ requireParentFragment() })
+    private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
 
     private val memberAdapter by lazy {
         MemberFollowPeopleAdapter(requireContext(), listener)
@@ -35,6 +36,11 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_list
+
+    override fun initSettings() {
+        super.initSettings()
+        tv_title_count.text = getString(R.string.follow_members_total_num, "0")
+    }
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -113,7 +119,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        myFollowViewModel.deleteFollow.observe(this) {
+        myPagesViewModel.deleteAll.observe(this) {
             if (type == it) {
                 when (it) {
                     MyFollowFragment.TAB_FOLLOW_PEOPLE -> viewModel.cleanAllFollowMember(
@@ -134,6 +140,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
         }
 
         viewModel.postCount.observe(this) {
+            tv_title_count.text = getString(R.string.follow_members_total_num, it.toString())
             if (it == 0) {
                 text_page_empty.text = getString(R.string.follow_no_data)
                 id_empty_group.visibility = View.VISIBLE
@@ -155,6 +162,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initSettings()
         when (type) {
             MyFollowFragment.TAB_FOLLOW_PEOPLE -> {
                 recycler_view.adapter = memberAdapter

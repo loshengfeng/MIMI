@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.my_pages.collection.mimi_video
+package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
 
 import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 

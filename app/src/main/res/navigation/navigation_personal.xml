@@ -94,7 +94,7 @@
 
     <fragment
         android:id="@+id/fansListFragment"
-        android:name="com.dabenxiang.mimi.view.my_pages.fans.FansListFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.pages.fans.FansListFragment"
         android:label="FansListFragment" >
         <action
             android:id="@+id/action_fansListFragment_to_navigation_my_post"
