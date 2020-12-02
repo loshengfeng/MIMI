@@ -195,9 +195,15 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             when (it) {
                 is Loading -> progressHUD.show()
                 is Loaded -> progressHUD.dismiss()
-                is Empty -> GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                is Empty -> {
+                    cachedItem?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.also { item ->
+                        item.reported = true
+                    }
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
                 is Error -> onApiError(it.throwable)
-                else -> {}
+                else -> {
+                }
             }
         })
     }
@@ -242,14 +248,13 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         }
     }
 
+    private var cachedItem: VideoItem? = null
     private fun onMoreClick(item: VideoItem) {
         checkStatus {
             Timber.d("onMoreClick, item:$item")
-            item.videoEpisodes?.get(0)?.run {
-                Pair(this.videoStreams?.get(0), this.reported ?: false)
-            }?.run {
-                val (videoStream, isReported) = this
-                showMoreDialog(videoStream?.id ?: 0, PostType.VIDEO, isReported)
+            cachedItem = item
+            item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
+                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false)
             }
         }
     }
@@ -363,7 +368,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             } else {
                 when (item) {
                     is MemberPostItem -> {
-                            viewModel.sendVideoReport(item.id.toString(), content)
+                            viewModel.sendVideoReport(item.id, content)
                     }
                 }
             }
