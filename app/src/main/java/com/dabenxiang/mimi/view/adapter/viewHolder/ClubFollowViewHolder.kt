@@ -33,6 +33,12 @@ class ClubFollowViewHolder(
         tvName.setOnClickListener {
             listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
+        tvClubPost.setOnClickListener {
+            listener.onItemClick(item, ClickType.TYPE_ITEM)
+        }
+        tvSubTitle.setOnClickListener {
+            listener.onItemClick(item, ClickType.TYPE_ITEM)
+        }
         ivPhoto.setOnClickListener {
             listener.onItemClick(item, ClickType.TYPE_ITEM)
         }

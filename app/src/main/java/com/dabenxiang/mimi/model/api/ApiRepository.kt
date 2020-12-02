@@ -509,8 +509,8 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得女優分頁資料
      */
     suspend fun getActorsList(
-        offset: String,
-        limit: String
+        offset: Int,
+        limit: Int
     ) = apiService.getActorsList(offset, limit)
 
     /**

@@ -3,9 +3,7 @@ package com.dabenxiang.mimi.view.actorvideos
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
@@ -32,11 +30,12 @@ import kotlin.math.abs
 
 
 class ActorVideosFragment : BaseFragment() {
+
     companion object {
         const val KEY_DATA = "data"
 
         fun createBundle(
-                id: Long = 0L
+            id: Long = 0L
         ): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, id)
@@ -56,6 +55,9 @@ class ActorVideosFragment : BaseFragment() {
 
     private var actorName: String = ""
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
@@ -72,10 +74,10 @@ class ActorVideosFragment : BaseFragment() {
     override fun initSettings() {
         super.initSettings()
         actor_toolbar_title.text = getString(R.string.actor_videos_title)
-            arguments?.getSerializable(KEY_DATA)?.let { id ->
-                id as Long
-                viewModel.getActorVideosById(id)
-            }
+        arguments?.getSerializable(KEY_DATA)?.let { id ->
+            id as Long
+            viewModel.getActorVideosById(id)
+        }
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
 
@@ -89,12 +91,12 @@ class ActorVideosFragment : BaseFragment() {
             it.setHasFixedSize(true)
             it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
             it.addItemDecoration(
-                    GridSpaceItemDecoration(
-                            2,
-                            GeneralUtils.dpToPx(requireContext(), 10),
-                            GeneralUtils.dpToPx(requireContext(), 20),
-                            false
-                    )
+                GridSpaceItemDecoration(
+                    2,
+                    GeneralUtils.dpToPx(requireContext(), 10),
+                    GeneralUtils.dpToPx(requireContext(), 20),
+                    false
+                )
             )
         }
     }
@@ -105,8 +107,10 @@ class ActorVideosFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     val item = it.result
                     tv_name.text = item.name
-                    tv_total_click.text = item.totalClick.toString() + getString(R.string.actor_hot_unit)
-                    tv_total_video.text = item.totalVideo.toString() + getString(R.string.actor_videos_unit)
+                    tv_total_click.text =
+                        item.totalClick.toString() + getString(R.string.actor_hot_unit)
+                    tv_total_video.text =
+                        item.totalVideo.toString() + getString(R.string.actor_videos_unit)
                     viewModel.loadImage(item.attachmentId, iv_avatar, LoadImageType.AVATAR_CS)
                     actorName = item.name
                     tv_name.text = actorName
@@ -122,7 +126,7 @@ class ActorVideosFragment : BaseFragment() {
     override fun setupListeners() {
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            if(actorName != "")
+            if (actorName != "")
                 getVideoData(actorName)
             else
                 arguments?.getSerializable(KEY_DATA)?.let { id ->
@@ -138,11 +142,11 @@ class ActorVideosFragment : BaseFragment() {
 
             when {
                 verticalOffset == 0 -> {
-                    actor_toolbar_title.visibility =View.VISIBLE
+                    actor_toolbar_title.visibility = View.VISIBLE
                 }
 
                 abs(verticalOffset) > 10 -> {
-                    actor_toolbar_title.visibility =View.GONE
+                    actor_toolbar_title.visibility = View.GONE
                 }
             }
 
@@ -203,7 +207,7 @@ class ActorVideosFragment : BaseFragment() {
             }
         }
 
-    private fun getVideoData(actorName: String){
+    private fun getVideoData(actorName: String) {
         lifecycleScope.launch {
             viewModel.getVideoByCategory(actorName)
                 .collectLatest {
@@ -212,13 +216,13 @@ class ActorVideosFragment : BaseFragment() {
         }
     }
 
-    private fun navToPlayer(item: PlayerItem){
+    private fun navToPlayer(item: PlayerItem) {
         val bundle = PlayerV2Fragment.createBundle(item)
         navigateTo(
-                NavigateItem.Destination(
-                        R.id.action_to_navigation_player,
-                        bundle
-                )
+            NavigateItem.Destination(
+                R.id.action_to_navigation_player,
+                bundle
+            )
         )
     }
 }

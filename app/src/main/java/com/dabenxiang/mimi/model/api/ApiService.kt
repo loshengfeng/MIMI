@@ -387,9 +387,9 @@ interface ApiService {
 
     @GET("/v1/Members/Home/Actors/ActorsList")
     suspend fun getActorsList(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
-    ): Response<ApiBaseItem<ActorsItem>>
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<ActorCategoriesItem>>>
 
 
     @GET("/v1/Members/Home/Actors/ActorsList/{id}")
