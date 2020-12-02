@@ -130,6 +130,21 @@ class OrderResultEpoxyController(
                     setupClickListener(successListener)
                 }
             }
+            PaymentType.TIK_TOK.value -> {
+                orderResultUrlSuccessItemView {
+                    id("order_result_url_tik_tok_success")
+                    setupTimeout(timeout)
+                    setupPaymentImg(R.drawable.ico_tiktokpay_160_px)
+                    setupPaymentCountdown(item.countdown)
+                    setupPaymentCountdownColor(R.color.color_black_1_50)
+                    setupPaymentCountdownBackground(R.drawable.bg_black_1_radius_6)
+                    setupPaymentGoBackground(R.drawable.bg_black_2_radius_6)
+                    setupPaymentCountdownVisibility(item.isCountdownVisible)
+                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                    setupPaymentPageListener(item.paymentUrl)
+                    setupClickListener(successListener)
+                }
+            }
         }
     }
 }
