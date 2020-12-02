@@ -69,13 +69,7 @@ class PostVideoFragment : BasePostFragment() {
             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
-        tv_clean.isEnabled = true
-        val img = requireContext().getDrawable(R.drawable.btn_close_n)
-        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
-
         edt_hashtag.imeOptions = EditorInfo.IME_ACTION_DONE
-
-        useAdultTheme(false)
 
         arguments?.let {
             isEdit = it.getBoolean(MyPostFragment.EDIT, false)
@@ -139,10 +133,6 @@ class PostVideoFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postVideoFragment_to_myPostFragment, bundle)
-        } else if (isEdit && page == ADULT) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
         } else if (isEdit && page == SEARCH) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
@@ -196,8 +186,6 @@ class PostVideoFragment : BasePostFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 REQUEST_VIDEO_CAPTURE -> {
