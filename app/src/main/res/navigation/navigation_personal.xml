@@ -94,7 +94,7 @@
 
     <fragment
         android:id="@+id/fansListFragment"
-        android:name="com.dabenxiang.mimi.view.fans.FansListFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.fans.FansListFragment"
         android:label="FansListFragment" >
         <action
             android:id="@+id/action_fansListFragment_to_navigation_my_post"
@@ -103,7 +103,7 @@
 
     <fragment
         android:id="@+id/likesListFragment"
-        android:name="com.dabenxiang.mimi.view.my.like.LikeFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.like.LikeFragment"
         tools:layout="@layout/fragment_my_collection"
         android:label="LikeFragment" >
 
@@ -138,7 +138,7 @@
 
     <fragment
         android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.my.follow.MyFollowFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment"
         android:label="MyFollowFragment" >
         <action
             android:id="@+id/action_myFollowFragment_to_navigation_my_post"
@@ -150,7 +150,7 @@
     </fragment>
     <fragment
         android:id="@+id/myCollectionFragment"
-        android:name="com.dabenxiang.mimi.view.my.collection.MyCollectionFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.collection.MyCollectionFragment"
         android:label="MyCollectionFragment">
 
         <action
