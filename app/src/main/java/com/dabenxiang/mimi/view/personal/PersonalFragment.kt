@@ -24,7 +24,7 @@ import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_personal2.*
+import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import retrofit2.HttpException
 import java.text.SimpleDateFormat
@@ -41,7 +41,7 @@ class PersonalFragment : BaseFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_personal2
+        return R.layout.fragment_personal
     }
 
     override fun initSettings() {
@@ -60,11 +60,6 @@ class PersonalFragment : BaseFragment() {
             layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
             tv_expiry_date.visibility = View.VISIBLE
             img_arrow.visibility = View.VISIBLE
-//            behavior!!.setDragCallback(object : DragCallback() {
-//                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-//                    return true
-//                }
-//            })
         } else {
             item_is_Login.visibility = View.GONE
             tv_logout.visibility = View.GONE
@@ -76,12 +71,6 @@ class PersonalFragment : BaseFragment() {
             layout_vip_unlimit_unlogin.visibility = View.VISIBLE
             tv_expiry_date.visibility = View.GONE
             img_arrow.visibility = View.INVISIBLE
-
-//            behavior!!.setDragCallback(object : DragCallback() {
-//                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-//                    return false
-//                }
-//            })
             Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
         }
         layout_refresh.setOnRefreshListener {
@@ -147,10 +136,6 @@ class PersonalFragment : BaseFragment() {
                             )
                         }
                     }
-//                    //TODO: 目前先不判斷是否有驗證過
-////                    takeUnless { meItem.isEmailConfirmed == true }?.run {
-////                        (requireActivity() as MainActivity).showEmailConfirmDialog()
-////                    }
                     viewModel.loadImage(meItem.avatarAttachmentId, avatar, LoadImageType.AVATAR)
                 }
                 is Error -> onApiError(it.throwable)
