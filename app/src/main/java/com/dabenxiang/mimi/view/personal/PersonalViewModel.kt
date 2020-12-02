@@ -1,17 +1,15 @@
 package com.dabenxiang.mimi.view.personal
 
-import android.provider.SyncStateContract.Helpers.update
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MeItem
+import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class PersonalViewModel : BaseViewModel() {
 
@@ -24,15 +22,9 @@ class PersonalViewModel : BaseViewModel() {
     private val _unreadResult = MutableLiveData<ApiResult<Int>>()
     val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
 
-    private val _visibleSetting = MutableLiveData<Boolean>()
-    val visibleSetting: LiveData<Boolean> = _visibleSetting
-
-    fun getPostDetail() {
-        setShowProgress(true)
+    fun getMemberInfo() {
         viewModelScope.launch {
-            setShowProgress(false)
             if (isLogin()) {
-                _visibleSetting.value = true
                 flow {
                     val result = domainManager.getApiRepository().getMe()
                     if (!result.isSuccessful) throw HttpException(result)
@@ -47,7 +39,6 @@ class PersonalViewModel : BaseViewModel() {
                     .onCompletion { emit(ApiResult.loaded()) }
                     .collect { _meItem.value = it }
             } else {
-                _visibleSetting.value = false
                 flow {
                     val result = domainManager.getApiRepository().getGuestInfo()
                     if (!result.isSuccessful) throw HttpException(result)
@@ -65,11 +56,14 @@ class PersonalViewModel : BaseViewModel() {
         }
     }
 
+    fun getProfile(): ProfileItem {
+        return pref.profileItem
+    }
+
     fun signOut() {
         viewModelScope.launch {
             accountManager.signOut().collect {
                 _apiSignOut.value = it
-                _meItem.value = null
             }
         }
     }

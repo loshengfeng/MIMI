@@ -104,7 +104,13 @@ class SearchPostFragment : BaseFragment() {
                         )
                     }
                     PostType.VIDEO -> {
-                        //todo
+                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
+                            )
+                        )
                     }
                     else -> {
                     }
@@ -201,7 +207,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_clipPlayerFragment,
+                            R.id.action_to_clipPlayerFragment,
                             bundle
                         )
                     )

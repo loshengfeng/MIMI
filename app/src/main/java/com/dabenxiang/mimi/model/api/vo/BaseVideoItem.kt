@@ -127,7 +127,10 @@ data class VideoStream(
     val sign: String? = "",
 
     @SerializedName("utcTime")
-    val utcTime: Long? = 0
+    val utcTime: Long? = 0,
+
+    @SerializedName("reported")
+    var reported: Boolean? = false,
 )
 
 data class VideoM3u8Source(

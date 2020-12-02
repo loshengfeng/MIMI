@@ -5,12 +5,12 @@ import android.content.pm.ActivityInfo
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.*
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
@@ -19,7 +19,6 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.custom_playback_control.*
 import kotlinx.android.synthetic.main.fragment_v2_player.*
 import kotlinx.android.synthetic.main.fragment_v2_player.view.*
@@ -33,6 +32,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     private val JUMP_TIME = 1000
     private val SWIPE_DISTANCE_UNIT = 25
     private val SWIPE_SOUND_LEAST = 100
+    private var volume: Float = 1f
 
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null
@@ -130,6 +130,17 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     }
 
     override fun setupListeners() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                if (requireActivity().requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                    playerViewModel.lockFullScreen = !playerViewModel.lockFullScreen
+                    switchScreenOrientation()
+                } else {
+                    navigateTo(NavigateItem.Up)
+                }
+            }
+        )
         orientationDetector =
             OrientationDetector(
                 requireActivity(),
@@ -234,7 +245,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
                 player.repeatMode = Player.REPEAT_MODE_OFF
                 player.playWhenReady = playerViewModel.isPlaying.value ?: true
                 player.seekTo(playerViewModel.currentWindow, playerViewModel.playbackPosition)
-                player.volume = PlayerViewModel.volume
+                player.volume = volume
                 player.addListener(this)
                 player.addAnalyticsListener(this)
                 playerViewModel.setPlaying(player.playWhenReady)
@@ -380,7 +391,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
             params.height = 0
             player_view.layoutParams = params
-            activity?.bottom_navigation?.visibility = View.VISIBLE
+//            activity?.bottom_navigation?.visibility = View.VISIBLE
         } else {
             val params = player_view.layoutParams
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -388,7 +399,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
             player_view.layoutParams = params
             requireActivity().window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            activity?.bottom_navigation?.visibility = View.GONE
+//            activity?.bottom_navigation?.visibility = View.GONE
         }
     }
 

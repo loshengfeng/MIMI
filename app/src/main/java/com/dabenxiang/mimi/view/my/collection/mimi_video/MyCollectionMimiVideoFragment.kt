@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
@@ -218,7 +219,8 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
         })
 
         collectionViewModel.deleteMiMIs.observe(this,  {
-            if(type.value == it) viewModel.deleteVideos(adapter.snapshot().items)
+            if(isLike) viewModel.deleteAllLike(adapter.snapshot().items)
+            else if(type.value == it) viewModel.deleteVideos(adapter.snapshot().items)
         })
     }
 
@@ -230,6 +232,13 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
             layout_refresh.isRefreshing = false
             viewModel.getData(adapter, type, isLike)
         }
+
+        img_page_empty.setImageDrawable(ContextCompat.getDrawable(requireContext(),
+            when(isLike) {
+                false -> R.drawable.img_history_empty_2
+                true -> R.drawable.img_love_empty
+            }
+        ))
     }
 
     override fun initSettings() {
@@ -254,7 +263,8 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, type, isLike)
         }
-        viewModel.getAd()
+        if(!isLike)
+            viewModel.getAd()
     }
 
 

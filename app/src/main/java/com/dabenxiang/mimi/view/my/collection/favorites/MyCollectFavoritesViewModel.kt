@@ -88,4 +88,22 @@ class MyCollectFavoritesViewModel : ClubViewModel() {
         }
     }
 
+    fun deleteAllLike(items: List<MemberPostItem>) {
+        if (items.isEmpty()) return
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                    .deleteAllLike(
+                        items.map {it.id}.joinToString(separator = ",")
+                    )
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _cleanResult.value = it }
+        }
+    }
 }

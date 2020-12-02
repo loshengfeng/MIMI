@@ -40,6 +40,9 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     private val clipViewModel = ClipPlayerDescriptionViewModel()
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override val isStatusBarDark: Boolean = true
 
     private lateinit var detailItem: MemberPostItem
