@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.player.ui
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import com.dabenxiang.mimi.R
@@ -23,6 +22,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.fragment_v2_player.*
 import java.net.UnknownHostException
 
 class PlayerV2Fragment : BasePlayerFragment() {
@@ -93,7 +93,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
         }
 
         viewModel.videoStreamingUrl.observe(viewLifecycleOwner) {
-            if(!it.isNullOrEmpty()) {
+            if (!it.isNullOrEmpty()) {
                 setupPlayUrl(it, viewModel.isResetPlayer)
                 viewModel.m3u8SourceUrl = it
                 viewModel.isResetPlayer = false
@@ -127,7 +127,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
     }
 
     override fun getTabTitle(tab: TabLayout.Tab, position: Int) {
-        when(position) {
+        when (position) {
             0 -> tab.text = getString(R.string.video_desc)
             1 -> tab.text = getString(R.string.comment)
         }
@@ -158,11 +158,18 @@ class PlayerV2Fragment : BasePlayerFragment() {
         viewModel.parsingM3u8Content(videoM3u8Source)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val isComment = arguments?.getBoolean(KEY_IS_COMMENT, false) ?: false
+        player_pager.post {
+            player_pager.currentItem = if (isComment) 1 else 0
+        }
+    }
     /**
      * get video or clip content
      */
     private fun getVideoContent() {
-        if(arguments?.getSerializable(KEY_PLAYER_SRC) != null) {
+        if (arguments?.getSerializable(KEY_PLAYER_SRC) != null) {
             (arguments?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
                 this.arguments = null
                 contentId = it.videoId

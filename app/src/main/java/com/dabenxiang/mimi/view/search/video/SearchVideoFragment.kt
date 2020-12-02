@@ -32,6 +32,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
+import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
@@ -256,8 +257,8 @@ class SearchVideoFragment : BaseFragment() {
 
                 FunctionType.MSG -> {
                     // 點擊評論，進入播放頁面滾動到最下面
-                    val playerData = PlayerItem(item.id ?: 0)
-                    val bundle = PlayerFragment.createBundle(playerData, true)
+                    val playerData = PlayerItem(item.id)
+                    val bundle = PlayerV2Fragment.createBundle(playerData, true)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_searchVideoFragment_to_navigation_player,
