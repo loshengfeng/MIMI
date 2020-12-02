@@ -200,6 +200,8 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     fun showRechargeReminder(isShow: Boolean) {
         Timber.i("showRechargeReminder")
         player_view.visibility = if (isShow) View.INVISIBLE else View.VISIBLE
+        if (isShow)
+            iv_player.visibility = View.INVISIBLE
         recharge_reminder.visibility = if (isShow) View.VISIBLE else View.GONE
     }
 
