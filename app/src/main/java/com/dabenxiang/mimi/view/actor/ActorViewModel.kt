@@ -27,6 +27,9 @@ class ActorViewModel : BaseViewModel() {
     private val _actorVideosResult = MutableLiveData<Pair<ApiResult<ArrayList<ActorVideosItem>>,ApiResult<ArrayList<ActorCategoriesItem>>>>()
     val actorVideosResult: LiveData<Pair<ApiResult<ArrayList<ActorVideosItem>>,ApiResult<ArrayList<ActorCategoriesItem>>>> = _actorVideosResult
 
+    private val _actorsCount = MutableLiveData<Int>()
+    val actorsCount: LiveData<Int> = _actorsCount
+
     fun getActors() {
         viewModelScope.launch {
             flow {
@@ -63,6 +66,7 @@ class ActorViewModel : BaseViewModel() {
 
     private val pagingCallback = object : PagingCallback {
         override fun onTotalCount(count: Long) {
+            _actorsCount.postValue(count.toInt())
         }
 
     }

@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import kotlinx.android.synthetic.main.fragment_actor.*
 import kotlinx.android.synthetic.main.fragment_actor.tv_search
+import timber.log.Timber
 
 class ActorFragment : BaseFragment() {
 
@@ -95,6 +96,14 @@ class ActorFragment : BaseFragment() {
                 }
                 is ApiResult.Error -> onApiError((it.first as ApiResult.Error<ArrayList<ActorCategoriesItem>>).throwable)
             }
+        })
+
+        viewModel.actorsCount.observe(viewLifecycleOwner, Observer {
+            Timber.d("All actors count is $it")
+            val lp = sl_all_actresses.layoutParams
+            val holderParameter = (rv_all_actresses.adapter as ActorListAdapter).getHolderParameter()
+            lp.height = (holderParameter.height + holderParameter.topMargin +  holderParameter.bottomMargin) * (it/4) + holderParameter.height * 2
+            sl_all_actresses.layoutParams = lp
         })
     }
 
