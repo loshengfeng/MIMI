@@ -67,6 +67,7 @@ data class PostFavoriteItem(
     fun toMemberPostItem(): MemberPostItem {
         return MemberPostItem(
             id = postId,
+            postId = id,
             title = title,
             content = content,
             type = PostType.getTypeByValue(type),
@@ -83,6 +84,18 @@ data class PostFavoriteItem(
             isFollow = isFollow,
             postFriendlyName = posterName,
             category = category
+        )
+    }
+
+    fun toPlayItem(): PlayItem {
+        return PlayItem(
+            videoId = postId,
+            title = title,
+            favorite = true,
+            likeCount = likeCount,
+            favoriteCount = favoriteCount,
+            commentCount = commentCount,
+            tags = tags,
         )
     }
 }

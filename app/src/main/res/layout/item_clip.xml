@@ -27,6 +27,20 @@
     </com.google.android.exoplayer2.ui.PlayerView>
 
     <ImageButton
+        android:id="@+id/ib_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="40dp"
+        android:background="@null"
+        android:scaleType="center"
+        android:src="@drawable/btn_back_white_n"
+        android:contentDescription="@null"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
         android:id="@+id/ib_replay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

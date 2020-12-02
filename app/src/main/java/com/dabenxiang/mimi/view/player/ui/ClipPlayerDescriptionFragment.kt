@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -35,7 +36,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_clip_description
 
-    private val viewModel: ClipPlayerViewModel by activityViewModels()
+    private val viewModel: ClipPlayerViewModel by viewModels({requireParentFragment()})
 
     private val clipViewModel = ClipPlayerDescriptionViewModel()
 
@@ -118,32 +119,6 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         }
     }
 
-    @InternalCoroutinesApi
-    override fun setupListeners() {
-        super.setupListeners()
-        tv_follow.setOnClickListener {
-            clipViewModel.followPost(clipViewModel.createId, tv_follow.text == getText(R.string.followed))
-        }
-
-        clip_icon.setOnClickListener {
-            clipViewModel.followPost(clipViewModel.createId, tv_follow.text == getText(R.string.followed))
-        }
-
-        clip_name.setOnClickListener {
-            val bundle = MyPostFragment.createBundle(
-                viewModel.accountManager.getProfile().userId, (it as TextView).text.toString(),
-                isAdult = true,
-                isAdultTheme = true
-            )
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_clipPlayerFragment_to_navigation_my_post,
-                    bundle
-                )
-            )
-        }
-    }
-
     private fun setInteractiveListener() {
         imgLike.setOnClickListener {
             clipViewModel.likePost(detailItem, LikeType.LIKE)
@@ -207,7 +182,28 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
         setupChipGroup(postItem.tags)
 
-        clipViewModel.createId = postItem.creatorId
+        tv_follow.setOnClickListener {
+            clipViewModel.followPost(postItem.creatorId, tv_follow.text == getText(R.string.followed))
+        }
+
+        clip_icon.setOnClickListener {
+            clipViewModel.followPost(postItem.creatorId, tv_follow.text == getText(R.string.followed))
+        }
+
+        clip_name.setOnClickListener {
+            val bundle = MyPostFragment.createBundle(
+                postItem.creatorId, (it as TextView).text.toString(),
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_myPostFragment,
+                    bundle
+                )
+            )
+        }
+
         setUILike()
         setUIFavorite()
         setInteractiveListener()
@@ -286,7 +282,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         )
         bundle.putBoolean(PlayerFragment.KEY_IS_FROM_PLAYER, true)
         findNavController().navigate(
-            R.id.action_clipPlayerFragment_to_searchPostFragment,
+            R.id.action_to_searchPostFragment,
             bundle
         )
     }

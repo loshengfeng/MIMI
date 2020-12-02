@@ -240,10 +240,10 @@ class TopicDetailFragment : BaseFragment() {
                         )
                     }
                     AdultTabType.CLIP -> {
-                        val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
+                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_topicDetailFragment_to_clipFragment,
+                                R.id.action_topicDetailFragment_to_clipPlayerFragment,
                                 bundle
                             )
                         )
@@ -312,10 +312,10 @@ class TopicDetailFragment : BaseFragment() {
                     )
                 }
                 AdultTabType.CLIP -> {
-                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
+                    val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_topicDetailFragment_to_clipFragment,
+                            R.id.action_topicDetailFragment_to_clipPlayerFragment,
                             bundle
                         )
                     )

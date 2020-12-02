@@ -8,6 +8,7 @@
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_club_topic" />
     <include app:graph="@navigation/navigation_my_post" />
+    <include app:graph="@navigation/navigation_clip_player" />
 
     <fragment
         android:id="@+id/clubTabFragment"
@@ -33,7 +34,7 @@
             app:destination="@id/navigation_login" />
         <action
             android:id="@+id/action_to_clipPlayerFragment"
-            app:destination="@id/clipPlayerFragment" />
+            app:destination="@id/navigation_clip_player" />
 
         <action
             android:id="@+id/action_to_postArticleFragment"
@@ -110,19 +111,6 @@
         android:id="@+id/pictureFragment"
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
-
-    <fragment
-        android:id="@+id/clipPlayerFragment"
-        android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
-        tools:layout="@layout/fragment_v2_player"
-        android:label="ClipPlayerFragment" >
-        <action
-            android:id="@+id/action_clipPlayerFragment_to_navigation_my_post"
-            app:destination="@id/navigation_my_post" />
-        <action
-            android:id="@+id/action_clipPlayerFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment" />
-    </fragment>
 
     <fragment
         android:id="@+id/postArticleFragment"

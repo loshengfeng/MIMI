@@ -1,216 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinatorLayout"
+    android:id="@+id/layout_refresh"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:fitsSystemWindows="true">
-
-    <!--    FIXME android:layout_height="match_parent !!!-->
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/layout_refresh"
+    android:layout_height="match_parent">
+    <androidx.core.widget.NestedScrollView
+        android:fillViewport="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/color_gray_2">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/ad_vippromote"
-                    android:layout_width="match_parent"
-                    android:layout_height="222dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
-
-                    <RelativeLayout
-                        android:id="@+id/bg_vippromote"
-                        android:layout_width="0dp"
-                        android:layout_height="96dp"
-                        android:layout_marginLeft="18dp"
-                        android:layout_marginTop="92dp"
-                        android:layout_marginRight="18dp"
-                        android:background="@drawable/img_vippromote"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/vippromote_now"
-                        android:layout_width="100dp"
-                        android:layout_height="33dp"
-                        android:background="@drawable/bg_vip_personal_mimi_unlogin"
-                        android:gravity="center"
-                        android:text="@string/invite_now"
-                        android:textColor="@color/color_white_1"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="@+id/bg_vippromote"
-                        app:layout_constraintStart_toStartOf="@+id/bg_vippromote"
-                        app:layout_constraintTop_toBottomOf="@+id/vippromote_bottom" />
-
-                    <ImageView
-                        android:id="@+id/vippromote_bottom"
-                        android:layout_width="166dp"
-                        android:layout_height="68dp"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginBottom="16dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/bg_vippromote"
-                        app:layout_constraintEnd_toEndOf="@+id/bg_vippromote"
-                        app:layout_constraintTop_toTopOf="@+id/bg_vippromote"
-                        app:srcCompat="@drawable/img_vip_word" />
-
-                    <ImageView
-                        android:id="@+id/vippromote_top"
-                        android:layout_width="96dp"
-                        android:layout_height="96dp"
-                        android:layout_marginLeft="28dp"
-                        android:layout_marginBottom="30dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/bg_vippromote"
-                        app:layout_constraintStart_toStartOf="@+id/bg_vippromote"
-                        app:srcCompat="@drawable/ico_invitevip" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <include
-                        android:id="@+id/item_is_Login"
-                        layout="@layout/item_personal_is_login"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/tv_old_driver"
-                        style="@style/personalStyle"
-                        android:gravity="center_vertical"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
-                        android:text="@string/personal_old_driver"
-                        app:drawableEndCompat="@drawable/btn_arrow_black_n"
-                        app:drawableStartCompat="@drawable/btn_potato"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/item_is_Login"
-                        app:layout_goneMarginTop="10dp" />
-
-                    <TextView
-                        android:id="@+id/tv_logout"
-                        android:layout_width="0dp"
-                        android:layout_height="50dp"
-                        android:layout_marginTop="19dp"
-                        android:background="@color/color_white_1"
-                        android:gravity="center"
-                        android:text="@string/btn_logout"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_old_driver"
-                        tools:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/tv_version"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        android:gravity="center"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_logout"
-                        app:layout_goneMarginBottom="0dp"
-                        tools:text="v1.0.0" />
-
-                    <!--                <TextView-->
-                    <!--                    android:id="@+id/tv_chat_history"-->
-                    <!--                    style="@style/personalStyle"-->
-                    <!--                    android:gravity="center_vertical"-->
-                    <!--                    android:paddingStart="20dp"-->
-                    <!--                    android:paddingEnd="20dp"-->
-                    <!--                    android:text="@string/personal_chat_history"-->
-                    <!--                    android:visibility="gone"-->
-                    <!--                    app:drawableEndCompat="@drawable/btn_arrow_black_n"-->
-                    <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                    <!--                    app:layout_constraintTop_toBottomOf="@id/tv_topup_history" />-->
-
-
-                    <!--                <View-->
-                    <!--                    android:id="@+id/v_line_chat"-->
-                    <!--                    android:layout_width="match_parent"-->
-                    <!--                    android:layout_height="1dp"-->
-                    <!--                    android:layout_marginStart="20dp"-->
-                    <!--                    android:layout_marginEnd="20dp"-->
-                    <!--                    android:visibility="gone"-->
-                    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
-                    <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                    <!--                    app:layout_constraintTop_toBottomOf="@id/tv_chat_history" />-->
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_top"
+            android:id="@+id/coordinatorLayout"
             android:layout_width="match_parent"
-            android:layout_height="230dp"
-            android:background="@drawable/bg_layout_top_mimi"
-            android:minHeight="230dp"
-            app:layout_scrollFlags="scroll|snap">
+            android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/setting"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginRight="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/tv_title"
+                android:id="@+id/imageView5"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_layout_top_mimi"
+                app:layout_constraintBottom_toBottomOf="@+id/every_day_count_hint"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tv_title"
-                app:srcCompat="@drawable/btn_setting_n" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView6"
+                android:layout_width="match_parent"
+                android:layout_height="230dp"
+                android:background="@color/color_white_1"
+                app:layout_constraintBottom_toBottomOf="@+id/vippromote_now"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
             <ImageView
                 android:id="@+id/avatar"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginLeft="36dp"
                 android:layout_marginTop="14dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_title" />
-
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="36dp"
-                android:layout_height="25dp"
-                android:layout_marginTop="41dp"
-                android:background="@color/transparent"
-                android:gravity="center"
-                android:text="@string/personal_title"
-                android:textColor="@color/title_personal"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintEnd_toEndOf="@+id/like_count"
+                app:layout_constraintStart_toStartOf="@+id/like_count"
+                app:layout_constraintTop_toBottomOf="@+id/tv_title_count" />
 
             <TextView
                 android:id="@+id/id_personal"
@@ -227,25 +60,46 @@
                 app:layout_constraintTop_toTopOf="@+id/avatar"
                 tools:text="ADFGDHFJKUYTRE123456" />
 
+            <ImageView
+                android:id="@+id/setting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/btn_setting_n" />
+
+            <TextView
+                android:id="@+id/tv_title_count"
+                android:layout_width="36dp"
+                android:layout_height="25dp"
+                android:background="@color/transparent"
+                android:gravity="center"
+                android:text="@string/personal_title"
+                android:textColor="@color/title_personal"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/setting" />
+
             <TextView
                 android:id="@+id/like_count"
-                android:layout_width="25dp"
-                android:layout_height="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="54dp"
-                android:layout_marginTop="144dp"
-                android:layout_marginBottom="62dp"
+                android:layout_marginTop="13dp"
                 android:gravity="center"
                 android:textColor="@color/title_personal"
                 android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/avatar"
                 tools:text="0" />
 
             <TextView
                 android:id="@+id/fans_count"
-                android:layout_width="25dp"
-                android:layout_height="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginRight="54dp"
                 android:gravity="center"
                 android:textColor="@color/title_personal"
@@ -257,8 +111,8 @@
 
             <TextView
                 android:id="@+id/follow_count"
-                android:layout_width="25dp"
-                android:layout_height="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="@color/title_personal"
                 android:textSize="18sp"
@@ -266,12 +120,34 @@
                 app:layout_constraintEnd_toStartOf="@+id/fans_count"
                 app:layout_constraintStart_toEndOf="@+id/like_count"
                 app:layout_constraintTop_toTopOf="@+id/like_count"
+                app:layout_constraintVertical_bias="0.0"
                 tools:text="0" />
+
+            <View
+                android:id="@+id/split_line_like_follow"
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="@color/title_personal"
+                app:layout_constraintBottom_toBottomOf="@+id/like"
+                app:layout_constraintEnd_toStartOf="@+id/follow_count"
+                app:layout_constraintStart_toEndOf="@+id/like_count"
+                app:layout_constraintTop_toTopOf="@+id/like_count" />
+
+            <View
+                android:id="@+id/split_line_follow_fans"
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="@color/title_personal"
+                app:layout_constraintBottom_toBottomOf="@+id/fans"
+                app:layout_constraintEnd_toStartOf="@+id/fans_count"
+                app:layout_constraintStart_toEndOf="@+id/follow_count"
+                app:layout_constraintTop_toTopOf="@+id/fans_count" />
 
             <TextView
                 android:id="@+id/like"
-                android:layout_width="20dp"
-                android:layout_height="14dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:text="@string/like"
                 android:textColor="@color/title_personal"
@@ -282,211 +158,358 @@
 
             <TextView
                 android:id="@+id/follow"
-                android:layout_width="20dp"
-                android:layout_height="14dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:text="@string/follow"
                 android:textColor="@color/title_personal"
                 android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@+id/like"
                 app:layout_constraintEnd_toEndOf="@+id/follow_count"
                 app:layout_constraintStart_toStartOf="@+id/follow_count"
-                app:layout_constraintTop_toBottomOf="@+id/follow_count" />
+                app:layout_constraintTop_toBottomOf="@+id/like_count" />
 
             <TextView
                 android:id="@+id/fans"
-                android:layout_width="20dp"
-                android:layout_height="14dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:text="@string/fans"
                 android:textColor="@color/title_personal"
                 android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@+id/follow"
                 app:layout_constraintEnd_toEndOf="@+id/fans_count"
                 app:layout_constraintStart_toStartOf="@+id/fans_count"
-                app:layout_constraintTop_toBottomOf="@+id/fans_count" />
+                app:layout_constraintTop_toBottomOf="@+id/follow_count" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <ImageView
+                android:id="@+id/layout_every_day"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/bg_layout_every_day_mimi"
+                app:layout_constraintEnd_toStartOf="@+id/guideline5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/like" />
+
+            <ImageView
+                android:id="@+id/layout_vip_unlimit"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/bg_layout_vip_mimi"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline5"
+                app:layout_constraintTop_toTopOf="@+id/layout_every_day"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/layout_vip_unlimit_unlogin"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/bg_layout_vip_mimi_unlogin"
+                android:visibility="visible"
+                tools:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline5"
+                app:layout_constraintTop_toTopOf="@+id/layout_every_day" />
+
+            <ImageView
+                android:id="@+id/layout_every_day_background"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:background="@drawable/img_timeswatch"
+                app:layout_constraintBottom_toBottomOf="@+id/layout_every_day"
+                app:layout_constraintEnd_toEndOf="@+id/layout_every_day"
+                app:layout_constraintStart_toStartOf="@+id/guideline6"
+                app:layout_constraintTop_toTopOf="@+id/layout_every_day" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.3" />
+
+            <TextView
+                android:id="@+id/every_day_count_hint"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:text="@string/every_day_count"
+                android:textColor="@color/color_white_1"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@+id/layout_every_day"
+                app:layout_constraintStart_toStartOf="@+id/layout_every_day"
+                app:layout_constraintTop_toTopOf="@+id/layout_every_day" />
 
             <View
-                android:id="@+id/split_line_like_follow"
+                android:id="@+id/view2"
                 android:layout_width="1dp"
-                android:layout_height="16dp"
-                android:layout_marginBottom="6dp"
-                android:background="@color/title_personal"
-                app:layout_constraintBottom_toBottomOf="@+id/like"
-                app:layout_constraintEnd_toStartOf="@+id/follow"
-                app:layout_constraintStart_toEndOf="@+id/like" />
+                android:layout_height="30dp"
 
-            <View
-                android:id="@+id/split_line_follow_fans"
-                android:layout_width="1dp"
-                android:layout_height="16dp"
-                android:background="@color/title_personal"
-                app:layout_constraintBottom_toBottomOf="@+id/follow"
-                app:layout_constraintEnd_toStartOf="@+id/fans_count"
-                app:layout_constraintStart_toEndOf="@+id/follow" />
+                android:background="@color/color_blue_5"
+                app:layout_constraintBottom_toBottomOf="@+id/layout_every_day"
+                app:layout_constraintEnd_toEndOf="@+id/layout_every_day"
+                app:layout_constraintStart_toStartOf="@+id/layout_every_day"
+                app:layout_constraintTop_toBottomOf="@+id/every_day_count_hint" />
+
+            <TextView
+                android:id="@+id/video_long_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/color_white_1"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toStartOf="@+id/view2"
+                app:layout_constraintStart_toStartOf="@+id/layout_every_day"
+                app:layout_constraintTop_toBottomOf="@+id/every_day_count_hint"
+                tools:text="@string/every_day_video_count_unlimit" />
+
+            <TextView
+                android:id="@+id/video_long"
+                android:layout_width="wrap_content"
+                android:layout_height="14dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:text="@string/every_day_length"
+                android:textColor="@color/color_white_1"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@+id/layout_every_day"
+                app:layout_constraintEnd_toEndOf="@+id/video_long_count"
+                app:layout_constraintStart_toStartOf="@+id/video_long_count"
+                app:layout_constraintTop_toBottomOf="@+id/video_long_count" />
+
+            <TextView
+                android:id="@+id/video_short_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:textColor="@color/color_white_1"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@+id/layout_every_day"
+                app:layout_constraintStart_toEndOf="@+id/view2"
+                app:layout_constraintTop_toTopOf="@+id/video_long_count"
+                tools:text="@string/every_day_video_count_unlimit" />
+
+            <TextView
+                android:id="@+id/video_short"
+                android:layout_width="wrap_content"
+                android:layout_height="14dp"
+                android:gravity="center_vertical"
+                android:text="@string/every_day_short"
+                android:textColor="@color/color_white_1"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@+id/video_long"
+                app:layout_constraintEnd_toEndOf="@+id/video_short_count"
+                app:layout_constraintStart_toStartOf="@+id/video_short_count"
+                app:layout_constraintTop_toBottomOf="@+id/video_long_count" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.8" />
+
+            <ImageView
+                android:id="@+id/layout_vip_unlimit_unlogin_background"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/img_vip"
+                app:layout_constraintBottom_toBottomOf="@+id/layout_vip_unlimit"
+                app:layout_constraintEnd_toEndOf="@+id/layout_vip_unlimit"
+                app:layout_constraintStart_toStartOf="@+id/guideline4"
+                app:layout_constraintTop_toTopOf="@+id/layout_every_day" />
+
+            <TextView
+                android:id="@+id/vip_unlimit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:text="@string/vip_hint"
+                android:textColor="@color/color_white_1"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="@+id/layout_vip_unlimit"
+                app:layout_constraintTop_toTopOf="@+id/every_day_count_hint" />
+
+            <ImageView
+                android:id="@+id/img_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/btn_arrow_vip"
+                app:layout_constraintBottom_toBottomOf="@+id/vip_unlimit"
+                app:layout_constraintEnd_toEndOf="@+id/layout_vip_unlimit"
+                app:layout_constraintTop_toTopOf="@+id/vip_unlimit" />
+
+            <TextView
+                android:id="@+id/tv_expiry_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/color_white_1"
+                android:textSize="16sp"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/video_short"
+                app:layout_constraintEnd_toEndOf="@+id/layout_vip_unlimit"
+                app:layout_constraintStart_toStartOf="@+id/layout_vip_unlimit"
+                app:layout_constraintTop_toTopOf="@+id/video_short_count"
+                tools:text="2021-08-08 过期" />
+
+            <TextView
+                android:id="@+id/vip_buy"
+                android:layout_width="100dp"
+                android:layout_height="33dp"
+                android:layout_marginLeft="6dp"
+                android:background="@drawable/bg_vip_personal_mimi_unlogin"
+                android:gravity="center"
+                android:text="@string/buy_vip"
+                android:textColor="@color/color_white_1"
+                android:textSize="14sp"
+                android:visibility="visible"
+                tools:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/video_short"
+                app:layout_constraintEnd_toEndOf="@+id/layout_vip_unlimit"
+                app:layout_constraintStart_toStartOf="@+id/layout_vip_unlimit"
+                app:layout_constraintTop_toTopOf="@+id/video_short_count" />
+
+            <ImageView
+                android:id="@+id/bg_vippromote"
+                android:layout_width="0dp"
+                android:layout_height="96dp"
+                android:layout_marginLeft="18dp"
+                android:layout_marginTop="39dp"
+                android:layout_marginRight="18dp"
+                android:background="@drawable/img_vippromote"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layout_every_day" />
+
+            <ImageView
+                android:id="@+id/vippromote_top"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_marginLeft="28dp"
+                android:layout_marginBottom="30dp"
+                app:layout_constraintBottom_toBottomOf="@+id/bg_vippromote"
+                app:layout_constraintStart_toStartOf="@+id/bg_vippromote"
+                app:srcCompat="@drawable/ico_invitevip" />
+
+            <ImageView
+                android:id="@+id/vippromote_bottom"
+                android:layout_width="0dp"
+                android:layout_height="68dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/bg_vippromote"
+                app:layout_constraintEnd_toEndOf="@+id/bg_vippromote"
+                app:layout_constraintStart_toStartOf="@+id/guideline8"
+                app:layout_constraintTop_toTopOf="@+id/bg_vippromote"
+                app:srcCompat="@drawable/img_vip_word_2" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.45" />
+
+            <TextView
+                android:id="@+id/vippromote_now"
+                android:layout_width="100dp"
+                android:layout_height="33dp"
+                android:background="@drawable/bg_vip_personal_mimi_unlogin"
+                android:gravity="center"
+                android:text="@string/invite_now"
+                android:textColor="@color/color_white_1"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@+id/bg_vippromote"
+                app:layout_constraintStart_toStartOf="@+id/bg_vippromote"
+                app:layout_constraintTop_toBottomOf="@+id/vippromote_bottom" />
+
+            <include
+                android:id="@+id/item_is_Login"
+                layout="@layout/item_personal_is_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView6"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tv_old_driver"
+                style="@style/personalStyle"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="@string/personal_old_driver"
+                app:drawableEndCompat="@drawable/btn_arrow_black_n"
+                app:drawableStartCompat="@drawable/btn_potato"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/item_is_Login"
+                app:layout_goneMarginTop="10dp" />
+
+            <TextView
+                android:id="@+id/tv_logout"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="19dp"
+                android:background="@color/color_white_1"
+                android:gravity="center"
+                android:text="@string/btn_logout"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_old_driver"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tv_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_logout"
+                app:layout_goneMarginBottom="0dp"
+                tools:text="v1.0.0" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_every_day"
-        android:layout_width="160dp"
-        android:layout_height="84dp"
-        android:layout_marginLeft="16dp"
-        android:background="@drawable/bg_layout_every_day_mimi"
-        android:elevation="8dp"
-        app:layout_anchor="@id/appbar_layout"
-        app:layout_anchorGravity="bottom|start">
-
-        <TextView
-            android:id="@+id/every_day_count_hint"
-            android:layout_width="84dp"
-            android:layout_height="20dp"
-            android:layout_marginLeft="14dp"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:text="@string/every_day_count"
-            android:textColor="@color/color_white_1"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/video_long"
-            android:layout_width="wrap_content"
-            android:layout_height="14dp"
-            android:layout_marginLeft="28dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_vertical"
-            android:text="@string/every_day_length"
-            android:textColor="@color/color_white_1"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/video_long_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:gravity="center_vertical"
-            android:textColor="@color/color_white_1"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toTopOf="@+id/video_long"
-            app:layout_constraintEnd_toEndOf="@+id/video_long"
-            app:layout_constraintStart_toStartOf="@+id/video_long"
-            tools:text="無限" />
-
-        <TextView
-            android:id="@+id/video_short"
-            android:layout_width="wrap_content"
-            android:layout_height="14dp"
-            android:layout_marginRight="28dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_vertical"
-            android:text="@string/every_day_short"
-            android:textColor="@color/color_white_1"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
-            android:id="@+id/video_short_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:gravity="center_vertical"
-            android:textColor="@color/color_white_1"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toTopOf="@+id/video_short"
-            app:layout_constraintEnd_toEndOf="@+id/video_short"
-            app:layout_constraintStart_toStartOf="@+id/video_short"
-            tools:text="無限" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_vip_unlimit"
-        android:layout_width="160dp"
-        android:layout_height="84dp"
-        android:layout_marginRight="16dp"
-        android:background="@drawable/bg_layout_vip_mimi"
-        android:elevation="8dp"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        app:layout_anchor="@id/appbar_layout"
-        app:layout_anchorGravity="bottom|end">
-
-        <TextView
-            android:id="@+id/vip_unlimit"
-            android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_marginLeft="14dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="4dp"
-            android:gravity="center_vertical"
-            android:text="@string/vip_hint"
-            android:textColor="@color/color_white_1"
-            android:textSize="14sp"
-            app:drawableEndCompat="@drawable/ico_next_disable"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_expiry_date"
-            android:layout_width="0dp"
-            android:layout_height="22dp"
-            android:layout_marginTop="14dp"
-            android:gravity="center"
-            android:textColor="@color/color_white_1"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@+id/vip_unlimit"
-            app:layout_constraintStart_toStartOf="@+id/vip_unlimit"
-            app:layout_constraintTop_toBottomOf="@+id/vip_unlimit"
-            tools:text="嘗試頻" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_vip_unlimit_unlogin"
-        android:layout_width="160dp"
-        android:layout_height="84dp"
-        android:layout_marginRight="16dp"
-        android:background="@drawable/bg_layout_vip_mimi_unlogin"
-        android:elevation="8dp"
-        android:visibility="visible"
-        tools:visibility="invisible"
-        app:layout_anchor="@id/appbar_layout"
-        app:layout_anchorGravity="bottom|end">
-
-        <TextView
-            android:id="@+id/vip_unlimit_unlogin"
-            android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_marginLeft="14dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="4dp"
-            android:gravity="center_vertical"
-            android:text="@string/vip_hint"
-            android:textColor="@color/color_white_1"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/vip_buy"
-            android:layout_width="100dp"
-            android:layout_height="33dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="6dp"
-            android:layout_marginBottom="6dp"
-            android:background="@drawable/bg_vip_personal_mimi_unlogin"
-            android:gravity="center"
-            android:text="@string/buy_vip"
-            android:textColor="@color/color_white_1"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/vip_unlimit_unlogin" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

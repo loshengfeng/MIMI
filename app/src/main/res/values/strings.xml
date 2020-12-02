@@ -246,6 +246,8 @@
     <string name="identity">游客</string>
 
     <!-- Follow -->
+    <string name="follow_delete_favorite_message">确定从收藏移除 %s?</string>
+    <string name="follow_empty_msg">尚未收藏影片，快去看片吧！</string>
     <string name="follow_title">我的关注</string>
     <string name="follow_tab_mimi_video">蜜蜜影视</string>
     <string name="follow_tab_small_video">小视频</string>
@@ -301,6 +303,11 @@
     <string name="load_more_comment_fail">加载失败</string>
     <string name="reply">回复</string>
     <string name="n_reply">%d个回复</string>
+
+    <string-array name="player_short_video_tabs">
+        <item>@string/video_desc</item>
+        <item>@string/comment</item>
+    </string-array>
 
     <!-- Picture Detail -->
     <string name="picture_detail_title">图片详情</string>

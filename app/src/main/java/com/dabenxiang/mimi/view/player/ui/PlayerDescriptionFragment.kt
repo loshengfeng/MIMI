@@ -5,6 +5,7 @@ import android.text.Html
 import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -41,7 +42,7 @@ import java.util.*
 
 class PlayerDescriptionFragment : BaseFragment() {
 
-    private val viewModel: PlayerV2ViewModel by activityViewModels()
+    private val viewModel: PlayerV2ViewModel by viewModels({requireParentFragment()})
 
     private val descriptionViewModel = PlayerDescriptionViewModel()
 
@@ -74,6 +75,8 @@ class PlayerDescriptionFragment : BaseFragment() {
 
             override fun onStatisticsDetail(baseVideoItem: BaseVideoItem) {
                 viewModel.stopVideoPlayer.setNot()
+                viewModel.isResetPlayer = true
+                if(viewModel.selectEpisodePosition.value != 0) viewModel.selectStreamSourceIndex(0)
                 viewModel.videoContentId = (baseVideoItem as BaseVideoItem.Video).id!!
                 viewModel.getVideoContent()
             }
@@ -178,6 +181,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         viewModel.selectEpisodePosition.observe(viewLifecycleOwner) {
             Timber.w("Select index is $it and old index is ${episodeAdapter.getSelectedPosition()}")
             if (it != episodeAdapter.getSelectedPosition()) {
+                isReported = false
                 episodeAdapter.setLastSelectedIndex(it)
                 viewModel.getVideoContent()
             }

@@ -549,7 +549,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 移除我關注的圈子
      */
     suspend fun cancelMyClubFollow(
-        clubId: Long
+        clubId: String
     ) = apiService.cancelMyClubFollow(clubId)
 
     /**
@@ -564,8 +564,16 @@ class ApiRepository(private val apiService: ApiService) {
      * 移除我關注的人
      */
     suspend fun cancelMyMemberFollow(
-        userId: Long
+        userId: String
     ) = apiService.cancelMyMemberFollow(userId)
+
+    /**
+     * 取得我的粉絲列表
+     */
+    suspend fun getMyFans(
+        offset: Int,
+        limit: Int
+    ) = apiService.getMyFans(offset, limit)
 
     /**
      * 取得聊天室列表
@@ -626,16 +634,6 @@ class ApiRepository(private val apiService: ApiService) {
         postType: Int = 1,
     ) = apiService.getPostFavorite(offset, limit, postType)
 
-    suspend fun getPostVideoFavorite(
-        offset: Long,
-        limit: Int
-    ) = apiService.getPostFavorite(offset, limit, 8)
-
-    suspend fun getPostOtherFavorite(
-        offset: Long,
-        limit: Int
-    ) = apiService.getPostFavorite(offset, limit, 7)
-
     /**
      * 移除我的帖子收藏
      */
@@ -690,6 +688,17 @@ class ApiRepository(private val apiService: ApiService) {
         limit: String
     ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>> {
         return apiService.getReferrerHistory(offset, limit)
+    }
+
+    /**
+     * 我喜歡列表
+     */
+    suspend fun getPostLike(
+        offset: Long,
+        limit: Int,
+        type: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>> {
+        return apiService.getPostLike(offset, limit, type)
     }
 
     /**********************************************************
@@ -960,5 +969,10 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getMenu() = apiService.getMenu()
+
+    /**
+     * 取得各來源解碼key
+     */
+    suspend fun getDecryptSetting() = apiService.getDecryptSetting()
 }
 

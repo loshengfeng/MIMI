@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.APK_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
@@ -114,5 +115,25 @@ class SplashViewModel : BaseViewModel() {
 
     fun setupRecordTimestamp() {
         versionManager.setupRecordTimestamp()
+    }
+
+    fun getDecryptSettingResult() {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getDecryptSetting()
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> Timber.e("getDecryptSettingResult error: $e") }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            pref.decryptSettingArray = ArrayList(it.result.content ?: arrayListOf())
+                        }
+                        else -> {}
+                    }
+                }
+        }
     }
 }

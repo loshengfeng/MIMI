@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.player.ui
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.handleException
@@ -21,10 +22,9 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.fragment_v2_player.*
 import java.net.UnknownHostException
 
-class PlayerV2Fragment: BasePlayerFragment() {
+class PlayerV2Fragment : BasePlayerFragment() {
 
     companion object {
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
@@ -38,7 +38,7 @@ class PlayerV2Fragment: BasePlayerFragment() {
         }
     }
 
-    private val viewModel: PlayerV2ViewModel by activityViewModels()
+    private val viewModel: PlayerV2ViewModel by viewModels()
 
     override fun setupObservers() {
         super.setupObservers()
@@ -55,7 +55,7 @@ class PlayerV2Fragment: BasePlayerFragment() {
         viewModel.episodeContentSource.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Loading -> {
-                    if(!progressHUD.isShowing)
+                    if (!progressHUD.isShowing)
                         progressHUD.show()
                 }
                 is ApiResult.Success -> {
@@ -65,7 +65,7 @@ class PlayerV2Fragment: BasePlayerFragment() {
                     when (it.throwable) {
                         is PlayerV2ViewModel.NotDeductedException -> {
                             showRechargeReminder(true)
-                            if(progressHUD.isShowing)
+                            if (progressHUD.isShowing)
                                 progressHUD.dismiss()
                         }
                         else -> onApiError(it.throwable)
@@ -77,7 +77,7 @@ class PlayerV2Fragment: BasePlayerFragment() {
         viewModel.m3u8ContentSource.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Loading -> {
-                    if(!progressHUD.isShowing)
+                    if (!progressHUD.isShowing)
                         progressHUD.show()
                 }
                 is ApiResult.Loaded -> progressHUD.dismiss()
@@ -90,8 +90,9 @@ class PlayerV2Fragment: BasePlayerFragment() {
 
         viewModel.videoStreamingUrl.observe(viewLifecycleOwner) {
             if(!it.isNullOrEmpty()) {
-                setupPlayUrl(it, (viewModel.m3u8SourceUrl != it) )
+                setupPlayUrl(it, viewModel.isResetPlayer)
                 viewModel.m3u8SourceUrl = it
+                viewModel.isResetPlayer = false
             }
         }
 
@@ -109,7 +110,7 @@ class PlayerV2Fragment: BasePlayerFragment() {
     }
 
     override fun createViewPagerFragment(position: Int): Fragment {
-        when(position) {
+        when (position) {
             0 -> {
                 return PlayerDescriptionFragment()
             }
@@ -157,11 +158,14 @@ class PlayerV2Fragment: BasePlayerFragment() {
      * get video or clip content
      */
     private fun getVideoContent() {
-        (arguments?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
-            contentId = it.videoId
-            viewModel.videoContentId = it.videoId
-            viewModel.getVideoContent()
-        }
+        if(arguments?.getSerializable(KEY_PLAYER_SRC) != null) {
+            (arguments?.getSerializable(KEY_PLAYER_SRC) as PlayerItem?)?.also {
+                this.arguments = null
+                contentId = it.videoId
+                viewModel.videoContentId = it.videoId
+                viewModel.getVideoContent()
+            }
+        } else viewModel.getVideoContent()
     }
 
     private fun onApiError(throwable: Throwable) {

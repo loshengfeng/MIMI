@@ -51,7 +51,13 @@ class ClipViewModel : BaseViewModel() {
                     val errorCode = if (e is HttpException) e.code() else -1
                     update(position, "", errorCode)
                 }
-                .collect { update(position, it, -1) }
+                .collect {
+                    getDecryptSetting(item.source?:"")?.takeIf { it.isVideoDecrypt }?.also { decryptItem ->
+                        decryptM3U8(it, decryptItem) { update(position, it, -1) }
+                    } ?: run {
+                        update(position, it, -1)
+                    }
+                }
         }
     }
 
@@ -119,7 +125,7 @@ class ClipViewModel : BaseViewModel() {
         return Pager(
             config = PagingConfig(
                 pageSize = ApiRepository.NETWORK_PAGE_SIZE,
-                enablePlaceholders = false
+                enablePlaceholders = false,
             ),
             pagingSourceFactory = { ClipPagingSource(domainManager, orderByType) }
         ).flow.cachedIn(viewModelScope)

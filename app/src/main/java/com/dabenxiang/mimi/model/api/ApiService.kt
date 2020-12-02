@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.PostType
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -418,7 +419,7 @@ interface ApiService {
 
     @DELETE("/v1/Members/Me/ClubFollow/{clubId}")
     suspend fun cancelMyClubFollow(
-        @Path("clubId") id: Long
+        @Path("clubId") id: String
     ): Response<Void>
 
     @GET("/v1/Members/Me/MemberFollow")
@@ -429,8 +430,14 @@ interface ApiService {
 
     @DELETE("/v1/Members/Me/MemberFollow/{userId}")
     suspend fun cancelMyMemberFollow(
-        @Path("userId") id: Long
+        @Path("userId") id: String
     ): Response<Void>
+
+    @GET("/v1/Members/Me/Fans")
+    suspend fun getMyFans(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<FansItem>>>
 
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
@@ -468,7 +475,7 @@ interface ApiService {
         @Query("isShortVideo") isShortVideo: Boolean,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<PlayItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<PlayItem>>>
 
     @GET("/v1/Members/Me/PostFavorite")
     suspend fun getPostFavorite(
@@ -504,6 +511,13 @@ interface ApiService {
     suspend fun updateProfile(
         @Body body: ProfileRequest
     ): Response<Void>
+
+    @GET("/v1/Members/Me/PostLike")
+    suspend fun getPostLike(
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int,
+        @Query("postType") postType: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
 
     /**********************************************************
      *
@@ -768,4 +782,13 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Home/Menu")
     suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
+
+
+    /**********************************************************
+     *
+     *         Operators/DecryptSetting 取得各來源解碼key
+     *
+     ***********************************************************/
+    @GET("/v1/Operators/DecryptSetting")
+    suspend fun getDecryptSetting(): Response<ApiBaseItem<List<DecryptSettingItem>>>
 }

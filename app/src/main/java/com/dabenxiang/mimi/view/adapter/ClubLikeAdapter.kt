@@ -2,25 +2,19 @@ package com.dabenxiang.mimi.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.callback.MyLikeListener
 import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
-import com.dabenxiang.mimi.view.adapter.viewHolder.ClubFollowViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.ClubLikeViewHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
 
 class ClubLikeAdapter(
-    val listener: EventListener
+    val listener: MyLikeListener
 ) : PagingDataAdapter<PostFavoriteItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
-        private const val VIEW_TYPE_NORMAL = 0
-        private const val VIEW_TYPE_DELETED = 1
-
         private val diffCallback = object : DiffUtil.ItemCallback<PostFavoriteItem>() {
             override fun areItemsTheSame(
                 oldItem: PostFavoriteItem,
@@ -34,42 +28,37 @@ class ClubLikeAdapter(
         }
     }
 
-    interface EventListener {
-        fun onDetail(item: PostFavoriteItem)
-        fun onGetAttachment(id: Long, view:ImageView)
-        fun onCancelFollow(clubId: Long, position: Int)
-    }
-
     var removedPosList = ArrayList<Int>()
 
     override fun getItemViewType(position: Int): Int {
         return if (removedPosList.contains(position)) {
-            VIEW_TYPE_DELETED
+            R.layout.item_deleted
         } else {
-            VIEW_TYPE_NORMAL
+            R.layout.item_clip_post
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val itemview = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
         return when (viewType) {
-            VIEW_TYPE_NORMAL -> ClubLikeViewHolder(
-                LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_clip_post, parent, false), listener
-            )
-            else -> DeletedItemViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.item_deleted, parent, false)
-            )
+            R.layout.item_clip_post -> ClubLikeViewHolder(itemview)
+            else -> DeletedItemViewHolder(itemview)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
-        when (holder) {
-            is ClubLikeViewHolder -> holder.bind(item, position)
+        item?.also {
+            when (holder) {
+                is ClubLikeViewHolder -> {
+                    holder.onBind(
+                        it,
+                        null,
+                        position,
+                        listener
+                    )
+                }
+            }
         }
-    }
-
-    fun update(position: Int) {
-        notifyItemChanged(position)
     }
 }

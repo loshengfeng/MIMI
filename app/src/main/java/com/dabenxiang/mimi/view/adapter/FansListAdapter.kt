@@ -2,24 +2,22 @@ package com.dabenxiang.mimi.view.adapter
 
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
-import com.dabenxiang.mimi.R
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.dabenxiang.mimi.model.api.vo.error.FansItem
-import kotlinx.android.synthetic.main.item_header.view.*
-import kotlinx.android.synthetic.main.item_header.view.tv_title
-import kotlinx.android.synthetic.main.item_header_fans.view.*
-
+import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.FansItem
+import kotlinx.android.synthetic.main.item_fans.view.*
 
 class FansListAdapter(
-    private val listener: EventListener
-) : PagedListAdapter<FansItem, FansListAdapter.ViewHolder>(diffCallback) {
+    private val listener: FanListener
+) : PagingDataAdapter<FansItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<FansItem>() {
             override fun areItemsTheSame(
@@ -35,110 +33,60 @@ class FansListAdapter(
         }
     }
 
-    interface EventListener {
-        fun onClickListener(item: FansItem, position: Int)
-        fun onGetAttachment(id: Long?, view: ImageView)
-    }
-
-    override fun getItemCount(): Int {
-        var realsize = 0
-        if (currentList.isNullOrEmpty()) {
-            realsize = 1
-        } else {
-            currentList?.size.let {
-                realsize = it!!
-            }
-        }
-        return realsize + 1
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        if (currentList.isNullOrEmpty()) {
-            if (position === 0) {
-                return R.layout.item_club_item_header
-            } else {
-                return R.layout.item_empty
-            }
-        } else {
-            if (position === 0) {
-                return R.layout.item_club_item_header
-            } else {
-                return R.layout.item_fans
-            }
-        }
-        return super.getItemViewType(position)
-    }
+    private lateinit var mContext: Context
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): FansListAdapter.ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        when (viewType) {
-            R.layout.item_club_item_header -> return HeaderViewHolder(
-                layoutInflater.inflate(
-                    viewType,
-                    parent,
-                    false
-                )
-            )
-
-            R.layout.item_empty -> return EmptyViewHolder(
-                layoutInflater.inflate(
-                    viewType,
-                    parent,
-                    false
-                )
-            )
-
-            R.layout.item_fans -> return FansViewHolder(
-                layoutInflater.inflate(
-                    viewType,
-                    parent,
-                    false
-                )
-            )
-        }
-        throw IllegalArgumentException("no such view type...")
+    ): RecyclerView.ViewHolder {
+        mContext = parent.context
+        return FansViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_fans, parent, false))
     }
 
-    override fun onBindViewHolder(holder: FansListAdapter.ViewHolder, position: Int) {
-        var total = 0
-        currentList?.size.let {
-            if (it != null) {
-                total = it
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is FansViewHolder) {
+            holder.onBind(getItem(position), listener, position, mContext)
+        }
+    }
+
+
+    class FansViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val icon_fans: ImageView = itemView.icon_fans
+        private val name_fans: TextView = itemView.name_fans
+        private val decs_fans: TextView = itemView.decs_fans
+        private val follow_fnas: TextView = itemView.follow_fnas
+
+        fun onBind(item: FansItem?, listener: FanListener, position: Int, context: Context) {
+            name_fans.text = item?.friendlyName
+            decs_fans.text = item?.friendlyName
+
+            follow_fnas.setOnClickListener {
+                listener.onFollow(item!!, position, item.isFollow)
             }
-        }
-        holder.onBind(total, position)
-    }
 
-    abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        abstract fun onBind(total: Int, position: Int)
-    }
+            itemView.setOnClickListener {
+                listener.onAvatarClick(item!!.userId, item.friendlyName!!)
+            }
 
-    class HeaderViewHolder(itemView: View) : ViewHolder(itemView) {
-        val total_count_fans: TextView = itemView.findViewById(R.id.tv_title) as TextView
-        override fun onBind(total: Int, position: Int) {
-            total_count_fans.text = String.format(
-                itemView.context.getString(R.string.total_count_fans),
-                total.toString()
-            )
-        }
-    }
+            if (item!!.isFollow) {
+                follow_fnas.text = context.getString(R.string.followed)
+                follow_fnas.background =
+                    context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
+                follow_fnas.setTextColor(context.getColor(R.color.color_black_1_60))
+            } else {
+                follow_fnas.text = context.getString(R.string.follow)
+                follow_fnas.background =
+                    context.getDrawable(R.drawable.bg_red_1_stroke_radius_16)
+                follow_fnas.setTextColor(context.getColor(R.color.color_red_1))
+            }
 
-    class EmptyViewHolder(itemView: View) : ViewHolder(itemView) {
-        val text_empty: TextView = itemView.findViewById(R.id.text_page_empty) as TextView
-        override fun onBind(total: Int, position: Int) {
-            text_empty.text =""
+            listener.onGetAvatarAttachment(item.avatarAttachmentId, icon_fans)
         }
     }
 
-    class FansViewHolder(itemView: View) : ViewHolder(itemView) {
-        override fun onBind(total: Int, position: Int) {
-        }
-    }
-
-    fun update(position: Int) {
-        notifyItemChanged(position)
+    interface FanListener {
+        fun onAvatarClick(userId: Long, name: String)
+        fun onGetAvatarAttachment(id: Long?, view:ImageView)
+        fun onFollow(item: FansItem, position: Int, isFollow: Boolean)
     }
 }

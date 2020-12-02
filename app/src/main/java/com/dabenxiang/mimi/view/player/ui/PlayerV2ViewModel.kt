@@ -52,8 +52,7 @@ class PlayerV2ViewModel: BaseViewModel() {
 
     var videoContentId : Long = -1
     var m3u8SourceUrl: String = ""
-
-
+    var isResetPlayer: Boolean = true
 
     inner class NotDeductedException : Exception()
 
@@ -211,6 +210,6 @@ class PlayerV2ViewModel: BaseViewModel() {
         _selectSourcesPosition.value = 0
         _selectEpisodePosition.value = 0
         _videoStreamingUrl.value = null
+        isResetPlayer = true
     }
-
 }
