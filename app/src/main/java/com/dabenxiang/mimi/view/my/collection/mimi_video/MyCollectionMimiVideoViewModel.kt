@@ -148,4 +148,23 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     .collect { _cleanResult.value = it }
         }
     }
+
+    fun deleteAllLike(items: List<PlayItem>) {
+        if (items.isEmpty()) return
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository()
+                    .deleteAllLike(
+                        items.map {it.videoId}.joinToString(separator = ",")
+                    )
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _cleanResult.value = it }
+        }
+    }
 }

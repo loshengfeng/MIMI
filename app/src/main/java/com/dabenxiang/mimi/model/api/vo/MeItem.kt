@@ -5,7 +5,7 @@ import java.util.*
 
 data class MeItem(
     @SerializedName("id")
-    val id: Long?,
+    val id: Long,
 
     @SerializedName("friendlyName")
     val friendlyName: String? = null,

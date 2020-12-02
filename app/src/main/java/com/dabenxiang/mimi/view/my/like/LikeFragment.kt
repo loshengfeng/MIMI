@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.my.collection.MyCollectionFragment
+import com.dabenxiang.mimi.view.my.collection.MyCollectionViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_my_collection.*
@@ -20,7 +21,7 @@ import timber.log.Timber
 
 class LikeFragment : BaseFragment() {
 
-    private val viewModel: LikeViewModel by viewModels()
+    private val viewModel: MyCollectionViewModel by viewModels()
 
     companion object {
         const val TAB_MiMI_VIDEO = 0
@@ -113,18 +114,8 @@ class LikeFragment : BaseFragment() {
 
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
-
-            when (viewModel.lastTabIndex) {
-                MyCollectionFragment.TAB_MiMI_VIDEO -> {
-                    //TODO
-                }
-                MyCollectionFragment.TAB_SHORT_VIDEO -> {
-                    //TODO
-                }
-                else -> {
-                    //TODO
-                }
-            }
+            Timber.i("onCleanDialogListener lastTabIndex=${viewModel.lastTabIndex}")
+            viewModel.setDeleteNotify(true)
         }
     }
 }

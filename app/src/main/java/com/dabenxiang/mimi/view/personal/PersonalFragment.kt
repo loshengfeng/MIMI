@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -47,34 +48,78 @@ class PersonalFragment : BaseFragment() {
     override fun initSettings() {
         super.initSettings()
         tv_version.text = BuildConfig.VERSION_NAME
-        Glide.with(this).clear(avatar)
-        layout_vip_unlimit.visibility = View.INVISIBLE
-        layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
-        viewModel.getPostDetail()
+        initUi()
+        viewModel.getMemberInfo()
 
+        layout_refresh.setOnRefreshListener {
+            viewModel.getMemberInfo()
+        }
+    }
+
+    private fun initUi() {
+        Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
+        layout_vip_unlimit.visibility = View.INVISIBLE
+        layout_vip_unlimit_unlogin.visibility = View.VISIBLE
+        vip_buy.visibility = View.VISIBLE
+        tv_expiry_date.visibility = View.GONE
+        img_arrow.visibility = View.INVISIBLE
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
-            layout_vip_unlimit.visibility = View.VISIBLE
             tv_logout.visibility = View.VISIBLE
-            vip_buy.visibility = View.INVISIBLE
-            layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
-            tv_expiry_date.visibility = View.VISIBLE
-            img_arrow.visibility = View.VISIBLE
+            setting.visibility = View.VISIBLE
         } else {
             item_is_Login.visibility = View.GONE
             tv_logout.visibility = View.GONE
+            setting.visibility = View.INVISIBLE
+        }
+    }
+
+    private fun updateUi(profile: MeItem) {
+        if (viewModel.isLogin()) {
+            id_personal.text = profile.friendlyName
+            like_count.text = profile.likes.toString()
+            fans_count.text = profile.fans.toString()
+            follow_count.text = profile.follows.toString()
+            viewModel.loadImage(profile.avatarAttachmentId, avatar, LoadImageType.AVATAR)
+        } else {
             id_personal.text = getString(R.string.identity)
             like_count.text = "0"
             fans_count.text = "0"
             follow_count.text = "0"
-            vip_buy.visibility = View.VISIBLE
-            layout_vip_unlimit_unlogin.visibility = View.VISIBLE
-            tv_expiry_date.visibility = View.GONE
-            img_arrow.visibility = View.INVISIBLE
             Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
         }
-        layout_refresh.setOnRefreshListener {
-            viewModel.getPostDetail()
+
+        if (viewModel.isLogin() && profile.isSubscribed) {
+            layout_vip_unlimit.visibility = View.VISIBLE
+            layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
+            video_long_count.text = getString(R.string.every_day_video_count_unlimit)
+            video_short_count.text = getString(R.string.every_day_video_count_unlimit)
+            tv_expiry_date.text = getString(
+                R.string.deadline_vip,
+                SimpleDateFormat(
+                    "yyyy-MM-dd",
+                    Locale.getDefault()
+                ).format(profile.expiryDate ?: Date())
+            )
+            vip_buy.visibility = View.GONE
+            tv_expiry_date.visibility = View.VISIBLE
+            img_arrow.visibility = View.VISIBLE
+        } else {
+            layout_vip_unlimit.visibility = View.INVISIBLE
+            layout_vip_unlimit_unlogin.visibility = View.VISIBLE
+            profile.videoOnDemandCount.let { count ->
+                profile.videoOnDemandCountLimit.let { countLimit ->
+                    video_long_count.text = "$count/$countLimit"
+                }
+            }
+            profile.videoCount.let { count ->
+                profile.videoCountLimit.let { countLimit ->
+                    video_short_count.text = "$count/$countLimit"
+                }
+            }
+            vip_buy.visibility = View.VISIBLE
+            tv_expiry_date.visibility = View.GONE
+            img_arrow.visibility = View.INVISIBLE
         }
     }
 
@@ -86,91 +131,23 @@ class PersonalFragment : BaseFragment() {
 
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Success -> {
-                    val meItem = it.result
-                    if (meItem.isSubscribed) {
-                        layout_vip_unlimit.visibility = View.VISIBLE
-                        layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
-
-                        video_long_count.text = getString(R.string.every_day_video_count_unlimit)
-                        video_short_count.text = getString(R.string.every_day_video_count_unlimit)
-                    } else {
-                        layout_vip_unlimit.visibility = View.INVISIBLE
-                        layout_vip_unlimit_unlogin.visibility = View.VISIBLE
-
-                        meItem.videoCount?.let { count ->
-                            meItem.videoCountLimit?.let { countLimit ->
-                                video_long_count.text = "$count/$countLimit"
-                            }
-                        }
-                        meItem.videoOnDemandCount?.let { count ->
-                            meItem.videoOnDemandCountLimit?.let { countLimit ->
-                                video_short_count.text = "$count/$countLimit"
-                            }
-                        }
-                    }
-
-                    meItem.friendlyName?.let {
-                        id_personal.text = it
-                    }
-                    meItem.likes?.let { it ->
-                        like_count.text = it.toString()
-                    }
-                    meItem.fans?.let { it ->
-                        fans_count.text = it.toString()
-                    }
-                    meItem.follows?.let { it ->
-                        follow_count.text = it.toString()
-                    }
-
-                    if (meItem.expiryDate == null) {
-                        layout_vip_unlimit_unlogin.visibility = View.VISIBLE
-                    } else {
-                        meItem.expiryDate?.let { date ->
-                            tv_expiry_date.text = getString(
-                                R.string.deadline_vip,
-                                SimpleDateFormat(
-                                    "yyyy-MM-dd",
-                                    Locale.getDefault()
-                                ).format(date)
-                            )
-                        }
-                    }
-                    viewModel.loadImage(meItem.avatarAttachmentId, avatar, LoadImageType.AVATAR)
-                }
+                is Loading -> layout_refresh.isRefreshing = true
+                is Loaded -> layout_refresh.isRefreshing = false
+                is Success -> updateUi(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
 //
         viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
             when (it) {
+                is Loading -> layout_refresh.isRefreshing = true
+                is Loaded -> layout_refresh.isRefreshing = false
                 is Empty -> {
-                    Glide.with(this).clear(avatar)
-                    layout_vip_unlimit_unlogin.visibility = View.VISIBLE
-                    item_is_Login.visibility = View.GONE
-                    tv_logout.visibility = View.GONE
-                    id_personal.text = getString(R.string.identity)
-                    like_count.text = "0"
-                    fans_count.text = "0"
-                    follow_count.text = "0"
-                    Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
+                    initUi()
+                    scroll_view.smoothScrollTo(0, 0)
+                    viewModel.getMemberInfo()
                 }
-                is Error -> {
-                    when (it.throwable) {
-                        is HttpException -> {
-                            val data = GeneralUtils.getHttpExceptionData(it.throwable)
-                            data.errorItem.message?.also { message ->
-                                GeneralDialog.newInstance(
-                                    GeneralDialogData(
-                                        message = message,
-                                        messageIcon = R.drawable.ico_default_photo,
-                                        secondBtn = getString(R.string.btn_confirm)
-                                    )
-                                ).show(parentFragmentManager)
-                            }
-                        }
-                    }
-                }
+                is Error -> onApiError(it.throwable)
             }
         })
 
@@ -190,14 +167,6 @@ class PersonalFragment : BaseFragment() {
                     mainViewModel?.refreshBottomNavigationBadge?.value = it.result
                 }
                 is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.visibleSetting.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                setting.visibility = View.VISIBLE
-            } else {
-                setting.visibility = View.GONE
             }
         })
     }
@@ -223,7 +192,7 @@ class PersonalFragment : BaseFragment() {
 
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
 //                R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
-                R.id.tv_my_post -> findNavController().navigate(R.id.action_personalFragment_to_myPostFragment)
+                R.id.tv_my_post -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myPostFragment))
 //                R.id.tv_exchange -> navigateTo(
 //                    NavigateItem.Destination(R.id.action_to_settingFragment)
 //                )
