@@ -34,15 +34,18 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment() {
+class MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment() {
 
     private val viewModel: MyCollectFavoritesViewModel by viewModels()
-    private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
+    private val collectionViewModel: MyCollectionViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
     private val adapter: FavoritesAdapter by lazy {
-        FavoritesAdapter(requireActivity(), postListener,  memberPostFuncItem, attachmentListener)
+        FavoritesAdapter(requireActivity(), postListener, memberPostFuncItem, attachmentListener)
     }
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     override fun getLayoutId() = R.layout.fragment_my_collection_favorites
 
@@ -124,7 +127,7 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(this,  {
+        mainViewModel?.deletePostResult?.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
                     adapter.removedPosList.add(it.result)
@@ -133,8 +136,6 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
-
-
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
@@ -150,11 +151,10 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
             viewModel.getData(adapter, isLike)
         }
 
-        collectionViewModel.deleteFavorites?.observe(viewLifecycleOwner,  {
+        collectionViewModel.deleteFavorites?.observe(viewLifecycleOwner, {
 
             viewModel.deleteFavorites(adapter.snapshot().items)
         })
-
     }
 
     override fun onResume() {
@@ -168,11 +168,11 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
 
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
-                {},
-                { id, view, type -> },
-                { item, items, isFollow, func -> },
-                { item, isLike, func -> },
-                { item, isFavorite, func -> }
+            {},
+            { id, view, type -> },
+            { item, items, isFollow, func -> },
+            { item, isLike, func -> },
+            { item, isFavorite, func -> }
         )
     }
 
@@ -188,35 +188,40 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
                     AdultTabType.PICTURE -> {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clubPicFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clubPicFragment,
+                                bundle
+                            )
                         )
                     }
                     AdultTabType.TEXT -> {
                         val bundle = TextDetailFragment.createBundle(item, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clubTextFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clubTextFragment,
+                                bundle
+                            )
                         )
                     }
                     AdultTabType.CLIP -> {
                         val bundle = ClipPlayerFragment.createBundle(item.id, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clipPlayerFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
+                            )
                         )
                     }
                 }
             }
         }
 
-        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
+        override fun onFavoriteClick(
+            item: MemberPostItem,
+            position: Int,
+            isFavorite: Boolean,
+            type: AttachmentType
+        ) {
             checkStatus {
                 viewModel.favoritePost(item, position, isFavorite)
             }
@@ -236,22 +241,22 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
                 bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
-                when(it.type) {
+                when (it.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                                R.id.action_to_postArticleFragment,
+                            R.id.action_to_postArticleFragment,
                             bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                                R.id.action_to_postPicFragment,
+                            R.id.action_to_postPicFragment,
                             bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                                R.id.action_to_postVideoFragment,
+                            R.id.action_to_postVideoFragment,
                             bundle
                         )
                     }
@@ -265,28 +270,28 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clubPicFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clubPicFragment,
+                            bundle
+                        )
                     )
                 }
                 AdultTabType.TEXT -> {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clubTextFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clubTextFragment,
+                            bundle
+                        )
                     )
                 }
                 AdultTabType.CLIP -> {
                     val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clipPlayerFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clipPlayerFragment,
+                            bundle
+                        )
                     )
                 }
                 else -> {
@@ -302,24 +307,24 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
             val item = SearchPostItem(type = PostType.FOLLOWED, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_searchPostFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_searchPostFragment,
+                    bundle
+                )
             )
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
             val bundle = MyPostFragment.createBundle(
-                    userId, name,
-                    isAdult = true,
-                    isAdultTheme = true
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
             )
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_myPostFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_myPostFragment,
+                    bundle
+                )
             )
         }
     }
