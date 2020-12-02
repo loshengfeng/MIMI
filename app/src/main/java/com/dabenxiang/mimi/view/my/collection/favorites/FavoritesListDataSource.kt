@@ -30,8 +30,8 @@ class FavoritesListDataSource constructor(
 
             val result =
                 when(isLike) {
-                    false -> domainManager.getApiRepository().getPostFavorite( 0, ClubLikeListDataSource.PER_LIMIT, 7)
-                    true -> domainManager.getApiRepository().getPostLike(0, ClubLikeListDataSource.PER_LIMIT, 7)
+                    false -> domainManager.getApiRepository().getPostFavorite( offset, ClubLikeListDataSource.PER_LIMIT, 7)
+                    true -> domainManager.getApiRepository().getPostLike(offset, ClubLikeListDataSource.PER_LIMIT, 7)
                 }
             if (!result.isSuccessful) throw HttpException(result)
 

@@ -19,7 +19,7 @@ class MiMiLikeListDataSource constructor(
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, PlayItem> {
         val offset = params.key ?: 0
         return try {
-            val result = domainManager.getApiRepository().getPostFavorite( 0, PER_LIMIT,8 )
+            val result = domainManager.getApiRepository().getPostLike(offset, PER_LIMIT,8 )
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result?.body()
