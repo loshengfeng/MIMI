@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.*
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
@@ -129,6 +130,17 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     }
 
     override fun setupListeners() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            owner = viewLifecycleOwner,
+            onBackPressed = {
+                if (requireActivity().requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                    playerViewModel.lockFullScreen = !playerViewModel.lockFullScreen
+                    switchScreenOrientation()
+                } else {
+                    navigateTo(NavigateItem.Up)
+                }
+            }
+        )
         orientationDetector =
             OrientationDetector(
                 requireActivity(),
