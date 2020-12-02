@@ -61,6 +61,12 @@ data class PostFavoriteItem(
     @SerializedName("commentCount")
     val commentCount: Int = 0,
 
+    @SerializedName("cover")
+    var cover: String = "",
+
+    @SerializedName("isFavorite")
+    var isFavorite: Boolean = true,
+
     var position: Int = -1
 
 ) : BaseItem() {
@@ -72,7 +78,7 @@ data class PostFavoriteItem(
             content = content,
             type = PostType.getTypeByValue(type),
             creationDate = postDate,
-            isFavorite = true,
+            isFavorite = isFavorite,
             likeCount = likeCount,
             likeType = if (likeType == null) LikeType.DISLIKE else LikeType.getByValue(likeType!!),
             dislikeCount = dislikeCount,
@@ -91,11 +97,13 @@ data class PostFavoriteItem(
         return PlayItem(
             videoId = postId,
             title = title,
-            favorite = true,
+            favorite = isFavorite,
             likeCount = likeCount,
             favoriteCount = favoriteCount,
             commentCount = commentCount,
             tags = tags,
+            like = likeType == 0,
+            cover = cover,
         )
     }
 }

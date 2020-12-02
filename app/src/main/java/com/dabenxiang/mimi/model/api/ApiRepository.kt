@@ -509,8 +509,8 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得女優分頁資料
      */
     suspend fun getActorsList(
-        offset: String,
-        limit: String
+        offset: Int,
+        limit: Int
     ) = apiService.getActorsList(offset, limit)
 
     /**
@@ -750,6 +750,13 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun deleteLike(
         postId: Long
     ) = apiService.deleteLike(postId)
+
+    /**
+     * 帖子移除全部喜歡
+     */
+    suspend fun deleteAllLike(
+        postId: String
+    ) = apiService.deleteAllLike(postId)
 
     /**
      * 帖子問題回報

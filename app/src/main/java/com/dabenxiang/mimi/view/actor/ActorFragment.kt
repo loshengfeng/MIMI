@@ -41,6 +41,14 @@ class ActorFragment : BaseFragment() {
             )
         ) }
 
+    private val actorListAdapter by lazy {
+        ActorListAdapter(requireContext(),
+            ActorCategoriesFuncItem(
+                getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
+                onActorClickListener = { id, position -> onActorClickListener(id, position) }
+            )
+        ) }
+
     private fun onActorClickListener(id: Long, position: Int){
         navToActorVideosFragment(id)
     }
@@ -59,13 +67,16 @@ class ActorFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
         rv_hot_actresses.adapter = actorVideosAdapter
-        rv_all_actresses.adapter = actorCategoriesAdapter
+        rv_hot_actresses.isNestedScrollingEnabled = false
+        rv_all_actresses.adapter = actorListAdapter
+        rv_all_actresses.isNestedScrollingEnabled = false
 
     }
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.getActorList()
+        viewModel.getActors()
+        viewModel.getData(actorListAdapter)
     }
 
     override fun setupObservers() {
@@ -77,15 +88,14 @@ class ActorFragment : BaseFragment() {
                     val actorVideos = (it.first as ApiResult.Success).result
                     actorVideosAdapter.setupData(actorVideos)
                     actorVideosAdapter.notifyDataSetChanged()
-                    val actorCategories = (it.second as ApiResult.Success).result
-                    actorCategoriesAdapter.setupData(actorCategories)
-                    actorCategoriesAdapter.notifyDataSetChanged()
+//                    val actorCategories = (it.second as ApiResult.Success).result
+//                    actorCategoriesAdapter.setupData(actorCategories)
+//                    actorCategoriesAdapter.notifyDataSetChanged()
 
                 }
                 is ApiResult.Error -> onApiError((it.first as ApiResult.Error<ArrayList<ActorCategoriesItem>>).throwable)
             }
         })
-
     }
 
     override fun setupListeners() {

@@ -14,13 +14,16 @@ class MyCollectionViewModel : BaseViewModel() {
     private val _deleteMiMIs = MutableLiveData<Int>()
     val deleteMiMIs: LiveData<Int> = _deleteMiMIs
 
-    fun setDeleteNotify(){
+    fun setDeleteNotify(isLike: Boolean = false){
         when(lastTabIndex){
             MyCollectionFragment.TAB_FAVORITES ->{
                 _deleteFavorites.value = lastTabIndex
             }
             else ->{
-                _deleteMiMIs.value = lastTabIndex
+                if(lastTabIndex == MyCollectionFragment.TAB_SHORT_VIDEO && isLike)
+                    _deleteFavorites.value = lastTabIndex
+                else
+                    _deleteMiMIs.value = lastTabIndex
             }
         }
     }

@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -165,7 +166,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             id_not_login_group.visibility = View.GONE
             layout_refresh.visibility = View.VISIBLE
         } else {
-            id_not_login_group.visibility = View.VISIBLE
+            id_not_login_group.visibility = View.GONE
             layout_refresh.visibility = View.INVISIBLE
         }
     }
@@ -193,7 +194,18 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     private val postListener = object : MyPostListener {
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            checkStatus { viewModel.likePost(item, position, isLike) }
+            if (viewModel.accountManager.isLogin()) {
+                viewModel.likePost(item, position, isLike)
+            } else {
+                item.likeCount -= 1
+                item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
+                navigateTo(
+                        NavigateItem.Destination(
+                                R.id.action_to_loginFragment,
+                                LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                        )
+                )
+            }
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -234,8 +246,17 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             isFavorite: Boolean,
             type: AttachmentType
         ) {
-            checkStatus {
+            if (viewModel.accountManager.isLogin()) {
                 viewModel.favoritePost(item, position, isFavorite)
+            } else {
+                item.favoriteCount -= 1
+                item.isFavorite = !item.isFavorite
+                navigateTo(
+                        NavigateItem.Destination(
+                                R.id.action_to_loginFragment,
+                                LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                        )
+                )
             }
         }
 
