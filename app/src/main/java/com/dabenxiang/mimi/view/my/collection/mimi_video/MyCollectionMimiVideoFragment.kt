@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
@@ -222,6 +223,13 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: B
             layout_refresh.isRefreshing = false
             viewModel.getData(adapter, type, isLike)
         }
+
+        img_page_empty.setImageDrawable(ContextCompat.getDrawable(requireContext(),
+            when(isLike) {
+                false -> R.drawable.img_history_empty_2
+                true -> R.drawable.img_love_empty
+            }
+        ))
     }
 
     override fun initSettings() {

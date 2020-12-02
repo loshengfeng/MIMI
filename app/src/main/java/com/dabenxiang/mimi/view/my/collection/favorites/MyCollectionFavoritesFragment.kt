@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -155,6 +156,13 @@ class  MyCollectionFavoritesFragment(val isLike: Boolean = false) : BaseFragment
             viewModel.deleteFavorites(adapter.snapshot().items)
         })
 
+        img_page_empty.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(),
+            when(isLike) {
+                false -> R.drawable.img_history_empty_2
+                true -> R.drawable.img_love_empty
+            }
+        ))
     }
 
     override fun onResume() {
