@@ -12,7 +12,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
+import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import com.dabenxiang.mimi.view.my.like.MiMiLikeListDataSource
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +38,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
 
     var totalCount: Int = 0
 
-    fun getData(adapter: MyCollectionMimiVideoAdapter, type: MyFollowTabItemType, isLike: Boolean) {
+    fun getData(adapter: MyCollectionMimiVideoAdapter, type: MyCollectionTabItemType, isLike: Boolean) {
         Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())
@@ -56,7 +56,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
         }
     }
 
-    fun getPostItemList(type: MyFollowTabItemType): Flow<PagingData<PlayItem>> {
+    fun getPostItemList(type: MyCollectionTabItemType): Flow<PagingData<PlayItem>> {
         return Pager(
             config = PagingConfig(pageSize = MyCollectionMimiVideoDataSource.PER_LIMIT),
             pagingSourceFactory = {

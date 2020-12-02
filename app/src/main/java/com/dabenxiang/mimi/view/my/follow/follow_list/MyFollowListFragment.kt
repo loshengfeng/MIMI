@@ -64,7 +64,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                         }
                         ClickType.TYPE_FOLLOW -> {
                             val list = ArrayList<MemberFollowItem>()
-                            list.add(MemberFollowItem(id = item.id))
+                            list.add(item)
                             viewModel.cleanAllFollowMember(list)
                         }
                         else -> {
@@ -85,7 +85,8 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                                 title = item.name,
                                 description = item.description,
                                 followerCount = item.followerCount,
-                                postCount = item.postCount
+                                postCount = item.postCount,
+                                isFollow = true
                             )
 
                             val bundle = TopicDetailFragment.createBundle(clubItem)
@@ -132,6 +133,22 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
             }
         }
 
+        viewModel.postCount.observe(this) {
+            if (it == 0) {
+                text_page_empty.text = getString(R.string.follow_no_data)
+                id_empty_group.visibility = View.VISIBLE
+                recycler_view.visibility = View.INVISIBLE
+            } else {
+                id_empty_group.visibility = View.GONE
+                recycler_view.visibility = View.VISIBLE
+            }
+            layout_refresh.isRefreshing = false
+        }
+
+        viewModel.showProgress.observe(this) {
+            layout_refresh.isRefreshing = it
+        }
+
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
     }
@@ -155,7 +172,9 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        getData()
+        if (viewModel.postCount.value ?: -1 <= 0) {
+            getData()
+        }
     }
 
 

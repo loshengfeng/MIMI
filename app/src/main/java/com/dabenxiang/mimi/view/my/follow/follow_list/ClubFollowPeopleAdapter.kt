@@ -38,16 +38,6 @@ class ClubFollowPeopleAdapter(
 
     var removedPosList = ArrayList<Int>()
 
-//    override fun getItemViewType(position: Int): Int {
-//        val item = getItem(position)
-//        return when (item?.type) {
-//            PostType.VIDEO -> VIEW_TYPE_CLIP
-//            PostType.IMAGE -> VIEW_TYPE_PICTURE
-//            PostType.AD -> VIEW_TYPE_AD
-//            else -> VIEW_TYPE_TEXT
-//        }
-//    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return ClubFollowViewHolder(
                 LayoutInflater.from(parent.context)
