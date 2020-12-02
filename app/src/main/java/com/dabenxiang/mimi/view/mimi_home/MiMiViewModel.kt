@@ -8,6 +8,7 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
 import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -18,6 +19,9 @@ class MiMiViewModel : BaseViewModel() {
 
     private val _menusItems = MutableLiveData<ApiResult<List<SecondMenuItem>>>()
     val menusItems: LiveData<ApiResult<List<SecondMenuItem>>> = _menusItems
+
+    private val _inviteVipShake = MutableLiveData<Boolean>()
+    val inviteVipShake: LiveData<Boolean> = _inviteVipShake
 
     fun getMenu() {
         viewModelScope.launch {
@@ -47,6 +51,14 @@ class MiMiViewModel : BaseViewModel() {
             }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _menusItems.value = it }
+        }
+    }
+
+    fun startAnim(inverval: Long){
+        viewModelScope.launch {
+            _inviteVipShake.postValue(true)
+            delay(inverval)
+            _inviteVipShake.postValue(false)
         }
     }
 }
