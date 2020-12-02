@@ -197,36 +197,33 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            Timber.d("onCommentClick = ${adultTabType}")
-            checkStatus {
-                when (adultTabType) {
-                    AdultTabType.PICTURE -> {
-                        val bundle = ClubPicFragment.createBundle(item, 1)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_to_clubPicFragment,
-                                bundle
-                            )
+            when (adultTabType) {
+                AdultTabType.PICTURE -> {
+                    val bundle = ClubPicFragment.createBundle(item, 1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_to_clubPicFragment,
+                            bundle
                         )
-                    }
-                    AdultTabType.TEXT -> {
-                        val bundle = ClubTextFragment.createBundle(item, 1)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_to_clubTextFragment,
-                                bundle
-                            )
+                    )
+                }
+                AdultTabType.TEXT -> {
+                    val bundle = ClubTextFragment.createBundle(item, 1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_to_clubTextFragment,
+                            bundle
                         )
-                    }
-                    AdultTabType.CLIP -> {
-                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_to_clipPlayerFragment,
-                                bundle
-                            )
+                    )
+                }
+                AdultTabType.CLIP -> {
+                    val bundle = ClipPlayerFragment.createBundle(item.id, 1)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_to_clipPlayerFragment,
+                            bundle
                         )
-                    }
+                    )
                 }
             }
         }
@@ -295,11 +292,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            Timber.i("onItemClick:$item")
-            if (!accountManager.isLogin()) {
-                loginPageToggle(false)
-                return
-            }
             Timber.d("onItemClick =${adultTabType}")
             when (adultTabType) {
                 AdultTabType.TEXT -> {
