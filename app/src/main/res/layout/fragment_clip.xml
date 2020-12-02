@@ -36,20 +36,20 @@
         app:tabTextColor="@color/color_white_1_60">
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:text="@string/clip_newest"
-            tools:text="最新"/>
-
-        <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_online_pay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
             android:text="@string/clip_top_hit"
             tools:text="热门" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:text="@string/clip_newest"
+            tools:text="最新"/>
 
     </com.google.android.material.tabs.TabLayout>
 

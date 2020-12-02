@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class ClipSingleViewModel: BaseViewModel() {
 
@@ -32,8 +33,8 @@ class ClipSingleViewModel: BaseViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val resp = when {
-                    isFavorite -> apiRepository.postMePlaylist(PlayListRequest(item.id, 1))
-                    else -> apiRepository.deleteMePlaylist(item.id.toString())
+                    isFavorite -> apiRepository.postMePlaylist(PlayListRequest(item.videoId, 1))
+                    else -> apiRepository.deleteMePlaylist(item.videoId.toString())
                 }
                 if (!resp.isSuccessful) throw HttpException(resp)
                 item.favorite = isFavorite
