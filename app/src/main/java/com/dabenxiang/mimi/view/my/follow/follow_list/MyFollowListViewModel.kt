@@ -33,18 +33,13 @@ class MyFollowListViewModel : ClubViewModel() {
     val postCount: LiveData<Int> = _postCount
 
     fun getClubFollowData(adapter: ClubFollowPeopleAdapter) {
-        Timber.i("getData")
-//        when (type) {
-//            MyFollowFragment.TAB_FOLLOW_PEOPLE -> {
-                CoroutineScope(Dispatchers.IO).launch {
-                    adapter.submitData(PagingData.empty())
-                    getClubFollowList()
-                            .collectLatest {
-                                adapter.submitData(it)
-                            }
-//                }
-//            }
-
+        Timber.i("getClubFollowData")
+        CoroutineScope(Dispatchers.IO).launch {
+            adapter.submitData(PagingData.empty())
+            getClubFollowList()
+                    .collectLatest {
+                        adapter.submitData(it)
+                    }
         }
     }
 
@@ -65,14 +60,15 @@ class MyFollowListViewModel : ClubViewModel() {
                 .cachedIn(viewModelScope)
     }
 
-    fun getMemberData(adapter: MemberFollowPeopleAdapter){
-            CoroutineScope(Dispatchers.IO).launch {
-                adapter.submitData(PagingData.empty())
-                getMemberFollowList()
-                        .collectLatest {
-                            adapter.submitData(it)
-                        }
-            }
+    fun getMemberData(adapter: MemberFollowPeopleAdapter) {
+        Timber.i("getMemberData")
+        CoroutineScope(Dispatchers.IO).launch {
+            adapter.submitData(PagingData.empty())
+            getMemberFollowList()
+                    .collectLatest {
+                        adapter.submitData(it)
+                    }
+        }
     }
 
     private fun getMemberFollowList(): Flow<PagingData<MemberFollowItem>> {
@@ -101,7 +97,7 @@ class MyFollowListViewModel : ClubViewModel() {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().cancelMyMemberFollow(
-                        items.map {it.userId}.joinToString(separator = ","))
+                        items.map { it.userId }.joinToString(separator = ","))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
@@ -119,7 +115,7 @@ class MyFollowListViewModel : ClubViewModel() {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().cancelMyClubFollow(
-                        items.map {it.clubId}.joinToString(separator = ","))
+                        items.map { it.clubId }.joinToString(separator = ","))
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

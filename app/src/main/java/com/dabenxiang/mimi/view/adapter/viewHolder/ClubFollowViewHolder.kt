@@ -4,6 +4,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.bumptech.glide.Glide
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.enums.ClickType
@@ -31,8 +33,17 @@ class ClubFollowViewHolder(
         tvName.setOnClickListener {
             listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
+        tvClubPost.setOnClickListener {
+            listener.onItemClick(item, ClickType.TYPE_ITEM)
+        }
+        tvSubTitle.setOnClickListener {
+            listener.onItemClick(item, ClickType.TYPE_ITEM)
+        }
         ivPhoto.setOnClickListener {
             listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
+
+        Glide.with(ivPhoto.context)
+                .load(item.avatarAttachmentId).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
     }
 }

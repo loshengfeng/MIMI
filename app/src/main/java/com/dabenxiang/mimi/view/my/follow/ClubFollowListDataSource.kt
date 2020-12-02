@@ -6,6 +6,7 @@ import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
+import timber.log.Timber
 
 class ClubFollowListDataSource constructor(
     private val domainManager: DomainManager,
@@ -31,13 +32,9 @@ class ClubFollowListDataSource constructor(
             )
             val nextKey = if (hasNext) offset + PER_LIMIT_LONG else null
             if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
-            val idList = ArrayList<Long>()
-            items?.forEach {
-                idList.add(it.clubId)
-            }
-//            pagingCallback.onIdList(idList, false)
             LoadResult.Page(items ?: listOf(), null, nextKey)
         } catch (e: Exception) {
+            pagingCallback.onTotalCount(0)
             LoadResult.Error(e)
         }
     }
