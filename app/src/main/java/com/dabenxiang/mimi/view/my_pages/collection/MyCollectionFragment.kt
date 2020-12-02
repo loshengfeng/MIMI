@@ -28,8 +28,6 @@ class MyCollectionFragment: BaseMyPagesTabFragment() {
             TAB_FAVORITES to {  MyFavoritesFragment(TAB_FAVORITES, MyCollectionTabItemType.POST)  }
     )
 
-
-
     override fun setFragmentTitle() {
         tool_bar.toolbar_title.text = getString(R.string.personal_follow)
     }

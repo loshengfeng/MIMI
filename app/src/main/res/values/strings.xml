@@ -333,6 +333,7 @@
     <string name="like_title">我喜欢</string>
     <string name="like_tab1">帖子</string>
     <string name="like_tab2">蜜蜜影視</string>
+    <string name="like_delete_all">是否要清除所有喜歡的內容?</string>
     <string-array name="like_tabs">
         <item>@string/like_tab1</item>
         <item>@string/like_tab2</item>
