@@ -19,6 +19,8 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
+import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -230,9 +232,21 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
             isFavorite: Boolean,
             type: AttachmentType
         ) {
-            checkStatus {
-                viewModel.favoritePost(item, position, isFavorite)
-            }
+            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+                override fun onClean() {
+                    checkStatus {viewModel.favoritePost(item, position, isFavorite)}
+                }
+            })
+
+            dialog.setMsg(
+                    if(isLike) getString(R.string.like_delete_all)
+                    else getString(R.string.follow_delete_favorite_message)
+            )
+
+            dialog.show(
+                    requireActivity().supportFragmentManager,
+                    CleanDialogFragment::class.java.simpleName
+            )
         }
 
         override fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean) {
