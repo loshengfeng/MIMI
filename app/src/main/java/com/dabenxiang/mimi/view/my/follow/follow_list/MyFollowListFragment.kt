@@ -14,26 +14,36 @@ import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.enums.ClickType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.my.follow.MyFollowFragment
 import com.dabenxiang.mimi.view.my.follow.MyFollowViewModel
-import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_follow_list.*
 import kotlinx.android.synthetic.main.fragment_my_follow_list.layout_refresh
 
 class MyFollowListFragment(val type: Int) : BaseFragment() {
+
     private val viewModel: MyFollowListViewModel by viewModels()
     private val myFollowViewModel: MyFollowViewModel by viewModels({ requireParentFragment() })
 
     private val memberAdapter by lazy {
         MemberFollowPeopleAdapter(requireContext(), listener)
     }
+
     private val clubAdapter: ClubFollowPeopleAdapter by lazy {
         ClubFollowPeopleAdapter(requireContext(), listener)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_list
+
+    override fun initSettings() {
+        super.initSettings()
+        tv_title_count.text = getString(R.string.follow_members_total_num, "0")
+    }
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     private val listener: BaseItemListener = object : BaseItemListener {
         override fun onItemClick(item: Any, type: ClickType) {
@@ -47,15 +57,20 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                     when (type) {
                         ClickType.TYPE_ITEM -> {
                             val bundle = MyPostFragment.createBundle(
-                                    userId, name,
-                                    isAdult = true,
-                                    isAdultTheme = false
+                                userId, name,
+                                isAdult = true,
+                                isAdultTheme = false
                             )
-                            navigateTo(NavigateItem.Destination(R.id.action_myFollowFragment_to_navigation_my_post, bundle))
+                            navigateTo(
+                                NavigateItem.Destination(
+                                    R.id.action_myFollowFragment_to_navigation_my_post,
+                                    bundle
+                                )
+                            )
                         }
                         ClickType.TYPE_FOLLOW -> {
                             val list = ArrayList<MemberFollowItem>()
-                            list.add(MemberFollowItem(id = item.id))
+                            list.add(item)
                             viewModel.cleanAllFollowMember(list)
                         }
                         else -> {
@@ -69,15 +84,23 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
                     when (type) {
                         ClickType.TYPE_ITEM -> {
-                            val clubItem = MemberClubItem(id = item.id, avatarAttachmentId = item.avatarAttachmentId,
-                                    tag = item.tag, title = item.name, description = item.description, followerCount = item.followerCount, postCount = item.postCount)
+                            val clubItem = MemberClubItem(
+                                id = item.id,
+                                avatarAttachmentId = item.avatarAttachmentId,
+                                tag = item.tag,
+                                title = item.name,
+                                description = item.description,
+                                followerCount = item.followerCount,
+                                postCount = item.postCount,
+                                isFollow = true
+                            )
 
                             val bundle = TopicDetailFragment.createBundle(clubItem)
                             navigateTo(
-                                    NavigateItem.Destination(
-                                            R.id.action_to_topicDetailFragment,
-                                            bundle
-                                    )
+                                NavigateItem.Destination(
+                                    R.id.action_to_topicDetailFragment,
+                                    bundle
+                                )
                             )
                         }
                         ClickType.TYPE_FOLLOW -> {
@@ -99,7 +122,9 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
         myFollowViewModel.deleteFollow.observe(this) {
             if (type == it) {
                 when (it) {
-                    MyFollowFragment.TAB_FOLLOW_PEOPLE -> viewModel.cleanAllFollowMember(memberAdapter.snapshot().items)
+                    MyFollowFragment.TAB_FOLLOW_PEOPLE -> viewModel.cleanAllFollowMember(
+                        memberAdapter.snapshot().items
+                    )
                     MyFollowFragment.TAB_FOLLOW_CLUB -> viewModel.cleanAllFollowClub(clubAdapter.snapshot().items)
                 }
             }
@@ -114,12 +139,30 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
             }
         }
 
+        viewModel.postCount.observe(this) {
+            tv_title_count.text = getString(R.string.follow_members_total_num, it.toString())
+            if (it == 0) {
+                text_page_empty.text = getString(R.string.follow_no_data)
+                id_empty_group.visibility = View.VISIBLE
+                recycler_view.visibility = View.INVISIBLE
+            } else {
+                id_empty_group.visibility = View.GONE
+                recycler_view.visibility = View.VISIBLE
+            }
+            layout_refresh.isRefreshing = false
+        }
+
+        viewModel.showProgress.observe(this) {
+            layout_refresh.isRefreshing = it
+        }
+
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initSettings()
         when (type) {
             MyFollowFragment.TAB_FOLLOW_PEOPLE -> {
                 recycler_view.adapter = memberAdapter
@@ -137,7 +180,9 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        getData()
+        if (viewModel.postCount.value ?: -1 <= 0) {
+            getData()
+        }
     }
 
 

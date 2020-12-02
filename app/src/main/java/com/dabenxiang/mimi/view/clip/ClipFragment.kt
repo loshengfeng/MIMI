@@ -14,8 +14,8 @@ class ClipFragment: BaseFragment() {
 
     companion object {
         val tabTitle = arrayListOf(
-            App.self.getString(R.string.clip_newest),
-            App.self.getString(R.string.clip_top_hit)
+            App.self.getString(R.string.clip_top_hit),
+            App.self.getString(R.string.clip_newest)
         )
 
         fun createBundle(

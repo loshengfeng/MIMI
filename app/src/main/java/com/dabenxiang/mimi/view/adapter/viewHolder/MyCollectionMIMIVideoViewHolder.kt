@@ -1,35 +1,26 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import android.content.res.ColorStateList
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.callback.MyFollowVideoListener
-import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.vo.MediaContentItem
+import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.view.my.collection.mimi_video.CollectionFuncItem
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_my_follow_video.view.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import java.util.*
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 
 class MyCollectionMIMIVideoViewHolder(
         itemView: View
@@ -54,9 +45,9 @@ class MyCollectionMIMIVideoViewHolder(
 
     fun onBind(
             item: PlayItem,
-            itemList: List<MemberPostItem>?,
             position: Int,
-            listener: MyFollowVideoListener,
+            listener: MyCollectionVideoListener,
+            funcItem: CollectionFuncItem,
             searchTag: String = ""
     ) {
         Timber.d("neo, item = ${item}")
@@ -83,12 +74,24 @@ class MyCollectionMIMIVideoViewHolder(
             }
             tagChipGroup.addView(chip)
         }
-        item.cover?.let { images ->
+
+//        item.cover?.let { images ->
+//            Glide.with(ivPhoto.context)
+//                    .load(images).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+//        } ?: kotlin.run {
+//            Glide.with(ivPhoto.context)
+//                    .load(0).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+//        }
+
+        funcItem.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
+                ?.let { decryptSettingItem ->
+                    funcItem.decryptCover(item.cover?:"", decryptSettingItem) {
+                        Glide.with(ivPhoto.context)
+                                .load(it).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+                    }
+                } ?: run {
             Glide.with(ivPhoto.context)
-                    .load(images).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
-        } ?: kotlin.run {
-            Glide.with(ivPhoto.context)
-                    .load(0).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+                    .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
         }
         ivMore.setOnClickListener {
             listener.onMoreClick(item, position)
@@ -103,7 +106,7 @@ class MyCollectionMIMIVideoViewHolder(
                     item,
                     position,
                     item.favorite ?: false,
-                    MyFollowTabItemType.MIMI_VIDEO
+                    MyCollectionTabItemType.MIMI_VIDEO
             )
         }
         ivFavorite.setOnClickListener(onFavoriteClickListener)
@@ -120,14 +123,14 @@ class MyCollectionMIMIVideoViewHolder(
 
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
-            listener.onCommentClick(item, MyFollowTabItemType.MIMI_VIDEO)
+            listener.onCommentClick(item, MyCollectionTabItemType.MIMI_VIDEO)
         }
 
         ivComment.setOnClickListener(onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
-            listener.onItemClick(item, MyFollowTabItemType.MIMI_VIDEO)
+            listener.onItemClick(item, MyCollectionTabItemType.MIMI_VIDEO)
         }
 
     }

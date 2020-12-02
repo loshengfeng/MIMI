@@ -15,7 +15,7 @@ class MyCollectionMimiVideoDataSource(
         private val pagingCallback: PagingCallback,
         private val adWidth: Int,
         private val adHeight: Int,
-        private val type: MyFollowTabItemType
+        private val type: MyCollectionTabItemType
 ) : PagingSource<Int, PlayItem>() {
 
     companion object {
@@ -32,10 +32,10 @@ class MyCollectionMimiVideoDataSource(
 
             val result =
                     when (type) {
-                        MyFollowTabItemType.MIMI_VIDEO -> {
+                        MyCollectionTabItemType.MIMI_VIDEO -> {
                             domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value, true, isShortVideo = false, offset = offset.toString(), limit = PER_LIMIT.toString())
                         }
-                        MyFollowTabItemType.SHORT_VIDEO -> {
+                        MyCollectionTabItemType.SHORT_VIDEO -> {
                             domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value, true, isShortVideo = true, offset = offset.toString(), limit = PER_LIMIT.toString())
                         }
                         else -> null

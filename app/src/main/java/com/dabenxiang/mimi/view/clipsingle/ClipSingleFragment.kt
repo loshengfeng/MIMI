@@ -51,9 +51,9 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     override val bottomNavigationVisibility = View.GONE
+    override val isStatusBarDark = true
 
     private var exoPlayer: SimpleExoPlayer? = null
-
     private var playItem: PlayItem? = null
 
     override fun getLayoutId() = R.layout.item_clip
@@ -71,7 +71,6 @@ class ClipSingleFragment : BaseFragment() {
             }
 
             tv_title.text = data.title
-            iv_favorite.text = data.favoriteCount.toString()
             tv_comment.text = data.commentCount.toString()
             modifyFavorite()
             ib_back.visibility = View.VISIBLE
@@ -85,6 +84,7 @@ class ClipSingleFragment : BaseFragment() {
         val favoriteRes =
             takeIf { playItem?.favorite == true }?.let { R.drawable.btn_favorite_forvideo_s }
                 ?: let { R.drawable.btn_favorite_forvideo_n }
+        iv_favorite.text = playItem?.favoriteCount.toString()
         iv_favorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
     }
 
@@ -157,7 +157,7 @@ class ClipSingleFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Success -> modifyFavorite()
+                is ApiResult.Empty -> modifyFavorite()
                 is ApiResult.Error -> onApiError(it.throwable)
                 else -> {
                 }

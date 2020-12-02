@@ -62,13 +62,7 @@ class PostPicFragment : BasePostFragment() {
             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
-        tv_clean.isEnabled = true
-        val img = requireContext().getDrawable(R.drawable.btn_close_n)
-        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
-
         edt_hashtag.imeOptions = EditorInfo.IME_ACTION_DONE
-
-        useAdultTheme(false)
     }
 
     override fun setupListeners() {
@@ -123,10 +117,6 @@ class PostPicFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postPicFragment_to_myPostFragment, bundle)
-        } else if (isEdit && page == ADULT) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
         } else if (isEdit && page == SEARCH) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)

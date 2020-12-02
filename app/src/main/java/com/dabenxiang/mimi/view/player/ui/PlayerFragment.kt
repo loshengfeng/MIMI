@@ -104,7 +104,6 @@ class PlayerFragment : BaseFragment() {
     private var isFirstInit = true
     private var isKeyboardShown = false
     private var oldPlayerItem: PlayerItem = PlayerItem(-1)
-    override val bottomNavigationVisibility = GONE
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -228,6 +227,9 @@ class PlayerFragment : BaseFragment() {
             }
         }
     }
+
+    override val bottomNavigationVisibility: Int
+        get() = GONE
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_player
