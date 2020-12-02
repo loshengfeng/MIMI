@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clip.ClipFuncItem
 import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
@@ -39,8 +40,15 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
     private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
+    private val clipFuncItem by lazy {
+        CollectionFuncItem(
+                { source -> viewModel.getDecryptSetting(source) },
+                { videoItem, decryptSettingItem, function -> viewModel.decryptCover(videoItem, decryptSettingItem, function) }
+        )
+    }
+
     private val adapter: MyCollectionMimiVideoAdapter by lazy {
-        MyCollectionMimiVideoAdapter(requireContext(), listener)
+        MyCollectionMimiVideoAdapter(requireContext(), clipFuncItem, listener)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_collection_videos
