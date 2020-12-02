@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class MyCollectionMimiVideoAdapter(
         val context: Context,
+        val funcItem:CollectionFuncItem,
         private val listener: MyCollectionVideoListener
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {
 
@@ -86,9 +87,9 @@ class MyCollectionMimiVideoAdapter(
                 is MyCollectionMIMIVideoViewHolder -> {
                     holder.onBind(
                             it,
-                            null,
                             position,
-                            listener
+                            listener,
+                            funcItem
                     )
                 }
             }
