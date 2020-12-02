@@ -24,8 +24,6 @@ import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import retrofit2.HttpException
@@ -40,13 +38,6 @@ class PersonalFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
-        appbar_layout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            var newalpha = 255f + verticalOffset
-            newalpha = if (newalpha < 0) 0f else newalpha
-            layout_every_day.setAlpha(newalpha)
-            layout_vip_unlimit.setAlpha(newalpha)
-            layout_vip_unlimit_unlogin.setAlpha(newalpha)
-        })
     }
 
     override fun getLayoutId(): Int {
@@ -60,31 +51,26 @@ class PersonalFragment : BaseFragment() {
         layout_vip_unlimit.visibility = View.INVISIBLE
         layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
         viewModel.getPostDetail()
-        //FIXME
-        //            ViewCompat.setNestedScrollingEnabled(nestedScroll, true)
-        val behavior = appbar_layout.behavior as AppBarLayout.Behavior?
+
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
             layout_vip_unlimit.visibility = View.VISIBLE
             tv_logout.visibility = View.VISIBLE
-            behavior!!.setDragCallback(object : DragCallback() {
-                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                    return true
-                }
-            })
+            vip_buy.visibility = View.INVISIBLE
+            layout_vip_unlimit_unlogin.visibility = View.INVISIBLE
+            tv_expiry_date.visibility = View.VISIBLE
+            img_arrow.visibility = View.VISIBLE
         } else {
-            layout_vip_unlimit_unlogin.visibility = View.VISIBLE
             item_is_Login.visibility = View.GONE
             tv_logout.visibility = View.GONE
             id_personal.text = getString(R.string.identity)
             like_count.text = "0"
             fans_count.text = "0"
             follow_count.text = "0"
-            behavior!!.setDragCallback(object : DragCallback() {
-                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                    return false
-                }
-            })
+            vip_buy.visibility = View.VISIBLE
+            layout_vip_unlimit_unlogin.visibility = View.VISIBLE
+            tv_expiry_date.visibility = View.GONE
+            img_arrow.visibility = View.INVISIBLE
             Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
         }
         layout_refresh.setOnRefreshListener {
@@ -94,9 +80,10 @@ class PersonalFragment : BaseFragment() {
 
     @SuppressLint("SetTextI18n")
     override fun setupObservers() {
-        viewModel.showProgress.observe(this, {
+        viewModel.showProgress.observe(this, Observer {
             layout_refresh.isRefreshing = it
         })
+
         viewModel.meItem.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
@@ -149,10 +136,6 @@ class PersonalFragment : BaseFragment() {
                             )
                         }
                     }
-//                    //TODO: 目前先不判斷是否有驗證過
-////                    takeUnless { meItem.isEmailConfirmed == true }?.run {
-////                        (requireActivity() as MainActivity).showEmailConfirmDialog()
-////                    }
                     viewModel.loadImage(meItem.avatarAttachmentId, avatar, LoadImageType.AVATAR)
                 }
                 is Error -> onApiError(it.throwable)
