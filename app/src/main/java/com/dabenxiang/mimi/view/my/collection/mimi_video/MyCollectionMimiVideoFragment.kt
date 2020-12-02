@@ -48,7 +48,7 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
     }
 
     private val adapter: MyCollectionMimiVideoAdapter by lazy {
-        MyCollectionMimiVideoAdapter(requireContext(), clipFuncItem, listener)
+        MyCollectionMimiVideoAdapter(requireContext(), clipFuncItem, listener, type)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_collection_videos

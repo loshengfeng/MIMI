@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.vo.PlayItem
+import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -18,8 +19,9 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class MyCollectionMimiVideoAdapter(
         val context: Context,
-        val funcItem:CollectionFuncItem,
-        private val listener: MyCollectionVideoListener
+        val funcItem: CollectionFuncItem,
+        private val listener: MyCollectionVideoListener,
+        val itemType: MyCollectionTabItemType
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -28,6 +30,7 @@ class MyCollectionMimiVideoAdapter(
         const val PAYLOAD_UPDATE_FOLLOW = 2
 
         const val MIMI_VIDEO = 3
+        const val SHORT_VIDEO = 5
         const val VIEW_TYPE_AD = 4
 
         val diffCallback = object : DiffUtil.ItemCallback<PlayItem>() {
@@ -51,9 +54,12 @@ class MyCollectionMimiVideoAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return when (item?.playlistType?.toInt()) {
-            PostType.AD.value -> VIEW_TYPE_AD
-            else -> MIMI_VIDEO
+        return if (item?.playlistType?.toInt() == PostType.AD.value) {
+            VIEW_TYPE_AD
+        } else if (itemType.value == MyCollectionTabItemType.MIMI_VIDEO.value) {
+            MIMI_VIDEO
+        } else {
+            SHORT_VIDEO
         }
     }
 
@@ -65,8 +71,21 @@ class MyCollectionMimiVideoAdapter(
                                 .inflate(R.layout.item_ad, parent, false)
                 )
             }
+            MIMI_VIDEO -> {
+                MyCollectionMIMIVideoViewHolder(
+                        LayoutInflater.from(parent.context)
+                                .inflate(R.layout.item_my_follow_video, parent, false)
+                )
+            }
+            SHORT_VIDEO -> {
+                MyCollectionShortVideoViewHolder(
+                        LayoutInflater.from(parent.context)
+                                .inflate(R.layout.item_my_follow_short_video, parent, false)
+                )
+
+            }
             else -> {
-                return MyCollectionMIMIVideoViewHolder(
+                MyCollectionMIMIVideoViewHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_my_follow_video, parent, false)
                 )
@@ -85,6 +104,14 @@ class MyCollectionMimiVideoAdapter(
                     }
                 }
                 is MyCollectionMIMIVideoViewHolder -> {
+                    holder.onBind(
+                            it,
+                            position,
+                            listener,
+                            funcItem
+                    )
+                }
+                is MyCollectionShortVideoViewHolder -> {
                     holder.onBind(
                             it,
                             position,
