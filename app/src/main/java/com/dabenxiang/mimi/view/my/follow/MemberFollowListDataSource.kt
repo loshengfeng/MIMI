@@ -31,13 +31,9 @@ class MemberFollowListDataSource constructor(
             )
             val nextKey = if (hasNext) offset + PER_LIMIT_LONG else null
             if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
-            val idList = ArrayList<Long>()
-            items?.forEach {
-                idList.add(it.userId)
-            }
-//            pagingCallback.onIdList(idList, false)
             LoadResult.Page(items ?: listOf(), null, nextKey)
         } catch (e: Exception) {
+            pagingCallback.onTotalCount(0)
             LoadResult.Error(e)
         }
     }
