@@ -37,7 +37,6 @@ class MyFollowFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("1@@.....")
     }
 
     override fun onCreateView(
