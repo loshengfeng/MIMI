@@ -38,6 +38,9 @@ class FansListFragment : BaseFragment() {
         const val NO_DATA = 0
     }
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
@@ -103,12 +106,18 @@ class FansListFragment : BaseFragment() {
                 isAdult = true,
                 isAdultTheme = false
             )
-            navigateTo(NavigateItem.Destination(R.id.action_fansListFragment_to_navigation_my_post, bundle))
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_fansListFragment_to_navigation_my_post,
+                    bundle
+                )
+            )
         }
 
         override fun onGetAvatarAttachment(id: Long?, view: ImageView) {
             viewModel.loadImage(id, view, LoadImageType.AVATAR)
         }
+
         override fun onFollow(
             item: com.dabenxiang.mimi.model.api.vo.FansItem,
             position: Int,

@@ -30,7 +30,6 @@ class MyFollowListViewModel : ClubViewModel() {
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
     private val _postCount = MutableLiveData<Int>()
-
     val postCount: LiveData<Int> = _postCount
 
     fun getClubFollowData(adapter: ClubFollowPeopleAdapter) {
