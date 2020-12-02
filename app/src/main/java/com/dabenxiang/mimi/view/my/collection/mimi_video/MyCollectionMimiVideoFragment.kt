@@ -124,7 +124,7 @@ class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLik
                 }
             })
 
-            dialog.setMsg(getString(R.string.follow_delete_favorite_message,item.title))
+            dialog.setMsg(getString(R.string.follow_delete_favorite_message))
             dialog.show(
                         requireActivity().supportFragmentManager,
                         CleanDialogFragment::class.java.simpleName
