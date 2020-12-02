@@ -143,6 +143,10 @@
         <action
             android:id="@+id/action_myFollowFragment_to_navigation_my_post"
             app:destination="@id/navigation_my_post" />
+
+        <action
+            android:id="@+id/action_to_topicDetailFragment"
+            app:destination="@id/navigation_club_topic" />
     </fragment>
     <fragment
         android:id="@+id/myCollectionFragment"
