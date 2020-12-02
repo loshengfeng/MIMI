@@ -52,6 +52,9 @@ class PlayerDescriptionFragment : BaseFragment() {
 
     override val isStatusBarDark: Boolean = true
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
             override fun onClickItemIndex(view: View, index: Int) {
