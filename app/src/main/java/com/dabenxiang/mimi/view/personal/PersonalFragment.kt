@@ -192,7 +192,7 @@ class PersonalFragment : BaseFragment() {
 
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
 //                R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
-                R.id.tv_my_post -> findNavController().navigate(R.id.action_personalFragment_to_myPostFragment)
+                R.id.tv_my_post -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myPostFragment))
 //                R.id.tv_exchange -> navigateTo(
 //                    NavigateItem.Destination(R.id.action_to_settingFragment)
 //                )

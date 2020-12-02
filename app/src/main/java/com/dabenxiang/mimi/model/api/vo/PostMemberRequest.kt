@@ -9,7 +9,7 @@ import java.util.*
 @Parcelize
 data class PostMemberRequest (
     @SerializedName("title")
-    val title: String = "",
+    var title: String = "",
 
     @SerializedName("content")
     var content: String = "",
