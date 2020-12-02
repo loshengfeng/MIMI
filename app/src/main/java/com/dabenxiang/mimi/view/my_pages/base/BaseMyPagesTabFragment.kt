@@ -19,19 +19,15 @@ abstract class BaseMyPagesTabFragment: BaseFragment() {
     lateinit var tabLayoutMediator: TabLayoutMediator
     abstract val viewModel: MyPagesViewModel
     abstract val tabFragmentsCreators: Map<Int, () -> Fragment>
-    open val viewPagerAdapter: MyViewPagerAdapter by lazy {
-        MyViewPagerAdapter(
-                tabFragmentsCreators,
-                childFragmentManager,
-                lifecycle)
-    }
 
     override fun getLayoutId() = R.layout.fragment_my
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
-
-        view.view_pager.adapter = viewPagerAdapter
+        view.view_pager.adapter = MyViewPagerAdapter(
+                tabFragmentsCreators,
+                childFragmentManager,
+                lifecycle)
         view.view_pager.offscreenPageLimit = tabFragmentsCreators.size -1
         tabLayoutMediator = TabLayoutMediator(view.tabs, view.view_pager) { tab, position ->
             tab.text = getTabTitle(position)
