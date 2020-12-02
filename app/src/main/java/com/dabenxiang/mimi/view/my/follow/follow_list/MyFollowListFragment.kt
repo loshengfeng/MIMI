@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_follow_list.*
+import kotlinx.android.synthetic.main.fragment_my_follow_list.id_empty_group
 import kotlinx.android.synthetic.main.fragment_my_follow_list.layout_refresh
 
 class MyFollowListFragment(val type: Int) : BaseFragment() {
@@ -55,7 +56,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                         }
                         ClickType.TYPE_FOLLOW -> {
                             val list = ArrayList<MemberFollowItem>()
-                            list.add(MemberFollowItem(id = item.id))
+                            list.add(item)
                             viewModel.cleanAllFollowMember(list)
                         }
                         else -> {
@@ -70,7 +71,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                     when (type) {
                         ClickType.TYPE_ITEM -> {
                             val clubItem = MemberClubItem(id = item.id, avatarAttachmentId = item.avatarAttachmentId,
-                                    tag = item.tag, title = item.name, description = item.description, followerCount = item.followerCount, postCount = item.postCount)
+                                    tag = item.tag, title = item.name, description = item.description, followerCount = item.followerCount, postCount = item.postCount, isFollow = true)
 
                             val bundle = TopicDetailFragment.createBundle(clubItem)
                             navigateTo(
@@ -114,6 +115,22 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
             }
         }
 
+        viewModel.postCount.observe(this) {
+            if (it == 0) {
+                text_page_empty.text = getString(R.string.follow_no_data)
+                id_empty_group.visibility = View.VISIBLE
+                recycler_view.visibility = View.INVISIBLE
+            } else {
+                id_empty_group.visibility = View.GONE
+                recycler_view.visibility = View.VISIBLE
+            }
+            layout_refresh.isRefreshing = false
+        }
+
+        viewModel.showProgress.observe(this) {
+            layout_refresh.isRefreshing = it
+        }
+
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
     }
@@ -137,7 +154,9 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        getData()
+        if (viewModel.postCount.value ?: -1 <= 0) {
+            getData()
+        }
     }
 
 
