@@ -10,8 +10,8 @@ class ClipPagerAdapter(fragment: ClipFragment) : FragmentStateAdapter(fragment) 
 
     override fun createFragment(position: Int): Fragment {
         val orderType = when(position) {
-            0 -> StatisticsOrderType.LATEST
-            else -> StatisticsOrderType.HOTTEST
+            0 -> StatisticsOrderType.HOTTEST
+            else -> StatisticsOrderType.LATEST
         }
         return ClipPagerFragment(orderType)
     }

@@ -19,6 +19,7 @@ import timber.log.Timber
 
 
 class LikeFragment : BaseFragment() {
+
     private val viewModel: LikeViewModel by viewModels()
 
     companion object {
@@ -51,7 +52,7 @@ class LikeFragment : BaseFragment() {
 
         view.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.apply{
+                tab?.apply {
                     viewModel.lastTabIndex = position
                 }
 
@@ -101,7 +102,7 @@ class LikeFragment : BaseFragment() {
         }
     }
 
-    private fun deleteAll(){
+    private fun deleteAll() {
         CleanDialogFragment.newInstance(onCleanDialogListener).also {
             it.show(
                 requireActivity().supportFragmentManager,
@@ -113,14 +114,14 @@ class LikeFragment : BaseFragment() {
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
 
-            when(viewModel.lastTabIndex){
-                MyCollectionFragment.TAB_MiMI_VIDEO ->{
+            when (viewModel.lastTabIndex) {
+                MyCollectionFragment.TAB_MiMI_VIDEO -> {
                     //TODO
                 }
-                MyCollectionFragment.TAB_SHORT_VIDEO ->{
+                MyCollectionFragment.TAB_SHORT_VIDEO -> {
                     //TODO
                 }
-                else ->{
+                else -> {
                     //TODO
                 }
             }

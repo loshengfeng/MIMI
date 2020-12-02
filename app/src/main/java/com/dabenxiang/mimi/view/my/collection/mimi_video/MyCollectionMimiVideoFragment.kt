@@ -10,18 +10,19 @@ import androidx.lifecycle.observe
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.callback.MyFollowVideoListener
+import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.model.enums.MyFollowTabItemType
+import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clip.ClipFuncItem
 import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
@@ -34,13 +35,20 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: Boolean = false) : BaseFragment() {
+class MyCollectionMimiVideoFragment(val type: MyCollectionTabItemType, val isLike: Boolean = false) : BaseFragment() {
     private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
     private val collectionViewModel: MyCollectionViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
+    private val clipFuncItem by lazy {
+        CollectionFuncItem(
+                { source -> viewModel.getDecryptSetting(source) },
+                { videoItem, decryptSettingItem, function -> viewModel.decryptCover(videoItem, decryptSettingItem, function) }
+        )
+    }
+
     private val adapter: MyCollectionMimiVideoAdapter by lazy {
-        MyCollectionMimiVideoAdapter(requireContext(), listener)
+        MyCollectionMimiVideoAdapter(requireContext(), clipFuncItem, listener)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_collection_videos
@@ -54,7 +62,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: B
         }
     }
 
-    private val listener = object : MyFollowVideoListener {
+    private val listener = object : MyCollectionVideoListener {
         override fun onMoreClick(item: PlayItem, position: Int) {
 
         }
@@ -81,8 +89,8 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: B
             )
         }
 
-        override fun onItemClick(item: PlayItem, type: MyFollowTabItemType) {
-            if (this@MyCollectionMimiVideoFragment.type == MyFollowTabItemType.MIMI_VIDEO) {
+        override fun onItemClick(item: PlayItem, type: MyCollectionTabItemType) {
+            if (this@MyCollectionMimiVideoFragment.type == MyCollectionTabItemType.MIMI_VIDEO) {
                 val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
                 navigateTo(
                     NavigateItem.Destination(
@@ -98,7 +106,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: B
             }
         }
 
-        override fun onCommentClick(item: PlayItem, type: MyFollowTabItemType) {
+        override fun onCommentClick(item: PlayItem, type: MyCollectionTabItemType) {
             Timber.d("onCommentClick, item = ${item}")
             val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0), true)
             navigateTo(
@@ -108,7 +116,7 @@ class MyCollectionMimiVideoFragment(val type: MyFollowTabItemType, val isLike: B
                     ))
         }
 
-        override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyFollowTabItemType) {
+        override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyCollectionTabItemType) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
                     checkStatus { viewModel.deleteMIMIVideoFavorite(item.videoId.toString()) }

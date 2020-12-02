@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -39,6 +40,9 @@ class PlayerV2Fragment : BasePlayerFragment() {
     }
 
     private val viewModel: PlayerV2ViewModel by viewModels()
+
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
 
     override fun setupObservers() {
         super.setupObservers()

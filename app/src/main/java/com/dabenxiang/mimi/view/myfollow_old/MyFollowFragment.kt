@@ -54,9 +54,6 @@ class MyFollowFragment : BaseFragment() {
 
     private var vpAdapter: MyFollowViewPagerAdapter? = null
 
-    override val bottomNavigationVisibility: Int
-        get() = View.GONE
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

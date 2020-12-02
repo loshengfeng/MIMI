@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_my_collection.*
 import kotlinx.android.synthetic.main.fragment_my_collection.view.*
 import timber.log.Timber
 
-class MyFollowFragment: BaseFragment() {
+class MyFollowFragment : BaseFragment() {
 
     companion object {
         const val TAB_FOLLOW_PEOPLE = 0
@@ -28,16 +28,22 @@ class MyFollowFragment: BaseFragment() {
     private lateinit var tabLayoutMediator: TabLayoutMediator
     override fun getLayoutId() = R.layout.fragment_my_follow_tab
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
 
         view.view_pager.adapter = MyFollowViewPagerAdapter(childFragmentManager, lifecycle)
@@ -49,7 +55,7 @@ class MyFollowFragment: BaseFragment() {
 
         view.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.apply{
+                tab?.apply {
                     viewModel.lastTabIndex = position
                 }
 
@@ -89,7 +95,6 @@ class MyFollowFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         Timber.i("ClubTabFragment onResume")
-
     }
 
     override fun onDestroy() {
@@ -106,14 +111,16 @@ class MyFollowFragment: BaseFragment() {
         }
     }
 
-    private fun deleteAll(){
-        CleanDialogFragment.newInstance(listener= onCleanDialogListener,
-                msgResId = if (viewModel.lastTabIndex == TAB_FOLLOW_PEOPLE)
-                    R.string.follow_clean_member_dlg_msg else
-                    R.string.follow_clean_club_dlg_msg).also {
+    private fun deleteAll() {
+        CleanDialogFragment.newInstance(
+            listener = onCleanDialogListener,
+            msgResId = if (viewModel.lastTabIndex == TAB_FOLLOW_PEOPLE)
+                R.string.follow_clean_member_dlg_msg else
+                R.string.follow_clean_club_dlg_msg
+        ).also {
             it.show(
-                    requireActivity().supportFragmentManager,
-                    CleanDialogFragment::class.java.simpleName
+                requireActivity().supportFragmentManager,
+                CleanDialogFragment::class.java.simpleName
             )
         }
     }
@@ -121,7 +128,7 @@ class MyFollowFragment: BaseFragment() {
     private val onCleanDialogListener = object : OnCleanDialogListener {
         override fun onClean() {
             Timber.i("onCleanDialogListener lastTabIndex=${viewModel.lastTabIndex}")
-           viewModel.setDeleteNotify()
+            viewModel.setDeleteNotify()
         }
     }
 }
