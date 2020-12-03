@@ -212,6 +212,7 @@ abstract class BaseFragment : Fragment() {
                             val content = Gson().toJson(mediaItem)
                             Timber.d("Post pic content item : $content")
 
+                            memberPostItem.content = content
 
                             val postId = arguments?.getLong(BasePostFragment.POST_ID)
                             mainViewModel?.clearLiveDataValue()
@@ -363,6 +364,7 @@ abstract class BaseFragment : Fragment() {
             deleteCurrentPicPosition += 1
             if (deleteCurrentPicPosition > deletePicList.size - 1) {
                 setSnackBarPostStatus(postId)
+                deleteCurrentPicPosition = 0
             } else {
                 mainViewModel?.deleteAttachment(deletePicList[deleteCurrentPicPosition])
             }
