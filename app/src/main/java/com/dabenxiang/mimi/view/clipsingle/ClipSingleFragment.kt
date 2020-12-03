@@ -48,6 +48,21 @@ class ClipSingleFragment : BaseFragment() {
                 it.putSerializable(KEY_DATA, item)
             }
         }
+
+        fun createBundle(item: VideoItem): Bundle {
+            val playItem = PlayItem(
+                videoId = item.id,
+                title = item.title,
+                cover = item.cover,
+                source = item.source,
+                favorite = item.favorite,
+                favoriteCount = item.favoriteCount?.toInt(),
+                commentCount = item.commentCount.toInt()
+            )
+            return Bundle().also {
+                it.putSerializable(KEY_DATA, playItem)
+            }
+        }
     }
 
     override val bottomNavigationVisibility = View.GONE
