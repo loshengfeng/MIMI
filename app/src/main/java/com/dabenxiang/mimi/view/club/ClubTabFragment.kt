@@ -21,6 +21,8 @@ import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.ClubTabViewModel.Companion.REFRESH_TASK
+import com.dabenxiang.mimi.view.club.ClubTabViewModel.Companion.REFRESH_TASK_CANCEL
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
 import com.dabenxiang.mimi.view.club.adapter.TopicItemListener
 import com.dabenxiang.mimi.view.club.adapter.TopicListAdapter
@@ -108,6 +110,13 @@ class ClubTabFragment : BaseFragment() {
 
         viewModel.clubCount.observe(this, {
             topic_group.visibility = if (it <= 0) View.GONE else View.VISIBLE
+        })
+
+        viewModel.doTask.observe(this, {
+            when(it){
+                REFRESH_TASK -> getClubItemList()
+                else ->{}
+            }
         })
     }
 

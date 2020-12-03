@@ -12,14 +12,14 @@ import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_NOVEL
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_PICTURE
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
 import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
-import com.dabenxiang.mimi.view.club.item.ClubItemFragment
+import com.dabenxiang.mimi.view.club.pages.ClubItemFragment
 
 class ClubTabAdapter(
         fragmentManager: FragmentManager,
         lifecycle: Lifecycle) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            TAB_FOLLOW to { ClubPostFollowFragment() },
+            TAB_FOLLOW to {  ClubItemFragment(ClubTabItemType.FOLLOW) },
             TAB_RECOMMEND to { ClubItemFragment(ClubTabItemType.RECOMMEND) },
             TAB_LATEST to { ClubItemFragment(ClubTabItemType.LATEST) },
             TAB_CLIP to { ClubItemFragment(ClubTabItemType.SHORT_VIDEO) },

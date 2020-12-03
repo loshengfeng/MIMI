@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.item
+package com.dabenxiang.mimi.view.club.pages
 
 import android.content.Context
 import android.os.Bundle
@@ -20,6 +20,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -38,7 +39,9 @@ import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
+
     private val viewModel: ClubItemViewModel by viewModels()
+    private val clubTabViewModel: ClubTabViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubItemAdapter by lazy {
@@ -153,6 +156,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
+            clubTabViewModel.doTask(ClubTabViewModel.REFRESH_TASK)
             viewModel.getData(adapter, type)
         }
     }
@@ -173,8 +177,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        //According to specs, this page does not need to log in currently
-        loginPageToggle(true)
+        loginPageToggle(
+                if(type ==ClubTabItemType.FOLLOW) accountManager.isLogin()
+                else true)
 
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, type)
