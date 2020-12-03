@@ -23,6 +23,9 @@ class RankingViewModel : BaseViewModel() {
     private val _rankingVideosList = MutableLiveData<PagedList<StatisticsItem>>()
     val rankingVideosList: LiveData<PagedList<StatisticsItem>> = _rankingVideosList
 
+    private val _isLoadingData = MutableLiveData<Boolean>()
+    val isLoadingData: LiveData<Boolean> = _isLoadingData
+
     var statisticsTypeSelected: StatisticsType = StatisticsType.TODAY
     var postTypeSelected: PostType = PostType.VIDEO_ON_DEMAND
 
@@ -94,10 +97,12 @@ class RankingViewModel : BaseViewModel() {
     private val pagingCallback = object : PagingCallback {
         override fun onLoading() {
             setShowProgress(true)
+            _isLoadingData.value = true
         }
 
         override fun onLoaded() {
             setShowProgress(false)
+            _isLoadingData.value = false
         }
 
         override fun onThrowable(throwable: Throwable) {}

@@ -138,6 +138,16 @@ class RankingFragment : BaseFragment() {
                 layout_refresh?.isRefreshing = false
             }
         })
+
+        viewModel.isLoadingData.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                progress_bar.visibility = View.VISIBLE
+                rv_ranking_content.visibility = View.INVISIBLE
+            } else {
+                progress_bar.visibility = View.INVISIBLE
+                rv_ranking_content.visibility = View.VISIBLE
+            }
+        })
     }
 
     private fun setupAdapter() {
