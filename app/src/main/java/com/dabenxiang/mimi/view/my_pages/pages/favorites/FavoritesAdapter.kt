@@ -116,10 +116,8 @@ class FavoritesAdapter(
                     holder.pictureRecycler.tag = position
                     holder.onBind(
                             it,
-                            null,
                             position,
                             myPostListener,
-                            attachmentListener,
                             memberPostFuncItem
                     )
                 }

@@ -121,10 +121,8 @@ class SearchPostAdapter(
                     holder.pictureRecycler.tag = position
                     holder.onBind(
                         it,
-                        null,
                         position,
                         myPostListener,
-                        attachmentListener,
                         memberPostFuncItem,
                         getSearchText.invoke(),
                         getSearchTag.invoke()

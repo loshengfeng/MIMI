@@ -11,7 +11,6 @@ import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_LATEST
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_NOVEL
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_PICTURE
 import com.dabenxiang.mimi.view.club.ClubTabFragment.Companion.TAB_RECOMMEND
-import com.dabenxiang.mimi.view.club.follow.ClubPostFollowFragment
 import com.dabenxiang.mimi.view.club.pages.ClubItemFragment
 
 class ClubTabAdapter(

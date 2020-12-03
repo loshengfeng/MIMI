@@ -131,10 +131,8 @@ class MyPostPagedAdapter(
                         holder.pictureRecycler.tag = position
                         holder.onBind(
                             it,
-                            currentList,
                             position,
                             myPostListener,
-                            attachmentListener,
                             memberPostFuncItem
                         )
                     }

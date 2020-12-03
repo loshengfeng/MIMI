@@ -73,10 +73,8 @@ class MyPostPicturePostHolder(
 
     fun onBind(
         item: MemberPostItem,
-        itemList: List<MemberPostItem>?,
         position: Int,
         myPostListener: MyPostListener,
-        attachmentListener: AttachmentListener,
         memberPostFuncItem: MemberPostFuncItem,
         searchStr: String = "",
         searchTag: String = ""
@@ -100,7 +98,7 @@ class MyPostPicturePostHolder(
         ) else item.title
         tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        memberPostFuncItem.getBitmap(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
         imgAvatar.setOnClickListener {
             myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
         }

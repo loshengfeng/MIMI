@@ -458,7 +458,7 @@ class SearchPostFragment : BaseFragment() {
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, view, type -> },
+            { id, view, type -> viewModel.loadImage(id, view, type)},
             { item, items, isFollow, func -> },
             { item, isLike, func -> },
             { item, isFavorite, func -> }
