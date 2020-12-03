@@ -70,6 +70,9 @@
         android:name="com.dabenxiang.mimi.view.club.pic.ClubPicFragment"
         tools:layout="@layout/fragment_club_pic" >
         <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
             android:id="@+id/action_clubPicFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
@@ -84,6 +87,9 @@
         android:id="@+id/searchPostFragment"
         android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
         tools:layout="@layout/fragment_search_post" >
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
         <action
             android:id="@+id/action_searchPostFragment_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />

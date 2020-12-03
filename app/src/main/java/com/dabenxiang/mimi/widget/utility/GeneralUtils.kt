@@ -28,6 +28,15 @@ import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.dash.DashMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -365,6 +374,41 @@ object GeneralUtils {
         return result
     }
 
+    fun getMediaSource(
+        uriString: String,
+        sourceFactory: DefaultDataSourceFactory
+    ): MediaSource? {
+        val uri = Uri.parse(uriString)
+
+        val sourceType = Util.inferContentType(uri)
+        Timber.d("#sourceType: $sourceType")
+
+        return when (sourceType) {
+            C.TYPE_DASH ->
+                DashMediaSource.Factory(sourceFactory)
+                    .createMediaSource(uri)
+            C.TYPE_HLS ->
+                HlsMediaSource.Factory(sourceFactory)
+                    .createMediaSource(uri)
+            C.TYPE_SS ->
+                SsMediaSource.Factory(sourceFactory)
+                    .createMediaSource(uri)
+            C.TYPE_OTHER -> {
+                when {
+                    uriString.startsWith("rtmp://") ->
+                        ProgressiveMediaSource.Factory(RtmpDataSourceFactory())
+                            .createMediaSource(uri)
+                    uriString.contains("m3u8") -> HlsMediaSource.Factory(sourceFactory)
+                        .createMediaSource(uri)
+                    else ->
+                        ProgressiveMediaSource.Factory(sourceFactory)
+                            .createMediaSource(uri)
+                }
+            }
+            else -> null
+        }
+    }
+
     fun parseTimeToUTC(date: Date): String {
         var time: String
         try {
@@ -378,5 +422,4 @@ object GeneralUtils {
         Timber.d("parse time to UTC: $time")
         return time
     }
-
 }

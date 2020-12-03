@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
@@ -46,13 +46,12 @@ class MyPostTextPostHolder(
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
 
     fun onBind(
-        item: MemberPostItem,
-        itemList: List<MemberPostItem>?,
-        position: Int,
-        myPostListener: MyPostListener,
-        attachmentListener: AttachmentListener,
-        searchStr: String = "",
-        searchTag: String = ""
+            item: MemberPostItem,
+            position: Int,
+            myPostListener: MyPostListener,
+            memberPostFuncItem: MemberPostFuncItem,
+            searchStr: String = "",
+            searchTag: String = ""
     ) {
 
         tvName.text = item.postFriendlyName
@@ -67,7 +66,7 @@ class MyPostTextPostHolder(
             Timber.e(e)
         }
 
-        attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        memberPostFuncItem.getBitmap(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
         imgAvatar.setOnClickListener {
             myPostListener.onAvatarClick(item.creatorId, item.postFriendlyName)
         }
