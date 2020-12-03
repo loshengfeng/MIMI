@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.ranking
 
 import android.content.Context
 import android.text.TextUtils
@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -16,26 +17,27 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_ranking.view.*
 
-class RankingAdapter(
+class RankingClipAdapter(
     private val context: Context,
-    private val rankingFuncItem: RankingFuncItem = RankingFuncItem()
-) : PagedListAdapter<PostStatisticsItem, RecyclerView.ViewHolder>(diffCallback) {
+    private val rankingFuncItem: RankingFuncItem = RankingFuncItem(),
+    private val funcItem: CollectionFuncItem,
+) : PagingDataAdapter<VideoItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<PostStatisticsItem>() {
-            override fun areItemsTheSame(
-                oldItem: PostStatisticsItem,
-                newItem: PostStatisticsItem
-            ): Boolean = oldItem.id == newItem.id
+        private val diffCallback = object : DiffUtil.ItemCallback<VideoItem>() {
+            override fun areItemsTheSame(oldItem: VideoItem, newItem: VideoItem): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-            override fun areContentsTheSame(
-                oldItem: PostStatisticsItem,
-                newItem: PostStatisticsItem
-            ): Boolean = oldItem == newItem
+            override fun areContentsTheSame(oldItem: VideoItem, newItem: VideoItem): Boolean {
+                return oldItem == newItem
+            }
         }
     }
 
@@ -47,12 +49,13 @@ class RankingAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder as RankingViewHolder
+        val item = getItem(position) ?: VideoItem()
         holder.bind(
             context,
             position,
-            currentList?.toMutableList()!!,
-            getItem(position)!!,
-            rankingFuncItem
+            item,
+            rankingFuncItem,
+            funcItem
         )
     }
 
@@ -66,9 +69,9 @@ class RankingAdapter(
         fun bind(
             context: Context,
             position: Int,
-            items: MutableList<PostStatisticsItem>,
-            item: PostStatisticsItem,
-            rankingFuncItem: RankingFuncItem
+            item: VideoItem,
+            rankingFuncItem: RankingFuncItem,
+            funcItem:CollectionFuncItem
         ) {
 
             ranking.let {
@@ -84,24 +87,21 @@ class RankingAdapter(
                 }
             }
 
-            val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-            contentItem.images?.also { images ->
-                if (!TextUtils.isEmpty(images[0].url)) {
-                    Glide.with(picture.context)
-                        .load(images[0].url).placeholder(R.drawable.img_nopic_03)
-                        .into(picture)
-                } else {
-                    rankingFuncItem.getBitmap(
-                        images[0].id.toLongOrNull(),
-                        picture
-                    )
-                }
+            funcItem.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
+                ?.let { decryptSettingItem ->
+                    funcItem.decryptCover(item.cover ?: "", decryptSettingItem) {
+                        Glide.with(picture.context)
+                            .load(it).placeholder(R.drawable.img_nopic_03).into(picture)
+                    }
+                } ?: run {
+                Glide.with(picture.context)
+                    .load(item.cover).placeholder(R.drawable.img_nopic_03).into(picture)
             }
 
             title.text = item.title
-            hot.text = item.count.toString()
+            hot.text = item.timesWatched.toString()
             layout.setOnClickListener {
-                rankingFuncItem.onItemClick(items, position)
+                rankingFuncItem.onClipItemClick(item)
             }
         }
     }

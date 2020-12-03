@@ -579,4 +579,6 @@
     <string name="boo">踩</string>
 
     <string name="video_desc">视频简介</string>
+
+    <string name="small_video">小视频</string>
 </resources>
