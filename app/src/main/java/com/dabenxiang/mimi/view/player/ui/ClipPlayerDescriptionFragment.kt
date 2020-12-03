@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -66,6 +67,8 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getAdContent()
+        imgReport.background = ContextCompat.getDrawable(requireContext(), R.drawable.btn_more_gray_p)
+        text5.text = getString(R.string.text_more)
     }
 
     override fun setupObservers() {
@@ -136,7 +139,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     private fun setReportListener() {
         imgReport.setOnClickListener {
-            onMoreClick(detailItem, -1) {
+            onMoreClick(detailItem, -1, deducted = detailItem.deducted) {
                 it as MemberPostItem
 
                 val bundle = Bundle()
