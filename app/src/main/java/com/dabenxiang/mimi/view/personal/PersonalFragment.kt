@@ -66,11 +66,9 @@ class PersonalFragment : BaseFragment() {
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
             tv_logout.visibility = View.VISIBLE
-            setting.visibility = View.VISIBLE
         } else {
             item_is_Login.visibility = View.GONE
             tv_logout.visibility = View.GONE
-            setting.visibility = View.INVISIBLE
         }
     }
 
@@ -122,6 +120,12 @@ class PersonalFragment : BaseFragment() {
             img_arrow.visibility = View.INVISIBLE
         }
     }
+
+    private fun likeClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment)) }
+
+    private fun followClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment)) }
+
+    private fun fansClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment)) }
 
     @SuppressLint("SetTextI18n")
     override fun setupObservers() {
@@ -186,10 +190,6 @@ class PersonalFragment : BaseFragment() {
 
                 R.id.tv_favorite -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myCollectionFragment))
 
-                R.id.follow_count -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
-                R.id.follow -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
-
-
                 R.id.tv_topup_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_orderFragment))
 //                R.id.tv_chat_history -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_chatHistoryFragment))
                 R.id.tv_my_post -> navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myPostFragment))
@@ -207,21 +207,12 @@ class PersonalFragment : BaseFragment() {
                     viewModel.signOut()
                 }
                 R.id.vippromote_now -> {
-                    if (viewModel.isLogin()) {
-                        navigateTo(
+                    checkStatus { navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_to_inviteVipFragment,
-                                null
+                                    R.id.action_to_inviteVipFragment,
+                                    null
                             )
-                        )
-                    } else {
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_personalFragment_to_loginFragment,
-                                LoginFragment.createBundle(TYPE_LOGIN)
-                            )
-                        )
-                    }
+                    ) }
                 }
                 R.id.tv_register -> navigateTo(
                     NavigateItem.Destination(
@@ -255,12 +246,27 @@ class PersonalFragment : BaseFragment() {
                     }
                 }
 
-                R.id.fans_count -> navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment))
-                R.id.fans -> navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment))
+                R.id.like_count -> likeClick()
+                R.id.like -> likeClick()
 
-                R.id.like_count -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
-                R.id.like -> navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
-                R.id.setting -> navigateTo(NavigateItem.Destination(R.id.action_to_settingFragment))
+                R.id.fans_count -> fansClick()
+                R.id.fans -> fansClick()
+
+                R.id.follow_count -> followClick()
+                R.id.follow -> followClick()
+
+                R.id.setting -> {
+                    if (viewModel.isLogin()) {
+                        navigateTo(NavigateItem.Destination(R.id.action_to_settingFragment))
+                    } else {
+                        navigateTo(
+                                NavigateItem.Destination(
+                                        R.id.action_personalFragment_to_loginFragment,
+                                        LoginFragment.createBundle(TYPE_LOGIN)
+                                )
+                        )
+                    }
+                }
             }
         }.also {
             layout_vip_unlimit_unlogin.setOnClickListener(it)

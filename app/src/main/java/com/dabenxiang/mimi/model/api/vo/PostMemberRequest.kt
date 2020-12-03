@@ -15,7 +15,7 @@ data class PostMemberRequest (
     var content: String = "",
 
     @SerializedName("type")
-    val type: Int = 0,
+    var type: Int = 0,
 
     @SerializedName("isAdult")
     val isAdult: Boolean = true,

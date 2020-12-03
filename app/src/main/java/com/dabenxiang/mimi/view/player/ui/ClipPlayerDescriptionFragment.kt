@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
+import androidx.core.content.ContextCompat
+import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -22,6 +23,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
@@ -29,7 +31,6 @@ import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_clip_info.*
 import kotlinx.android.synthetic.main.item_comment_interactive.*
 import kotlinx.android.synthetic.main.item_video_tag.*
-import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 
 class ClipPlayerDescriptionFragment : BaseFragment() {
@@ -66,6 +67,8 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getAdContent()
+        imgReport.background = ContextCompat.getDrawable(requireContext(), R.drawable.btn_more_gray_p)
+        text5.text = getString(R.string.text_more)
     }
 
     override fun setupObservers() {
@@ -124,35 +127,47 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     private fun setInteractiveListener() {
         imgLike.setOnClickListener {
-            clipViewModel.likePost(detailItem, LikeType.LIKE)
+            checkStatus { clipViewModel.likePost(detailItem, LikeType.LIKE)}
         }
         imgDislike.setOnClickListener {
-            clipViewModel.likePost(detailItem, LikeType.DISLIKE)
+            checkStatus { clipViewModel.likePost(detailItem, LikeType.DISLIKE)}
         }
         imgFavorite.setOnClickListener {
-            clipViewModel.favoritePost(detailItem)
+            checkStatus { clipViewModel.favoritePost(detailItem)}
         }
     }
 
     private fun setReportListener() {
         imgReport.setOnClickListener {
-            if (detailItem.reported) {
-                GeneralUtils.showToast(
-                    App.applicationContext(),
-                    getString(R.string.already_reported)
-                )
-            } else {
-                reportDialog =
-                    ReportDialogFragment.newInstance(
-                        item = detailItem,
-                        listener = onReportDialogListener,
-                        isComment = false
-                    ).also {
-                        it.show(
-                            requireActivity().supportFragmentManager,
-                            ReportDialogFragment::class.java.simpleName
+            onMoreClick(detailItem, -1, deducted = detailItem.deducted) {
+                it as MemberPostItem
+
+                val bundle = Bundle()
+                detailItem.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, detailItem)
+
+                when (it.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                                R.id.action_to_postArticleFragment,
+                                bundle
                         )
                     }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                                R.id.action_to_postPicFragment,
+                                bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                                R.id.action_to_postVideoFragment,
+                                bundle
+                        )
+                    }
+                }
             }
         }
     }
@@ -171,17 +186,8 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         clip_update_time.text = GeneralUtils.getTimeDiff(postItem.creationDate, Date())
 
         clip_title.setTextColor(App.self.getColor(R.color.color_black_1))
-        val adjustmentFormat = postItem.title.let {
-            val builder = StringBuilder().append(it)
-            if(it.length > 20) {
-                for (i in 0..it.length) {
-                    if( (i / 10) == 0) builder.append("/n")
-                    builder.append(it[i])
-                }
-            }
-            builder.toString()
-        }
-        clip_title.text = adjustmentFormat
+
+        clip_title.text = postItem.title
 
         setupChipGroup(postItem.tags)
 
@@ -261,7 +267,11 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
         list.indices.mapNotNull {
             list[it]
-        }.forEach {
+        }.forEach addChipItem@{
+            if (tag_group.size == 20) {
+                return@addChipItem
+            }
+
             val chip = layoutInflater.inflate(
                 R.layout.chip_item,
                 tag_group,

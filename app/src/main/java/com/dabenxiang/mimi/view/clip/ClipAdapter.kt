@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,13 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.dash.DashMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
@@ -60,7 +54,20 @@ class ClipAdapter(
     private var m3u8Url: String? = null
     private var isOverdue: Boolean = false
 
-    fun setM3U8Result(url: String, errorCode: Int) {
+    fun getM3U8() {
+        getItem(currentPosition)?.run {
+            clipFuncItem.getM3U8(this, currentPosition, ::updateAfterM3U8)
+        }
+    }
+
+    private fun updateAfterM3U8(pos: Int, url: String, errorCode: Int) {
+        currentPosition.takeIf { it == pos }?.run {
+            setM3U8Result(url, errorCode)
+            notifyItemChanged(this, PAYLOAD_UPDATE_AFTER_M3U8)
+        }
+    }
+
+    private fun setM3U8Result(url: String, errorCode: Int) {
         m3u8Url = url
         isOverdue = errorCode == ERROR_CODE_ACCOUNT_OVERDUE
     }
@@ -131,40 +138,8 @@ class ClipAdapter(
                 PAYLOAD_UPDATE_AFTER_M3U8 -> {
                     holder.progress.visibility = View.GONE
                     holder.updateAfterM3U8(item, clipFuncItem, position, isOverdue)
-                    if (!isOverdue) {
-                        takeIf { currentPosition == position }?.also {
-                            currentViewHolder = holder
-                            holder.progress.visibility = View.VISIBLE
-                        } ?: run {
-                            holder.ivCover.visibility = View.VISIBLE
-                            holder.progress.visibility = View.GONE
-                        }
-
-                        holder.ibReplay.setOnClickListener { view ->
-                            exoPlayer?.also { player ->
-                                player.seekTo(0)
-                                player.playWhenReady = true
-                            }
-                            view.visibility = View.GONE
-                        }
-
-                        holder.playerView.setOnClickListener {
-                            takeIf { exoPlayer?.isPlaying ?: false }?.also {
-                                exoPlayer?.playWhenReady = false
-                                holder.ibPlay.visibility = View.VISIBLE
-                            } ?: run {
-                                exoPlayer?.playWhenReady = true
-                                holder.ibPlay.visibility = View.GONE
-                            }
-                        }
-
-                        holder.ibPlay.setOnClickListener {
-                            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
-                                exoPlayer?.playWhenReady = true
-                                holder.ibPlay.visibility = View.GONE
-                            }
-                        }
-                        processClip(holder.playerView, m3u8Url, position)
+                    takeUnless { isOverdue }?.run {
+                        processUpdateAfterM3U8Payload(holder, position)
                     }
                 }
             }
@@ -177,9 +152,50 @@ class ClipAdapter(
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
     }
 
+    private fun processUpdateAfterM3U8Payload(holder: ClipViewHolder, position: Int) {
+        takeIf { currentPosition == position }?.also {
+            currentViewHolder = holder
+            holder.progress.visibility = View.VISIBLE
+        } ?: run {
+            holder.ivCover.visibility = View.VISIBLE
+            holder.progress.visibility = View.GONE
+        }
+        holder.ibReplay.setOnClickListener { view ->
+            exoPlayer?.also { player ->
+                player.seekTo(0)
+                player.playWhenReady = true
+            }
+            view.visibility = View.GONE
+        }
+        holder.playerView.setOnClickListener {
+            takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                exoPlayer?.playWhenReady = false
+                holder.ibPlay.visibility = View.VISIBLE
+            } ?: run {
+                exoPlayer?.playWhenReady = true
+                holder.ibPlay.visibility = View.GONE
+            }
+        }
+        holder.ibPlay.setOnClickListener {
+            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                exoPlayer?.playWhenReady = true
+                holder.ibPlay.visibility = View.GONE
+            }
+        }
+        holder.btnRetry.setOnClickListener {
+            holder.btnRetry.visibility = View.GONE
+            holder.progress.visibility = View.VISIBLE
+            getM3U8()
+        }
+        processClip(holder.playerView, m3u8Url, position)
+    }
+
     private fun processClip(playerView: PlayerView, url: String?, position: Int) {
         Timber.d("processClip position:$position, url:$url")
-        url?.takeIf { currentPosition == position }?.run { setupPlayer(playerView, this) }
+        url?.takeIf { currentPosition == position }?.run {
+            releasePlayer()
+            setupPlayer(playerView, this)
+        }
     }
 
     private fun setupPlayer(playerView: PlayerView, uri: String) {
@@ -194,7 +210,7 @@ class ClipAdapter(
         playerView.player = exoPlayer
         val agent = Util.getUserAgent(context, context.getString(R.string.app_name))
         val sourceFactory = DefaultDataSourceFactory(context, agent)
-        getMediaSource(uri, sourceFactory)?.also { mediaSource ->
+        GeneralUtils.getMediaSource(uri, sourceFactory)?.also { mediaSource ->
             playerView.player?.also {
                 playerView.tag = uri
                 (it as SimpleExoPlayer).prepare(mediaSource, true, true)
@@ -268,46 +284,14 @@ class ClipAdapter(
                     //showErrorDialog("UNKNOWN")
                 }
             }
+
+            currentViewHolder?.progress?.visibility = View.GONE
+            currentViewHolder?.btnRetry?.visibility = View.VISIBLE
             playingId.takeIf { it.isNotEmpty() }?.also { id->
                 clipFuncItem.onPlayerError(id, error.message ?: "error: UNKNOWN")
             }
 
 
-        }
-    }
-
-    private fun getMediaSource(
-        uriString: String,
-        sourceFactory: DefaultDataSourceFactory
-    ): MediaSource? {
-        val uri = Uri.parse(uriString)
-
-        val sourceType = Util.inferContentType(uri)
-        Timber.d("#sourceType: $sourceType")
-
-        return when (sourceType) {
-            C.TYPE_DASH ->
-                DashMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_HLS ->
-                HlsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_SS ->
-                SsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_OTHER -> {
-                when {
-                    uriString.startsWith("rtmp://") ->
-                        ProgressiveMediaSource.Factory(RtmpDataSourceFactory())
-                            .createMediaSource(uri)
-                    uriString.contains("m3u8") -> HlsMediaSource.Factory(sourceFactory)
-                        .createMediaSource(uri)
-                    else ->
-                        ProgressiveMediaSource.Factory(sourceFactory)
-                            .createMediaSource(uri)
-                }
-            }
-            else -> null
         }
     }
 }

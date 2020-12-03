@@ -434,7 +434,31 @@ class ApiRepository(private val apiService: ApiService) {
         orderByType: StatisticsOrderType = StatisticsOrderType.LATEST,
         offset: String,
         limit: String
-    ) = apiService.searchShortVideo(q, orderByType.value, offset, limit)
+    ) = apiService.searchShortVideo(
+        q = q,
+        orderByType = orderByType.value,
+        offset = offset,
+        limit = limit
+    )
+
+    /**
+     * 取得小视频影片with時間區間(需Client Credentials|需登入帳號)
+     */
+    suspend fun searchShortVideo(
+        q: String? = null,
+        startTime: String? = null,
+        endTime: String?= null,
+        orderByType: StatisticsOrderType = StatisticsOrderType.LATEST,
+        offset: String,
+        limit: String
+    ) = apiService.searchShortVideo(
+        q = q,
+        startTime = startTime,
+        endTime = endTime,
+        orderByType = orderByType.value,
+        offset = offset,
+        limit = limit
+    )
 
     /**
      * 取得類別影片
@@ -450,8 +474,8 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        startTime: String = "2018-12-01T10:00:05Z",
-        endTime: String = "2020-11-24T10:00:05Z",
+        startTime: String = "",
+        endTime: String = "",
         orderByType: Int = StatisticsOrderType.HOTTEST.value,
         category: String? = "",
         tags: String? = "",

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.item
+package com.dabenxiang.mimi.view.club.pages
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

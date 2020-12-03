@@ -10,7 +10,6 @@ import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.CategoryBanner
 import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -21,7 +20,6 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
 import kotlinx.android.synthetic.main.fragment_recommend.*
-import timber.log.Timber
 
 class RecommendFragment(
     private val thirdMenuItems: List<ThirdMenuItem>
@@ -90,12 +88,10 @@ class RecommendFragment(
                 navToPlayer(PlayerItem(videoItem.id))
             },
             { thirdMenuItem ->
-                // TODO: 跳至播放頁面
                 when (thirdMenuItem.name) {
                     getString(R.string.recommend_today) -> navToRanking()
                     else -> navToCategory(thirdMenuItem.category)
                 }
-                Timber.d("OnMore Click Category: ${thirdMenuItem.category}")
             }
         )
     }
@@ -132,7 +128,7 @@ class RecommendFragment(
         )
     }
 
-    private fun navToPlayer(item: PlayerItem){
+    private fun navToPlayer(item: PlayerItem) {
         val bundle = PlayerV2Fragment.createBundle(item)
         navigateTo(
             NavigateItem.Destination(

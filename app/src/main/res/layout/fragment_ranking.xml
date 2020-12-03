@@ -89,7 +89,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:icon="@drawable/ico_rank_shortvideo_1"
-            android:text="@string/short_video" />
+            android:text="@string/small_video" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_picture_type"
@@ -121,8 +121,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tl_type"
-            tools:visability="visible" />
+            tools:visability="invisible" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tab_type_filter" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

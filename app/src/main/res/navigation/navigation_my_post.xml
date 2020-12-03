@@ -66,6 +66,9 @@
         <action
             android:id="@+id/action_myPostFragment_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_clubPicFragment"
+            app:destination="@id/clipPlayerFragment" />
     </fragment>
 
     <fragment
@@ -92,32 +95,16 @@
     <fragment
         android:id="@+id/searchPostFragment"
         android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
-        tools:layout="@layout/fragment_search_post">
-
+        tools:layout="@layout/fragment_search_post" >
         <action
-            android:id="@+id/action_searchPostFragment_to_pictureDetailFragment"
-            app:destination="@id/pictureDetailFragment" />
-
+            android:id="@+id/action_searchPostFragment_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
         <action
-            android:id="@+id/action_searchPostFragment_to_textDetailFragment"
-            app:destination="@id/textDetailFragment" />
-
+            android:id="@+id/action_searchPostFragment_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
         <action
-            android:id="@+id/action_searchPostFragment_to_clipFragment"
-            app:destination="@id/clipFragment" />
-
-        <action
-            android:id="@+id/action_searchPostFragment_to_topicDetailFragment"
-            app:destination="@id/navigation_club_topic" />
-        <action
-            android:id="@+id/action_to_myPostFragment"
-            app:destination="@id/myPostFragment" />
-        <action
-            android:id="@+id/action_to_settingFragment"
-            app:destination="@id/navigation_setting" />
-        <action
-            android:id="@+id/action_to_loginFragment"
-            app:destination="@id/navigation_login" />
+            android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
         <action
             android:id="@+id/action_searchPostFragment_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
@@ -127,6 +114,9 @@
         <action
             android:id="@+id/action_searchPostFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
 
     <fragment
@@ -273,6 +263,9 @@
         <action
             android:id="@+id/action_to_pictureFragment"
             app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
@@ -281,10 +274,13 @@
         tools:layout="@layout/fragment_v2_player"
         android:label="ClipPlayerFragment" >
         <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_clipPlayerFragment_to_searchPostFragment"
+            android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
     </fragment>
 

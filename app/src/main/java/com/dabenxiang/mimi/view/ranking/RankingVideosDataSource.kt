@@ -16,7 +16,8 @@ class RankingVideosDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
-    private val statisticsType: StatisticsType
+    private val startTime:String,
+    private val endTime:String
 ) : PageKeyedDataSource<Long, StatisticsItem>() {
 
     companion object {
@@ -33,6 +34,8 @@ class RankingVideosDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().statisticsHomeVideos(
+                    startTime = startTime,
+                    endTime = endTime,
                     isAdult = true,
                     offset = 0,
                     limit = PER_LIMIT_LONG.toInt()
@@ -53,6 +56,7 @@ class RankingVideosDataSource constructor(
 
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
@@ -79,6 +83,7 @@ class RankingVideosDataSource constructor(
                 emit(result)
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->

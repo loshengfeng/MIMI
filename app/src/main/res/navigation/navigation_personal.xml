@@ -23,6 +23,10 @@
             app:destination="@id/navigation_login" />
 
         <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+        <action
             android:id="@+id/action_personalFragment_to_myCollectionFragment"
             app:destination="@id/myCollectionFragment" />
 
@@ -105,7 +109,7 @@
     <fragment
         android:id="@+id/likesListFragment"
         android:name="com.dabenxiang.mimi.view.my_pages.like.LikeFragment"
-        tools:layout="@layout/fragment_my_collection"
+        tools:layout="@layout/fragment_my"
         android:label="LikeFragment" >
 
         <action
@@ -177,6 +181,9 @@
         android:id="@+id/searchPostFragment"
         android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
         android:label="SearchPostFragment">
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
         <action
             android:id="@+id/action_searchPostFragment_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
@@ -252,6 +259,9 @@
         <action
             android:id="@+id/action_to_pictureFragment"
             app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
@@ -267,7 +277,12 @@
     <fragment
         android:id="@+id/clipPlayerFragment"
         android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
-        android:label="ClipPlayerFragment" />
+        android:label="ClipPlayerFragment">
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchVideoFragment"
@@ -302,6 +317,10 @@
     <fragment
         android:id="@+id/clipSingleFragment"
         android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
-        android:label="ClipSingleFragment" />
+        android:label="ClipSingleFragment">
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
 
 </navigation>
