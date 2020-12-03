@@ -50,6 +50,7 @@ import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -406,5 +407,19 @@ object GeneralUtils {
             }
             else -> null
         }
+    }
+
+    fun parseTimeToUTC(date: Date): String {
+        var time: String
+        try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            time = sdf.format(date)
+        } catch (e: Exception) {
+            Timber.d("parse time error: $e")
+            time = "0000-00-00T00:00:00Z"
+        }
+        Timber.d("parse time to UTC: $time")
+        return time
     }
 }

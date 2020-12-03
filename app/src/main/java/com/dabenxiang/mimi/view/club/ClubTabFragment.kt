@@ -35,6 +35,7 @@ import com.dabenxiang.mimi.view.post.video.EditVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.UriUtils
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_tab_club.*
 import kotlinx.android.synthetic.main.fragment_tab_club.view.*
@@ -138,12 +139,32 @@ class ClubTabFragment : BaseFragment() {
             tab.text = tabs[position]
         }
         tabLayoutMediator.attach()
-        view.club_tabs.getTabAt(DEFAULT_TAB)?.select()
+        view.club_tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                viewModel.currentTab = tab?.position ?: 0
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+        })
+        if(viewModel.currentTab == -1)  view.club_tabs.getTabAt(DEFAULT_TAB)?.select()
+
         view.topic_tabs.adapter = topicListAdapter
         view.search_bar.setOnClickListener {
             navToSearch(view.club_tabs.selectedTabPosition)
         }
         return view
+    }
+
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+
     }
 
     override fun onResume() {

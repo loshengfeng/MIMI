@@ -58,15 +58,26 @@
         <action
             android:id="@+id/action_rankingFragment_to_navigation_player"
             app:destination="@id/navigation_player" />
-        <action
-            android:id="@+id/action_to_clipPlayerFragment"
-            app:destination="@id/navigation_clip_player" />
 
         <action
-            android:id="@+id/action_rankingFragment_to_navigation_picture"
+            android:id="@+id/action_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
+
+        <action
+            android:id="@+id/action_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
 
     </fragment>
+    <fragment
+        android:id="@+id/clipSingleFragment"
+        android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
+        android:label="ClipSingleFragment">
+
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
+
     <fragment
         android:id="@+id/actorVideosFragment"
         android:name="com.dabenxiang.mimi.view.actorvideos.ActorVideosFragment"
