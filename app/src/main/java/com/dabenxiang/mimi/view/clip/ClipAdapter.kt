@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,13 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.dash.DashMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
@@ -194,7 +188,7 @@ class ClipAdapter(
         playerView.player = exoPlayer
         val agent = Util.getUserAgent(context, context.getString(R.string.app_name))
         val sourceFactory = DefaultDataSourceFactory(context, agent)
-        getMediaSource(uri, sourceFactory)?.also { mediaSource ->
+        GeneralUtils.getMediaSource(uri, sourceFactory)?.also { mediaSource ->
             playerView.player?.also {
                 playerView.tag = uri
                 (it as SimpleExoPlayer).prepare(mediaSource, true, true)
@@ -273,41 +267,6 @@ class ClipAdapter(
             }
 
 
-        }
-    }
-
-    private fun getMediaSource(
-        uriString: String,
-        sourceFactory: DefaultDataSourceFactory
-    ): MediaSource? {
-        val uri = Uri.parse(uriString)
-
-        val sourceType = Util.inferContentType(uri)
-        Timber.d("#sourceType: $sourceType")
-
-        return when (sourceType) {
-            C.TYPE_DASH ->
-                DashMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_HLS ->
-                HlsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_SS ->
-                SsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
-            C.TYPE_OTHER -> {
-                when {
-                    uriString.startsWith("rtmp://") ->
-                        ProgressiveMediaSource.Factory(RtmpDataSourceFactory())
-                            .createMediaSource(uri)
-                    uriString.contains("m3u8") -> HlsMediaSource.Factory(sourceFactory)
-                        .createMediaSource(uri)
-                    else ->
-                        ProgressiveMediaSource.Factory(sourceFactory)
-                            .createMediaSource(uri)
-                }
-            }
-            else -> null
         }
     }
 }

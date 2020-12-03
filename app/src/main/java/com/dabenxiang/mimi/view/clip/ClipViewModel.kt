@@ -7,7 +7,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
@@ -19,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class ClipViewModel : BaseViewModel() {
 
@@ -147,6 +145,13 @@ class ClipViewModel : BaseViewModel() {
                 enablePlaceholders = false,
             ),
             pagingSourceFactory = { ClipPagingSource(domainManager, orderByType) }
+        ).flow.cachedIn(viewModelScope)
+    }
+
+    fun getLimitClips(items: ArrayList<VideoItem>): Flow<PagingData<VideoItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = ApiRepository.NETWORK_PAGE_SIZE),
+            pagingSourceFactory = { ClipLimitPagingSource(items) }
         ).flow.cachedIn(viewModelScope)
     }
 

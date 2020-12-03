@@ -17,7 +17,6 @@ data class ClipFuncItem(
     val onPlayerError: ((String, String) -> Unit) = { _, _ -> },
     val onVipClick: (() -> Unit) = {},
     val onPromoteClick: (() -> Unit) = {},
-    val getClips: (((PagingData<VideoItem>, CoroutineScope) -> Unit)) -> Unit = { _ -> },
     val getM3U8: (VideoItem, Int,  (Int, String, Int) -> Unit) -> Unit = { _, _, _ -> },
     val scrollToNext: ((Int) -> Unit) = { _ -> },
     val getDecryptSetting: ((String) -> DecryptSettingItem?) = { _ -> null },

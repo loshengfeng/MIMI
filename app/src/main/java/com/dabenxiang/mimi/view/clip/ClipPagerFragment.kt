@@ -1,12 +1,12 @@
 package com.dabenxiang.mimi.view.clip
 
+import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -27,13 +27,23 @@ import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_clip_pager.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
 class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFragment() {
+
+    companion object {
+        const val KEY_DATA = "data"
+
+        fun createBundle(items: ArrayList<VideoItem>): Bundle {
+            return Bundle().also {
+                it.putSerializable(KEY_DATA, items)
+            }
+        }
+    }
+
     private val viewModel: ClipViewModel by viewModels()
 
     private val clipFuncItem by lazy {
@@ -46,7 +56,6 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             { id, error -> viewModel.sendVideoReport(id, error) },
             { onVipClick() },
             { onPromoteClick() },
-            { update -> getClips(update) },
             { item, pos, update -> getM3U8(item, pos, update) },
             { pos -> scrollToNext(pos) },
             { source -> viewModel.getDecryptSetting(source) },
@@ -71,6 +80,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                     Timber.d("refresh NotLoading endOfPaginationReached:${(loadStatus.refresh as LoadState.NotLoading).endOfPaginationReached}")
                     progressHUD.dismiss()
                     cl_error?.visibility = View.GONE
+
+                    /**API首次載入觸發獲取m3u8流程**/
                     takeIf { this@ClipPagerFragment.isVisible && adapter.itemCount > 0 }?.let {
                         adapter.getVideoItem(0)
                     }?.run {
@@ -106,6 +117,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                             (rv_clip.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
                         Timber.d("SCROLL_STATE_IDLE lastPosition: $lastPos, currentPos:$currentPos")
                         takeIf { currentPos >= 0 && currentPos != lastPos }?.run {
+                            /**頁面切換後觸發獲取m3u8流程**/
                             clipAdapter.pausePlayer()
                             clipAdapter.releasePlayer()
                             clipAdapter.updateCurrentPosition(currentPos)
@@ -144,13 +156,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             PagerSnapHelper().attachToRecyclerView(rv_clip)
             rv_clip.addOnScrollListener(onScrollListener)
-            clipFuncItem.getClips(::setupClips)
-        }
-    }
 
-    private fun setupClips(data: PagingData<VideoItem>, coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
-            (rv_clip.adapter as ClipAdapter).submitData(data)
+            (arguments?.getSerializable(KEY_DATA) as? ArrayList<VideoItem>)?.run {
+                getLimitClips(this)
+            } ?: run { getClips() }
         }
     }
 
@@ -215,7 +224,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     override fun setupListeners() {
         btn_retry.setOnClickListener {
             progressHUD.show()
-            clipFuncItem.getClips(::setupClips)
+            getClips()
         }
     }
 
@@ -259,10 +268,21 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         }
     }
 
-    private fun getClips(update: ((PagingData<VideoItem>, CoroutineScope) -> Unit)) {
+    private fun getClips() {
         lifecycleScope.launch {
             viewModel.getClips(orderByType).collectLatest {
-                update(it, this)
+                (rv_clip.adapter as ClipAdapter).submitData(it)
+            }
+        }
+    }
+
+    /**
+     * 提供固定數量小視頻列表
+     */
+    private fun getLimitClips(items: ArrayList<VideoItem>) {
+        lifecycleScope.launch {
+            viewModel.getLimitClips(items).collectLatest {
+                (rv_clip.adapter as ClipAdapter).submitData(it)
             }
         }
     }
