@@ -82,7 +82,9 @@ class MainActivity : BaseActivity(){
             when (it) {
                 is Success -> {
                     when (it.result.status) {
-                        StatusItem.NOT_LOGIN -> showNotLoginDialog()
+                        StatusItem.NOT_LOGIN -> {
+//                            showNotLoginDialog()
+                            goToLoginPage() }
                         StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED -> showEmailConfirmDialog()
                         StatusItem.LOGIN_AND_EMAIL_CONFIRMED -> it.result.onLoginAndEmailConfirmed()
                     }
@@ -446,4 +448,12 @@ class MainActivity : BaseActivity(){
         ).show(supportFragmentManager)
     }
 
+    private fun goToLoginPage(){
+        val bundle = Bundle()
+        bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
+        Navigation.findNavController(this, R.id.nav_host_fragment).navigate(
+                R.id.action_to_loginFragment,
+                bundle
+        )
+    }
 }

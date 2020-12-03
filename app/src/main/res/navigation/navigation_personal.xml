@@ -23,6 +23,10 @@
             app:destination="@id/navigation_login" />
 
         <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+        <action
             android:id="@+id/action_personalFragment_to_myCollectionFragment"
             app:destination="@id/myCollectionFragment" />
 

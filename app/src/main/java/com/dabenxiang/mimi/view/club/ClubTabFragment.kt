@@ -21,6 +21,8 @@ import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.ClubTabViewModel.Companion.REFRESH_TASK
+import com.dabenxiang.mimi.view.club.ClubTabViewModel.Companion.REFRESH_TASK_CANCEL
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
 import com.dabenxiang.mimi.view.club.adapter.TopicItemListener
 import com.dabenxiang.mimi.view.club.adapter.TopicListAdapter
@@ -82,10 +84,8 @@ class ClubTabFragment : BaseFragment() {
             override fun getAttachment(id: Long?, view: ImageView, type: LoadImageType) {
                 viewModel.loadImage(id, view, type)
             }
-
         })
     }
-
 
     override fun getLayoutId() = R.layout.fragment_tab_club
     override fun setupObservers() {}
@@ -109,6 +109,13 @@ class ClubTabFragment : BaseFragment() {
         viewModel.clubCount.observe(this, {
             topic_group.visibility = if (it <= 0) View.GONE else View.VISIBLE
         })
+
+        viewModel.doTask.observe(this, {
+            when(it){
+                REFRESH_TASK -> getClubItemList()
+                else ->{}
+            }
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,14 +123,19 @@ class ClubTabFragment : BaseFragment() {
         getClubItemList()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view =  inflater.inflate(getLayoutId(), container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(getLayoutId(), container, false)
         view.club_view_pager.adapter = ClubTabAdapter(childFragmentManager, lifecycle)
-        view.club_view_pager.offscreenPageLimit =7
+        view.club_view_pager.offscreenPageLimit = 7
         val tabs = resources.getStringArray(R.array.club_tabs)
-        tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
-            tab.text =tabs[position]
-        }
+        tabLayoutMediator =
+            TabLayoutMediator(view.club_tabs, view.club_view_pager) { tab, position ->
+                tab.text = tabs[position]
+            }
         tabLayoutMediator.attach()
         view.topic_tabs.adapter = topicListAdapter
         view.search_bar.setOnClickListener {
@@ -141,7 +153,7 @@ class ClubTabFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         Timber.i("ClubTabFragment onDestroy")
-        if(::tabLayoutMediator.isInitialized) tabLayoutMediator.detach()
+        if (::tabLayoutMediator.isInitialized) tabLayoutMediator.detach()
     }
 
     private fun getClubItemList() {
@@ -224,7 +236,7 @@ class ClubTabFragment : BaseFragment() {
         bundle.putStringArrayList(BasePostFragment.BUNDLE_PIC_URI, pciUri)
 
         findNavController().navigate(
-                R.id.action_to_postPicFragment,
+            R.id.action_to_postPicFragment,
             bundle
         )
     }
@@ -269,7 +281,7 @@ class ClubTabFragment : BaseFragment() {
                         val bundle = Bundle()
                         bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
                         findNavController().navigate(
-                                R.id.action_to_editVideoFragment,
+                            R.id.action_to_editVideoFragment,
                             bundle
                         )
                     } else {
@@ -291,8 +303,14 @@ class ClubTabFragment : BaseFragment() {
     private fun navToSearch(position: Int) {
         val searchPostItem = when (position) {
             TAB_FOLLOW -> SearchPostItem(type = PostType.FOLLOWED)
-            TAB_RECOMMEND -> SearchPostItem(type = PostType.TEXT_IMAGE_VIDEO, orderBy = StatisticsOrderType.HOTTEST)
-            TAB_LATEST -> SearchPostItem(type = PostType.TEXT_IMAGE_VIDEO, orderBy = StatisticsOrderType.LATEST)
+            TAB_RECOMMEND -> SearchPostItem(
+                type = PostType.TEXT_IMAGE_VIDEO,
+                orderBy = StatisticsOrderType.HOTTEST
+            )
+            TAB_LATEST -> SearchPostItem(
+                type = PostType.TEXT_IMAGE_VIDEO,
+                orderBy = StatisticsOrderType.LATEST
+            )
             TAB_CLIP -> SearchPostItem(type = PostType.VIDEO)
             TAB_PICTURE -> SearchPostItem(type = PostType.IMAGE)
             TAB_NOVEL -> SearchPostItem(type = PostType.TEXT)
