@@ -287,6 +287,9 @@
         tools:layout="@layout/fragment_v2_player"
         android:label="ClipPlayerFragment" >
         <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
