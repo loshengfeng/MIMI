@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -20,8 +19,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 class FavoritesAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
-        private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
-        private val attachmentListener: AttachmentListener
+        private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         const val VIEW_TYPE_CLIP = 0
@@ -106,25 +104,22 @@ class FavoritesAdapter(
                 is MyPostClipPostHolder -> {
                     holder.onBind(
                             it,
-                            null,
                             position,
                             myPostListener,
-                            attachmentListener
+                            memberPostFuncItem
                     )
                 }
                 is MyPostPicturePostHolder -> {
                     holder.pictureRecycler.tag = position
                     holder.onBind(
                             it,
-                            null,
                             position,
                             myPostListener,
-                            attachmentListener,
                             memberPostFuncItem
                     )
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(it, null, position, myPostListener, attachmentListener)
+                    holder.onBind(it,  position, myPostListener, memberPostFuncItem)
                 }
             }
         }

@@ -2,20 +2,17 @@ package com.dabenxiang.mimi.view.mypost
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
@@ -100,7 +97,6 @@ class MyPostFragment : BaseFragment() {
             requireContext(),
             isAdultTheme,
             myPostListener,
-            attachmentListener,
             memberPostFuncItem
         )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -226,15 +222,6 @@ class MyPostFragment : BaseFragment() {
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
             viewModel.getMyPost(userId, isAdult)
-        }
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
         }
     }
 

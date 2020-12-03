@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.callback.OnItemClickListener
@@ -73,10 +72,8 @@ class MyPostPicturePostHolder(
 
     fun onBind(
         item: MemberPostItem,
-        itemList: List<MemberPostItem>?,
         position: Int,
         myPostListener: MyPostListener,
-        attachmentListener: AttachmentListener,
         memberPostFuncItem: MemberPostFuncItem,
         searchStr: String = "",
         searchTag: String = ""
@@ -100,7 +97,7 @@ class MyPostPicturePostHolder(
         ) else item.title
         tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        attachmentListener.onGetAttachment(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        memberPostFuncItem.getBitmap(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
         imgAvatar.setOnClickListener {
             myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
         }
