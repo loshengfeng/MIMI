@@ -166,6 +166,13 @@ class ClipSingleFragment : BaseFragment() {
         }
 
         ib_back.setOnClickListener { findNavController().navigateUp() }
+
+        btn_retry.setOnClickListener {
+            playItem?.run {
+                btn_retry.visibility = View.GONE
+                viewModel.getM3U8(this)
+            }
+        }
     }
 
     override fun setupObservers() {
@@ -182,6 +189,7 @@ class ClipSingleFragment : BaseFragment() {
                         setupPlayer(player_view, it.result)
                     }
                 }
+                is ApiResult.Error -> onApiError(it.throwable)
                 else -> {
                 }
             }
@@ -296,10 +304,12 @@ class ClipSingleFragment : BaseFragment() {
                 }
                 else -> {
                     Timber.d("error: UNKNOWN")
-                    playItem?.videoId?.run { viewModel.sendVideoReport(this.toString()) }
                     //showErrorDialog("UNKNOWN")
                 }
             }
+            progress_video?.visibility = View.GONE
+            btn_retry.visibility = View.VISIBLE
+            playItem?.videoId?.run { viewModel.sendVideoReport(this.toString()) }
         }
     }
 

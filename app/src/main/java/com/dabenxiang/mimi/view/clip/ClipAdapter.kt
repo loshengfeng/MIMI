@@ -54,7 +54,20 @@ class ClipAdapter(
     private var m3u8Url: String? = null
     private var isOverdue: Boolean = false
 
-    fun setM3U8Result(url: String, errorCode: Int) {
+    fun getM3U8() {
+        getItem(currentPosition)?.run {
+            clipFuncItem.getM3U8(this, currentPosition, ::updateAfterM3U8)
+        }
+    }
+
+    private fun updateAfterM3U8(pos: Int, url: String, errorCode: Int) {
+        currentPosition.takeIf { it == pos }?.run {
+            setM3U8Result(url, errorCode)
+            notifyItemChanged(this, PAYLOAD_UPDATE_AFTER_M3U8)
+        }
+    }
+
+    private fun setM3U8Result(url: String, errorCode: Int) {
         m3u8Url = url
         isOverdue = errorCode == ERROR_CODE_ACCOUNT_OVERDUE
     }
@@ -125,40 +138,8 @@ class ClipAdapter(
                 PAYLOAD_UPDATE_AFTER_M3U8 -> {
                     holder.progress.visibility = View.GONE
                     holder.updateAfterM3U8(item, clipFuncItem, position, isOverdue)
-                    if (!isOverdue) {
-                        takeIf { currentPosition == position }?.also {
-                            currentViewHolder = holder
-                            holder.progress.visibility = View.VISIBLE
-                        } ?: run {
-                            holder.ivCover.visibility = View.VISIBLE
-                            holder.progress.visibility = View.GONE
-                        }
-
-                        holder.ibReplay.setOnClickListener { view ->
-                            exoPlayer?.also { player ->
-                                player.seekTo(0)
-                                player.playWhenReady = true
-                            }
-                            view.visibility = View.GONE
-                        }
-
-                        holder.playerView.setOnClickListener {
-                            takeIf { exoPlayer?.isPlaying ?: false }?.also {
-                                exoPlayer?.playWhenReady = false
-                                holder.ibPlay.visibility = View.VISIBLE
-                            } ?: run {
-                                exoPlayer?.playWhenReady = true
-                                holder.ibPlay.visibility = View.GONE
-                            }
-                        }
-
-                        holder.ibPlay.setOnClickListener {
-                            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
-                                exoPlayer?.playWhenReady = true
-                                holder.ibPlay.visibility = View.GONE
-                            }
-                        }
-                        processClip(holder.playerView, m3u8Url, position)
+                    takeUnless { isOverdue }?.run {
+                        processUpdateAfterM3U8Payload(holder, position)
                     }
                 }
             }
@@ -169,6 +150,44 @@ class ClipAdapter(
     }
 
     override fun onBindViewHolder(holder: ClipViewHolder, position: Int) {
+    }
+
+    private fun processUpdateAfterM3U8Payload(holder: ClipViewHolder, position: Int) {
+        takeIf { currentPosition == position }?.also {
+            currentViewHolder = holder
+            holder.progress.visibility = View.VISIBLE
+        } ?: run {
+            holder.ivCover.visibility = View.VISIBLE
+            holder.progress.visibility = View.GONE
+        }
+        holder.ibReplay.setOnClickListener { view ->
+            exoPlayer?.also { player ->
+                player.seekTo(0)
+                player.playWhenReady = true
+            }
+            view.visibility = View.GONE
+        }
+        holder.playerView.setOnClickListener {
+            takeIf { exoPlayer?.isPlaying ?: false }?.also {
+                exoPlayer?.playWhenReady = false
+                holder.ibPlay.visibility = View.VISIBLE
+            } ?: run {
+                exoPlayer?.playWhenReady = true
+                holder.ibPlay.visibility = View.GONE
+            }
+        }
+        holder.ibPlay.setOnClickListener {
+            takeUnless { exoPlayer?.isPlaying ?: true }?.also {
+                exoPlayer?.playWhenReady = true
+                holder.ibPlay.visibility = View.GONE
+            }
+        }
+        holder.btnRetry.setOnClickListener {
+            holder.btnRetry.visibility = View.GONE
+            holder.progress.visibility = View.VISIBLE
+            getM3U8()
+        }
+        processClip(holder.playerView, m3u8Url, position)
     }
 
     private fun processClip(playerView: PlayerView, url: String?, position: Int) {
@@ -262,6 +281,9 @@ class ClipAdapter(
                     //showErrorDialog("UNKNOWN")
                 }
             }
+
+            currentViewHolder?.progress?.visibility = View.GONE
+            currentViewHolder?.btnRetry?.visibility = View.VISIBLE
             playingId.takeIf { it.isNotEmpty() }?.also { id->
                 clipFuncItem.onPlayerError(id, error.message ?: "error: UNKNOWN")
             }

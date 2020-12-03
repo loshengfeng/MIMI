@@ -1,7 +1,5 @@
 package com.dabenxiang.mimi.model.api.vo
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
