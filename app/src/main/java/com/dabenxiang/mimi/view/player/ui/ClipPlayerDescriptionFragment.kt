@@ -142,7 +142,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
                 val bundle = Bundle()
                 detailItem.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.VIDEO)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, detailItem)
 
                 when (it.type) {
