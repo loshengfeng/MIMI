@@ -898,13 +898,15 @@ abstract class BaseFragment : Fragment() {
     fun onMoreClick(
         item: MemberPostItem,
         position: Int,
+        deducted: Boolean = true,
         onEdit: (BaseMemberPostItem) -> Unit
     ) {
         val isMe = mainViewModel?.accountManager?.getProfile()?.userId == item.creatorId
         if (isMe) {
             showMeMoreDialog(item, position, onEdit)
         } else {
-            showMoreDialog(item)
+            if (deducted)
+                showMoreDialog(item)
         }
     }
 
