@@ -104,7 +104,7 @@
             app:destination="@id/clubTextFragment" />
         <action
             android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
-            app:destination="@id/navigation_clip_player" />
+            app:destination="@id/clipPlayerFragment" />
         <action
             android:id="@+id/action_searchPostFragment_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
@@ -280,7 +280,7 @@
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_clipPlayerFragment_to_searchPostFragment"
+            android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
     </fragment>
 
