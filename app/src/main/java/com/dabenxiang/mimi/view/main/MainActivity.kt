@@ -257,7 +257,6 @@ class MainActivity : BaseActivity(){
     private fun refreshBottomNavigationBadge(unreadCount: Int) {
         Timber.i("refreshBottomNavigationBadge: $unreadCount")
         val visibility = takeIf { unreadCount > 0 }?.let { View.VISIBLE } ?: let { View.GONE }
-        badgeViewMap[BottomNavType.TOPUP]?.visibility = visibility
         badgeViewMap[BottomNavType.PERSONAL]?.visibility = visibility
     }
 
