@@ -27,6 +27,8 @@ class ClubTabViewModel : BaseViewModel() {
     private val _doTask = MutableLiveData<Int>()
     val doTask: LiveData<Int> = _doTask
 
+    var currentTab =-1
+
     fun getClubItemList(): Flow<PagingData<MemberClubItem>> {
         Timber.i("ClubTabFragment getClubItemList")
         return Pager(
