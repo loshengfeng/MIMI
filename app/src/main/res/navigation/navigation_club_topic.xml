@@ -310,6 +310,9 @@
         <action
             android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@+id/postVideoFragment" />
     </fragment>
 
 </navigation>

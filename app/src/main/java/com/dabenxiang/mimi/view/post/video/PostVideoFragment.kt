@@ -149,6 +149,14 @@ class PostVideoFragment : BasePostFragment() {
                 R.id.action_postVideoFragment_to_topicDetailFragment,
                 bundle
             )
+        } else if (isEdit && page == VIDEO) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
+            findNavController().navigate(
+                R.id.action_postVideoFragment_to_clipPlayerFragment,
+                bundle
+            )
         } else if (isEdit && page == TAB) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)

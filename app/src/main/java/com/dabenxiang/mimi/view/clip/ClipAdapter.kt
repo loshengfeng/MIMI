@@ -192,7 +192,10 @@ class ClipAdapter(
 
     private fun processClip(playerView: PlayerView, url: String?, position: Int) {
         Timber.d("processClip position:$position, url:$url")
-        url?.takeIf { currentPosition == position }?.run { setupPlayer(playerView, this) }
+        url?.takeIf { currentPosition == position }?.run {
+            releasePlayer()
+            setupPlayer(playerView, this)
+        }
     }
 
     private fun setupPlayer(playerView: PlayerView, uri: String) {

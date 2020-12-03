@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@+id/postVideoFragment" />
     </fragment>
 
     <fragment
@@ -35,6 +38,35 @@
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
 
+    </fragment>
+
+    <fragment
+        android:id="@+id/postVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.video.PostVideoFragment"
+        android:label="PostVideoFragment"
+        tools:layout="@layout/fragment_post_video">
+        <action
+            android:id="@+id/action_postVideoFragment_self"
+            app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment"
+            app:popUpTo="@+id/myPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
     </fragment>
 
 </navigation>
