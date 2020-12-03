@@ -56,4 +56,6 @@ class ActorListAdapter(
             }
         }
     }
+
+    fun isDataEmpty() = itemCount == 0
 }
