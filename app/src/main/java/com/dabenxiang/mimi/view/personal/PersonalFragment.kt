@@ -121,44 +121,11 @@ class PersonalFragment : BaseFragment() {
         }
     }
 
-    private fun likeClick() {
-        if (viewModel.isLogin()) {
-            navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment))
-        } else {
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_personalFragment_to_loginFragment,
-                            LoginFragment.createBundle(TYPE_LOGIN)
-                    )
-            )
-        }
-    }
+    private fun likeClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment)) }
 
-    private fun followClick() {
-        if (viewModel.isLogin()) {
-            navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment))
-        } else {
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_personalFragment_to_loginFragment,
-                            LoginFragment.createBundle(TYPE_LOGIN)
-                    )
-            )
-        }
-    }
+    private fun followClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment)) }
 
-    private fun fansClick() {
-        if (viewModel.isLogin()) {
-            navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment))
-        } else {
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_personalFragment_to_loginFragment,
-                            LoginFragment.createBundle(TYPE_LOGIN)
-                    )
-            )
-        }
-    }
+    private fun fansClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment)) }
 
     @SuppressLint("SetTextI18n")
     override fun setupObservers() {
@@ -240,21 +207,12 @@ class PersonalFragment : BaseFragment() {
                     viewModel.signOut()
                 }
                 R.id.vippromote_now -> {
-                    if (viewModel.isLogin()) {
-                        navigateTo(
+                    checkStatus { navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_to_inviteVipFragment,
-                                null
+                                    R.id.action_to_inviteVipFragment,
+                                    null
                             )
-                        )
-                    } else {
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_personalFragment_to_loginFragment,
-                                LoginFragment.createBundle(TYPE_LOGIN)
-                            )
-                        )
-                    }
+                    ) }
                 }
                 R.id.tv_register -> navigateTo(
                     NavigateItem.Destination(

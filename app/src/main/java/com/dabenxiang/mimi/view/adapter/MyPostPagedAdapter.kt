@@ -6,20 +6,17 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
 
 class MyPostPagedAdapter(
     val context: Context,
     private val isAdultTheme: Boolean,
     private val myPostListener: MyPostListener,
-    private val attachmentListener: AttachmentListener,
     private val memberPostFuncItem: MemberPostFuncItem
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
@@ -114,10 +111,9 @@ class MyPostPagedAdapter(
                     } ?: run {
                         holder.onBind(
                             it,
-                            currentList,
                             position,
                             myPostListener,
-                            attachmentListener
+                                memberPostFuncItem
                         )
                     }
                 }
@@ -131,10 +127,8 @@ class MyPostPagedAdapter(
                         holder.pictureRecycler.tag = position
                         holder.onBind(
                             it,
-                            currentList,
                             position,
                             myPostListener,
-                            attachmentListener,
                             memberPostFuncItem
                         )
                     }
@@ -146,7 +140,7 @@ class MyPostPagedAdapter(
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
                         }
                     } ?: run {
-                        holder.onBind(it, currentList, position, myPostListener, attachmentListener)
+                        holder.onBind(it, position, myPostListener, memberPostFuncItem)
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.item
+package com.dabenxiang.mimi.view.club.pages
 
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
@@ -10,7 +10,6 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
-import timber.log.Timber
 
 class ClubItemDataSource(
         private val domainManager: DomainManager,
@@ -34,6 +33,9 @@ class ClubItemDataSource(
 
             val result =
                     when (type) {
+                        ClubTabItemType.FOLLOW -> {
+                            domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
+                        }
                         ClubTabItemType.RECOMMEND -> {
                             domainManager.getApiRepository().getMembersPost(PostType.TEXT_IMAGE_VIDEO, OrderBy.HOTTEST, offset, PER_LIMIT)
                         }
@@ -53,8 +55,6 @@ class ClubItemDataSource(
                         else -> null
                     }
 
-
-            Timber.i("ClubShortListDataSource result=$result")
             if (result?.isSuccessful == false) throw HttpException(result)
 
             val body = result?.body()

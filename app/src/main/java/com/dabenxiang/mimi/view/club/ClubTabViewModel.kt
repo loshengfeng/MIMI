@@ -16,8 +16,16 @@ import timber.log.Timber
 
 class ClubTabViewModel : BaseViewModel() {
 
+    companion object{
+        const val REFRESH_TASK_CANCEL = 0
+        const val REFRESH_TASK = 1
+    }
+
     private val _clubCount = MutableLiveData<Int>()
     val clubCount: LiveData<Int> = _clubCount
+
+    private val _doTask = MutableLiveData<Int>()
+    val doTask: LiveData<Int> = _doTask
 
     fun getClubItemList(): Flow<PagingData<MemberClubItem>> {
         Timber.i("ClubTabFragment getClubItemList")
@@ -39,6 +47,10 @@ class ClubTabViewModel : BaseViewModel() {
             _clubCount.postValue(count.toInt())
         }
 
+    }
+
+    fun doTask(task:Int) {
+        _doTask.value = task
     }
 
 }

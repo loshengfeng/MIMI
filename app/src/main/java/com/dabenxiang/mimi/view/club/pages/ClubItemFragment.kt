@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.item
+package com.dabenxiang.mimi.view.club.pages
 
 import android.content.Context
 import android.os.Bundle
@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.observe
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -20,6 +19,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -28,24 +28,23 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_short.*
-import kotlinx.android.synthetic.main.fragment_club_short.id_empty_group
-import kotlinx.android.synthetic.main.fragment_club_short.id_not_login_group
-import kotlinx.android.synthetic.main.fragment_club_short.layout_ad
-import kotlinx.android.synthetic.main.fragment_club_short.layout_refresh
+import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.item_ad.view.*
+import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
+
     private val viewModel: ClubItemViewModel by viewModels()
+    private val clubTabViewModel: ClubTabViewModel by viewModels({requireParentFragment()})
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubItemAdapter by lazy {
-        ClubItemAdapter(requireContext(), postListener, attachmentListener, memberPostFuncItem)
+        ClubItemAdapter(requireContext(), postListener, memberPostFuncItem)
     }
 
-    override fun getLayoutId() = R.layout.fragment_club_short
+    override fun getLayoutId() = R.layout.fragment_club_item
 
     companion object {
         const val KEY_DATA = "data"
@@ -101,6 +100,10 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             Timber.i("postCount= $it")
             if (it == 0) {
                 id_empty_group.visibility = View.VISIBLE
+                text_page_empty.text = when(type){
+                    ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
+                    else -> getText(R.string.empty_post)
+                }
                 list_short.visibility = View.INVISIBLE
             } else {
                 id_empty_group.visibility = View.GONE
@@ -153,8 +156,28 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
+            clubTabViewModel.doTask(ClubTabViewModel.REFRESH_TASK)
             viewModel.getData(adapter, type)
         }
+
+        tv_register.setOnClickListener {
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_to_loginFragment,
+                            LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                    )
+            )
+        }
+
+        tv_login.setOnClickListener {
+            navigateTo(
+                    NavigateItem.Destination(
+                            R.id.action_to_loginFragment,
+                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+            )
+        }
+
     }
 
     override fun initSettings() {
@@ -162,34 +185,26 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     }
 
     private fun loginPageToggle(isLogin: Boolean) {
+        Timber.i("loginPageToggle= $isLogin")
         if (isLogin) {
             id_not_login_group.visibility = View.GONE
             layout_refresh.visibility = View.VISIBLE
         } else {
-            id_not_login_group.visibility = View.GONE
+            id_not_login_group.visibility = View.VISIBLE
             layout_refresh.visibility = View.INVISIBLE
         }
     }
 
     override fun onResume() {
         super.onResume()
-        //According to specs, this page does not need to log in currently
-        loginPageToggle(true)
+        loginPageToggle(
+                if(type == ClubTabItemType.FOLLOW) accountManager.isLogin()
+                else true)
 
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, type)
         }
         viewModel.getAd()
-    }
-
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-        }
     }
 
     private val postListener = object : MyPostListener {
