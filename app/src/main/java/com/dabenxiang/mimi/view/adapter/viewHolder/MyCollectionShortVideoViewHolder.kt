@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
@@ -21,7 +22,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
-class MyCollectionMIMIVideoViewHolder(
+class MyCollectionShortVideoViewHolder(
         itemView: View
 ) : BaseViewHolder(itemView), KoinComponent {
 
@@ -32,8 +33,8 @@ class MyCollectionMIMIVideoViewHolder(
     private val ivPhoto: ImageView = itemView.iv_photo
     private val tvLength: TextView = itemView.tv_length
     private val tagChipGroup: ChipGroup = itemView.chip_group_tag
-    private val ivLike: ImageView = itemView.iv_like
-    private val tvLikeCount: TextView = itemView.tv_like_count
+//    private val ivLike: ImageView = itemView.iv_like
+//    private val tvLikeCount: TextView = itemView.tv_like_count
     private val ivComment: ImageView = itemView.iv_comment
     private val tvCommentCount: TextView = itemView.tv_comment_count
     private val ivMore: ImageView = itemView.iv_more
@@ -52,7 +53,7 @@ class MyCollectionMIMIVideoViewHolder(
         Timber.d("neo, item = ${item}")
         clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvTitle.setTextColor(App.self.getColor(R.color.color_black_1))
-        tvLikeCount.setTextColor(App.self.getColor(R.color.color_black_1))
+//        tvLikeCount.setTextColor(App.self.getColor(R.color.color_black_1))
         tvFavoriteCount.setTextColor(App.self.getColor(R.color.color_black_1))
         tvCommentCount.setTextColor(App.self.getColor(R.color.color_black_1))
         ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
@@ -111,14 +112,14 @@ class MyCollectionMIMIVideoViewHolder(
         ivFavorite.setOnClickListener(onFavoriteClickListener)
         tvFavoriteCount.setOnClickListener(onFavoriteClickListener)
 
-        updateLike(item)
-        val onLikeClickListener = View.OnClickListener {
-            item.like = item.like != true
-            item.likeCount = if (item.like == true) ((item.likeCount ?: 0) + 1) else ((item.likeCount ?: 0) - 1)
-            listener.onLikeClick(item, position, item.like == true)
-        }
-        ivLike.setOnClickListener(onLikeClickListener)
-        tvLikeCount.setOnClickListener(onLikeClickListener)
+//        updateLike(item)
+//        val onLikeClickListener = View.OnClickListener {
+//            item.like = item.like != true
+//            item.likeCount = if (item.like == true) ((item.likeCount ?: 0) + 1) else ((item.likeCount ?: 0) - 1)
+//            listener.onLikeClick(item, position, item.like == true)
+//        }
+//        ivLike.setOnClickListener(onLikeClickListener)
+//        tvLikeCount.setOnClickListener(onLikeClickListener)
 
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
@@ -135,13 +136,13 @@ class MyCollectionMIMIVideoViewHolder(
     }
 
     fun updateLike(item: PlayItem) {
-        tvLikeCount.text = item.likeCount.toString()
-
-        if (item.like == true) {
-            ivLike.setImageResource(R.drawable.ico_nice_s)
-        } else {
-            ivLike.setImageResource(R.drawable.ico_nice_gray)
-        }
+//        tvLikeCount.text = item.likeCount.toString()
+//
+//        if (item.like == true) {
+//            ivLike.setImageResource(R.drawable.ico_nice_s)
+//        } else {
+//            ivLike.setImageResource(R.drawable.ico_nice_gray)
+//        }
     }
 
     fun updateFavorite(item: PlayItem) {

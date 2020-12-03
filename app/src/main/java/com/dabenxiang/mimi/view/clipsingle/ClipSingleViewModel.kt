@@ -47,6 +47,9 @@ class ClipSingleViewModel: BaseViewModel() {
         }
     }
 
+    /**
+     * 影片回報問題(用於內部播放錯誤主動回報)
+     */
     fun sendVideoReport(id: String) {
         viewModelScope.launch {
             flow {
@@ -58,6 +61,23 @@ class ClipSingleViewModel: BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
+                .collect ()
+        }
+    }
+
+    /**
+     * 影片回報問題(用於點擊更多)
+     */
+    fun sendVideoReport(id: Long, content: String) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val resp = apiRepository.sendVideoReport(ReportRequest(content, id))
+                if(!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e-> emit(ApiResult.error(e)) }
                 .collect { _videoReport.value = it }
         }
     }

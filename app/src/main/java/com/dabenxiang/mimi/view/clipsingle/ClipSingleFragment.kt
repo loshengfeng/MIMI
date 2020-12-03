@@ -119,11 +119,8 @@ class ClipSingleFragment : BaseFragment() {
         }
 
         tv_more.setOnClickListener {
-            viewModel.videoEpisodeItem?.run {
-                Pair(this.videoStreams?.get(0), this.reported ?: false)
-            }?.run {
-                val (videoStream, isReported) = this
-                showMoreDialog(videoStream?.id ?: 0, PostType.VIDEO, isReported)
+            viewModel.videoEpisodeItem?.videoStreams?.get(0)?.run {
+                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported)
             }
         }
 
@@ -168,10 +165,12 @@ class ClipSingleFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Empty -> GeneralUtils.showToast(
-                    requireContext(),
-                    getString(R.string.report_success)
-                )
+                is ApiResult.Empty -> {
+                    viewModel.videoEpisodeItem?.videoStreams?.get(0)?.also { item ->
+                        item.reported = true
+                    }
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
                 is ApiResult.Error -> onApiError(it.throwable)
                 else -> {
                 }
@@ -260,6 +259,7 @@ class ClipSingleFragment : BaseFragment() {
                 }
                 else -> {
                     Timber.d("error: UNKNOWN")
+                    playItem?.videoId?.run { viewModel.sendVideoReport(this.toString()) }
                     //showErrorDialog("UNKNOWN")
                 }
             }
@@ -390,7 +390,7 @@ class ClipSingleFragment : BaseFragment() {
             } else {
                 when (item) {
                     is MemberPostItem -> {
-                        viewModel.sendVideoReport(item.id.toString())
+                        viewModel.sendVideoReport(item.id, content)
                     }
                 }
             }
