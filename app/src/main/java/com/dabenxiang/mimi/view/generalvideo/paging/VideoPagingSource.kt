@@ -13,12 +13,12 @@ class VideoPagingSource(
     private val orderByType: Int = StatisticsOrderType.LATEST.value,
     private val adWidth: Int,
     private val adHeight: Int,
-    private val needAd:Boolean
+    private val needAd: Boolean
 ) : PagingSource<Long, StatisticsItem>() {
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, StatisticsItem> {
         return try {
-            val offset = params.key ?: 0L
+            val lastId = params.key ?: 0L
 
             val result = domainManager.getApiRepository()
                 .statisticsHomeVideos(
@@ -26,45 +26,34 @@ class VideoPagingSource(
                     endTime = "",
                     orderByType = orderByType,
                     category = category,
-                    offset = offset.toString().toInt(),
-                    limit = params.loadSize
+                    offset = 0,
+                    limit = params.loadSize,
+                    lastId = lastId
                 )
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result.body()
             val items = body?.content
+            val lastItem = items?.last()
 
-            if(needAd){
+            if (needAd) {
                 val adItem = domainManager.getAdRepository()
-                        .getAD(adWidth, adHeight).body()?.content ?: AdItem()
+                    .getAD(adWidth, adHeight).body()?.content ?: AdItem()
                 items?.add(0, StatisticsItem(adItem = adItem))
             }
 
             val nextOffset = when {
-                hasNextPage(
-                    body?.paging?.count ?: 0,
-                    body?.paging?.offset ?: 0,
-                    items?.size ?: 0,
-                    params.loadSize
-                ) -> offset + params.loadSize
+                items?.isNotEmpty() == true -> lastItem?.id
                 else -> null
             }
 
             LoadResult.Page(
                 data = items ?: arrayListOf(),
-                prevKey = if (offset == 0L) null else offset - params.loadSize.toLong(),
+                prevKey = null,
                 nextKey = nextOffset
             )
         } catch (exception: Exception) {
             LoadResult.Error(exception)
-        }
-    }
-
-    private fun hasNextPage(total: Long, offset: Long, currentSize: Int, loadSize: Int): Boolean {
-        return when {
-            currentSize < loadSize -> false
-            offset >= total -> false
-            else -> true
         }
     }
 }

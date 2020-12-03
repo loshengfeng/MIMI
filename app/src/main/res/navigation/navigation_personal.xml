@@ -11,6 +11,7 @@
     <include app:graph="@navigation/navigation_setting" />
     <include app:graph="@navigation/navigation_topup" />
     <include app:graph="@navigation/navigation_clip_player" />
+    <include app:graph="@navigation/navigation_player" />
 
     <fragment
         android:id="@+id/personalFragment"
@@ -94,7 +95,7 @@
 
     <fragment
         android:id="@+id/fansListFragment"
-        android:name="com.dabenxiang.mimi.view.fans.FansListFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.pages.fans.FansListFragment"
         android:label="FansListFragment" >
         <action
             android:id="@+id/action_fansListFragment_to_navigation_my_post"
@@ -103,7 +104,7 @@
 
     <fragment
         android:id="@+id/likesListFragment"
-        android:name="com.dabenxiang.mimi.view.my.like.LikeFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.like.LikeFragment"
         tools:layout="@layout/fragment_my_collection"
         android:label="LikeFragment" >
 
@@ -128,17 +129,13 @@
     </fragment>
 
     <fragment
-        android:id="@+id/inviteVipFragment"
-        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
-        android:label="InviteVipFragment" />
-    <fragment
         android:id="@+id/topUpFragment"
         android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
         android:label="TopUpFragment" />
 
     <fragment
         android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.my.follow.MyFollowFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment"
         android:label="MyFollowFragment" >
         <action
             android:id="@+id/action_myFollowFragment_to_navigation_my_post"
@@ -150,7 +147,7 @@
     </fragment>
     <fragment
         android:id="@+id/myCollectionFragment"
-        android:name="com.dabenxiang.mimi.view.my.collection.MyCollectionFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.collection.MyCollectionFragment"
         android:label="MyCollectionFragment">
 
         <action
@@ -231,9 +228,27 @@
     </fragment>
 
     <fragment
+        android:id="@+id/clubTextFragment"
+        android:name="com.dabenxiang.mimi.view.club.text.ClubTextFragment"
+        tools:layout="@layout/fragment_club_text">
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/clubPicFragment"
         android:name="com.dabenxiang.mimi.view.club.pic.ClubPicFragment"
-        android:label="ClubPicFragment">
+        tools:layout="@layout/fragment_club_pic" >
+        <action
+            android:id="@+id/action_clubPicFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clubPicFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
         <action
             android:id="@+id/action_to_pictureFragment"
             app:destination="@id/pictureFragment" />
@@ -253,10 +268,37 @@
         android:id="@+id/clipPlayerFragment"
         android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
         android:label="ClipPlayerFragment" />
+
     <fragment
         android:id="@+id/searchVideoFragment"
         android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
-        android:label="SearchVideoFragment" />
+        tools:layout="@layout/fragment_search_video">
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/inviteVipRecordFragment"
+        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
+        android:label="InviteVipRecordFragment" />
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment">
+        <action
+            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
+            app:destination="@id/inviteVipRecordFragment" />
+        <action
+            android:id="@+id/action_inviteVipFragment_to_navigation_login"
+            app:destination="@id/navigation_login" />
+    </fragment>
     <fragment
         android:id="@+id/clipSingleFragment"
         android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"

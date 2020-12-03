@@ -7,12 +7,10 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.PlayListRequest
-import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.api.vo.VideoStream
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
@@ -21,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class ClipViewModel : BaseViewModel() {
 
@@ -84,6 +83,9 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
+    /**
+     * 影片回報問題(用於內部播放錯誤主動回報)
+     */
     fun sendVideoReport(id: String, error: String) {
         viewModelScope.launch {
             flow {
@@ -95,6 +97,23 @@ class ClipViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
+                .collect()
+        }
+    }
+
+    /**
+     * 影片回報問題(用於點擊更多)
+     */
+    fun sendVideoReport(id: Long, content: String) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val resp = apiRepository.sendVideoReport(ReportRequest(content, id))
+                if(!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e-> emit(ApiResult.error(e)) }
                 .collect { _videoReport.value = it }
         }
     }

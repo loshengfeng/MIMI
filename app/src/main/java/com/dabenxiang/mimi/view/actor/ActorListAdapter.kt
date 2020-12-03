@@ -3,8 +3,10 @@ package com.dabenxiang.mimi.view.actor
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -38,6 +40,8 @@ class ActorListAdapter(
         }
     }
 
+    var holder: ActorCategoriesViewHolder? = null
+
     override fun getItemViewType(position: Int): Int {
         return VIEW_TYPE_NORMAL
     }
@@ -45,10 +49,11 @@ class ActorListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             VIEW_TYPE_NORMAL -> {
-               ActorCategoriesViewHolder(
+               holder = ActorCategoriesViewHolder(
                         LayoutInflater.from(parent.context)
                                 .inflate(R.layout.item_actor_categories, parent, false)
                 )
+                holder!!
             }
             else -> {
                 ActorCategoriesViewHolder(
@@ -72,6 +77,14 @@ class ActorListAdapter(
                 }
             }
         }
+    }
+
+    fun getHolderParameter(): GridLayoutManager.LayoutParams {
+        val params = holder?.clCategory?.layoutParams
+        return if(params != null)
+            params as GridLayoutManager.LayoutParams
+        else
+            GridLayoutManager.LayoutParams(70,117)
     }
 
 }
