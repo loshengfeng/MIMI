@@ -337,6 +337,8 @@ interface ApiService {
     @GET("/v1/Members/Home/Videos/SearchShortVideo")
     suspend fun searchShortVideo(
         @Query("q") q: String?,
+        @Query("startTime") startTime: String? = null,
+        @Query("endTime") endTime: String? = null,
         @Query("orderByType") orderByType: Int?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,

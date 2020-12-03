@@ -317,6 +317,10 @@
     <fragment
         android:id="@+id/clipSingleFragment"
         android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
-        android:label="ClipSingleFragment" />
+        android:label="ClipSingleFragment">
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
 
 </navigation>
