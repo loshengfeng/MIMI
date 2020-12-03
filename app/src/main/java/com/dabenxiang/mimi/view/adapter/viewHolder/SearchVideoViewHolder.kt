@@ -72,6 +72,7 @@ class SearchVideoViewHolder(
                 data!!
             )
         }
+        tvTitle.setOnClickListener { listener.onVideoClick(data!!) }
         tvMore.visibility = View.GONE
     }
 
