@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
+import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -29,7 +29,6 @@ import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_clip_info.*
 import kotlinx.android.synthetic.main.item_comment_interactive.*
 import kotlinx.android.synthetic.main.item_video_tag.*
-import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 
 class ClipPlayerDescriptionFragment : BaseFragment() {
@@ -263,7 +262,11 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
         list.indices.mapNotNull {
             list[it]
-        }.forEach {
+        }.forEach addChipItem@{
+            if (tag_group.size == 20) {
+                return@addChipItem
+            }
+
             val chip = layoutInflater.inflate(
                 R.layout.chip_item,
                 tag_group,
