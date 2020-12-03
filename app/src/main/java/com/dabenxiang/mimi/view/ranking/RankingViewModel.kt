@@ -6,32 +6,36 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.enums.StatisticsType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
 import java.util.*
+import kotlin.collections.ArrayList
 
 class RankingViewModel : BaseViewModel() {
 
     private val _rankingList = MutableLiveData<PagedList<PostStatisticsItem>>()
     val rankingList: LiveData<PagedList<PostStatisticsItem>> = _rankingList
 
+    private val _rankingClipList = MutableLiveData<ApiResult<List<VideoItem>>>()
+    val rankingClipList: LiveData<ApiResult<List<VideoItem>>> = _rankingClipList
+
     private val _rankingVideosList = MutableLiveData<PagedList<StatisticsItem>>()
     val rankingVideosList: LiveData<PagedList<StatisticsItem>> = _rankingVideosList
 
     var statisticsTypeSelected: StatisticsType = StatisticsType.TODAY
     var postTypeSelected: PostType = PostType.VIDEO_ON_DEMAND
-
 
     fun setPostType(position: Int) {
         postTypeSelected = when (position) {
@@ -104,20 +108,27 @@ class RankingViewModel : BaseViewModel() {
         override fun onThrowable(throwable: Throwable) {}
     }
 
-    fun getRankingClipList(): Flow<PagingData<VideoItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = RankingClipPagingSource.PER_LIMIT),
-            pagingSourceFactory = {
+    fun getRankingClipList() {
+        viewModelScope.launch {
+            flow<ApiResult<List<VideoItem>>> {
                 val timeRange = getTimeRange()
-                RankingClipPagingSource(domainManager, timeRange.first, timeRange.second)
+                val result = domainManager.getApiRepository().searchShortVideo(
+                    startTime = timeRange.first,
+                    endTime = timeRange.second,
+                    orderByType = StatisticsOrderType.HOTTEST,
+                    offset = "0",
+                    limit = "10"
+                )
+                if (!result.isSuccessful) throw HttpException(result)
+                val list = result.body()?.content?.videos ?: arrayListOf()
+                emit(ApiResult.success(list))
             }
-        )
-            .flow
-            .onStart { setShowProgress(true) }
-            .onCompletion {
-                Timber.d("onCompletion")
-                setShowProgress(false) }
-            .cachedIn(viewModelScope)
+                .flowOn(Dispatchers.IO)
+                .onStart { setShowProgress(true) }
+                .onCompletion { setShowProgress(false) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _rankingClipList.value = it }
+        }
     }
 
     private fun getTimeRange(): Pair<String, String> {

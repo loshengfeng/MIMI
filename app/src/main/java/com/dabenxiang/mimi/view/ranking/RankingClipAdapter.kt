@@ -27,19 +27,9 @@ class RankingClipAdapter(
     private val context: Context,
     private val rankingFuncItem: RankingFuncItem = RankingFuncItem(),
     private val funcItem: CollectionFuncItem,
-) : PagingDataAdapter<VideoItem, RecyclerView.ViewHolder>(diffCallback) {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<VideoItem>() {
-            override fun areItemsTheSame(oldItem: VideoItem, newItem: VideoItem): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-            override fun areContentsTheSame(oldItem: VideoItem, newItem: VideoItem): Boolean {
-                return oldItem == newItem
-            }
-        }
-    }
+    private val dataList: ArrayList<VideoItem> = arrayListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return RankingViewHolder(
@@ -47,9 +37,14 @@ class RankingClipAdapter(
         )
     }
 
+    fun updateData(data: ArrayList<VideoItem>) {
+        dataList.clear()
+        dataList.addAll(data)
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         holder as RankingViewHolder
-        val item = getItem(position) ?: VideoItem()
+        val item = dataList[position]
         holder.bind(
             context,
             position,
@@ -71,7 +66,7 @@ class RankingClipAdapter(
             position: Int,
             item: VideoItem,
             rankingFuncItem: RankingFuncItem,
-            funcItem:CollectionFuncItem
+            funcItem: CollectionFuncItem
         ) {
 
             ranking.let {
@@ -105,4 +100,6 @@ class RankingClipAdapter(
             }
         }
     }
+
+    override fun getItemCount() = dataList.size
 }

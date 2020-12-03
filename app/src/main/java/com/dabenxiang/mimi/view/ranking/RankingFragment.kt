@@ -13,7 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.error.SUCCESS
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
@@ -165,6 +168,17 @@ class RankingFragment : BaseFragment() {
         viewModel.rankingList.observe(viewLifecycleOwner, Observer {
             pictureAdapter.submitList(it)
         })
+
+        viewModel.rankingClipList.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Loading -> layout_refresh.isRefreshing = true
+                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
+                is ApiResult.Success -> clipAdapter.updateData(it.result as ArrayList<VideoItem>)
+                is ApiResult.Error -> onApiError(it.throwable)
+                else -> {
+                }
+            }
+        })
     }
 
     private fun setupAdapter() {
@@ -236,14 +250,8 @@ class RankingFragment : BaseFragment() {
 
     fun getRankingList() {
         when (viewModel.postTypeSelected) {
-            PostType.VIDEO_ON_DEMAND-> viewModel.getVideosRanking()
-            PostType.VIDEO ->
-                lifecycleScope.launch {
-                    clipAdapter.submitData(PagingData.empty())
-                    viewModel.getRankingClipList().collectLatest {
-                        clipAdapter.submitData(it)
-                    }
-                }
+            PostType.VIDEO_ON_DEMAND -> viewModel.getVideosRanking()
+            PostType.VIDEO -> viewModel.getRankingClipList()
             PostType.IMAGE -> viewModel.getRankingPostList()
         }
     }
