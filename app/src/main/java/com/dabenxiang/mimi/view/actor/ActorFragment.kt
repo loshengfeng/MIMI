@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.widget.view.ActorsGridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_actor.*
 import kotlinx.android.synthetic.main.fragment_actor.tv_search
 import timber.log.Timber
@@ -76,8 +77,8 @@ class ActorFragment : BaseFragment() {
         return R.layout.fragment_actor
     }
 
-    override fun initSettings() {
-        super.initSettings()
+    override fun setupFirstTime() {
+        super.setupFirstTime()
         actorListAdapter.addLoadStateListener(loadStateListener)
         val gridLayoutManager = GridLayoutManager(requireContext(), 4)
             .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
@@ -85,6 +86,9 @@ class ActorFragment : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
             it.adapter = concatAdapter
+            it.addItemDecoration(
+                ActorsGridSpaceItemDecoration(requireContext())
+            )
         }
         viewModel.getActors()
         viewModel.getData(actorListAdapter)
