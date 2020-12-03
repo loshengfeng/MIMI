@@ -37,6 +37,7 @@ class FavoritesListDataSource constructor(
             val memberPostItems =  result.body()?.content?.map {
                 it.toMemberPostItem()
             } as ArrayList
+
             if(!isLike)
                 memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
             val hasNext = hasNextPage(
