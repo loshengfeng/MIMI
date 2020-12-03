@@ -67,28 +67,6 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
             layout_refresh.isRefreshing = false
         })
 
-        viewModel.adResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result?.let { item ->
-                        Glide.with(context).load(item.href).into(layout_ad.iv_ad)
-                        layout_ad.iv_ad.setOnClickListener {
-                            GeneralUtils.openWebView(context, item.target ?: "")
-                        }
-                    }
-                }
-                is ApiResult.Error -> {
-                    layout_ad.visibility = View.GONE
-                    onApiError(it.throwable)
-                }
-
-                else -> {
-                    layout_ad.visibility = View.GONE
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-        })
-
         viewModel.likePostResult.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
@@ -173,7 +151,6 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, isLike)
         }
-//        viewModel.getAd()
     }
 
     private val memberPostFuncItem by lazy {

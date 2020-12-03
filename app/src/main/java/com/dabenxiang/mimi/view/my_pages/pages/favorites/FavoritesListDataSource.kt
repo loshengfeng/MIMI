@@ -25,8 +25,6 @@ class FavoritesListDataSource constructor(
         val offset = params.key ?: 0
         return try {
 
-            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content ?: AdItem()
-
             val result =
                 when(isLike) {
                     false -> domainManager.getApiRepository().getPostFavorite( offset, LikeListDataSource.PER_LIMIT, 7)
@@ -38,8 +36,6 @@ class FavoritesListDataSource constructor(
                 it.toMemberPostItem()
             } as ArrayList
 
-            if(!isLike)
-                memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
                 result.body()?.paging?.offset ?: 0,
