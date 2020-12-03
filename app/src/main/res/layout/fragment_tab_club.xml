@@ -96,6 +96,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimaryDark"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="4dp"
             app:tabMode="scrollable"
             app:tabTextAppearance="@style/club_tab_item_type_text" />
     </com.google.android.material.appbar.AppBarLayout>
