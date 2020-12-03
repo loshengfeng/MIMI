@@ -124,35 +124,37 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     private fun setInteractiveListener() {
         imgLike.setOnClickListener {
-            clipViewModel.likePost(detailItem, LikeType.LIKE)
+            checkStatus { clipViewModel.likePost(detailItem, LikeType.LIKE)}
         }
         imgDislike.setOnClickListener {
-            clipViewModel.likePost(detailItem, LikeType.DISLIKE)
+            checkStatus { clipViewModel.likePost(detailItem, LikeType.DISLIKE)}
         }
         imgFavorite.setOnClickListener {
-            clipViewModel.favoritePost(detailItem)
+            checkStatus { clipViewModel.favoritePost(detailItem)}
         }
     }
 
     private fun setReportListener() {
         imgReport.setOnClickListener {
-            if (detailItem.reported) {
-                GeneralUtils.showToast(
-                    App.applicationContext(),
-                    getString(R.string.already_reported)
-                )
-            } else {
-                reportDialog =
-                    ReportDialogFragment.newInstance(
-                        item = detailItem,
-                        listener = onReportDialogListener,
-                        isComment = false
-                    ).also {
-                        it.show(
-                            requireActivity().supportFragmentManager,
-                            ReportDialogFragment::class.java.simpleName
-                        )
-                    }
+            checkStatus {
+                if (detailItem.reported) {
+                    GeneralUtils.showToast(
+                        App.applicationContext(),
+                        getString(R.string.already_reported)
+                    )
+                } else {
+                    reportDialog =
+                        ReportDialogFragment.newInstance(
+                            item = detailItem,
+                            listener = onReportDialogListener,
+                            isComment = false
+                        ).also {
+                            it.show(
+                                requireActivity().supportFragmentManager,
+                                ReportDialogFragment::class.java.simpleName
+                            )
+                        }
+                }
             }
         }
     }
