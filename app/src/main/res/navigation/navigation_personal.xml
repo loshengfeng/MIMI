@@ -228,9 +228,27 @@
     </fragment>
 
     <fragment
+        android:id="@+id/clubTextFragment"
+        android:name="com.dabenxiang.mimi.view.club.text.ClubTextFragment"
+        tools:layout="@layout/fragment_club_text">
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/clubPicFragment"
         android:name="com.dabenxiang.mimi.view.club.pic.ClubPicFragment"
-        android:label="ClubPicFragment">
+        tools:layout="@layout/fragment_club_pic" >
+        <action
+            android:id="@+id/action_clubPicFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_clubPicFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
         <action
             android:id="@+id/action_to_pictureFragment"
             app:destination="@id/pictureFragment" />
