@@ -345,7 +345,8 @@ abstract class BaseFragment : Fragment() {
                             mediaItem.videoParameter = videoParameter
                             mediaItem.textContent = postMemberRequest.content
                             val content = Gson().toJson(mediaItem)
-                            postMemberRequest.title = memberRequest!!.title
+                            postMemberRequest.type = memberRequest!!.type
+                            postMemberRequest.title = memberRequest.title
                             memberPostItem.content = content
                             Timber.d("Post id : $postId")
                             Timber.d("Request : $postMemberRequest")
