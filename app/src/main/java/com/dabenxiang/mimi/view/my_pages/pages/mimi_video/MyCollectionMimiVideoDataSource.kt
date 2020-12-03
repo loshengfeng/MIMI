@@ -26,10 +26,6 @@ class MyCollectionMimiVideoDataSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PlayItem> {
         val offset = params.key ?: 0
         return try {
-
-            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
-                    ?: AdItem()
-
             val result =
                     when (type) {
                         MyCollectionTabItemType.MIMI_VIDEO -> {
@@ -40,18 +36,10 @@ class MyCollectionMimiVideoDataSource(
                         }
                         else -> null
                     }
-
-
-            Timber.i("MyFollowItemDataSource result=$result")
             if (result?.isSuccessful == false) throw HttpException(result)
 
             val body = result?.body()
             val memberPostItems = body?.content
-
-            memberPostItems?.forEachWithIndex { i, _ ->
-                if (i % AD_GAP == 0)
-                    memberPostItems.add(i, PlayItem(playlistType = PostType.AD.value.toLong(), adItem = adItem))
-            }
 
             val hasNext = hasNextPage(
                     result?.body()?.paging?.count ?: 0,

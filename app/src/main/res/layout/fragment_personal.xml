@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view"
-        android:fillViewport="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/coordinatorLayout"
@@ -49,10 +49,9 @@
             <TextView
                 android:id="@+id/id_personal"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="92dp"
-                android:gravity="center|left"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="92dp"
                 android:textColor="@color/title_personal"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="@+id/avatar"
@@ -75,9 +74,9 @@
                 android:id="@+id/tv_title_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:background="@color/transparent"
                 android:gravity="center"
-                android:layout_marginTop="16dp"
                 android:text="@string/personal_title"
                 android:textColor="@color/title_personal"
                 android:textSize="18sp"
@@ -89,7 +88,7 @@
                 android:id="@+id/like_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="54dp"
+                android:layout_marginStart="54dp"
                 android:layout_marginTop="13dp"
                 android:gravity="center"
                 android:textColor="@color/title_personal"
@@ -102,7 +101,7 @@
                 android:id="@+id/fans_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="54dp"
+                android:layout_marginEnd="54dp"
                 android:gravity="center"
                 android:textColor="@color/title_personal"
                 android:textSize="18sp"
@@ -153,7 +152,7 @@
                 android:gravity="center"
                 android:text="@string/like"
                 android:textColor="@color/title_personal"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="@+id/like_count"
                 app:layout_constraintStart_toStartOf="@+id/like_count"
                 app:layout_constraintTop_toBottomOf="@+id/like_count" />
@@ -166,7 +165,7 @@
                 android:gravity="center"
                 android:text="@string/follow"
                 android:textColor="@color/title_personal"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/like"
                 app:layout_constraintEnd_toEndOf="@+id/follow_count"
                 app:layout_constraintStart_toStartOf="@+id/follow_count"
@@ -180,7 +179,7 @@
                 android:gravity="center"
                 android:text="@string/fans"
                 android:textColor="@color/title_personal"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/follow"
                 app:layout_constraintEnd_toEndOf="@+id/fans_count"
                 app:layout_constraintStart_toStartOf="@+id/fans_count"
@@ -226,10 +225,10 @@
                 android:layout_marginEnd="15dp"
                 android:background="@drawable/bg_layout_vip_mimi_unlogin"
                 android:visibility="visible"
-                tools:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/guideline5"
-                app:layout_constraintTop_toTopOf="@+id/layout_every_day" />
+                app:layout_constraintTop_toTopOf="@+id/layout_every_day"
+                tools:visibility="invisible" />
 
             <ImageView
                 android:id="@+id/layout_every_day_background"
@@ -294,7 +293,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/every_day_length"
                 android:textColor="@color/color_white_1"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/layout_every_day"
                 app:layout_constraintEnd_toEndOf="@+id/video_long_count"
                 app:layout_constraintStart_toStartOf="@+id/video_long_count"
@@ -319,7 +318,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/every_day_short"
                 android:textColor="@color/color_white_1"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/video_long"
                 app:layout_constraintEnd_toEndOf="@+id/video_short_count"
                 app:layout_constraintStart_toStartOf="@+id/video_short_count"
@@ -346,7 +345,7 @@
                 android:id="@+id/vip_unlimit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="14dp"
+                android:layout_marginStart="14dp"
                 android:drawablePadding="6dp"
                 android:gravity="center_vertical"
                 android:text="@string/vip_hint"
@@ -373,29 +372,29 @@
                 android:textColor="@color/color_white_1"
                 android:textSize="16sp"
                 android:visibility="invisible"
-                tools:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@+id/video_short"
                 app:layout_constraintEnd_toEndOf="@+id/layout_vip_unlimit"
                 app:layout_constraintStart_toStartOf="@+id/layout_vip_unlimit"
                 app:layout_constraintTop_toTopOf="@+id/video_short_count"
-                tools:text="2021-08-08 过期" />
+                tools:text="2021-08-08 过期"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/vip_buy"
                 android:layout_width="100dp"
                 android:layout_height="33dp"
-                android:layout_marginLeft="6dp"
+                android:layout_marginStart="6dp"
                 android:background="@drawable/bg_vip_personal_mimi_unlogin"
                 android:gravity="center"
                 android:text="@string/buy_vip"
                 android:textColor="@color/color_white_1"
                 android:textSize="14sp"
                 android:visibility="visible"
-                tools:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@+id/video_short"
                 app:layout_constraintEnd_toEndOf="@+id/layout_vip_unlimit"
                 app:layout_constraintStart_toStartOf="@+id/layout_vip_unlimit"
-                app:layout_constraintTop_toTopOf="@+id/video_short_count" />
+                app:layout_constraintTop_toTopOf="@+id/video_short_count"
+                tools:visibility="invisible" />
 
             <ImageView
                 android:id="@+id/bg_vippromote"
@@ -413,7 +412,7 @@
                 android:id="@+id/vippromote_top"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
-                android:layout_marginLeft="28dp"
+                android:layout_marginStart="28dp"
                 android:layout_marginBottom="30dp"
                 app:layout_constraintBottom_toBottomOf="@+id/bg_vippromote"
                 app:layout_constraintStart_toStartOf="@+id/bg_vippromote"
@@ -424,7 +423,7 @@
                 android:layout_width="0dp"
                 android:layout_height="68dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="20dp"
                 android:layout_marginBottom="16dp"
                 app:layout_constraintBottom_toBottomOf="@+id/bg_vippromote"
                 app:layout_constraintEnd_toEndOf="@+id/bg_vippromote"
@@ -510,8 +509,6 @@
                 app:layout_goneMarginBottom="0dp"
                 tools:text="v1.0.0" />
 
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.core.widget.NestedScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

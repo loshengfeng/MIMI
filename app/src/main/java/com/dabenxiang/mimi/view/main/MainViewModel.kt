@@ -530,6 +530,8 @@ class MainViewModel : BaseViewModel() {
         _postVideoResult.value = null
         _uploadPicItem.value = null
         _uploadCoverItem.value = null
+        _postVideoMemberResult.value = null
+        _postPicMemberResult.value = null
     }
 
     fun cancelJob() {

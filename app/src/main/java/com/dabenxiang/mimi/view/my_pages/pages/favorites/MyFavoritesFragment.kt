@@ -19,6 +19,8 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
+import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
@@ -63,28 +65,6 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
                 recycler_view.visibility = View.VISIBLE
             }
             layout_refresh.isRefreshing = false
-        })
-
-        viewModel.adResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result?.let { item ->
-                        Glide.with(context).load(item.href).into(layout_ad.iv_ad)
-                        layout_ad.iv_ad.setOnClickListener {
-                            GeneralUtils.openWebView(context, item.target ?: "")
-                        }
-                    }
-                }
-                is ApiResult.Error -> {
-                    layout_ad.visibility = View.GONE
-                    onApiError(it.throwable)
-                }
-
-                else -> {
-                    layout_ad.visibility = View.GONE
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
         })
 
         viewModel.likePostResult.observe(this, {
@@ -171,7 +151,6 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, isLike)
         }
-//        viewModel.getAd()
     }
 
     private val memberPostFuncItem by lazy {
@@ -230,9 +209,21 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
             isFavorite: Boolean,
             type: AttachmentType
         ) {
-            checkStatus {
-                viewModel.favoritePost(item, position, isFavorite)
-            }
+            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+                override fun onClean() {
+                    checkStatus {viewModel.favoritePost(item, position, isFavorite)}
+                }
+            })
+
+            dialog.setMsg(
+                    if(isLike) getString(R.string.like_delete_all)
+                    else getString(R.string.follow_delete_favorite_message)
+            )
+
+            dialog.show(
+                    requireActivity().supportFragmentManager,
+                    CleanDialogFragment::class.java.simpleName
+            )
         }
 
         override fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean) {

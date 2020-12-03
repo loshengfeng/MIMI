@@ -48,6 +48,21 @@ class ClipSingleFragment : BaseFragment() {
                 it.putSerializable(KEY_DATA, item)
             }
         }
+
+        fun createBundle(item: VideoItem): Bundle {
+            val playItem = PlayItem(
+                videoId = item.id,
+                title = item.title,
+                cover = item.cover,
+                source = item.source,
+                favorite = item.favorite,
+                favoriteCount = item.favoriteCount?.toInt(),
+                commentCount = item.commentCount.toInt()
+            )
+            return Bundle().also {
+                it.putSerializable(KEY_DATA, playItem)
+            }
+        }
     }
 
     override val bottomNavigationVisibility = View.GONE
@@ -76,6 +91,35 @@ class ClipSingleFragment : BaseFragment() {
             ib_back.visibility = View.VISIBLE
 
             viewModel.getM3U8(data)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        releasePlayer()
+    }
+
+    private fun releasePlayer() {
+        player_view?.hideController()
+        iv_cover?.visibility = View.VISIBLE
+
+        exoPlayer?.also { player ->
+            player.playWhenReady = false
+            player.removeListener(playbackStateListener)
+            player.release()
+        }
+        exoPlayer = null
+    }
+
+    private fun pausePlayer() {
+        exoPlayer?.also { player ->
+            player.playWhenReady = false
+            ib_play?.visibility = View.VISIBLE
         }
     }
 
