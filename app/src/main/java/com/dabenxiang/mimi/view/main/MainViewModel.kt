@@ -87,6 +87,9 @@ class MainViewModel : BaseViewModel() {
     private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
     val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
 
+    private val _postPicMemberResult = MutableLiveData<ApiResult<Long>>()
+    val postPicMemberResult: LiveData<ApiResult<Long>> = _postPicMemberResult
+
     private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
     val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
 
@@ -409,28 +412,32 @@ class MainViewModel : BaseViewModel() {
                 val ext = "." + extSplit?.last()
                 var mime: String? = null
 
-                if (type == HomeViewModel.TYPE_PIC) {
-                    val picParameter = PicParameter(ext = ext)
-                    _uploadPicItem.postValue(picParameter)
-                } else if (type == HomeViewModel.TYPE_COVER) {
-                    val picParameter = PicParameter(ext = ext)
-                    _uploadCoverItem.postValue(picParameter)
-                } else if (type == HomeViewModel.TYPE_VIDEO) {
-                    _uploadVideoParameter.postValue(ext)
-                    val mmr = MediaMetadataRetriever()
-                    mmr.setDataSource(realPath)
-                    mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
+                when(type) {
+                    HomeViewModel.TYPE_PIC -> {
+                        val picParameter = PicParameter(ext = ext) //Set extension
+                        _uploadPicItem.postValue(picParameter)
+                    }
+                    HomeViewModel.TYPE_COVER -> {
+                        val picParameter = PicParameter(ext = ext) //Set extension
+                        _uploadCoverItem.postValue(picParameter)
+                    }
+                    HomeViewModel.TYPE_VIDEO -> {
+                        _uploadVideoParameter.postValue(ext)
+                        val mmr = MediaMetadataRetriever()
+                        mmr.setDataSource(realPath)
+                        mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+                    }
                 }
 
                 Timber.d("Upload photo path : $realPath")
                 Timber.d("Upload photo ext : $ext")
 
-                val result = if (mime == null) {
+                val result = if (mime == null) { //Post pic type
                     domainManager.getApiRepository().postAttachment(
                         File(realPath!!),
                         fileName = URLEncoder.encode(fileName, "UTF-8")
                     )
-                } else {
+                } else { //Post video type
                     domainManager.getApiRepository().postAttachment(
                         File(realPath!!),
                         fileName = URLEncoder.encode(fileName, "UTF-8"),
@@ -453,7 +460,7 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun postPic(id: Long = 0, request: PostMemberRequest, content: String) {
+    fun postPicOrVideo(id: Long = 0, request: PostMemberRequest, content: String, type: String) {
         viewModelScope.launch(context = job) {
             flow {
                 request.content = content
@@ -473,7 +480,14 @@ class MainViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postVideoMemberResult.value = it }
+                .collect {
+                    if (type == HomeViewModel.TYPE_VIDEO) {
+                        _postVideoMemberResult.value = it
+                    } else {
+                        _postPicMemberResult.value = it
+
+                    }
+                }
         }
     }
 
@@ -516,6 +530,8 @@ class MainViewModel : BaseViewModel() {
         _postVideoResult.value = null
         _uploadPicItem.value = null
         _uploadCoverItem.value = null
+        _postVideoMemberResult.value = null
+        _postPicMemberResult.value = null
     }
 
     fun cancelJob() {

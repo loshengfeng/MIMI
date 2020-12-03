@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.PostType
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -361,7 +360,8 @@ interface ApiService {
         @Query("isAdult") isAdult: Boolean,
         @Query("isRandom") isRandom: Boolean,
         @Query("offset") offset: Int,
-        @Query("limit") limit: Int
+        @Query("limit") limit: Int,
+        @Query("lastId") lastId: Long
     ): Response<ApiBasePagingItem<ArrayList<StatisticsItem>>>
 
     @GET("/v1/Members/Home/Videos/PostStatistics")
@@ -561,6 +561,11 @@ interface ApiService {
     @DELETE("/v1/Members/Post/{postId}/Like")
     suspend fun deleteLike(
         @Path("postId") postId: Long
+    ): Response<Void>
+
+    @DELETE("/v1/Members/Post/{postId}/Like")
+    suspend fun deleteAllLike(
+        @Path("postId") postId: String
     ): Response<Void>
 
     @POST("/v1/Members/Post/{postId}/PostReport")

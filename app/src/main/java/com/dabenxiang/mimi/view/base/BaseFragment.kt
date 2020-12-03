@@ -214,8 +214,8 @@ abstract class BaseFragment : Fragment() {
 
 
                             val postId = arguments?.getLong(BasePostFragment.POST_ID)
-
-                            mainViewModel?.postPic(postId!!, postMemberRequest, content)
+                            mainViewModel?.clearLiveDataValue()
+                            mainViewModel?.postPicOrVideo(postId!!, postMemberRequest, content, HomeViewModel.TYPE_PIC)
                         } else {
                             val pic = uploadPicList[uploadCurrentPicPosition]
                             mainViewModel?.postAttachment(
@@ -231,15 +231,28 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
+        mainViewModel?.postPicMemberResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    deleteTempFile()
+                    if (deletePicList.isNotEmpty()) {
+                        mainViewModel?.deleteAttachment(deletePicList[deleteCurrentPicPosition])
+                    } else {
+                        setSnackBarPostStatus(it.result)
+                        mainViewModel?.clearLiveDataValue()
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         mainViewModel?.postVideoMemberResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     deleteTempFile()
                     videoParameter = VideoParameter()
 
-                    if (deletePicList.isNotEmpty()) {
-                        mainViewModel?.deleteAttachment(deletePicList[deleteCurrentPicPosition])
-                    } else if (deleteVideoItem.isNotEmpty()) {
+                  if (deleteVideoItem.isNotEmpty()) {
                         mainViewModel?.deleteVideoAttachment(
                             deleteVideoItem[0].picAttachmentId,
                             MyPostFragment.TYPE_PIC
@@ -297,15 +310,18 @@ abstract class BaseFragment : Fragment() {
                             videoParameter.id = it.result.toString()
                             videoParameter.length = uploadVideoList[0].length
 
+                            val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
+
                             val mediaItem = MediaItem()
                             mediaItem.picParameter.add(picParameter)
                             mediaItem.videoParameter = videoParameter
                             mediaItem.textContent = postMemberRequest.content
                             val content = Gson().toJson(mediaItem)
                             memberPostItem.content = content
+                            postMemberRequest.title = memberRequest!!.title
                             Timber.d("Post video content item : $content")
                             mainViewModel?.clearLiveDataValue()
-                            mainViewModel?.postPic(request = postMemberRequest, content = content)
+                            mainViewModel?.postPicOrVideo(request = postMemberRequest, content = content, type = HomeViewModel.TYPE_VIDEO)
 
                             postType = PostType.VIDEO
                         } else {
@@ -315,6 +331,8 @@ abstract class BaseFragment : Fragment() {
 
                             videoParameter.id = uploadVideoList[0].videoAttachmentId
                             videoParameter.length = uploadVideoList[0].length
+
+                            val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
 
                             val picParameter = PicParameter(
                                 id = uploadVideoList[0].picAttachmentId,
@@ -326,12 +344,12 @@ abstract class BaseFragment : Fragment() {
                             mediaItem.videoParameter = videoParameter
                             mediaItem.textContent = postMemberRequest.content
                             val content = Gson().toJson(mediaItem)
-
+                            postMemberRequest.title = memberRequest!!.title
                             memberPostItem.content = content
                             Timber.d("Post id : $postId")
                             Timber.d("Request : $postMemberRequest")
                             Timber.d("Post video content item : $content")
-                            mainViewModel?.postPic(postId!!, postMemberRequest, content)
+                            mainViewModel?.postPicOrVideo(postId!!, postMemberRequest, content, HomeViewModel.TYPE_VIDEO)
                         }
                     }
                 }
@@ -405,7 +423,7 @@ abstract class BaseFragment : Fragment() {
         val tags = bundle.getStringArrayList(BasePostFragment.TAG)
         val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
 
-        if (data != null) {
+        if (data != null) { //If update novel
             memberPostItem = data as MemberPostItem
         }
 
@@ -428,36 +446,10 @@ abstract class BaseFragment : Fragment() {
                     combinationDataAndPostText(it)
                 }
                 isNeedPicUpload -> {
-                    setPostTpe(PostType.IMAGE)
-
-                    val memberRequest = it.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
-                    val picUriList = it.getParcelableArrayList<PostAttachmentItem>(PIC_URI)
-
-                    postMemberRequest = memberRequest!!
-
-                    val data = it.getSerializable(MyPostFragment.MEMBER_DATA)
-
-                    if (data != null) {
-                        updateImagePost(it, data, picUriList!!)
-                    } else {
-                        newImagePost(picUriList!!, memberRequest)
-                    }
+                    uploadPicFlow(it)
                 }
                 isNeedVideoUpload -> {
-                    setPostTpe(PostType.VIDEO)
-
-                    val memberRequest = it.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
-
-                    deleteVideoItem =
-                        it.getParcelableArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
-                    uploadVideoList = it.getParcelableArrayList(BasePostFragment.VIDEO_DATA)!!
-                    postId = it.getLong(BasePostFragment.POST_ID, 0)
-
-                    if (postId.toInt() == 0) {
-                        newVideoPost(memberRequest!!)
-                    } else {
-                        updateVideoPost(memberRequest!!)
-                    }
+                    uploadVideoFlow(it)
                 }
                 else -> {
 
@@ -466,7 +458,41 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    private fun newImagePost(
+    private fun uploadPicFlow(bundle: Bundle) {
+        setPostTpe(PostType.IMAGE)
+
+        val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
+        val picUriList = bundle.getParcelableArrayList<PostAttachmentItem>(PIC_URI)
+
+        postMemberRequest = memberRequest!!
+
+        val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
+
+        if (data != null) {
+            updatePicPostAttachment(bundle, data, picUriList!!)
+        } else {
+            handelNewPicPostAttachment(picUriList!!, memberRequest)
+        }
+    }
+
+    private fun uploadVideoFlow(bundle: Bundle) {
+        setPostTpe(PostType.VIDEO)
+
+        val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
+
+        deleteVideoItem =
+            bundle.getParcelableArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
+        uploadVideoList = bundle.getParcelableArrayList(BasePostFragment.VIDEO_DATA)!!
+        postId = bundle.getLong(BasePostFragment.POST_ID, 0)
+
+        if (postId.toInt() == 0) {
+            postVideoCoverAttachment(memberRequest!!)
+        } else {
+            updateVideoPost(memberRequest!!)
+        }
+    }
+
+    private fun handelNewPicPostAttachment(
         picUriList: ArrayList<PostAttachmentItem>,
         memberRequest: PostMemberRequest
     ) {
@@ -478,12 +504,12 @@ abstract class BaseFragment : Fragment() {
         memberPostItem.tags = memberRequest.tags
     }
 
-    private fun updateImagePost(
+    private fun updatePicPostAttachment(
         bundle: Bundle,
         data: Serializable,
         picUriList: ArrayList<PostAttachmentItem>
     ) {
-        deletePicList = bundle.getStringArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
+        deletePicList = bundle.getStringArrayList(BasePostFragment.DELETE_ATTACHMENT)!! // Delete pic attachment list
         memberPostItem = data as MemberPostItem
         postId = bundle.getLong(BasePostFragment.POST_ID)
 
@@ -513,14 +539,18 @@ abstract class BaseFragment : Fragment() {
 
             mediaItem.textContent = postMemberRequest.content
             val content = Gson().toJson(mediaItem)
+
+            val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
+
+            memberPostItem.title = memberRequest!!.title
             memberPostItem.content = content
             Timber.d("Post pic content item : $content")
 
-            mainViewModel?.postPic(postId, postMemberRequest, content)
+            mainViewModel?.postPicOrVideo(postId, postMemberRequest, content, HomeViewModel.TYPE_PIC)
         }
     }
 
-    private fun newVideoPost(memberRequest: PostMemberRequest) {
+    private fun postVideoCoverAttachment(memberRequest: PostMemberRequest) {
         postMemberRequest = memberRequest
         memberPostItem.title = memberRequest.title
         memberPostItem.tags = memberRequest.tags
@@ -557,7 +587,7 @@ abstract class BaseFragment : Fragment() {
             memberPostItem.content = content
             Timber.d("Post video content item : $content")
 
-            mainViewModel?.postPic(postId, memberRequest, content)
+            mainViewModel?.postPicOrVideo(postId, memberRequest, content, HomeViewModel.TYPE_VIDEO)
         }
     }
 
@@ -773,7 +803,7 @@ abstract class BaseFragment : Fragment() {
         Timber.d("Post pic content item : $content")
         memberPostItem.content = content
         mainViewModel?.clearLiveDataValue()
-        mainViewModel?.postPic(request = postMemberRequest, content = content)
+        mainViewModel?.postPicOrVideo(request = postMemberRequest, content = content, type = HomeViewModel.TYPE_PIC)
     }
 
     private fun compressVideoAndUpload(realPath: String, outPutPath: String) {

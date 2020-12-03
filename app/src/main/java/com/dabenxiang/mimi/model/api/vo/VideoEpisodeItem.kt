@@ -24,7 +24,7 @@ data class VideoEpisodeItem(
         @SerializedName("utcTime")
         val utcTime: Long?,
         @SerializedName("reported")
-        val reported: Boolean
+        var reported: Boolean
     )
 }
 

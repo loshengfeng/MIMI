@@ -43,7 +43,12 @@ class ClubPostFollowFragment : BaseFragment() {
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubPostFollowAdapter by lazy {
-        ClubPostFollowAdapter(requireActivity(), postListener,  memberPostFuncItem, attachmentListener)
+        ClubPostFollowAdapter(
+            requireActivity(),
+            postListener,
+            memberPostFuncItem,
+            attachmentListener
+        )
     }
 
     override fun getLayoutId() = R.layout.fragment_club_follow
@@ -115,7 +120,7 @@ class ClubPostFollowFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(this,  {
+        mainViewModel?.deletePostResult?.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
                     adapter.removedPosList.add(it.result)
@@ -142,19 +147,19 @@ class ClubPostFollowFragment : BaseFragment() {
 
         tv_register.setOnClickListener {
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_loginFragment,
-                            LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
             )
         }
 
         tv_login.setOnClickListener {
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_loginFragment,
-                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
             )
         }
 
@@ -172,11 +177,11 @@ class ClubPostFollowFragment : BaseFragment() {
 
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
-                {},
-                { id, view, type -> },
-                { item, items, isFollow, func -> },
-                { item, isLike, func -> },
-                { item, isFavorite, func -> }
+            {},
+            { id, view, type -> viewModel.loadImage(id, view, type) },
+            { item, items, isFollow, func -> },
+            { item, isLike, func -> },
+            { item, isFavorite, func -> }
         )
     }
 
@@ -192,35 +197,40 @@ class ClubPostFollowFragment : BaseFragment() {
                     AdultTabType.PICTURE -> {
                         val bundle = ClubPicFragment.createBundle(item, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clubPicFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clubPicFragment,
+                                bundle
+                            )
                         )
                     }
                     AdultTabType.TEXT -> {
                         val bundle = ClubTextFragment.createBundle(item, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clubTextFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clubTextFragment,
+                                bundle
+                            )
                         )
                     }
                     AdultTabType.CLIP -> {
                         val bundle = ClipPlayerFragment.createBundle(item.id, 1)
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_to_clipPlayerFragment,
-                                        bundle
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
+                            )
                         )
                     }
                 }
             }
         }
 
-        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean, type: AttachmentType) {
+        override fun onFavoriteClick(
+            item: MemberPostItem,
+            position: Int,
+            isFavorite: Boolean,
+            type: AttachmentType
+        ) {
             checkStatus {
                 viewModel.favoritePost(item, position, isFavorite)
             }
@@ -240,22 +250,22 @@ class ClubPostFollowFragment : BaseFragment() {
                 bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
-                when(it.type) {
+                when (it.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                                R.id.action_to_postArticleFragment,
+                            R.id.action_to_postArticleFragment,
                             bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                                R.id.action_to_postPicFragment,
+                            R.id.action_to_postPicFragment,
                             bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                                R.id.action_to_postVideoFragment,
+                            R.id.action_to_postVideoFragment,
                             bundle
                         )
                     }
@@ -273,28 +283,28 @@ class ClubPostFollowFragment : BaseFragment() {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clubPicFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clubPicFragment,
+                            bundle
+                        )
                     )
                 }
                 AdultTabType.TEXT -> {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clubTextFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clubTextFragment,
+                            bundle
+                        )
                     )
                 }
                 AdultTabType.CLIP -> {
                     val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
-                            NavigateItem.Destination(
-                                    R.id.action_to_clipPlayerFragment,
-                                    bundle
-                            )
+                        NavigateItem.Destination(
+                            R.id.action_to_clipPlayerFragment,
+                            bundle
+                        )
                     )
                 }
                 else -> {
@@ -310,24 +320,24 @@ class ClubPostFollowFragment : BaseFragment() {
             val item = SearchPostItem(type = PostType.FOLLOWED, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_searchPostFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_searchPostFragment,
+                    bundle
+                )
             )
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
             val bundle = MyPostFragment.createBundle(
-                    userId, name,
-                    isAdult = true,
-                    isAdultTheme = true
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
             )
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_myPostFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_myPostFragment,
+                    bundle
+                )
             )
         }
     }

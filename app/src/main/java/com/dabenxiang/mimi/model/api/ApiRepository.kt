@@ -458,7 +458,8 @@ class ApiRepository(private val apiService: ApiService) {
         isAdult: Boolean = true,
         isRandom: Boolean = false,
         offset: Int,
-        limit: Int
+        limit: Int,
+        lastId: Long = 0L
     ) = apiService.statisticsHomeVideos(
         startTime = startTime,
         endTime = endTime,
@@ -468,7 +469,8 @@ class ApiRepository(private val apiService: ApiService) {
         isAdult = isAdult,
         isRandom = isRandom,
         offset = offset,
-        limit = limit
+        limit = limit,
+        lastId = lastId
     )
 
     /**
@@ -750,6 +752,13 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun deleteLike(
         postId: Long
     ) = apiService.deleteLike(postId)
+
+    /**
+     * 帖子移除全部喜歡
+     */
+    suspend fun deleteAllLike(
+        postId: String
+    ) = apiService.deleteAllLike(postId)
 
     /**
      * 帖子問題回報
