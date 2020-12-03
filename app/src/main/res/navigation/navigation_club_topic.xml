@@ -15,16 +15,16 @@
         android:label="TopicDetailFragment"
         tools:layout="@layout/fragment_club_topic">
         <action
-            android:id="@+id/action_topicDetailFragment_to_clipFragment"
+            android:id="@+id/action_to_clipFragment"
             app:destination="@id/clipFragment" />
         <action
-            android:id="@+id/action_topicDetailFragment_to_clubPicFragment"
+            android:id="@+id/action_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
         <action
-            android:id="@+id/action_topicDetailFragment_to_clubTextFragment"
+            android:id="@+id/action_to_clubTextFragment"
             app:destination="@id/clubTextFragment" />
         <action
-            android:id="@+id/action_topicDetailFragment_to_clipPlayerFragment"
+            android:id="@+id/action_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
         <action
             android:id="@+id/action_topicDetailFragment_to_searchPostFragment"
@@ -123,13 +123,13 @@
         tools:layout="@layout/fragment_search_post">
 
         <action
-            android:id="@+id/action_searchPostFragment_to_clubPicFragment"
+            android:id="@+id/action_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
         <action
-            android:id="@+id/action_searchPostFragment_to_clubTextFragment"
+            android:id="@+id/action_to_clubTextFragment"
             app:destination="@id/clubTextFragment" />
         <action
-            android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
+            android:id="@+id/action_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
         <action
             android:id="@+id/action_to_myPostFragment"
