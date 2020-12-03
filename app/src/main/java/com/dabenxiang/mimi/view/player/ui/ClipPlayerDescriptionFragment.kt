@@ -172,17 +172,8 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         clip_update_time.text = GeneralUtils.getTimeDiff(postItem.creationDate, Date())
 
         clip_title.setTextColor(App.self.getColor(R.color.color_black_1))
-        val adjustmentFormat = postItem.title.let {
-            val builder = StringBuilder().append(it)
-            if(it.length > 20) {
-                for (i in 0..it.length) {
-                    if( (i / 10) == 0) builder.append("/n")
-                    builder.append(it[i])
-                }
-            }
-            builder.toString()
-        }
-        clip_title.text = adjustmentFormat
+
+        clip_title.text = postItem.title
 
         setupChipGroup(postItem.tags)
 
