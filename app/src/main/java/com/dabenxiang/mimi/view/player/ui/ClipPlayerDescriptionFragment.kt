@@ -136,7 +136,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     private fun setReportListener() {
         imgReport.setOnClickListener {
-            checkStatus {
+            if (detailItem.deducted) {
                 if (detailItem.reported) {
                     GeneralUtils.showToast(
                         App.applicationContext(),
