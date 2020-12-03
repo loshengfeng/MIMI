@@ -105,7 +105,7 @@
     <fragment
         android:id="@+id/likesListFragment"
         android:name="com.dabenxiang.mimi.view.my_pages.like.LikeFragment"
-        tools:layout="@layout/fragment_my_collection"
+        tools:layout="@layout/fragment_my"
         android:label="LikeFragment" >
 
         <action
