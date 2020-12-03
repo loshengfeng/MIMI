@@ -141,6 +141,7 @@
     <!-- Personal -->
     <string name="phone_num">手机号</string>
     <string name="personal_title">我的</string>
+    <string name="personal_not_login_tips">請立即登錄享受完整功能</string>
     <string name="personal_not_login_tips_1">还没登录吗?</string>
     <string name="personal_not_login_tips_2">赶紧登录观看更多内容</string>
     <string name="personal_not_login_tips_3">若尚未成为会员，赶紧注册体验更多内容</string>
@@ -319,10 +320,12 @@
     <!-- Text Detail -->
     <string name="text">短文</string>
     <string name="text_detail_title">短文详情</string>
+
     <!-- Club -->
     <string name="picture">图片</string>
     <string name="video">视频</string>
     <string name="empty_post">目前尚无贴文</string>
+    <string name="empty_follow">尚未有任何关注，快去关注一下吧！</string>
 
     <!-- Follow -->
     <string name="follow">关注</string>

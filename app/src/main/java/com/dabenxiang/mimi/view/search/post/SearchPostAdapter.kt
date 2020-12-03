@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -21,7 +20,6 @@ class SearchPostAdapter(
     val context: Context,
     private val myPostListener: MyPostListener,
     private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
-    private val attachmentListener: AttachmentListener,
     private val getSearchText: () -> String,
     private val getSearchTag: () -> String
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
@@ -109,10 +107,9 @@ class SearchPostAdapter(
                 is MyPostClipPostHolder -> {
                     holder.onBind(
                         it,
-                        null,
                         position,
                         myPostListener,
-                        attachmentListener,
+                        memberPostFuncItem,
                         getSearchText.invoke(),
                         getSearchTag.invoke()
                     )
@@ -121,10 +118,8 @@ class SearchPostAdapter(
                     holder.pictureRecycler.tag = position
                     holder.onBind(
                         it,
-                        null,
                         position,
                         myPostListener,
-                        attachmentListener,
                         memberPostFuncItem,
                         getSearchText.invoke(),
                         getSearchTag.invoke()
@@ -133,10 +128,9 @@ class SearchPostAdapter(
                 is MyPostTextPostHolder -> {
                     holder.onBind(
                         it,
-                        null,
                         position,
                         myPostListener,
-                        attachmentListener,
+                        memberPostFuncItem,
                         getSearchText.invoke(),
                         getSearchTag.invoke()
                     )

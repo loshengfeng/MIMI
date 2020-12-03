@@ -41,7 +41,7 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
     private val accountManager: AccountManager by inject()
 
     private val adapter: FavoritesAdapter by lazy {
-        FavoritesAdapter(requireActivity(), postListener, memberPostFuncItem, attachmentListener)
+        FavoritesAdapter(requireActivity(), postListener, memberPostFuncItem)
     }
 
     override val bottomNavigationVisibility: Int
@@ -325,15 +325,6 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
                     bundle
                 )
             )
-        }
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
         }
     }
 }
