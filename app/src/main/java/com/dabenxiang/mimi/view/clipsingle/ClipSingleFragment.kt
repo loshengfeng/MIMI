@@ -94,6 +94,35 @@ class ClipSingleFragment : BaseFragment() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        releasePlayer()
+    }
+
+    private fun releasePlayer() {
+        player_view?.hideController()
+        iv_cover?.visibility = View.VISIBLE
+
+        exoPlayer?.also { player ->
+            player.playWhenReady = false
+            player.removeListener(playbackStateListener)
+            player.release()
+        }
+        exoPlayer = null
+    }
+
+    private fun pausePlayer() {
+        exoPlayer?.also { player ->
+            player.playWhenReady = false
+            ib_play?.visibility = View.VISIBLE
+        }
+    }
+
     fun modifyFavorite() {
         Timber.d("@@modifyFavorite: ${playItem?.favorite}")
         val favoriteRes =
