@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ConcatAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
@@ -54,6 +55,10 @@ class ActorFragment : BaseFragment() {
         navToActorVideosFragment(id)
     }
 
+    private val concatAdapter by lazy {
+        ConcatAdapter(actorVideosAdapter, actorListAdapter)
+    }
+
     private val viewModel: ActorViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,10 +72,7 @@ class ActorFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-        rv_hot_actresses.adapter = actorVideosAdapter
-        rv_hot_actresses.isNestedScrollingEnabled = false
-        rv_all_actresses.adapter = actorListAdapter
-        rv_all_actresses.isNestedScrollingEnabled = false
+        rv_all_actresses.adapter = concatAdapter
 
     }
 
@@ -89,10 +91,6 @@ class ActorFragment : BaseFragment() {
                     val actorVideos = (it.first as ApiResult.Success).result
                     actorVideosAdapter.setupData(actorVideos)
                     actorVideosAdapter.notifyDataSetChanged()
-//                    val actorCategories = (it.second as ApiResult.Success).result
-//                    actorCategoriesAdapter.setupData(actorCategories)
-//                    actorCategoriesAdapter.notifyDataSetChanged()
-
                 }
                 is ApiResult.Error -> onApiError((it.first as ApiResult.Error<ArrayList<ActorCategoriesItem>>).throwable)
             }
@@ -100,10 +98,6 @@ class ActorFragment : BaseFragment() {
 
         viewModel.actorsCount.observe(viewLifecycleOwner, Observer {
             Timber.d("All actors count is $it")
-            val lp = sl_all_actresses.layoutParams
-            val holderParameter = (rv_all_actresses.adapter as ActorListAdapter).getHolderParameter()
-            lp.height = (holderParameter.height + holderParameter.topMargin +  holderParameter.bottomMargin) * (it/4) + holderParameter.height * 2
-            sl_all_actresses.layoutParams = lp
         })
     }
 
