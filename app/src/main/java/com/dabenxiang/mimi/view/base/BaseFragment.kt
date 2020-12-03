@@ -214,7 +214,7 @@ abstract class BaseFragment : Fragment() {
 
 
                             val postId = arguments?.getLong(BasePostFragment.POST_ID)
-
+                            mainViewModel?.clearLiveDataValue()
                             mainViewModel?.postPicOrVideo(postId!!, postMemberRequest, content, HomeViewModel.TYPE_PIC)
                         } else {
                             val pic = uploadPicList[uploadCurrentPicPosition]
@@ -235,7 +235,6 @@ abstract class BaseFragment : Fragment() {
             when (it) {
                 is ApiResult.Success -> {
                     deleteTempFile()
-
                     if (deletePicList.isNotEmpty()) {
                         mainViewModel?.deleteAttachment(deletePicList[deleteCurrentPicPosition])
                     } else {
@@ -540,6 +539,10 @@ abstract class BaseFragment : Fragment() {
 
             mediaItem.textContent = postMemberRequest.content
             val content = Gson().toJson(mediaItem)
+
+            val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
+
+            memberPostItem.title = memberRequest!!.title
             memberPostItem.content = content
             Timber.d("Post pic content item : $content")
 
