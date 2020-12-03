@@ -123,7 +123,11 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
                 }
             })
 
-            dialog.setMsg(getString(R.string.follow_delete_favorite_message))
+            dialog.setMsg(getString(
+                when(isLike) {
+                    true -> R.string.like_delete_favorite_message
+                    false -> R.string.follow_delete_favorite_message
+            }))
             dialog.show(
                         requireActivity().supportFragmentManager,
                         CleanDialogFragment::class.java.simpleName
@@ -137,28 +141,6 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
-        viewModel.adResult.observe(this) {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result?.let { item ->
-                        Glide.with(requireContext()).load(item.href).into(layout_ad.iv_ad)
-                        layout_ad.iv_ad.setOnClickListener {
-                            GeneralUtils.openWebView(requireContext(), item.target ?: "")
-                        }
-                    }
-                }
-                is ApiResult.Error -> {
-                    layout_ad.visibility = View.GONE
-                    onApiError(it.throwable)
-                }
-
-                else -> {
-                    layout_ad.visibility = View.GONE
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-        }
-
         viewModel.deleteFavoriteResult.observe(this) {
             viewModel.getData(adapter, type, isLike)
         }
@@ -170,12 +152,10 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.postCount.observe(this) {
             Timber.i("postCount= $it")
             if (it == 0) {
-                layout_ad.visibility = View.VISIBLE
                 text_page_empty.text = getString(R.string.follow_empty_msg)
                 id_empty_group.visibility = View.VISIBLE
                 list_short.visibility = View.INVISIBLE
             } else {
-                layout_ad.visibility = View.GONE
                 id_empty_group.visibility = View.GONE
                 list_short.visibility = View.VISIBLE
             }
@@ -246,26 +226,12 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
     }
 
-    private fun loginPageToggle(isLogin: Boolean) {
-        if (isLogin) {
-            id_not_login_group.visibility = View.GONE
-            layout_refresh.visibility = View.VISIBLE
-        } else {
-            id_not_login_group.visibility = View.VISIBLE
-            layout_refresh.visibility = View.INVISIBLE
-        }
-    }
-
     override fun onResume() {
         super.onResume()
-        //According to specs, this page does not need to log in currently
-        loginPageToggle(true)
 
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, type, isLike)
         }
-        if(!isLike)
-            viewModel.getAd()
     }
 
 

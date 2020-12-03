@@ -247,6 +247,7 @@
 
     <!-- Follow -->
     <string name="follow_delete_favorite_message">确定从收藏移除?</string>
+    <string name="like_delete_favorite_message">确定从喜欢移除?</string>
     <string name="follow_empty_msg">尚未收藏影片，快去看片吧！</string>
     <string name="follow_title">我的关注</string>
     <string name="follow_tab_mimi_video">蜜蜜影视</string>
@@ -333,6 +334,7 @@
     <string name="like_title">我喜欢</string>
     <string name="like_tab1">帖子</string>
     <string name="like_tab2">蜜蜜影視</string>
+    <string name="like_delete_all">是否要清除所有喜歡的內容?</string>
     <string-array name="like_tabs">
         <item>@string/like_tab1</item>
         <item>@string/like_tab2</item>

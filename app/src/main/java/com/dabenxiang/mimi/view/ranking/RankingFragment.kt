@@ -19,8 +19,8 @@ import com.dabenxiang.mimi.view.adapter.RankingAdapter
 import com.dabenxiang.mimi.view.adapter.RankingVideosAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_picture_detail.toolbarContainer
@@ -76,20 +76,16 @@ class RankingFragment : BaseFragment() {
 
                     when (viewModel.postTypeSelected) {
                         PostType.VIDEO -> {
-                            val bundle = ClipFragment.createBundle(
-                                memberPostItems, position, false
-                            )
+                            val bundle = ClipPlayerFragment.createBundle(memberPostItems[position].id)
                             navigateTo(
                                 NavigateItem.Destination(
-                                    R.id.action_rankingFragment_to_navigation_clip,
+                                    R.id.action_to_clipPlayerFragment,
                                     bundle
                                 )
                             )
                         }
                         PostType.IMAGE -> {
-                            val bundle = PictureDetailFragment.createBundle(
-                                memberPostItems[position], 0
-                            )
+                            val bundle = ClubPicFragment.createBundle(memberPostItems[position])
                             navigateTo(
                                 NavigateItem.Destination(
                                     R.id.action_rankingFragment_to_navigation_picture,
@@ -140,6 +136,16 @@ class RankingFragment : BaseFragment() {
             lifecycleScope.launch {
                 delay(500)
                 layout_refresh?.isRefreshing = false
+            }
+        })
+
+        viewModel.isLoadingData.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                progress_bar.visibility = View.VISIBLE
+                rv_ranking_content.visibility = View.INVISIBLE
+            } else {
+                progress_bar.visibility = View.INVISIBLE
+                rv_ranking_content.visibility = View.VISIBLE
             }
         })
     }
