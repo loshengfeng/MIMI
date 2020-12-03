@@ -66,6 +66,9 @@
         <action
             android:id="@+id/action_myPostFragment_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_clubPicFragment"
+            app:destination="@id/clipPlayerFragment" />
     </fragment>
 
     <fragment
@@ -273,6 +276,9 @@
         <action
             android:id="@+id/action_to_pictureFragment"
             app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
