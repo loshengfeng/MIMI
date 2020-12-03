@@ -22,6 +22,12 @@ import timber.log.Timber
 
 class ActorFragment : BaseFragment() {
 
+    companion object {
+        const val VIEW_TYPE_ACTOR_HEADER = 1
+        const val VIEW_TYPE_ACTOR_VIDEOS = 2
+        const val VIEW_TYPE_ACTOR_LIST = 3
+    }
+
     private val actorVideosAdapter by lazy {
         ActorVideosAdapter(requireContext(),
             ActorVideosFuncItem(
@@ -35,28 +41,29 @@ class ActorFragment : BaseFragment() {
         navToPlayer(PlayerItem(item.id))
     }
 
-    private val actorCategoriesAdapter by lazy {
-        ActorCategoriesAdapter(requireContext(),
-            ActorCategoriesFuncItem(
+    private val actorListAdapter by lazy {
+        ActorListAdapter(requireContext(),
+            ActorListFuncItem(
                 getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
                 onActorClickListener = { id, position -> onActorClickListener(id, position) }
             )
         ) }
 
-    private val actorListAdapter by lazy {
-        ActorListAdapter(requireContext(),
-            ActorCategoriesFuncItem(
-                getActorAvatarAttachment =  { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
-                onActorClickListener = { id, position -> onActorClickListener(id, position) }
-            )
-        ) }
+    private val baseGridConcatAdapter by lazy {
+        BaseGridConcatAdapter(requireContext(), actorListAdapter, 4)
+    }
 
     private fun onActorClickListener(id: Long, position: Int){
         navToActorVideosFragment(id)
     }
 
     private val concatAdapter by lazy {
-        ConcatAdapter(actorVideosAdapter, actorListAdapter)
+        ConcatAdapter(
+            ActorHeaderAdapter(getString(R.string.actor_hot_actresses),requireContext()),
+            actorVideosAdapter,
+            ActorHeaderAdapter(getString(R.string.actor_all_actresses),requireContext()),
+            baseGridConcatAdapter
+        )
     }
 
     private val viewModel: ActorViewModel by viewModels()
