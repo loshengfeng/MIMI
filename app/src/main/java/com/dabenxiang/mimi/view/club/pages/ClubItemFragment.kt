@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.observe
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -42,7 +41,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubItemAdapter by lazy {
-        ClubItemAdapter(requireContext(), postListener, attachmentListener, memberPostFuncItem)
+        ClubItemAdapter(requireContext(), postListener, memberPostFuncItem)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item
@@ -206,16 +205,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             viewModel.getData(adapter, type)
         }
         viewModel.getAd()
-    }
-
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
-        }
     }
 
     private val postListener = object : MyPostListener {

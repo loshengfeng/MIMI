@@ -20,7 +20,6 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -71,7 +70,6 @@ class SearchPostFragment : BaseFragment() {
             requireActivity(),
             postListener,
             memberPostFuncItem,
-            attachmentListener,
             { searchText ?: "" },
             { searchTag ?: "" })
     }
@@ -223,15 +221,6 @@ class SearchPostFragment : BaseFragment() {
 
         override fun onChipClick(type: PostType, tag: String) {
             search(tag = tag)
-        }
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
         }
     }
 

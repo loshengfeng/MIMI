@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -22,7 +21,6 @@ import timber.log.Timber
 class ClubItemAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
-        private val attachmentListener: AttachmentListener,
         private val memberPostFuncItem: MemberPostFuncItem
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
@@ -124,15 +122,14 @@ class ClubItemAdapter(
 
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(it, null, position, myPostListener, attachmentListener)
+                    holder.onBind(it, position, myPostListener, memberPostFuncItem)
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
                             it,
-                            null,
                             position,
                             myPostListener,
-                            attachmentListener
+                            memberPostFuncItem
                     )
                 }
             }

@@ -1,17 +1,15 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import android.content.res.ColorStateList
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -19,6 +17,7 @@ import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -27,7 +26,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
 
 class MyPostClipPostHolder(
     itemView: View
@@ -55,13 +53,12 @@ class MyPostClipPostHolder(
     private val vSeparator: View = itemView.v_separator
 
     fun onBind(
-        item: MemberPostItem,
-        itemList: List<MemberPostItem>?,
-        position: Int,
-        myPostListener: MyPostListener,
-        attachmentListener: AttachmentListener,
-        searchStr: String = "",
-        searchTag: String = ""
+            item: MemberPostItem,
+            position: Int,
+            myPostListener: MyPostListener,
+            memberPostFuncItem: MemberPostFuncItem,
+            searchStr: String = "",
+            searchTag: String = ""
     ) {
         clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(R.color.color_black_1))
@@ -84,7 +81,7 @@ class MyPostClipPostHolder(
         tvFollow.visibility =
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        attachmentListener.onGetAttachment(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
+        memberPostFuncItem.getBitmap(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
         ivAvatar.setOnClickListener {
             myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
         }
@@ -111,7 +108,7 @@ class MyPostClipPostHolder(
                 Glide.with(ivPhoto.context)
                     .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
             } else {
-                attachmentListener.onGetAttachment(
+                memberPostFuncItem.getBitmap(
                     images[0].id.toLongOrNull(),
                     ivPhoto,
                     LoadImageType.PICTURE_THUMBNAIL

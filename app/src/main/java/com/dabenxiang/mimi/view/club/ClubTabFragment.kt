@@ -56,6 +56,8 @@ class ClubTabFragment : BaseFragment() {
         const val TAB_PICTURE = 4
         const val TAB_NOVEL = 5
 
+        const val DEFAULT_TAB = TAB_RECOMMEND
+
         private const val PERMISSION_VIDEO_REQUEST_CODE = 20001
         private const val PERMISSION_PIC_REQUEST_CODE = 20002
 
@@ -131,9 +133,10 @@ class ClubTabFragment : BaseFragment() {
         view.club_view_pager.offscreenPageLimit =7
         val tabs = resources.getStringArray(R.array.club_tabs)
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
-            tab.text =tabs[position]
+            tab.text = tabs[position]
         }
         tabLayoutMediator.attach()
+        view.club_tabs.getTabAt(DEFAULT_TAB)?.select()
         view.topic_tabs.adapter = topicListAdapter
         view.search_bar.setOnClickListener {
             navToSearch(view.club_tabs.selectedTabPosition)
