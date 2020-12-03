@@ -52,6 +52,7 @@ class RankingDataSource constructor(
                 emit(InitResult(items ?: arrayListOf(), null))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
