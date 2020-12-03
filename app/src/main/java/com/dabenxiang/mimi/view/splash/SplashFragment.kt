@@ -232,8 +232,7 @@ class SplashFragment : BaseFragment() {
 
     private fun firstTimeCheck() {
         getPromoteCode().takeIf {
-//            !FileUtil.isSecreteFileExist(requireContext()) && !TextUtils.isEmpty(it)
-            !FileUtil.isSecreteFileExist(requireContext())
+            !FileUtil.isSecreteFileExist(requireContext()) && !TextUtils.isEmpty(it)
         }?.run {
             viewModel.firstTimeStatistics(requireContext(), this)
         }
