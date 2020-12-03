@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ActorCategoriesItem
@@ -49,10 +50,6 @@ class ActorFragment : BaseFragment() {
             )
         ) }
 
-    private val baseGridConcatAdapter by lazy {
-        BaseGridConcatAdapter(requireContext(), actorListAdapter, 4)
-    }
-
     private fun onActorClickListener(id: Long, position: Int){
         navToActorVideosFragment(id)
     }
@@ -62,7 +59,7 @@ class ActorFragment : BaseFragment() {
             ActorHeaderAdapter(getString(R.string.actor_hot_actresses),requireContext()),
             actorVideosAdapter,
             ActorHeaderAdapter(getString(R.string.actor_all_actresses),requireContext()),
-            baseGridConcatAdapter
+            actorListAdapter
         )
     }
 
@@ -79,7 +76,13 @@ class ActorFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-        rv_all_actresses.adapter = concatAdapter
+        val gridLayoutManager = GridLayoutManager(requireContext(), 4)
+            .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
+        rv_all_actresses.also {
+            it.layoutManager = gridLayoutManager
+            it.setHasFixedSize(true)
+            it.adapter = concatAdapter
+        }
 
     }
 
@@ -113,6 +116,17 @@ class ActorFragment : BaseFragment() {
             navToSearch()
         }
     }
+
+    private val gridLayoutSpanSizeLookup =
+        object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (concatAdapter.getItemViewType(position)) {
+                    VIEW_TYPE_ACTOR_VIDEOS -> 4
+                    VIEW_TYPE_ACTOR_LIST -> 1
+                    else -> 4
+                }
+            }
+        }
 
     private fun navToActorVideosFragment(id: Long) {
         val bundle = ActorVideosFragment.createBundle(id)
