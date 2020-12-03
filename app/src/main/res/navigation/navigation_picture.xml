@@ -22,12 +22,22 @@
         <action
             android:id="@+id/action_to_pictureFragment"
             app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
         android:id="@+id/searchPostFragment"
         android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
-        tools:layout="@layout/fragment_search_post" />
+        tools:layout="@layout/fragment_search_post" >
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/pictureFragment"

@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
+import com.dabenxiang.mimi.view.actor.ActorFragment.Companion.VIEW_TYPE_ACTOR_VIDEOS
 
 class ActorVideosAdapter(
     val context: Context,
     val actorVideosFuncItem: ActorVideosFuncItem
 ) : RecyclerView.Adapter<ActorVideosViewHolder>() {
-
     private var selectItem: ActorVideosItem? = null
 
     private var actorVideosItems: ArrayList<ActorVideosItem>? = null
@@ -22,6 +22,10 @@ class ActorVideosAdapter(
                 onVideoClickListener = { actorVideoItem, position -> actorVideosFuncItem.onVideoClickListener(actorVideoItem, position) }
             )
         ) }
+
+    override fun getItemViewType(position: Int): Int {
+        return VIEW_TYPE_ACTOR_VIDEOS
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActorVideosViewHolder {
         val view = LayoutInflater.from(parent.context)

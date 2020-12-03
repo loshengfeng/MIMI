@@ -30,6 +30,10 @@ import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
 import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -41,7 +45,7 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
     private val accountManager: AccountManager by inject()
 
     private val adapter: FavoritesAdapter by lazy {
-        FavoritesAdapter(requireActivity(), postListener, memberPostFuncItem, attachmentListener)
+        FavoritesAdapter(requireActivity(), postListener, memberPostFuncItem)
     }
 
     override val bottomNavigationVisibility: Int
@@ -136,6 +140,7 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
             }
         })
 
+        text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.empty_post)
         img_page_empty.setImageDrawable(
             ContextCompat.getDrawable(requireContext(),
             when(isLike) {
@@ -325,15 +330,6 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
                     bundle
                 )
             )
-        }
-    }
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
         }
     }
 }

@@ -6,6 +6,7 @@
     app:startDestination="@id/clipPlayerFragment">
 
     <include app:graph="@navigation/navigation_my_post" />
+    <include app:graph="@navigation/navigation_login" />
 
     <fragment
         android:id="@+id/clipPlayerFragment"
@@ -13,11 +14,17 @@
         tools:layout="@layout/fragment_v2_player"
         android:label="ClipPlayerFragment" >
         <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
             android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@+id/postVideoFragment" />
     </fragment>
 
     <fragment
@@ -26,6 +33,42 @@
         tools:layout="@layout/fragment_search_post" >
         <action
             android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/postVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.video.PostVideoFragment"
+        android:label="PostVideoFragment"
+        tools:layout="@layout/fragment_post_video">
+        <action
+            android:id="@+id/action_postVideoFragment_self"
+            app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment"
+            app:popUpTo="@+id/myPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
     </fragment>
 
