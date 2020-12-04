@@ -65,7 +65,6 @@ class ClubItemAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        Timber.d("neo = ${viewType}")
         return when (viewType) {
             VIEW_TYPE_AD -> {
                 AdHolder(
