@@ -32,6 +32,7 @@ import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -247,7 +248,7 @@ class SearchPostFragment : BaseFragment() {
 
         adapter.addLoadStateListener(loadStateListener)
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
-        recycler_search_result.adapter = adapter
+        recycler_search_result.adapter = adapter.withMimiLoadStateFooter { adapter.retry() }
 
         searchTag?.also { search(tag = searchTag) }
         searchText?.also { search(text = searchText) }

@@ -423,7 +423,7 @@ class ApiRepository(private val apiService: ApiService) {
         isAdult: Boolean = true,
         offset: String,
         limit: String,
-        tag: String = ""
+        tag: String?= null
     ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag)
 
     /**

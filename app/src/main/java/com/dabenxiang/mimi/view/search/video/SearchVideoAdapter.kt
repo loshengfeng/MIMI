@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.search.video
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -21,7 +22,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 class SearchVideoAdapter(
     val context: Context,
     private val listener: EventListener
-) : PagedListAdapter<VideoItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<VideoItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
         const val VIEW_TYPE_VIDEO = 0

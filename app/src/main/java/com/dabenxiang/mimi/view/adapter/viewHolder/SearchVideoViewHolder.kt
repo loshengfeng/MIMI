@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
-import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
+import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup

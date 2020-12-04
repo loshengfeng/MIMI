@@ -1,12 +1,10 @@
-package com.dabenxiang.mimi.view.generalvideo.paging
+package com.dabenxiang.mimi.view.pagingfooter
 
 import android.view.ViewGroup
 import androidx.paging.LoadState
 import androidx.paging.LoadStateAdapter
-import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
-import com.dabenxiang.mimi.view.pagingfooter.PagingLoadStateViewHolder
 
-class VideoLoadStateAdapter(private val adapter: GeneralVideoAdapter) :
+class PagingLoadStateAdapter(private val retryListener: () -> Unit) :
     LoadStateAdapter<PagingLoadStateViewHolder>() {
 
     override fun onBindViewHolder(holder: PagingLoadStateViewHolder, loadState: LoadState) {
@@ -17,7 +15,6 @@ class VideoLoadStateAdapter(private val adapter: GeneralVideoAdapter) :
         parent: ViewGroup,
         loadState: LoadState
     ): PagingLoadStateViewHolder {
-        return PagingLoadStateViewHolder(parent) { adapter.retry() }
+        return PagingLoadStateViewHolder(parent) { retryListener.invoke() }
     }
-
 }

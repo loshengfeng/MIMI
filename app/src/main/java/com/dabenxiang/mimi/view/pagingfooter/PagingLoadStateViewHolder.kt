@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.generalvideo.paging
+package com.dabenxiang.mimi.view.pagingfooter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import kotlinx.android.synthetic.main.item_network_state.view.*
 
-class VideoLoadStateViewHolder(
+class PagingLoadStateViewHolder(
     parent: ViewGroup,
     private val retryCallback: () -> Unit
 ) : RecyclerView.ViewHolder(
