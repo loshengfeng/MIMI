@@ -196,7 +196,7 @@ class ClubTextDetailAdapter(
 
     fun updateContent(item: MemberPostItem) {
         memberPostItem.content = item.content
-        notifyItemChanged(VIEW_TYPE_TEXT_DETAIL)
+        notifyItemChanged(1)
     }
 
     fun setupAdItem(item: AdItem) {
