@@ -23,11 +23,21 @@ class VideoLoadStateViewHolder(
             ?: let { View.INVISIBLE }
 
         retry.visibility =
-            takeIf { loadState is LoadState.Error }?.let { View.VISIBLE } ?: let { View.INVISIBLE }
+            takeIf { loadState is LoadState.Error && (loadState as? LoadState.Error)?.error !is NoSuchElementException}?.let {
+                View.VISIBLE
+            } ?: let {
+                View.INVISIBLE
+            }
 
         errorMsg.visibility =
-            takeIf { !(loadState as? LoadState.Error)?.error?.message.isNullOrBlank() }?.let { View.VISIBLE }
-                ?: let { View.INVISIBLE }
+            takeIf { !(loadState as? LoadState.Error)?.error?.message.isNullOrBlank() && (loadState as? LoadState.Error)?.error !is NoSuchElementException}?.let {
+                View.VISIBLE
+            } ?: let {
+                View.INVISIBLE
+            }
+
+        if((loadState is LoadState.Error) && loadState.error is NoSuchElementException)
+            progressBar.visibility = View.INVISIBLE
 
         errorMsg.text = (loadState as? LoadState.Error)?.error?.message
     }

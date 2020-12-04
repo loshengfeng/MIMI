@@ -33,7 +33,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
         var response: Response? = null
         val request = chain.request()
         val url = request.url
-
+        Timber.d("URL: $url")
         if (checkTokenUrl(url.toString())) {
             return chain.proceed(chain.request())
         }
@@ -55,8 +55,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
         try {
             response = chain.proceed(newRequest)
-            Timber.d("Response code: ${response.code}")
-
+            Timber.d("Response Code: ${response.code}")
             return when (response.code) {
                 HttpURLConnection.HTTP_UNAUTHORIZED -> {
                     response.close()

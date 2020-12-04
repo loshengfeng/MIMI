@@ -29,7 +29,8 @@ class ChooseClubDataSource constructor(
     ) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getApiRepository().getMembersClubPost(
+                val resp = domainManager.getApiRepository().getMembersClub(
+                    "",
                     offset = 0,
                     limit = PER_LIMIT.toInt()
                 )

@@ -78,6 +78,7 @@ class ClipPlayerViewModel : BaseViewModel() {
                 fileName = "tmp_clip.$extension"
 
                 val path = "${FileUtil.getVideoFolderPath(context)}$fileName"
+                File(path).delete()
                 if (!File(path).exists()) {
                     convertByteToVideo(context, byteArray, fileName)
                 }

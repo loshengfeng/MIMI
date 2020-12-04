@@ -1,7 +1,5 @@
 package com.dabenxiang.mimi.model.api.vo
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
@@ -78,6 +76,9 @@ data class VideoItem(
 
     @SerializedName("videoEpisodes")
     val videoEpisodes: List<VideoEpisode>? = arrayListOf(),
+
+    @SerializedName("timesWatched")
+    val timesWatched: Int = 0,
 
     var isAdult: Boolean = false,
     var searchingTag: String = "", // 搜尋的 TAG

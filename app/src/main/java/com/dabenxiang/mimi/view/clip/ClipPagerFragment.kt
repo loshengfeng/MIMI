@@ -83,9 +83,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
                     /**API首次載入觸發獲取m3u8流程**/
                     takeIf { this@ClipPagerFragment.isVisible && adapter.itemCount > 0 }?.let {
-                        adapter.getVideoItem(0)
-                    }?.run {
-                        clipFuncItem.getM3U8(this, 0, ::updateAfterM3U8)
+                        adapter.getM3U8()
                     }
                 }
             }
@@ -122,9 +120,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                             clipAdapter.releasePlayer()
                             clipAdapter.updateCurrentPosition(currentPos)
                             clipAdapter.notifyItemChanged(lastPos)
-                            clipAdapter.getVideoItem(currentPos)?.run {
-                                clipFuncItem.getM3U8(this, currentPos, ::updateAfterM3U8)
-                            }
+                            clipAdapter.getM3U8()
                         }
                     }
                 }
@@ -157,17 +153,9 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             PagerSnapHelper().attachToRecyclerView(rv_clip)
             rv_clip.addOnScrollListener(onScrollListener)
 
-            (arguments?.getSerializable(KEY_DATA) as? ArrayList<VideoItem>)?.run {
-                getLimitClips(this)
+            (arguments?.getSerializable(KEY_DATA) as? ArrayList<*>)?.run {
+                getLimitClips(ArrayList(this.filterIsInstance<VideoItem>()))
             } ?: run { getClips() }
-        }
-    }
-
-    private fun updateAfterM3U8(pos: Int, url: String, errorCode: Int) {
-        val currentPos = (rv_clip?.layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition()
-        currentPos?.takeIf { it == pos }?.run {
-            clipAdapter.setM3U8Result(url, errorCode)
-            clipAdapter.notifyItemChanged(this, ClipAdapter.PAYLOAD_UPDATE_AFTER_M3U8)
         }
     }
 

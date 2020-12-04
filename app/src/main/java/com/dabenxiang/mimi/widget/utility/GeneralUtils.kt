@@ -58,6 +58,7 @@ import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -417,31 +418,6 @@ object GeneralUtils {
         }
     }
 
-    fun toEllipsizeString(text: String, startIndex: Int = 2, substitute: String = "."): String {
-
-        var ellipsize = ""
-
-        text.forEachIndexed { index, char ->
-            ellipsize += if (index < startIndex) {
-                char.toString()
-            } else {
-                substitute
-            }
-        }
-        return  ellipsize
-    }
-
-    fun isTextEllipsized(view: TextView): Boolean {
-        val layout = view.layout ?: return false
-        val lines = layout.lineCount
-        Timber.i("Char langh lines:$lines")
-        return if (lines > 0) {
-            val ellipsisCount = layout.getEllipsisCount(lines - 1)
-            Timber.i("Char langh ellipsisCount:$ellipsisCount")
-            ellipsisCount > 0
-        } else false
-    }
-
     fun makeTextViewResizable(tv: TextView, maxLine: Int, expandText: String, viewMore: Boolean) {
         if (tv.tag == null) {
             tv.tag = tv.text
@@ -494,6 +470,18 @@ object GeneralUtils {
         }
         return ssb
     }
-
-
+    
+    fun parseTimeToUTC(date: Date): String {
+        var time: String
+        try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            time = sdf.format(date)
+        } catch (e: Exception) {
+            Timber.d("parse time error: $e")
+            time = "0000-00-00T00:00:00Z"
+        }
+        Timber.d("parse time to UTC: $time")
+        return time
+    }
 }

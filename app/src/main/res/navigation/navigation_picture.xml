@@ -35,7 +35,7 @@
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
         <action
-            android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
+            android:id="@+id/action_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
     </fragment>
 

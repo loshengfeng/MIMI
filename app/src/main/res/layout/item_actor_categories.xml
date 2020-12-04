@@ -2,9 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cl_category"
-    android:layout_width="70dp"
-    android:layout_height="97dp"
-    android:layout_margin="9dp">
+    android:layout_width="80dp"
+    android:layout_height="97dp">
 
     <ImageView
         android:id="@+id/iv_photo"

@@ -1,10 +1,7 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -24,6 +21,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvComment: TextView = view.tv_comment
     var tvMore: TextView = view.tv_more
     var progress: ProgressBar = view.progress_video
+    var btnRetry: Button = view.btn_retry
     var reminder: View = view.recharge_reminder
     private var btnVip: View = view.btn_vip
     private var btnPromote: View = view.btn_promote
@@ -32,6 +30,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         reminder.visibility = View.GONE
         ibReplay.visibility = View.GONE
         ibPlay.visibility = View.GONE
+        progress.visibility = View.GONE
+        btnRetry.visibility = View.GONE
         tvTitle.text = item.title
         tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()

@@ -86,6 +86,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
                 }
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
+                    streamId = it.result.id ?: 0
                     parsionM3u8Content(it.result)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)

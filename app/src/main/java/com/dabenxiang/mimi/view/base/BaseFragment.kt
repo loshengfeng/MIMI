@@ -58,6 +58,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.Serializable
 import java.net.UnknownHostException
+import java.util.NoSuchElementException
 
 abstract class BaseFragment : Fragment() {
 
@@ -691,6 +692,8 @@ abstract class BaseFragment : Fragment() {
             is ExceptionResult.Crash -> {
                 if (errorHandler.throwable is UnknownHostException) {
                     showCrashDialog(HttpErrorMsgType.CHECK_NETWORK)
+                } else if(errorHandler.throwable is NoSuchElementException) {
+                    Timber.e("${errorHandler.throwable}")
                 } else {
                     showToast(requireContext(), errorHandler.throwable.toString())
                 }
@@ -898,13 +901,15 @@ abstract class BaseFragment : Fragment() {
     fun onMoreClick(
         item: MemberPostItem,
         position: Int,
+        deducted: Boolean = true,
         onEdit: (BaseMemberPostItem) -> Unit
     ) {
         val isMe = mainViewModel?.accountManager?.getProfile()?.userId == item.creatorId
         if (isMe) {
             showMeMoreDialog(item, position, onEdit)
         } else {
-            showMoreDialog(item)
+            if (deducted)
+                showMoreDialog(item)
         }
     }
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -246,7 +245,7 @@ class PlayerDescriptionFragment : BaseFragment() {
             checkStatus { descriptionViewModel.favorite(videoItem) }
         }
         imgReport.setOnClickListener {
-            checkStatus {
+            if (videoItem.deducted == true) {
                 if (isReported) {
                     GeneralUtils.showToast(
                         requireContext(),
@@ -321,6 +320,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         setUILike()
         setUIFavorite()
         setInteractiveListener()
+        setStreamInfo()
     }
 
     private fun setUILike() {
@@ -353,6 +353,32 @@ class PlayerDescriptionFragment : BaseFragment() {
                 null
             )
         )
+    }
+
+    private fun setStreamInfo() {
+        val videoStream = arrayListOf<VideoEpisodeItem.VideoStream>()
+        videoItem.sources?.get(0)?.videoEpisodes?.get(0)?.videoStreams?.forEach {
+            videoStream.add(
+                VideoEpisodeItem.VideoStream(
+                    it.id,
+                    it.sign,
+                    it.streamName,
+                    it.utcTime,
+                    false
+                ))
+        }
+        val videoEpisode = videoItem.sources?.get(0)?.videoEpisodes?.get(0).run {
+            val videoEpisodeItem = VideoEpisodeItem(
+                this?.episode,
+                this?.episodePublishTime,
+                this?.id,
+                this?.reported,
+                videoStream)
+            videoEpisodeItem
+        }.let {
+            it
+        }
+        updateStreamInfo(videoEpisode)
     }
 
     private fun updateStreamInfo(videoEpisodeItem: VideoEpisodeItem) {

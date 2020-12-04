@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.ranking
 
 import android.content.Context
 import android.view.LayoutInflater
