@@ -134,12 +134,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
-                if (requireActivity().requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-                    playerViewModel.lockFullScreen = !playerViewModel.lockFullScreen
-                    switchScreenOrientation()
-                } else {
-                    navigateTo(NavigateItem.Up)
-                }
+                backupEvent()
             }
         )
         orientationDetector =
@@ -207,6 +202,10 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
                 )
             )
         }
+
+        btn_backup.setOnClickListener {
+            backupEvent()
+        }
     }
 
     fun showRechargeReminder(isShow: Boolean) {
@@ -234,6 +233,15 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
 
     fun sendVideoReport() {
         playerViewModel.sendVideoReport(streamId)
+    }
+
+    private fun backupEvent() {
+        if (requireActivity().requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            playerViewModel.lockFullScreen = !playerViewModel.lockFullScreen
+            switchScreenOrientation()
+        } else {
+            navigateTo(NavigateItem.Up)
+        }
     }
 
     /**

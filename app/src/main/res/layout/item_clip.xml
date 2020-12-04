@@ -199,18 +199,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btn_retry"
-        android:layout_width="75dp"
-        android:layout_height="35dp"
-        android:background="@drawable/bg_red_1_radius_6"
+    <ImageButton
+        android:id="@+id/ib_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/baseline_sync_problem_black_48"
+        android:backgroundTint="@color/color_red_1"
         android:text="@string/btn_retry"
-        android:textColor="@color/color_white_1"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@null" />
 
 <!--    <com.google.android.material.chip.ChipGroup-->
 <!--        android:id="@+id/cg_tag"-->
