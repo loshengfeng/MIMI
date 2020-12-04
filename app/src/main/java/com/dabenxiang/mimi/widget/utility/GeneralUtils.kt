@@ -11,11 +11,17 @@ import android.content.pm.PackageInstaller
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.Settings
+import android.text.Html
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.method.LinkMovementMethod
 import android.text.style.ForegroundColorSpan
 import android.util.DisplayMetrics
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
+import android.widget.TextView.BufferType
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -28,6 +34,7 @@ import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.flurry.sdk.s
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -49,11 +56,14 @@ import timber.log.Timber
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.lang.reflect.Array.getLength
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.math.ceil
 import kotlin.math.roundToInt
+
 
 object GeneralUtils {
 
@@ -66,8 +76,8 @@ object GeneralUtils {
     @SuppressLint("HardwareIds")
     fun getAndroidID(): String {
         return Settings.Secure.getString(
-            App.applicationContext().contentResolver,
-            Settings.Secure.ANDROID_ID
+                App.applicationContext().contentResolver,
+                Settings.Secure.ANDROID_ID
         )
 //        return "1234567890"
     }
@@ -89,11 +99,11 @@ object GeneralUtils {
         }
 
         val responseBody = Gson().toJson(
-            ErrorItem(
-                errorItem.code,
-                errorItem.message,
-                null
-            )
+                ErrorItem(
+                        errorItem.code,
+                        errorItem.message,
+                        null
+                )
         )
             .toResponseBody(ApiRepository.MEDIA_TYPE_JSON.toMediaTypeOrNull())
 
@@ -108,9 +118,9 @@ object GeneralUtils {
 
         val httpExceptionClone = HttpException(response)
         return HttpExceptionItem(
-            errorItem,
-            httpExceptionClone,
-            url
+                errorItem,
+                httpExceptionClone,
+                url
         )
     }
 
@@ -126,15 +136,15 @@ object GeneralUtils {
 
     fun isFriendlyNameValid(name: String): Boolean {
         return Pattern.matches(
-            "^[a-zA-Z0-9-\\u4e00-\\u9fa5-`\\[\\]~!@#\$%^&*()_+{}|:”<>?`\\[\\];’,./\\\\]{1,20}+$",
-            name
+                "^[a-zA-Z0-9-\\u4e00-\\u9fa5-`\\[\\]~!@#\$%^&*()_+{}|:”<>?`\\[\\];’,./\\\\]{1,20}+$",
+                name
         )
     }
 
     fun isEmailValid(email: String): Boolean {
         return Pattern.matches(
-            "^[A-Za-z0-9_\\-\\.\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$",
-            email
+                "^[A-Za-z0-9_\\-\\.\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$",
+                email
         )
     }
 
@@ -144,8 +154,8 @@ object GeneralUtils {
 
     fun isPasswordValid(pwd: String): Boolean {
         return Pattern.matches(
-            "^[a-zA-Z0-9-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{8,20}+$",
-            pwd
+                "^[a-zA-Z0-9-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{8,20}+$",
+                pwd
         )
     }
 
@@ -359,15 +369,15 @@ object GeneralUtils {
         var index = text.toLowerCase().indexOf(keyword.toLowerCase())
         while (index != -1) {
             result.setSpan(
-                ForegroundColorSpan(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.color_red_1
-                    )
-                ),
-                index,
-                index + keyword.length,
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                    ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                    context,
+                                    R.color.color_red_1
+                            )
+                    ),
+                    index,
+                    index + keyword.length,
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
             )
             index = text.toLowerCase().indexOf(keyword.toLowerCase(), index + keyword.length)
         }
@@ -375,8 +385,8 @@ object GeneralUtils {
     }
 
     fun getMediaSource(
-        uriString: String,
-        sourceFactory: DefaultDataSourceFactory
+            uriString: String,
+            sourceFactory: DefaultDataSourceFactory
     ): MediaSource? {
         val uri = Uri.parse(uriString)
 
@@ -386,28 +396,48 @@ object GeneralUtils {
         return when (sourceType) {
             C.TYPE_DASH ->
                 DashMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
+                        .createMediaSource(uri)
             C.TYPE_HLS ->
                 HlsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
+                        .createMediaSource(uri)
             C.TYPE_SS ->
                 SsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
+                        .createMediaSource(uri)
             C.TYPE_OTHER -> {
                 when {
                     uriString.startsWith("rtmp://") ->
                         ProgressiveMediaSource.Factory(RtmpDataSourceFactory())
-                            .createMediaSource(uri)
+                                .createMediaSource(uri)
                     uriString.contains("m3u8") -> HlsMediaSource.Factory(sourceFactory)
-                        .createMediaSource(uri)
+                            .createMediaSource(uri)
                     else ->
                         ProgressiveMediaSource.Factory(sourceFactory)
-                            .createMediaSource(uri)
+                                .createMediaSource(uri)
                 }
             }
             else -> null
         }
     }
+
+    fun getStringLength(str: String):Int{
+        Timber.i("getStringLength str =$str 1.0")
+        var valueLength = 0.0
+        val PATTERN = Pattern.compile("""^[_A-z0-9]*((\s)*[_A-z0-9])*${'$'}""")
+        for (i in str.indices) {
+
+            val temp: String = str.substring(i, i + 1)
+            valueLength += if (PATTERN.matcher(temp).matches()) {
+                Timber.i("getStringLength temp =$temp 1.0")
+                1.0
+            } else {
+                Timber.i("getStringLength temp =$temp 2.0")
+                2.0
+            }
+        }
+        return ceil(valueLength).toInt()
+    }
+
+
 
     fun parseTimeToUTC(date: Date): String {
         var time: String

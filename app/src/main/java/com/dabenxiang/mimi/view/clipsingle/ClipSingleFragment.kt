@@ -117,7 +117,6 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     fun modifyFavorite() {
-        Timber.d("@@modifyFavorite: ${playItem?.favorite}")
         val favoriteRes =
             takeIf { playItem?.favorite == true }?.let { R.drawable.btn_favorite_forvideo_s }
                 ?: let { R.drawable.btn_favorite_forvideo_n }
