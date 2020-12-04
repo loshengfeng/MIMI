@@ -130,6 +130,9 @@
         <action
             android:id="@+id/action_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
 
     <fragment
@@ -176,6 +179,9 @@
         <action
             android:id="@+id/action_to_clipSingleFragment"
             app:destination="@id/clipSingleFragment" />
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
     </fragment>
     <fragment
         android:id="@+id/searchPostFragment"
@@ -239,7 +245,7 @@
         android:name="com.dabenxiang.mimi.view.club.text.ClubTextFragment"
         tools:layout="@layout/fragment_club_text">
         <action
-            android:id="@+id/action_clubTextDetailFragment_to_myPostFragment"
+            android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
             android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
