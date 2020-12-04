@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -51,9 +52,10 @@ class ClipPlayerFragment : BasePlayerFragment() {
         }
     }
 
-    override fun getTabTitle(tab: TabLayout.Tab, position: Int) = when (position) {
-        0 -> tab.text = "视频简介"
-        else -> tab.text = "评论"
+    // UI spec only two tabs use when ? use StringArray ?
+    override fun getTabTitle(tab: TabLayout.Tab, position: Int) {
+        val tabs = resources.getStringArray(R.array.clip_play_tabs)
+        tab.text = tabs[position]
     }
 
     override fun onResume() {

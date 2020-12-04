@@ -571,6 +571,10 @@
     <!-- Clip -->
     <string name="clip_newest">最新</string>
     <string name="clip_top_hit">热门</string>
+    <string-array name="clip_play_tabs">
+        <item>@string/video_desc</item>
+        <item>@string/comment</item>
+    </string-array>
 
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
