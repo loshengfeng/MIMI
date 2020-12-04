@@ -33,6 +33,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     private val SWIPE_DISTANCE_UNIT = 25
     private val SWIPE_SOUND_LEAST = 100
     private var volume: Float = 1f
+    open var streamId = 0L
 
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null
@@ -232,7 +233,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     }
 
     fun sendVideoReport() {
-        playerViewModel.sendVideoReport(contentId)
+        playerViewModel.sendVideoReport(streamId)
     }
 
     /**
