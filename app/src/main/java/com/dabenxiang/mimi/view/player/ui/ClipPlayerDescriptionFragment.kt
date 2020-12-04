@@ -192,7 +192,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         setupChipGroup(postItem.tags)
 
         tv_follow.setOnClickListener {
-            clipViewModel.followPost(postItem.creatorId, tv_follow.text == getText(R.string.followed))
+            checkStatus { clipViewModel.followPost(postItem.creatorId, tv_follow.text == getText(R.string.followed)) }
         }
 
         clip_icon.setOnClickListener {
