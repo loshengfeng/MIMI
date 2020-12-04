@@ -167,9 +167,9 @@ class ClipSingleFragment : BaseFragment() {
 
         ib_back.setOnClickListener { findNavController().navigateUp() }
 
-        btn_retry.setOnClickListener {
+        ib_retry.setOnClickListener {
             playItem?.run {
-                btn_retry.visibility = View.GONE
+                ib_retry.visibility = View.GONE
                 viewModel.getM3U8(this)
             }
         }
@@ -308,7 +308,7 @@ class ClipSingleFragment : BaseFragment() {
                 }
             }
             progress_video?.visibility = View.GONE
-            btn_retry.visibility = View.VISIBLE
+            ib_retry.visibility = View.VISIBLE
             viewModel.videoEpisodeItem?.videoStreams?.get(0)
                 ?.run { viewModel.sendVideoReport(this.toString()) }
         }

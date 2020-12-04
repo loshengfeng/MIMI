@@ -180,8 +180,8 @@ class ClipAdapter(
                 holder.ibPlay.visibility = View.GONE
             }
         }
-        holder.btnRetry.setOnClickListener {
-            holder.btnRetry.visibility = View.GONE
+        holder.ibRetry.setOnClickListener {
+            holder.ibRetry.visibility = View.GONE
             holder.progress.visibility = View.VISIBLE
             getM3U8()
         }
@@ -284,7 +284,7 @@ class ClipAdapter(
             }
 
             currentViewHolder?.progress?.visibility = View.GONE
-            currentViewHolder?.btnRetry?.visibility = View.VISIBLE
+            currentViewHolder?.ibRetry?.visibility = View.VISIBLE
             getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
                 clipFuncItem.onPlayerError(id.toString(), error.message ?: "error: UNKNOWN")
             }
