@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.view.actor.ActorFragment.Companion.VIEW_TYPE_ACTOR_VIDEOS
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.VideosSpaceItemDecoration
+import timber.log.Timber
 
 class ActorVideosAdapter(
     val context: Context,
@@ -63,7 +64,10 @@ class ActorVideosAdapter(
                 decorationPosition.add(position)
             }
         }
-        actorVideoAdapter.setupData(item.videos)
+        if(item.videos.isNotEmpty()){
+            actorVideoAdapter.setupData(item.videos)
+            actorVideoAdapter.notifyDataSetChanged()
+        }
         actorVideosFuncItem.getActorAvatarAttachment.invoke(item?.attachmentId,holder.ivAvatar)
         holder.ivAvatar.setOnClickListener { actorVideosFuncItem.onActorClickListener(item.id, position) }
     }
