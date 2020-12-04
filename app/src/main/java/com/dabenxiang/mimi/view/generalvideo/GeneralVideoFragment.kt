@@ -50,7 +50,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         }
 
         layout_refresh.setOnRefreshListener {
-            Timber.d("@@DAVE......")
             generalVideoAdapter.refresh()
         }
 
@@ -117,6 +116,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     layout_empty_data?.run { this.visibility = View.INVISIBLE }
                     rv_video?.run { this.visibility = View.VISIBLE }
                 }
+
                 layout_refresh?.run { this.isRefreshing = false }
             }
         }

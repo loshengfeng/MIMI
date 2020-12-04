@@ -81,13 +81,12 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkStatus {
                 when (item.type) {
                     PostType.IMAGE -> {
                         val bundle = ClubPicFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_searchPostFragment_to_clubPicFragment,
+                                R.id.action_to_clubPicFragment,
                                 bundle
                             )
                         )
@@ -96,7 +95,7 @@ class SearchPostFragment : BaseFragment() {
                         val bundle = ClubTextFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_searchPostFragment_to_clubTextFragment,
+                                R.id.action_to_clubTextFragment,
                                 bundle
                             )
                         )
@@ -113,7 +112,6 @@ class SearchPostFragment : BaseFragment() {
                     else -> {
                     }
                 }
-            }
         }
 
         override fun onFavoriteClick(
@@ -187,7 +185,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = ClubPicFragment.createBundle(item)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_clubPicFragment,
+                            R.id.action_to_clubPicFragment,
                             bundle
                         )
                     )
@@ -196,7 +194,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = ClubTextFragment.createBundle(item)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_clubTextFragment,
+                            R.id.action_to_clubTextFragment,
                             bundle
                         )
                     )
@@ -205,7 +203,7 @@ class SearchPostFragment : BaseFragment() {
                     val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_clipPlayerFragment,
+                            R.id.action_to_clipPlayerFragment,
                             bundle
                         )
                     )
@@ -496,7 +494,7 @@ class SearchPostFragment : BaseFragment() {
     override fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_searchPostFragment_to_clubTextFragment,
+                R.id.action_to_clubTextFragment,
                 bundle
             )
         )
@@ -505,7 +503,7 @@ class SearchPostFragment : BaseFragment() {
     override fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_searchPostFragment_to_clubPicFragment,
+                R.id.action_to_clubPicFragment,
                 bundle
             )
         )
@@ -517,7 +515,7 @@ class SearchPostFragment : BaseFragment() {
 
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_searchPostFragment_to_clipPlayerFragment,
+                R.id.action_to_clipPlayerFragment,
                 bundle
             )
         )
