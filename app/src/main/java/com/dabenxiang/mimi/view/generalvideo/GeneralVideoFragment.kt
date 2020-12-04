@@ -71,7 +71,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     true
                 )
             )
-            LinearSnapHelper().attachToRecyclerView(it)
         }
 
         lifecycleScope.launch {
