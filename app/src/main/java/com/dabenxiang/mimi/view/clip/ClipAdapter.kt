@@ -43,8 +43,6 @@ class ClipAdapter(
         const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
         const val PAYLOAD_UPDATE_SCROLL_AWAY = 2
         const val ERROR_CODE_ACCOUNT_OVERDUE = 402
-
-        var playingId: String = ""
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -287,8 +285,8 @@ class ClipAdapter(
 
             currentViewHolder?.progress?.visibility = View.GONE
             currentViewHolder?.btnRetry?.visibility = View.VISIBLE
-            playingId.takeIf { it.isNotEmpty() }?.also { id->
-                clipFuncItem.onPlayerError(id, error.message ?: "error: UNKNOWN")
+            getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
+                clipFuncItem.onPlayerError(id.toString(), error.message ?: "error: UNKNOWN")
             }
 
 
