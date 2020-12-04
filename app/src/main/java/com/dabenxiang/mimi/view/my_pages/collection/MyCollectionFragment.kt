@@ -32,13 +32,10 @@ class MyCollectionFragment: BaseMyPagesTabFragment() {
         tool_bar.toolbar_title.text = getString(R.string.personal_follow)
     }
 
-    override fun getTabTitle(position: Int): String? {
-        return when (position) {
-            TAB_MiMI_VIDEO -> getString(R.string.follow_tab_mimi_video)
-            TAB_SHORT_VIDEO -> getString(R.string.follow_tab_small_video)
-            TAB_FAVORITES -> getString(R.string.follow_tab_post)
-            else -> null
-        }
+    // UI spec only three tabs use when ? use StringArray ?
+    override fun getTabTitle(position: Int): String {
+        val tabs = resources.getStringArray(R.array.favorite_tabs)
+        return tabs[position]
     }
 
     override val bottomNavigationVisibility: Int
