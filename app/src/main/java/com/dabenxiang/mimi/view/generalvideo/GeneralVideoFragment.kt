@@ -97,7 +97,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 layout_empty_data?.run { this.visibility = View.VISIBLE }
                 tv_empty_data?.run { this.text = getString(R.string.error_video) }
 
-                rv_video?.run { this.visibility = View.INVISIBLE }
+                rv_video?.run { this.visibility = View.VISIBLE }
                 layout_refresh?.run { this.isRefreshing = false }
             }
             is LoadState.Loading -> {
@@ -110,12 +110,12 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 if (generalVideoAdapter.isDataEmpty()) {
                     layout_empty_data?.run { this.visibility = View.VISIBLE }
                     tv_empty_data?.run { this.text = getString(R.string.empty_video) }
-                    rv_video?.run { this.visibility = View.INVISIBLE }
                 } else {
                     layout_empty_data?.run { this.visibility = View.INVISIBLE }
-                    rv_video?.run { this.visibility = View.VISIBLE }
+                    tv_empty_data?.run { this.text = "" }
                 }
 
+                rv_video?.run { this.visibility = View.VISIBLE }
                 layout_refresh?.run { this.isRefreshing = false }
             }
         }
