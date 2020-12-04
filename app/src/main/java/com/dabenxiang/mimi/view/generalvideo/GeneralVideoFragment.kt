@@ -91,6 +91,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     }
 
     private val loadStateListener = { loadStatus: CombinedLoadStates ->
+        Timber.d("@@loadStateListener....")
         when (loadStatus.refresh) {
             is LoadState.Error -> {
                 Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
@@ -124,7 +125,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         when (loadStatus.append) {
             is LoadState.Error -> {
                 Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
-                onApiError((loadStatus.refresh as LoadState.Error).error)
             }
             is LoadState.Loading -> {
                 Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")

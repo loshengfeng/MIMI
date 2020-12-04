@@ -19,15 +19,21 @@ class VideoLoadStateViewHolder(
     private val retry = itemView.retry_button.also { it.setOnClickListener { retryCallback() } }
 
     fun bindTo(loadState: LoadState) {
+
         progressBar.visibility = takeIf { loadState is LoadState.Loading }?.let { View.VISIBLE }
-            ?: let { View.INVISIBLE }
+            ?: let { View.GONE }
 
-        retry.visibility =
-            takeIf { loadState is LoadState.Error }?.let { View.VISIBLE } ?: let { View.INVISIBLE }
-
-        errorMsg.visibility =
-            takeIf { !(loadState as? LoadState.Error)?.error?.message.isNullOrBlank() }?.let { View.VISIBLE }
-                ?: let { View.INVISIBLE }
+        val errMsg = (loadState as? LoadState.Error)?.error?.message
+        when {
+            errMsg.isNullOrBlank() || errMsg.contains("List is empty") -> {
+                errorMsg.visibility = View.GONE
+                retry.visibility = View.GONE
+            }
+            else -> {
+                errorMsg.visibility = View.VISIBLE
+                retry.visibility = View.VISIBLE
+            }
+        }
 
         errorMsg.text = (loadState as? LoadState.Error)?.error?.message
     }
