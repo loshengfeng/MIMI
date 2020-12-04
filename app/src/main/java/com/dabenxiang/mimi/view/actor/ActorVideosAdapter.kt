@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.view.actor.ActorFragment.Companion.VIEW_TYPE_ACTOR_VIDEOS
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.VideosSpaceItemDecoration
+import timber.log.Timber
 
 class ActorVideosAdapter(
     val context: Context,
@@ -17,13 +18,6 @@ class ActorVideosAdapter(
     private var selectItem: ActorVideosItem? = null
 
     private var actorVideosItems: ArrayList<ActorVideosItem>? = null
-
-    private val actorVideoAdapter by lazy {
-        ActorVideoAdapter(context,
-            ActorVideoFuncItem(
-                onVideoClickListener = { actorVideoItem, position -> actorVideosFuncItem.onVideoClickListener(actorVideoItem, position) }
-            )
-        ) }
 
     private val decorationPosition: ArrayList<Int> = ArrayList()
 
@@ -42,6 +36,12 @@ class ActorVideosAdapter(
     }
 
     override fun onBindViewHolder(holder: ActorVideosViewHolder, position: Int) {
+        val actorVideoAdapter =
+            ActorVideoAdapter(context,
+                ActorVideoFuncItem(
+                    onVideoClickListener = { actorVideoItem, position -> actorVideosFuncItem.onVideoClickListener(actorVideoItem, position) }
+                )
+            )
         val item = actorVideosItems?.get(position)?: ActorVideosItem()
         holder.name.run {
             text = item.name
@@ -63,13 +63,14 @@ class ActorVideosAdapter(
                 decorationPosition.add(position)
             }
         }
-        actorVideoAdapter.setupData(item.videos)
+        actorVideoAdapter.submitList(item.videos)
         actorVideosFuncItem.getActorAvatarAttachment.invoke(item?.attachmentId,holder.ivAvatar)
         holder.ivAvatar.setOnClickListener { actorVideosFuncItem.onActorClickListener(item.id, position) }
     }
 
-    fun setupData(data: ArrayList<ActorVideosItem>) {
+    fun submitList(data: ArrayList<ActorVideosItem>) {
         actorVideosItems = data
+        notifyDataSetChanged()
     }
 
     fun clearSelectItem() {

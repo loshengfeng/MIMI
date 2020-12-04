@@ -15,7 +15,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.*
@@ -26,16 +30,18 @@ import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchingVideoItem
-import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
@@ -74,6 +80,34 @@ class SearchVideoFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+    private val loadStateListener = { loadStatus: CombinedLoadStates ->
+        when (loadStatus.refresh) {
+            is LoadState.Error -> {
+                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                progressHUD.dismiss()
+                onApiError((loadStatus.refresh as LoadState.Error).error)
+            }
+            is LoadState.Loading -> {
+                progressHUD.show()
+            }
+            is LoadState.NotLoading -> {
+                progressHUD.dismiss()
+            }
+        }
+
+        when (loadStatus.append) {
+            is LoadState.Error -> {
+                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+                onApiError((loadStatus.refresh as LoadState.Error).error)
+            }
+            is LoadState.Loading -> {
+                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
+            }
+            is LoadState.NotLoading -> {
+                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
+            }
+        }
+    }
 
     override fun setupFirstTime() {
         super.setupFirstTime()
@@ -87,7 +121,7 @@ class SearchVideoFragment : BaseFragment() {
             viewModel.category = data.category
             if (data.tag.isNotBlank()) {
                 layout_search_history.visibility = View.GONE
-                viewModel.getSearchList()
+                searchVideo(tag = data.tag)
             }
 
             if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
@@ -99,9 +133,9 @@ class SearchVideoFragment : BaseFragment() {
                 layout_search_text.visibility = View.VISIBLE
             }
 
+            videoListAdapter.addLoadStateListener(loadStateListener)
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
-            recyclerview_content.adapter = videoListAdapter
-
+            recyclerview_content.adapter = videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
         }
     }
 
@@ -115,10 +149,6 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.searchTextLiveData.observe(viewLifecycleOwner, Observer {
 
-        })
-
-        viewModel.searchingListResult.observe(viewLifecycleOwner, Observer {
-            videoListAdapter.submitList(it)
         })
 
         viewModel.searchingTotalCount.observe(viewLifecycleOwner, Observer { count ->
@@ -172,7 +202,7 @@ class SearchVideoFragment : BaseFragment() {
                 layout_search_history.visibility = View.VISIBLE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
-                videoListAdapter.submitList(null)
+                lifecycleScope.launch { videoListAdapter.submitData(PagingData.empty()) }
             }
         }
 
@@ -192,7 +222,7 @@ class SearchVideoFragment : BaseFragment() {
             layout_search_history.visibility = View.GONE
             viewModel.searchingTag = ""
             viewModel.searchingStr = search_bar.text.toString()
-            viewModel.getSearchList()
+            searchVideo(keyword = search_bar.text.toString())
             viewModel.updateSearchHistory(viewModel.searchingStr)
             GeneralUtils.hideKeyboard(requireActivity())
         } else {
@@ -297,7 +327,7 @@ class SearchVideoFragment : BaseFragment() {
             layout_search_text.visibility = View.GONE
             viewModel.searchingTag = text
             viewModel.searchingStr = ""
-            viewModel.getSearchList()
+            searchVideo(tag = text)
             GeneralUtils.hideKeyboard(requireActivity())
         }
 
@@ -364,10 +394,21 @@ class SearchVideoFragment : BaseFragment() {
                 layout_search_history.visibility = View.GONE
                 viewModel.searchingStr = text
                 viewModel.searchingTag = ""
-                viewModel.getSearchList()
+                searchVideo(keyword = text)
                 GeneralUtils.hideKeyboard(requireActivity())
             }
             chip_group_search_text.addView(chip)
+        }
+    }
+
+    private fun searchVideo(
+        keyword: String? = null,
+        tag: String? = null
+    ) {
+        lifecycleScope.launch {
+            videoListAdapter.submitData(PagingData.empty())
+            viewModel.getSearchVideoResult(keyword, tag)
+                .collectLatest { videoListAdapter.submitData(it) }
         }
     }
 

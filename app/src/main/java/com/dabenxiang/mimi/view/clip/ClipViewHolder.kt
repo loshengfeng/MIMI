@@ -21,7 +21,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvComment: TextView = view.tv_comment
     var tvMore: TextView = view.tv_more
     var progress: ProgressBar = view.progress_video
-    var btnRetry: Button = view.btn_retry
+    var ibRetry: ImageButton = view.ib_retry
     var reminder: View = view.recharge_reminder
     private var btnVip: View = view.btn_vip
     private var btnPromote: View = view.btn_promote
@@ -31,7 +31,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         ibReplay.visibility = View.GONE
         ibPlay.visibility = View.GONE
         progress.visibility = View.GONE
-        btnRetry.visibility = View.GONE
+        ibRetry.visibility = View.GONE
         tvTitle.text = item.title
         tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()

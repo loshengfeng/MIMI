@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.category.CategoriesFragment
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -63,7 +64,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         rv_video.also {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
-            it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+            it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.addItemDecoration(
                 GridSpaceItemDecoration(
                     2,
@@ -91,6 +92,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     }
 
     private val loadStateListener = { loadStatus: CombinedLoadStates ->
+        Timber.d("@@loadStateListener....")
         when (loadStatus.refresh) {
             is LoadState.Error -> {
                 Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
@@ -124,7 +126,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         when (loadStatus.append) {
             is LoadState.Error -> {
                 Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
-                onApiError((loadStatus.refresh as LoadState.Error).error)
             }
             is LoadState.Loading -> {
                 Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")

@@ -139,7 +139,6 @@ class ActorVideosFragment : BaseFragment() {
         }
 
         app_bar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-
             when {
                 verticalOffset == 0 -> {
                     actor_toolbar_title.visibility = View.VISIBLE
@@ -149,7 +148,6 @@ class ActorVideosFragment : BaseFragment() {
                     actor_toolbar_title.visibility = View.GONE
                 }
             }
-
         })
     }
 

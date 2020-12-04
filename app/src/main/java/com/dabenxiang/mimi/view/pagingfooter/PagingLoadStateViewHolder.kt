@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.generalvideo.paging
+package com.dabenxiang.mimi.view.pagingfooter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import kotlinx.android.synthetic.main.item_network_state.view.*
 
-class VideoLoadStateViewHolder(
+class PagingLoadStateViewHolder(
     parent: ViewGroup,
     private val retryCallback: () -> Unit
 ) : RecyclerView.ViewHolder(
@@ -20,25 +20,19 @@ class VideoLoadStateViewHolder(
 
     fun bindTo(loadState: LoadState) {
         progressBar.visibility = takeIf { loadState is LoadState.Loading }?.let { View.VISIBLE }
-            ?: let { View.INVISIBLE }
+            ?: let { View.GONE }
 
-        retry.visibility =
-            takeIf { loadState is LoadState.Error && (loadState as? LoadState.Error)?.error !is NoSuchElementException}?.let {
-                View.VISIBLE
-            } ?: let {
-                View.INVISIBLE
+        val errMsg = (loadState as? LoadState.Error)?.error?.message
+        when {
+            errMsg.isNullOrBlank() || errMsg.contains("List is empty") -> {
+                errorMsg.visibility = View.GONE
+                retry.visibility = View.GONE
             }
-
-        errorMsg.visibility =
-            takeIf { !(loadState as? LoadState.Error)?.error?.message.isNullOrBlank() && (loadState as? LoadState.Error)?.error !is NoSuchElementException}?.let {
-                View.VISIBLE
-            } ?: let {
-                View.INVISIBLE
+            else -> {
+                errorMsg.visibility = View.VISIBLE
+                retry.visibility = View.VISIBLE
             }
-
-        if((loadState is LoadState.Error) && loadState.error is NoSuchElementException)
-            progressBar.visibility = View.INVISIBLE
-
+        }
         errorMsg.text = (loadState as? LoadState.Error)?.error?.message
     }
 

@@ -101,8 +101,7 @@ class ActorFragment : BaseFragment() {
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
                     val actorVideos = (it.first as ApiResult.Success).result
-                    actorVideosAdapter.setupData(actorVideos)
-                    actorVideosAdapter.notifyDataSetChanged()
+                    actorVideosAdapter.submitList(actorVideos)
                 }
                 is ApiResult.Error -> onApiError((it.first as ApiResult.Error<ArrayList<ActorCategoriesItem>>).throwable)
             }

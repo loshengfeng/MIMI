@@ -35,8 +35,9 @@ class ActorVideoAdapter(
             holder.item.setOnClickListener { actorVideoFuncItem.onVideoClickListener(item, position) }
     }
 
-    fun setupData(data: ArrayList<ActorVideoItem>) {
+    fun submitList(data: ArrayList<ActorVideoItem>) {
         actorVideoItems = data
+        notifyDataSetChanged()
     }
 
     fun clearSelectItem() {
