@@ -59,7 +59,6 @@ class RecommendFragment(
         iv_rank.setOnClickListener { navToRanking() }
 
         rv_recommend.adapter = recommendContentAdapter
-        LinearSnapHelper().attachToRecyclerView(rv_recommend)
     }
 
     override fun getLayoutId(): Int {

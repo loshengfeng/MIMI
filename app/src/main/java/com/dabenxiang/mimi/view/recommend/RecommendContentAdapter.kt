@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -60,10 +59,9 @@ class RecommendContentAdapter(
             is RecommendViewHolder -> {
                 holder.titleText.text = item.name
                 holder.moreText.setOnClickListener { recommendFuncItem.onMoreClick(item) }
-                holder.recommendContentRecycler.also {
-                    it.adapter = RecommendVideoAdapter(item.videos, recommendFuncItem)
-                    LinearSnapHelper().attachToRecyclerView(it)
-                }
+                holder.recommendContentRecycler.adapter = RecommendVideoAdapter(
+                    item.videos, recommendFuncItem
+                )
             }
         }
     }
