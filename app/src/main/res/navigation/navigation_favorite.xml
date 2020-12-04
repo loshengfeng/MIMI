@@ -82,7 +82,7 @@
         tools:layout="@layout/fragment_search_post">
 
         <action
-            android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
+            android:id="@+id/action_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
         <action
             android:id="@+id/action_searchPostFragment_to_pictureDetailFragment"
