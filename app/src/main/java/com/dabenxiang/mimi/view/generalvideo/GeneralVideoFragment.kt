@@ -6,7 +6,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
@@ -22,6 +21,10 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
+import kotlinx.android.synthetic.main.fragment_actor_videos.layout_empty_data
+import kotlinx.android.synthetic.main.fragment_actor_videos.layout_refresh
+import kotlinx.android.synthetic.main.fragment_actor_videos.rv_video
+import kotlinx.android.synthetic.main.fragment_actor_videos.tv_empty_data
 import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -113,6 +116,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     tv_empty_data?.run { this.text = getString(R.string.empty_video) }
                     rv_video?.run { this.visibility = View.INVISIBLE }
                 } else {
+                    rv_video?.scrollBy(0, 1) //FIXME: 滑動後頁面才能點擊，原因未明，查找中...
                     layout_empty_data?.run { this.visibility = View.INVISIBLE }
                     rv_video?.run { this.visibility = View.VISIBLE }
                 }
