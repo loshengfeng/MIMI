@@ -81,7 +81,6 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkStatus {
                 when (item.type) {
                     PostType.IMAGE -> {
                         val bundle = ClubPicFragment.createBundle(item, 1)
@@ -113,7 +112,6 @@ class SearchPostFragment : BaseFragment() {
                     else -> {
                     }
                 }
-            }
         }
 
         override fun onFavoriteClick(

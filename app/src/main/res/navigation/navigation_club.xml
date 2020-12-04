@@ -103,6 +103,9 @@
             android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
             app:destination="@id/navigation_clip_player" />
         <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/navigation_clip_player" />
+        <action
             android:id="@+id/action_searchPostFragment_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
         <action
