@@ -16,10 +16,8 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.util.DisplayMetrics
-import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -36,6 +34,7 @@ import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.flurry.sdk.s
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -57,10 +56,12 @@ import timber.log.Timber
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.lang.reflect.Array.getLength
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 
@@ -418,59 +419,26 @@ object GeneralUtils {
         }
     }
 
-    fun makeTextViewResizable(tv: TextView, maxLine: Int, expandText: String, viewMore: Boolean) {
-        if (tv.tag == null) {
-            tv.tag = tv.text
-        }
-        val vto = tv.viewTreeObserver
-        vto.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val text: String
-                val lineEndIndex: Int
-                val obs = tv.viewTreeObserver
-                obs.removeOnGlobalLayoutListener(this)
-                if (maxLine == 0) {
-                    lineEndIndex = tv.layout.getLineEnd(0)
-                    text = tv.text.subSequence(0, lineEndIndex - expandText.length + 1).toString() + " " + expandText
-                } else if (maxLine > 0 && tv.text.length >= 60) {
-                    lineEndIndex = tv.layout.getLineEnd(maxLine - 1)
-                    text = tv.text.subSequence(0, lineEndIndex - expandText.length + 1).toString() + " " + expandText
-                } else {
-                    lineEndIndex = tv.layout.getLineEnd(tv.layout.lineCount - 1)
-                    text = tv.text.subSequence(0, lineEndIndex).toString()
-                }
-                tv.text = text
-                tv.movementMethod = LinkMovementMethod.getInstance()
-                val pasteData = "" + tv.text
-                val strSpanned = Html.fromHtml(pasteData, Html.FROM_HTML_MODE_LEGACY)
-                val builder = addClickablePartTextViewResizable(strSpanned, tv, lineEndIndex, expandText,
-                        viewMore)
-                tv.setText(builder, BufferType.SPANNABLE)
+    fun getStringLength(str: String):Int{
+        Timber.i("getStringLength str =$str 1.0")
+        var valueLength = 0.0
+        val PATTERN = Pattern.compile("""^[_A-z0-9]*((\s)*[_A-z0-9])*${'$'}""")
+        for (i in str.indices) {
+
+            val temp: String = str.substring(i, i + 1)
+            valueLength += if (PATTERN.matcher(temp).matches()) {
+                Timber.i("getStringLength temp =$temp 1.0")
+                1.0
+            } else {
+                Timber.i("getStringLength temp =$temp 2.0")
+                2.0
             }
-        })
+        }
+        return ceil(valueLength).toInt()
     }
 
-    private fun addClickablePartTextViewResizable(strSpanned: Spanned, tv: TextView,
-                                                  maxLine: Int, spanableText: String, viewMore: Boolean): SpannableStringBuilder {
-        val str = strSpanned.toString()
-        val ssb = SpannableStringBuilder(strSpanned)
-        if (str.contains(spanableText)) {
-//            ssb.setSpan(object : ClickableSpan() {
-//                override fun onClick(widget: View) {
-//                    tv.layoutParams = tv.layoutParams
-//                    tv.setText(tv.tag.toString(), BufferType.SPANNABLE)
-//                    tv.invalidate()
-//                    if (viewMore) {
-//                        makeTextViewResizable(tv, -1, "View Less", false)
-//                    } else {
-//                        makeTextViewResizable(tv, 3, App.self.getString(R.string.show_more), true)
-//                    }
-//                }
-//            }, str.indexOf(spanableText), str.indexOf(spanableText) + spanableText.length, 0)
-        }
-        return ssb
-    }
-    
+
+
     fun parseTimeToUTC(date: Date): String {
         var time: String
         try {
