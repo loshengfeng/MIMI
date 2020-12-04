@@ -4,16 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.search.post.paging.SearchPostFollowDataSource
+import com.dabenxiang.mimi.view.search.video.paging.SearchVideoListDataSource
 import com.dabenxiang.mimi.widget.utility.EditTextLiveData
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
 import kotlinx.coroutines.Dispatchers
@@ -32,9 +34,6 @@ class SearchVideoViewModel : BaseViewModel() {
     private val _searchTextLiveData = EditTextMutableLiveData()
     val searchTextLiveData: EditTextLiveData = _searchTextLiveData
 
-    private val _searchingListResult = MutableLiveData<PagedList<VideoItem>>()
-    val searchingListResult: LiveData<PagedList<VideoItem>> = _searchingListResult
-
     private val _searchingTotalCount = MutableLiveData<Long>()
     val searchingTotalCount: LiveData<Long> = _searchingTotalCount
 
@@ -43,25 +42,6 @@ class SearchVideoViewModel : BaseViewModel() {
 
     private val _favoriteResult = MutableLiveData<ApiResult<Long>>()
     val favoriteResult: LiveData<ApiResult<Long>> = _favoriteResult
-
-    private fun getVideoPagingItems(): LiveData<PagedList<VideoItem>> {
-        val searchVideoDataSource =
-            SearchVideoListDataSource(
-                viewModelScope,
-                domainManager,
-                pagingCallback,
-                category,
-                searchingTag,
-                searchingStr,
-                adWidth,
-                adHeight
-            )
-        val videoFactory = SearchVideoFactory(searchVideoDataSource)
-        val config = PagedList.Config.Builder()
-            .setPrefetchDistance(4)
-            .build()
-        return LivePagedListBuilder(videoFactory, config).build()
-    }
 
     private val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
@@ -84,13 +64,26 @@ class SearchVideoViewModel : BaseViewModel() {
         _searchTextLiveData.value = ""
     }
 
-    fun getSearchList() {
-        viewModelScope.launch {
-            getVideoPagingItems().asFlow()
-                .collect {
-                    _searchingListResult.value = it
-                }
-        }
+    fun getSearchVideoResult(
+        keyword: String? = null,
+        tag: String? = null
+    ): Flow<PagingData<VideoItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = SearchVideoListDataSource.PER_LIMIT.toInt()),
+            pagingSourceFactory = {
+                SearchVideoListDataSource(
+                    domainManager,
+                    pagingCallback,
+                    category,
+                    tag,
+                    keyword,
+                    adWidth,
+                    adHeight
+                )
+            }
+        )
+            .flow
+            .cachedIn(viewModelScope)
     }
 
     fun modifyLike(videoID: Long) {

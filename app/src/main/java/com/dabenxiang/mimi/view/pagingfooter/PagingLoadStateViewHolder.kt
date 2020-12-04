@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.generalvideo.paging
+package com.dabenxiang.mimi.view.pagingfooter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import kotlinx.android.synthetic.main.item_network_state.view.*
 
-class VideoLoadStateViewHolder(
+class PagingLoadStateViewHolder(
     parent: ViewGroup,
     private val retryCallback: () -> Unit
 ) : RecyclerView.ViewHolder(
@@ -19,7 +19,6 @@ class VideoLoadStateViewHolder(
     private val retry = itemView.retry_button.also { it.setOnClickListener { retryCallback() } }
 
     fun bindTo(loadState: LoadState) {
-
         progressBar.visibility = takeIf { loadState is LoadState.Loading }?.let { View.VISIBLE }
             ?: let { View.GONE }
 
@@ -34,7 +33,6 @@ class VideoLoadStateViewHolder(
                 retry.visibility = View.VISIBLE
             }
         }
-
         errorMsg.text = (loadState as? LoadState.Error)?.error?.message
     }
 

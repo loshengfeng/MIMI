@@ -95,7 +95,6 @@ class ClipPlayerFragment : BasePlayerFragment() {
     }
 
     private fun parsingPostContent(postItem: MemberPostItem) {
-        streamId = Gson().fromJson(postItem.content, MediaContentItem::class.java).shortVideo?.id?.toLong() ?: 0
         viewModel.parsingM3u8Source(
             requireContext(),
             Gson().fromJson(postItem.content, MediaContentItem::class.java)

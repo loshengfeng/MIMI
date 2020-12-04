@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.category.CategoriesFragment
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -63,7 +64,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         rv_video.also {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
-            it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+            it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.addItemDecoration(
                 GridSpaceItemDecoration(
                     2,
