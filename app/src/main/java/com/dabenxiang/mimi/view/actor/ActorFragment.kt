@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.actor
 
-import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -68,11 +67,6 @@ class ActorFragment : BaseFragment() {
 
     private val viewModel: ActorViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initSettings()
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_actor
     }
@@ -101,8 +95,7 @@ class ActorFragment : BaseFragment() {
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Success -> {
                     val actorVideos = (it.first as ApiResult.Success).result
-                    actorVideosAdapter.setupData(actorVideos)
-                    actorVideosAdapter.notifyDataSetChanged()
+                    actorVideosAdapter.submitList(actorVideos)
                 }
                 is ApiResult.Error -> onApiError((it.first as ApiResult.Error<ArrayList<ActorCategoriesItem>>).throwable)
             }
@@ -141,6 +134,7 @@ class ActorFragment : BaseFragment() {
                 if (actorListAdapter.isDataEmpty()) {
                     rv_all_actresses?.run { this.visibility = View.INVISIBLE }
                 } else {
+                    rv_all_actresses?.scrollBy(0, 1) //FIXME: 滑動後頁面才能點擊，原因未明，查找中...
                     rv_all_actresses?.run { this.visibility = View.VISIBLE }
                 }
 

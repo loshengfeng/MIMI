@@ -89,7 +89,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     }
 
     private val loadStateListener = { loadStatus: CombinedLoadStates ->
-        Timber.d("@@loadStateListener....")
         when (loadStatus.refresh) {
             is LoadState.Error -> {
                 Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")

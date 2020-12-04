@@ -19,13 +19,6 @@ class ActorVideosAdapter(
 
     private var actorVideosItems: ArrayList<ActorVideosItem>? = null
 
-    private val actorVideoAdapter by lazy {
-        ActorVideoAdapter(context,
-            ActorVideoFuncItem(
-                onVideoClickListener = { actorVideoItem, position -> actorVideosFuncItem.onVideoClickListener(actorVideoItem, position) }
-            )
-        ) }
-
     private val decorationPosition: ArrayList<Int> = ArrayList()
 
     override fun getItemViewType(position: Int): Int {
@@ -43,6 +36,12 @@ class ActorVideosAdapter(
     }
 
     override fun onBindViewHolder(holder: ActorVideosViewHolder, position: Int) {
+        val actorVideoAdapter =
+            ActorVideoAdapter(context,
+                ActorVideoFuncItem(
+                    onVideoClickListener = { actorVideoItem, position -> actorVideosFuncItem.onVideoClickListener(actorVideoItem, position) }
+                )
+            )
         val item = actorVideosItems?.get(position)?: ActorVideosItem()
         holder.name.run {
             text = item.name
@@ -64,16 +63,14 @@ class ActorVideosAdapter(
                 decorationPosition.add(position)
             }
         }
-        if(item.videos.isNotEmpty()){
-            actorVideoAdapter.setupData(item.videos)
-            actorVideoAdapter.notifyDataSetChanged()
-        }
+        actorVideoAdapter.submitList(item.videos)
         actorVideosFuncItem.getActorAvatarAttachment.invoke(item?.attachmentId,holder.ivAvatar)
         holder.ivAvatar.setOnClickListener { actorVideosFuncItem.onActorClickListener(item.id, position) }
     }
 
-    fun setupData(data: ArrayList<ActorVideosItem>) {
+    fun submitList(data: ArrayList<ActorVideosItem>) {
         actorVideosItems = data
+        notifyDataSetChanged()
     }
 
     fun clearSelectItem() {

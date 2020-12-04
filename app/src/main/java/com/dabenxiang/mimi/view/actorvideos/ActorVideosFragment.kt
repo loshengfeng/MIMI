@@ -69,10 +69,6 @@ class ActorVideosFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-    }
-
-    override fun initSettings() {
-        super.initSettings()
         actor_toolbar_title.text = getString(R.string.actor_videos_title)
         arguments?.getSerializable(KEY_DATA)?.let { id ->
             id as Long
@@ -97,6 +93,10 @@ class ActorVideosFragment : BaseFragment() {
                 )
             )
         }
+    }
+
+    override fun initSettings() {
+        super.initSettings()
     }
 
     override fun setupObservers() {
