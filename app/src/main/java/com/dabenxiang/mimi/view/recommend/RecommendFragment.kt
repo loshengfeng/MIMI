@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
@@ -58,6 +59,7 @@ class RecommendFragment(
         iv_rank.setOnClickListener { navToRanking() }
 
         rv_recommend.adapter = recommendContentAdapter
+        LinearSnapHelper().attachToRecyclerView(rv_recommend)
     }
 
     override fun getLayoutId(): Int {

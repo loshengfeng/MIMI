@@ -13,6 +13,7 @@ import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -30,6 +31,11 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_categories.*
+import kotlinx.android.synthetic.main.fragment_categories.layout_empty_data
+import kotlinx.android.synthetic.main.fragment_categories.layout_refresh
+import kotlinx.android.synthetic.main.fragment_categories.rv_video
+import kotlinx.android.synthetic.main.fragment_categories.tv_empty_data
+import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -180,6 +186,7 @@ class CategoriesFragment : BaseFragment() {
                     true
                 )
             )
+            LinearSnapHelper().attachToRecyclerView(rv_video)
         }
 
         lstFilterRV = listOf(rl_filter_0, rl_filter_1)

@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.mimi_home
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
@@ -14,8 +13,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_mimi_home.*
-import kotlinx.android.synthetic.main.fragment_mimi_home.iv_invitevip
-import kotlinx.android.synthetic.main.fragment_mimi_home.layout_invitevip
 
 class MiMiFragment : BaseFragment() {
 
@@ -32,6 +29,21 @@ class MiMiFragment : BaseFragment() {
         viewModel.adHeight = (viewModel.adWidth / 7)
 
         btn_retry.setOnClickListener { viewModel.getMenu() }
+
+        viewModel.inviteVipShake.observe(this, {
+            if (layout_invitevip.visibility != View.GONE) {
+                if (it == true) {
+                    iv_invitevip.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            requireContext(),
+                            R.anim.anim_shake
+                        )
+                    )
+                } else {
+                    viewModel.startAnim(ANIMATE_INTERVAL)
+                }
+            }
+        })
 
         viewModel.menusItems.observe(this, {
             when (it) {
@@ -57,23 +69,6 @@ class MiMiFragment : BaseFragment() {
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->
             tab.text = menusItems[position].name
         }.attach()
-    }
-
-    override fun setupObservers() {
-        super.setupObservers()
-        viewModel.inviteVipShake.observe(this, Observer {
-            if (layout_invitevip.visibility != View.GONE) {
-                if (it == true)
-                    iv_invitevip.startAnimation(
-                        AnimationUtils.loadAnimation(
-                            requireContext(),
-                            R.anim.anim_shake
-                        )
-                    )
-                else
-                    viewModel.startAnim(ANIMATE_INTERVAL)
-            }
-        })
     }
 
     override fun setupListeners() {

@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
@@ -70,6 +71,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     true
                 )
             )
+            LinearSnapHelper().attachToRecyclerView(it)
         }
 
         lifecycleScope.launch {
@@ -78,6 +80,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     generalVideoAdapter.submitData(it)
                 }
         }
+
     }
 
     override fun getLayoutId(): Int {
