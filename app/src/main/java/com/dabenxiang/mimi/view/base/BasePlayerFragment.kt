@@ -232,7 +232,8 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     }
 
     fun sendVideoReport() {
-        playerViewModel.sendVideoReport(streamId)
+        if(streamId != 0L)
+            playerViewModel.sendVideoReport(streamId)
     }
 
     private fun backupEvent() {
