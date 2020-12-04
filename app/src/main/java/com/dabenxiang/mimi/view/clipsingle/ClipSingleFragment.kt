@@ -309,7 +309,8 @@ class ClipSingleFragment : BaseFragment() {
             }
             progress_video?.visibility = View.GONE
             btn_retry.visibility = View.VISIBLE
-            playItem?.videoId?.run { viewModel.sendVideoReport(this.toString()) }
+            viewModel.videoEpisodeItem?.videoStreams?.get(0)
+                ?.run { viewModel.sendVideoReport(this.toString()) }
         }
     }
 

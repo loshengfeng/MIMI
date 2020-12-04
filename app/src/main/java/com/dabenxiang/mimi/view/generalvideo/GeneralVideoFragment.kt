@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.category.CategoriesFragment
-import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
@@ -22,6 +21,7 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
+import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -39,6 +39,8 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         super.setupFirstTime()
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
+
+        rv_video.visibility = View.INVISIBLE
 
         tv_search.setOnClickListener {
             navToSearch()
@@ -97,8 +99,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
                 layout_empty_data?.run { this.visibility = View.VISIBLE }
                 tv_empty_data?.run { this.text = getString(R.string.error_video) }
-
-                rv_video?.run { this.visibility = View.VISIBLE }
+                rv_video?.run { this.visibility = View.INVISIBLE }
                 layout_refresh?.run { this.isRefreshing = false }
             }
             is LoadState.Loading -> {
@@ -111,12 +112,12 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 if (generalVideoAdapter.isDataEmpty()) {
                     layout_empty_data?.run { this.visibility = View.VISIBLE }
                     tv_empty_data?.run { this.text = getString(R.string.empty_video) }
+                    rv_video?.run { this.visibility = View.INVISIBLE }
                 } else {
                     layout_empty_data?.run { this.visibility = View.INVISIBLE }
-                    tv_empty_data?.run { this.text = "" }
+                    rv_video?.run { this.visibility = View.VISIBLE }
                 }
 
-                rv_video?.run { this.visibility = View.VISIBLE }
                 layout_refresh?.run { this.isRefreshing = false }
             }
         }
