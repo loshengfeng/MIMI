@@ -6,6 +6,7 @@ import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
+import timber.log.Timber
 
 class VideoPagingSource(
     private val domainManager: DomainManager,
@@ -34,7 +35,12 @@ class VideoPagingSource(
 
             val body = result.body()
             val items = body?.content
-            val lastItem = items?.last()
+
+            val lastItem = if (items?.isNotEmpty() == true) {
+                items.last()
+            } else {
+                null
+            }
 
             if (needAd) {
                 val adItem = domainManager.getAdRepository()
@@ -47,12 +53,13 @@ class VideoPagingSource(
                 else -> null
             }
 
-            LoadResult.Page(
+            return LoadResult.Page(
                 data = items ?: arrayListOf(),
                 prevKey = null,
                 nextKey = nextOffset
             )
         } catch (exception: Exception) {
+            Timber.e(exception)
             LoadResult.Error(exception)
         }
     }
