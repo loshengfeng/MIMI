@@ -140,7 +140,7 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
             }
         })
 
-        text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.empty_post)
+        text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
         img_page_empty.setImageDrawable(
             ContextCompat.getDrawable(requireContext(),
             when(isLike) {
