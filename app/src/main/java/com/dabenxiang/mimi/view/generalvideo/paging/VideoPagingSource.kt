@@ -43,7 +43,7 @@ class VideoPagingSource(
             }
 
             val nextOffset = when {
-                items?.isNotEmpty() == true -> lastItem?.id
+                lastId != lastItem?.id && items?.isNotEmpty() == true -> lastItem?.id
                 else -> null
             }
 

@@ -371,7 +371,7 @@ class CategoriesFragment : BaseFragment() {
                 15
             ),
             0,
-            0
+            GeneralUtils.dpToPx(requireContext(), 20)
         )
     }
 
