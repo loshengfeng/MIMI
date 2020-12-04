@@ -381,6 +381,8 @@ dependencies {
     //Video compressor
     implementation "org.cks.utils.video:videocompressor:$video_compressor"
 
+    implementation 'tm.charlie.androidlib:expandable-textview:2.0.2'
+
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
     testImplementation "junit:junit:$junit_version"

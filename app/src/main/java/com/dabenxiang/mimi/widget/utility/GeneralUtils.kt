@@ -11,11 +11,19 @@ import android.content.pm.PackageInstaller
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.Settings
+import android.text.Html
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.util.DisplayMetrics
+import android.view.View
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
+import android.widget.TextView.BufferType
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -54,6 +62,7 @@ import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
+
 object GeneralUtils {
 
     private val decimalFormat = DecimalFormat("###,##0.00")
@@ -65,8 +74,8 @@ object GeneralUtils {
     @SuppressLint("HardwareIds")
     fun getAndroidID(): String {
         return Settings.Secure.getString(
-            App.applicationContext().contentResolver,
-            Settings.Secure.ANDROID_ID
+                App.applicationContext().contentResolver,
+                Settings.Secure.ANDROID_ID
         )
 //        return "1234567890"
     }
@@ -88,11 +97,11 @@ object GeneralUtils {
         }
 
         val responseBody = Gson().toJson(
-            ErrorItem(
-                errorItem.code,
-                errorItem.message,
-                null
-            )
+                ErrorItem(
+                        errorItem.code,
+                        errorItem.message,
+                        null
+                )
         )
             .toResponseBody(ApiRepository.MEDIA_TYPE_JSON.toMediaTypeOrNull())
 
@@ -107,9 +116,9 @@ object GeneralUtils {
 
         val httpExceptionClone = HttpException(response)
         return HttpExceptionItem(
-            errorItem,
-            httpExceptionClone,
-            url
+                errorItem,
+                httpExceptionClone,
+                url
         )
     }
 
@@ -125,15 +134,15 @@ object GeneralUtils {
 
     fun isFriendlyNameValid(name: String): Boolean {
         return Pattern.matches(
-            "^[a-zA-Z0-9-\\u4e00-\\u9fa5-`\\[\\]~!@#\$%^&*()_+{}|:”<>?`\\[\\];’,./\\\\]{1,20}+$",
-            name
+                "^[a-zA-Z0-9-\\u4e00-\\u9fa5-`\\[\\]~!@#\$%^&*()_+{}|:”<>?`\\[\\];’,./\\\\]{1,20}+$",
+                name
         )
     }
 
     fun isEmailValid(email: String): Boolean {
         return Pattern.matches(
-            "^[A-Za-z0-9_\\-\\.\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$",
-            email
+                "^[A-Za-z0-9_\\-\\.\\u4e00-\\u9fa5]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$",
+                email
         )
     }
 
@@ -143,8 +152,8 @@ object GeneralUtils {
 
     fun isPasswordValid(pwd: String): Boolean {
         return Pattern.matches(
-            "^[a-zA-Z0-9-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{8,20}+$",
-            pwd
+                "^[a-zA-Z0-9-`\\[\\]~!@#\$%^&*()_+\\-=;',./?<>{}|:\"\\\\]{8,20}+$",
+                pwd
         )
     }
 
@@ -358,15 +367,15 @@ object GeneralUtils {
         var index = text.toLowerCase().indexOf(keyword.toLowerCase())
         while (index != -1) {
             result.setSpan(
-                ForegroundColorSpan(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.color_red_1
-                    )
-                ),
-                index,
-                index + keyword.length,
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                    ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                    context,
+                                    R.color.color_red_1
+                            )
+                    ),
+                    index,
+                    index + keyword.length,
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
             )
             index = text.toLowerCase().indexOf(keyword.toLowerCase(), index + keyword.length)
         }
@@ -374,8 +383,8 @@ object GeneralUtils {
     }
 
     fun getMediaSource(
-        uriString: String,
-        sourceFactory: DefaultDataSourceFactory
+            uriString: String,
+            sourceFactory: DefaultDataSourceFactory
     ): MediaSource? {
         val uri = Uri.parse(uriString)
 
@@ -385,26 +394,106 @@ object GeneralUtils {
         return when (sourceType) {
             C.TYPE_DASH ->
                 DashMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
+                        .createMediaSource(uri)
             C.TYPE_HLS ->
                 HlsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
+                        .createMediaSource(uri)
             C.TYPE_SS ->
                 SsMediaSource.Factory(sourceFactory)
-                    .createMediaSource(uri)
+                        .createMediaSource(uri)
             C.TYPE_OTHER -> {
                 when {
                     uriString.startsWith("rtmp://") ->
                         ProgressiveMediaSource.Factory(RtmpDataSourceFactory())
-                            .createMediaSource(uri)
+                                .createMediaSource(uri)
                     uriString.contains("m3u8") -> HlsMediaSource.Factory(sourceFactory)
-                        .createMediaSource(uri)
+                            .createMediaSource(uri)
                     else ->
                         ProgressiveMediaSource.Factory(sourceFactory)
-                            .createMediaSource(uri)
+                                .createMediaSource(uri)
                 }
             }
             else -> null
         }
     }
+
+    fun toEllipsizeString(text: String, startIndex: Int = 2, substitute: String = "."): String {
+
+        var ellipsize = ""
+
+        text.forEachIndexed { index, char ->
+            ellipsize += if (index < startIndex) {
+                char.toString()
+            } else {
+                substitute
+            }
+        }
+        return  ellipsize
+    }
+
+    fun isTextEllipsized(view: TextView): Boolean {
+        val layout = view.layout ?: return false
+        val lines = layout.lineCount
+        Timber.i("Char langh lines:$lines")
+        return if (lines > 0) {
+            val ellipsisCount = layout.getEllipsisCount(lines - 1)
+            Timber.i("Char langh ellipsisCount:$ellipsisCount")
+            ellipsisCount > 0
+        } else false
+    }
+
+    fun makeTextViewResizable(tv: TextView, maxLine: Int, expandText: String, viewMore: Boolean) {
+        if (tv.tag == null) {
+            tv.tag = tv.text
+        }
+        val vto = tv.viewTreeObserver
+        vto.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val text: String
+                val lineEndIndex: Int
+                val obs = tv.viewTreeObserver
+                obs.removeOnGlobalLayoutListener(this)
+                if (maxLine == 0) {
+                    lineEndIndex = tv.layout.getLineEnd(0)
+                    text = tv.text.subSequence(0, lineEndIndex - expandText.length + 1).toString() + " " + expandText
+                } else if (maxLine > 0 && tv.text.length >= 60) {
+                    lineEndIndex = tv.layout.getLineEnd(maxLine - 1)
+                    text = tv.text.subSequence(0, lineEndIndex - expandText.length + 1).toString() + " " + expandText
+                } else {
+                    lineEndIndex = tv.layout.getLineEnd(tv.layout.lineCount - 1)
+                    text = tv.text.subSequence(0, lineEndIndex).toString()
+                }
+                tv.text = text
+                tv.movementMethod = LinkMovementMethod.getInstance()
+                val pasteData = "" + tv.text
+                val strSpanned = Html.fromHtml(pasteData, Html.FROM_HTML_MODE_LEGACY)
+                val builder = addClickablePartTextViewResizable(strSpanned, tv, lineEndIndex, expandText,
+                        viewMore)
+                tv.setText(builder, BufferType.SPANNABLE)
+            }
+        })
+    }
+
+    private fun addClickablePartTextViewResizable(strSpanned: Spanned, tv: TextView,
+                                                  maxLine: Int, spanableText: String, viewMore: Boolean): SpannableStringBuilder {
+        val str = strSpanned.toString()
+        val ssb = SpannableStringBuilder(strSpanned)
+        if (str.contains(spanableText)) {
+//            ssb.setSpan(object : ClickableSpan() {
+//                override fun onClick(widget: View) {
+//                    tv.layoutParams = tv.layoutParams
+//                    tv.setText(tv.tag.toString(), BufferType.SPANNABLE)
+//                    tv.invalidate()
+//                    if (viewMore) {
+//                        makeTextViewResizable(tv, -1, "View Less", false)
+//                    } else {
+//                        makeTextViewResizable(tv, 3, App.self.getString(R.string.show_more), true)
+//                    }
+//                }
+//            }, str.indexOf(spanableText), str.indexOf(spanableText) + spanableText.length, 0)
+        }
+        return ssb
+    }
+
+
 }

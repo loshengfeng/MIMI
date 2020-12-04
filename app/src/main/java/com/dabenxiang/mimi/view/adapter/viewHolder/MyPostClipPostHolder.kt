@@ -18,6 +18,9 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.isTextEllipsized
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.makeTextViewResizable
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.toEllipsizeString
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -38,6 +41,7 @@ class MyPostClipPostHolder(
     private val tvName: TextView = itemView.tv_name
     private val tvTime: TextView = itemView.tv_time
     private val tvTitle: TextView = itemView.tv_title
+    private val tvTitleMore: TextView = itemView.tv_more
     private val tvFollow: TextView = itemView.tv_follow
     private val ivPhoto: ImageView = itemView.iv_photo
     private val tvLength: TextView = itemView.tv_length
@@ -64,6 +68,7 @@ class MyPostClipPostHolder(
         tvName.setTextColor(App.self.getColor(R.color.color_black_1))
         tvTime.setTextColor(App.self.getColor(R.color.color_black_1_50))
         tvTitle.setTextColor(App.self.getColor(R.color.color_black_1))
+        tvTitleMore.setTextColor(App.self.getColor(R.color.color_black_1))
         tvLikeCount.setTextColor(App.self.getColor(R.color.color_black_1))
         tvFavoriteCount.setTextColor(App.self.getColor(R.color.color_black_1))
         tvCommentCount.setTextColor(App.self.getColor(R.color.color_black_1))
@@ -73,11 +78,19 @@ class MyPostClipPostHolder(
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
-        tvTitle.text =  if (searchStr.isNotBlank()) getSpanString(
-            tvTitle.context,
-            item.title,
-            searchStr
-        ) else item.title
+        item.title.let {
+            val title = if (searchStr.isNotBlank()) getSpanString(
+                    tvTitle.context,
+                    item.title,
+                    searchStr).toString() else item.title
+            tvTitle.text = title
+
+            if(title.length >=60) {
+                makeTextViewResizable(tvTitle, 2, App.self.getString(R.string.show_more), true)
+            }
+
+        }
+
         tvFollow.visibility =
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
