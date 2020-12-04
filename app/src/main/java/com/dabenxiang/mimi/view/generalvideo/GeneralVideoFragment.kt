@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.category.CategoriesFragment
-import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
 import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
@@ -21,6 +20,7 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
+import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -39,6 +39,8 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
         viewModel.adHeight = (viewModel.adWidth / 7)
 
+        rv_video.visibility = View.INVISIBLE
+
         tv_search.setOnClickListener {
             navToSearch()
         }
@@ -48,6 +50,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         }
 
         layout_refresh.setOnRefreshListener {
+            Timber.d("@@DAVE......")
             generalVideoAdapter.refresh()
         }
 
@@ -96,7 +99,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
                 layout_empty_data?.run { this.visibility = View.VISIBLE }
                 tv_empty_data?.run { this.text = getString(R.string.error_video) }
-
                 rv_video?.run { this.visibility = View.INVISIBLE }
                 layout_refresh?.run { this.isRefreshing = false }
             }
@@ -115,7 +117,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     layout_empty_data?.run { this.visibility = View.INVISIBLE }
                     rv_video?.run { this.visibility = View.VISIBLE }
                 }
-
                 layout_refresh?.run { this.isRefreshing = false }
             }
         }

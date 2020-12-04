@@ -42,7 +42,10 @@ class CategoriesFragment : BaseFragment() {
         const val SORT = 0
         const val CATEGORY = 1
 
-        fun createBundle(category: String, orderByType: Int = StatisticsOrderType.LATEST.value): Bundle {
+        fun createBundle(
+            category: String,
+            orderByType: Int = StatisticsOrderType.LATEST.value
+        ): Bundle {
             return Bundle().also {
                 it.putString(KEY_CATEGORY, category)
                 it.putInt(KEY_ORDER_BY, orderByType)
@@ -124,6 +127,8 @@ class CategoriesFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
+
+        rv_video?.run { this.visibility = View.INVISIBLE }
 
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
@@ -363,7 +368,10 @@ class CategoriesFragment : BaseFragment() {
     private fun adjustContentRV(notEmptyCount: Int) {
         rv_video.setPadding(
             0,
-            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount + GeneralUtils.dpToPx(requireContext(), 15),
+            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount + GeneralUtils.dpToPx(
+                requireContext(),
+                15
+            ),
             0,
             0
         )
