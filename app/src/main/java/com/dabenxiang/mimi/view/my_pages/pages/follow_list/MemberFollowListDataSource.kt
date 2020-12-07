@@ -7,8 +7,8 @@ import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 
 class MemberFollowListDataSource constructor(
-        private val domainManager: DomainManager,
-        private val pagingCallback: PagingCallback
+    private val domainManager: DomainManager,
+    private val pagingCallback: PagingCallback
 ) : PagingSource<Long, MemberFollowItem>() {
 
     companion object {
@@ -20,13 +20,15 @@ class MemberFollowListDataSource constructor(
         val offset = params.key ?: 0
         return try {
             val result =
-                    domainManager.getApiRepository().getMyMemberFollow(offset.toString(), PER_LIMIT.toString())
+                domainManager.getApiRepository()
+                    .getMyMemberFollow(offset.toString(), PER_LIMIT.toString())
             if (!result.isSuccessful) throw HttpException(result)
             val items = result.body()?.content
+
             val hasNext = hasNextPage(
-                    result.body()?.paging?.count ?: 0,
-                    result.body()?.paging?.offset ?: 0,
-                    items?.size ?: 0
+                result.body()?.paging?.count ?: 0,
+                result.body()?.paging?.offset ?: 0,
+                items?.size ?: 0
             )
             val nextKey = if (hasNext) offset + PER_LIMIT_LONG else null
             if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)

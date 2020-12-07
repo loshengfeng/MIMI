@@ -20,7 +20,6 @@ import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_follow_list.*
-import kotlinx.android.synthetic.main.fragment_my_follow_list.layout_refresh
 
 class MyFollowListFragment(val type: Int) : BaseFragment() {
 
