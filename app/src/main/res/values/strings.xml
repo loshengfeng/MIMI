@@ -129,8 +129,8 @@
     <string name="favorite_delete_favorite">取消收藏</string>
     <string name="favorite_no_data">尚未收藏影片，快去看片吧！</string>
     <string name="favorite_delete_this_favorite">是否要清除此收藏</string>
-    <string name="favorite_tab1">蜜蜜影視</string>
-    <string name="favorite_tab2">小視頻</string>
+    <string name="favorite_tab1">蜜蜜影视</string>
+    <string name="favorite_tab2">小视频</string>
     <string name="favorite_tab3">帖子</string>
     <string-array name="favorite_tabs">
         <item>@string/favorite_tab1</item>
@@ -336,7 +336,7 @@
     <string name="like">喜欢</string>
     <string name="like_title">我喜欢</string>
     <string name="like_tab1">帖子</string>
-    <string name="like_tab2">蜜蜜影視</string>
+    <string name="like_tab2">蜜蜜影视</string>
     <string name="like_empty_msg">尚未有任何喜欢的内容，快去浏览一下吧！</string>
     <string name="like_delete_all">是否要清除所有喜歡的內容?</string>
     <string-array name="like_tabs">
