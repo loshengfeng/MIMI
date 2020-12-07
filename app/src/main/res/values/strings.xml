@@ -352,8 +352,8 @@
 
     <!-- every day -->
     <string name="every_day_count">每日观看次数</string>
-    <string name="every_day_length">長視頻</string>
-    <string name="every_day_short">@string/short_video</string>
+    <string name="every_day_length">蜜蜜视频</string>
+    <string name="every_day_short">小视频</string>
     <string name="every_day_video_count_unlimit">无限</string>
     <!-- vip -->
     <string name="vip_hint">VIP享无限观影</string>
