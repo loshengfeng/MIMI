@@ -117,6 +117,12 @@
         <item>@string/club_tab_novel</item>
     </string-array>
 
+    <string-array name="club_hot_topic_tabs">
+        <item>@string/hottest</item>
+        <item>@string/newest</item>
+        <item>@string/video</item>
+    </string-array>
+
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
     <string name="favorite_clean">清除所有收藏</string>
@@ -335,8 +341,8 @@
     <!-- like -->
     <string name="like">喜欢</string>
     <string name="like_title">我喜欢</string>
-    <string name="like_tab1">帖子</string>
-    <string name="like_tab2">蜜蜜影视</string>
+    <string name="like_tab1">蜜蜜影视</string>
+    <string name="like_tab2">帖子</string>
     <string name="like_empty_msg">尚未有任何喜欢的内容，快去浏览一下吧！</string>
     <string name="like_delete_all">是否要清除所有喜歡的內容?</string>
     <string-array name="like_tabs">
@@ -352,8 +358,8 @@
 
     <!-- every day -->
     <string name="every_day_count">每日观看次数</string>
-    <string name="every_day_length">長視頻</string>
-    <string name="every_day_short">@string/short_video</string>
+    <string name="every_day_length">蜜蜜视频</string>
+    <string name="every_day_short">小视频</string>
     <string name="every_day_video_count_unlimit">无限</string>
     <!-- vip -->
     <string name="vip_hint">VIP享无限观影</string>
@@ -565,6 +571,10 @@
     <!-- Clip -->
     <string name="clip_newest">最新</string>
     <string name="clip_top_hit">热门</string>
+    <string-array name="clip_play_tabs">
+        <item>@string/video_desc</item>
+        <item>@string/comment</item>
+    </string-array>
 
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
