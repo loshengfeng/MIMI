@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.generalvideo.paging
 
 import androidx.paging.PagingSource
+import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
@@ -28,7 +29,7 @@ class VideoPagingSource(
                     orderByType = orderByType,
                     category = category,
                     offset = 0,
-                    limit = params.loadSize,
+                    limit = NETWORK_PAGE_SIZE,
                     lastId = lastId
                 )
             if (!result.isSuccessful) throw HttpException(result)
@@ -53,11 +54,18 @@ class VideoPagingSource(
                 else -> null
             }
 
+            val data = if (nextOffset != null) {
+                items ?: arrayListOf()
+            } else {
+                emptyList()
+            }
+
             return LoadResult.Page(
-                data = items ?: arrayListOf(),
+                data = data,
                 prevKey = null,
                 nextKey = nextOffset
             )
+
         } catch (exception: Exception) {
             Timber.e(exception)
             LoadResult.Error(exception)
