@@ -21,5 +21,5 @@ data class PostMemberRequest (
     val isAdult: Boolean = true,
 
     @SerializedName("tags")
-    val tags: ArrayList<String> = arrayListOf()
+    var tags: ArrayList<String> = arrayListOf()
 ): Serializable, Parcelable

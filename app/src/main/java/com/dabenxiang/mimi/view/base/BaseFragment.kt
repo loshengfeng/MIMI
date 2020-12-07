@@ -288,6 +288,9 @@ abstract class BaseFragment : Fragment() {
             when (it) {
                 is ApiResult.Success -> {
                     picParameter.id = it.result.toString()
+
+                    uploadVideoList[0].picAttachmentId = it.result.toString() // Update video
+
                     mainViewModel?.clearLiveDataValue()
                     val realPath =
                         UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].videoUrl))
@@ -348,6 +351,8 @@ abstract class BaseFragment : Fragment() {
                             val content = Gson().toJson(mediaItem)
                             postMemberRequest.type = memberRequest!!.type
                             postMemberRequest.title = memberRequest.title
+                            postMemberRequest.content = content
+                            postMemberRequest.tags = memberRequest.tags
                             memberPostItem.content = content
                             Timber.d("Post id : $postId")
                             Timber.d("Request : $postMemberRequest")
