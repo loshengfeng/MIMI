@@ -33,8 +33,8 @@ fun provideAuthInterceptor(pref: Pref): AuthInterceptor {
 
 fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
     val httpLoggingInterceptor = HttpLoggingInterceptor {
-//        if (!it.contains("�")) Timber.d(it)
-//        else Timber.d("base64 image")
+        if (!it.contains("�")) Timber.d(it)
+        else Timber.d("base64 image")
     }
     httpLoggingInterceptor.level = when (BuildConfig.DEBUG) {
         true -> HttpLoggingInterceptor.Level.BODY

@@ -14,7 +14,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_my.*
 import kotlinx.android.synthetic.main.fragment_my.view.*
 
-abstract class BaseMyPagesTabFragment: BaseFragment() {
+abstract class BaseMyPagesTabFragment : BaseFragment() {
 
     lateinit var tabLayoutMediator: TabLayoutMediator
     abstract val viewModel: MyPagesViewModel
@@ -22,13 +22,18 @@ abstract class BaseMyPagesTabFragment: BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_my
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
         view.view_pager.adapter = MyViewPagerAdapter(
-                tabFragmentsCreators,
-                childFragmentManager,
-                lifecycle)
-        view.view_pager.offscreenPageLimit = tabFragmentsCreators.size -1
+            tabFragmentsCreators,
+            childFragmentManager,
+            lifecycle
+        )
+        view.view_pager.offscreenPageLimit = tabFragmentsCreators.size - 1
         tabLayoutMediator = TabLayoutMediator(view.tabs, view.view_pager) { tab, position ->
             tab.text = getTabTitle(position)
         }
@@ -64,11 +69,11 @@ abstract class BaseMyPagesTabFragment: BaseFragment() {
     abstract fun getTabTitle(position: Int): String?
 
 
-    open fun deleteAll(){
+    open fun deleteAll() {
         CleanDialogFragment.newInstance(onCleanDialogListener).also {
             it.show(
-                    requireActivity().supportFragmentManager,
-                    CleanDialogFragment::class.java.simpleName
+                requireActivity().supportFragmentManager,
+                CleanDialogFragment::class.java.simpleName
             )
         }
     }
