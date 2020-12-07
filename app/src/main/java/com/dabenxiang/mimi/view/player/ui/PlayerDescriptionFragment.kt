@@ -244,7 +244,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         imgFavorite.setOnClickListener {
             checkStatus { descriptionViewModel.favorite(videoItem) }
         }
-        imgReport.setOnClickListener {
+        imgMore.setOnClickListener {
             if (videoItem.deducted == true) {
                 if (isReported) {
                     GeneralUtils.showToast(

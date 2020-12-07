@@ -67,8 +67,8 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getAdContent()
-        imgReport.background = ContextCompat.getDrawable(requireContext(), R.drawable.btn_more_gray_p)
-        text5.text = getString(R.string.text_more)
+        imgMore.background = ContextCompat.getDrawable(requireContext(), R.drawable.btn_more_gray_p)
+        txtMore.text = getString(R.string.text_more)
     }
 
     override fun setupObservers() {
@@ -138,7 +138,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     }
 
     private fun setReportListener() {
-        imgReport.setOnClickListener {
+        imgMore.setOnClickListener {
             onMoreClick(detailItem, -1, deducted = detailItem.deducted) {
                 it as MemberPostItem
 
