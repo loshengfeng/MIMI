@@ -32,7 +32,12 @@ class MyPostDataSource(
                 val apiRepository = domainManager.getApiRepository()
                 val result =
                     if (userId == USER_ID_ME) apiRepository.getMyPost(offset = 0, limit = PER_LIMIT)
-                    else apiRepository.getMembersPost(offset = 0, limit = PER_LIMIT, creatorId = userId, isAdult = isAdult)
+                    else apiRepository.getMembersPost(
+                        offset = 0,
+                        limit = PER_LIMIT,
+                        creatorId = userId,
+                        isAdult = isAdult
+                    )
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()
                 val myPostItem = body?.content
@@ -68,8 +73,16 @@ class MyPostDataSource(
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result =
-                    if (userId == USER_ID_ME) apiRepository.getMyPost(offset = next, limit = PER_LIMIT)
-                    else apiRepository.getMembersPost(offset = next, limit = PER_LIMIT, creatorId = userId, isAdult = isAdult)
+                    if (userId == USER_ID_ME) apiRepository.getMyPost(
+                        offset = next,
+                        limit = PER_LIMIT
+                    )
+                    else apiRepository.getMembersPost(
+                        offset = next,
+                        limit = PER_LIMIT,
+                        creatorId = userId,
+                        isAdult = isAdult
+                    )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result)
             }
