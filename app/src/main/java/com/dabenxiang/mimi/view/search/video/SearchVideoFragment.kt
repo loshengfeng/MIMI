@@ -22,7 +22,8 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -112,8 +113,6 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
-        super.setupFirstTime()
-
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
@@ -123,16 +122,15 @@ class SearchVideoFragment : BaseFragment() {
             viewModel.category = data.category
             if (data.tag.isNotBlank()) {
                 layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.GONE
                 search_bar.setText(data.tag)
                 searchVideo(tag = data.tag)
                 search_bar.clearFocus()
             } else {
-                layout_search_text.visibility = View.GONE
                 getSearchHistory()
                 GeneralUtils.showKeyboard(requireContext())
                 search_bar.requestFocus()
             }
+            layout_search_text.visibility = View.GONE
 
             videoListAdapter.addLoadStateListener(loadStateListener)
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
@@ -156,8 +154,6 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
                 is Success -> {
                     it.result.let { position ->
                         videoListAdapter.notifyItemChanged(position, UPDATE_LIKE)
@@ -169,8 +165,6 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
                 is Success -> {
                     it.result.let { position ->
                         videoListAdapter.notifyItemChanged(position, UPDATE_FAVORITE)
@@ -200,6 +194,7 @@ class SearchVideoFragment : BaseFragment() {
         iv_clear_history.setOnClickListener {
             chip_group_search_text.removeAllViews()
             viewModel.clearSearchHistory()
+            layout_search_history.visibility = View.GONE
         }
 
         search_bar.addTextChangedListener {
@@ -210,7 +205,6 @@ class SearchVideoFragment : BaseFragment() {
                 lifecycleScope.launch { videoListAdapter.submitData(PagingData.empty()) }
             } else {
                 iv_clear_search_bar.visibility = View.VISIBLE
-                layout_search_text.visibility = View.GONE
             }
         }
 

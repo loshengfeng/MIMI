@@ -96,9 +96,7 @@ class SearchVideoViewModel : BaseViewModel() {
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _likeResult.value = it }
         }
     }
@@ -124,9 +122,7 @@ class SearchVideoViewModel : BaseViewModel() {
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _favoriteResult.value = it }
         }
     }
