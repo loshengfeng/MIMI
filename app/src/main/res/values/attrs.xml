@@ -16,4 +16,9 @@
         <attr name="helperTextHighlightedColor" format="color"/>
 
     </declare-styleable>
+
+
+    <declare-styleable name="NestedRecyclerView">
+        <attr name="allowParentIntercept" format="boolean"/>
+    </declare-styleable>
 </resources>

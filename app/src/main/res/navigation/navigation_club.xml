@@ -66,6 +66,9 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
     </fragment>
 
     <fragment
@@ -87,6 +90,9 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
     </fragment>
 
     <fragment
@@ -138,6 +144,11 @@
             app:destination="@id/searchPostFragment"
             app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postArticleFragment_to_clubTextFragment"
+            app:destination="@id/clubTextFragment"
+            app:popUpTo="@+id/clubTextFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -157,6 +168,11 @@
             android:id="@+id/action_postPicFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment"
             app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postPicFragment_to_clubPicFragment"
+            app:destination="@id/clubPicFragment"
+            app:popUpTo="@+id/clubPicFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
