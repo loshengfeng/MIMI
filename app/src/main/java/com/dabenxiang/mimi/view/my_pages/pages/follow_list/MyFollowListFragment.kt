@@ -145,10 +145,10 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
         viewModel.postCount.observe(this) {
             when (type) {
                 MyFollowFragment.TAB_FOLLOW_PEOPLE -> {
-                    tv_title_count.text = getString(R.string.follow_members_total_num, "0")
+                    tv_title_count.text = getString(R.string.follow_members_total_num, "".plus(it))
                 }
                 MyFollowFragment.TAB_FOLLOW_CLUB -> {
-                    tv_title_count.text = getString(R.string.follow_circle_total_num, "0")
+                    tv_title_count.text = getString(R.string.follow_circle_total_num, "".plus(it))
                 }
             }
             if (it == 0) {
