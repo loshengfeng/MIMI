@@ -7,6 +7,14 @@
 
     <ImageView
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/img_welcome_03"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:src="@drawable/img_welcome_01"
         app:layout_constraintDimensionRatio="h,36:28.7"
@@ -15,6 +23,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="gone"
         android:src="@drawable/img_welcome_02"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="h,6:7" />
