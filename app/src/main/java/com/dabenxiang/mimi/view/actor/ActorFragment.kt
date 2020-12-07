@@ -84,6 +84,10 @@ class ActorFragment : BaseFragment() {
                 ActorsGridSpaceItemDecoration(requireContext())
             )
         }
+        tv_search.text = String.format(
+            getString(R.string.text_search_classification),
+            getString(R.string.actor)
+        )
         viewModel.getActors()
         viewModel.getData(actorListAdapter)
     }
@@ -187,7 +191,7 @@ class ActorFragment : BaseFragment() {
     }
 
     private fun navToSearch() {
-        val bundle = SearchVideoFragment.createBundle(category = "女优")
+        val bundle = SearchVideoFragment.createBundle(category = getString(R.string.actor))
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_to_searchVideoFragment,

@@ -95,7 +95,7 @@
 
     <!-- Club -->
     <string name="club_tab_follow">关注</string>
-    <string name="club_tab_recommend">推薦</string>
+    <string name="club_tab_recommend">推荐</string>
     <string name="club_tab_latest">最新</string>
     <string name="club_tab_clip">短视频</string>
     <string name="club_tab_picture">图片</string>
@@ -275,7 +275,7 @@
 
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
-    <string name="text_search_classification">搜寻 ”该分类” 内容</string>
+    <string name="text_search_classification">搜寻 ”%s” 内容</string>
     <string name="text_follow">关注</string>
     <string name="text_post">帖子</string>
     <string name="text_ranking">排行榜</string>
@@ -578,6 +578,7 @@
 
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
+    <string name="recommend">推荐</string>
 
     <!-- Category -->
     <string name="category_newest">最新</string>
@@ -595,4 +596,5 @@
     <string name="video_desc">视频简介</string>
     <string name="show_more"> 显示更多</string>
     <string name="small_video">小视频</string>
+    <string name="actor">女优</string>
 </resources>
