@@ -42,7 +42,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        tv_title_count.text = getString(R.string.follow_members_total_num, "0")
+//        tv_title_count.text = getString(R.string.follow_members_total_num, "0")
     }
 
     override val bottomNavigationVisibility: Int
@@ -143,7 +143,14 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
         }
 
         viewModel.postCount.observe(this) {
-            tv_title_count.text = getString(R.string.follow_members_total_num, it.toString())
+            when (type) {
+                MyFollowFragment.TAB_FOLLOW_PEOPLE -> {
+                    tv_title_count.text = getString(R.string.follow_members_total_num, "0")
+                }
+                MyFollowFragment.TAB_FOLLOW_CLUB -> {
+                    tv_title_count.text = getString(R.string.follow_circle_total_num, "0")
+                }
+            }
             if (it == 0) {
                 text_page_empty.text = getString(R.string.follow_no_data)
                 id_empty_group.visibility = View.VISIBLE
