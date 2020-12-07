@@ -54,7 +54,7 @@ class MemberFollowPeopleAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return MemberFollowViewHolder(
                 LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_follow_club, parent, false)
+                        .inflate(R.layout.item_follow_personal, parent, false)
         )
     }
 
