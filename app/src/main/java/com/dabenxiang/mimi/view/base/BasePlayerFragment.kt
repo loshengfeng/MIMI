@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
+import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.tabs.TabLayout
@@ -27,7 +28,7 @@ import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.round
 
-abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.EventListener {
+abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.EventListener, PlayerControlView.VisibilityListener {
 
     private val JUMP_TIME = 1000
     private val SWIPE_DISTANCE_UNIT = 25
@@ -107,16 +108,19 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         }
     }
 
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+        playerViewModel.showRechargeReminder.observe(viewLifecycleOwner) {
+            showRechargeReminder(it)
+        }
+    }
+
     override fun setupObservers() {
         playerViewModel.isPlaying.observe(viewLifecycleOwner) {
             iv_player.visibility = when (it) {
                 true -> View.GONE
                 false -> View.VISIBLE
             }
-        }
-
-        playerViewModel.showRechargeReminder.observe(viewLifecycleOwner) {
-            showRechargeReminder(it)
         }
 
         playerViewModel.fastForwardTime.observe(viewLifecycleOwner) {
@@ -206,6 +210,8 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         btn_backup.setOnClickListener {
             backupEvent()
         }
+
+        player_view.setControllerVisibilityListener(this)
     }
 
     fun showRechargeReminder(isShow: Boolean) {
@@ -214,6 +220,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         if (isShow)
             iv_player.visibility = View.INVISIBLE
         recharge_reminder.visibility = if (isShow) View.VISIBLE else View.GONE
+        btn_backup.visibility = if (isShow) View.VISIBLE else View.GONE
     }
 
     fun setupPlayUrl(url: String, isReset: Boolean) {
@@ -539,5 +546,9 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         elapsedSinceLastFeedMs: Long
     ) {
         Timber.d("AnalyticsListener onAudioUnderrun")
+    }
+
+    override fun onVisibilityChange(visibility: Int) {
+        btn_backup.visibility = visibility
     }
 }

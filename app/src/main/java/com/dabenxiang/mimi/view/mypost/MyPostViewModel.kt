@@ -48,6 +48,10 @@ class MyPostViewModel : BaseViewModel() {
         const val USER_ID_ME: Long = -1
     }
 
+    fun checkPostEmptyUi(removeListSize: Int) {
+        _isNoData.value = totalCount == removeListSize
+    }
+
     fun getMyPost(userId: Long, isAdult: Boolean) {
         viewModelScope.launch {
             getMyPostPagingItems(userId, isAdult).asFlow()
@@ -94,6 +98,7 @@ class MyPostViewModel : BaseViewModel() {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
             if (isInitial) cleanRemovedPosList()
+
             if (totalCount == 0) {
                 _isNoData.value = true
             }

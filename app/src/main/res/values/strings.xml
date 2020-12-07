@@ -215,7 +215,7 @@
     <string name="topup_completed">交易成功</string>
     <string name="topup_canceled">Canceled</string>
     <string name="topup_failed">交易失败</string>
-<!--    <string name="topup_teaching"><a href="https://www.google.com/?hl=zh_tw">充值教学 ></a></string>-->
+    <!--    <string name="topup_teaching"><a href="https://www.google.com/?hl=zh_tw">充值教学 ></a></string>-->
     <string name="topup_teaching">充值教学 ></string>
     <string name="title_chat_history">对话记录</string>
     <string name="edit_hint_chat">留下评论</string>
@@ -261,15 +261,16 @@
     <string name="follow_tab_small_video">小视频</string>
     <string name="follow_tab_post">帖子</string>
     <string name="follow_people">关注的人</string>
-    <string name="follow_circle">关注的圈子</string>
+    <string name="follow_circle">关注的社区</string>
     <string-array name="follow_tabs">
         <item>@string/follow_people</item>
         <item>@string/follow_circle</item>
     </string-array>
     <string name="follow_members_total_num">全部关注%s人</string>
+    <string name="follow_circle_total_num">全部关注%s社区</string>
     <string name="follow_clubs_total_num">全部关注%s圈子</string>
     <string name="follow_clean">清除</string>
-    <string name="follow_clean_member_dlg_msg">是否要清除所有关注的人</string>
+    <string name="follow_clean_member_dlg_msg">是否要清除所有关注的社区</string>
     <string name="follow_clean_club_dlg_msg">是否要清除所有关注的圈子</string>
     <string name="follow_no_data">尚未有任何关注，快去关注一下吧！</string>
 
@@ -353,6 +354,7 @@
     <string name="fans">粉丝</string>
     <string name="total_count_fans">全部粉丝%s人</string>
     <string name="title_fans">我的粉丝</string>
+    <string name="empty_fans_post">尚未有任何粉丝，快去发文吧！</string>
     <!-- fans -->
     <string name="exchange">兑换激活码</string>
 
@@ -444,6 +446,7 @@
     <!-- My post -->
     <string name="delete_post">删除</string>
     <string name="edit_post">编辑</string>
+    <string name="my_post_no_data">尚无任何帖子，赶快去发帖吧～</string>
 
     <string name="problem_report">问题回报</string>
     <string name="already_reported">您已回报过问题</string>
@@ -517,6 +520,7 @@
     <string name="order_contact_mimi_service">蜜蜜客服</string>
     <string name="order_no_data">尚未有充值纪录，快去充值吧！</string>
     <string name="payment_title">打款资讯</string>
+    <string name="chat_no_data">目前尚无聊天记录唷！</string>
 
     <!-- Order Result -->
     <string name="order_result_create_order">建立订单</string>
