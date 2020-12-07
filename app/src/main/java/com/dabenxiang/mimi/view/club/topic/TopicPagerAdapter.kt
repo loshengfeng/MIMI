@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
+import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 
 class TopicPagerAdapter(
@@ -20,8 +21,9 @@ class TopicPagerAdapter(
         )
     }
 
+    //   enum OrderBy is stable , use enum size ? or fixed count ?
     override fun getItemCount(): Int {
-        return 3
+        return OrderBy.values().size
     }
 
     override fun onBindViewHolder(holder: TopicPagerViewHolder, position: Int) {
