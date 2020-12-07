@@ -59,7 +59,7 @@ class FansListAdapter(
         fun onBind(item: FansItem?, listener: FanListener, position: Int, context: Context) {
             name_fans.text = item?.friendlyName
             decs_fans.text = item?.friendlyName
-
+            decs_fans.visibility = View.INVISIBLE
             follow_fnas.setOnClickListener {
                 listener.onFollow(item!!, position, !item.isFollow)
             }

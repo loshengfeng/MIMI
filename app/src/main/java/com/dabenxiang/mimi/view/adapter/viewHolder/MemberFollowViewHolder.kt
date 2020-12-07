@@ -41,6 +41,7 @@ class MemberFollowViewHolder(
         tvSubTitle.setOnClickListener {
             listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
+        tvSubTitle.visibility = View.INVISIBLE
 
         getBitmap(item.avatarAttachmentId, ivPhoto, LoadImageType.AVATAR)
     }
