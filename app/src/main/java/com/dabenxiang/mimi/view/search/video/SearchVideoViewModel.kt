@@ -31,9 +31,6 @@ class SearchVideoViewModel : BaseViewModel() {
 
     var currentItem: VideoItem? = null
 
-    private val _searchTextLiveData = EditTextMutableLiveData()
-    val searchTextLiveData: EditTextLiveData = _searchTextLiveData
-
     private val _searchingTotalCount = MutableLiveData<Long>()
     val searchingTotalCount: LiveData<Long> = _searchingTotalCount
 
@@ -58,10 +55,6 @@ class SearchVideoViewModel : BaseViewModel() {
 
         override fun onThrowable(throwable: Throwable) {
         }
-    }
-
-    fun cleanSearchText() {
-        _searchTextLiveData.value = ""
     }
 
     fun getSearchVideoResult(
@@ -103,9 +96,7 @@ class SearchVideoViewModel : BaseViewModel() {
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _likeResult.value = it }
         }
     }
@@ -131,9 +122,7 @@ class SearchVideoViewModel : BaseViewModel() {
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _favoriteResult.value = it }
         }
     }
