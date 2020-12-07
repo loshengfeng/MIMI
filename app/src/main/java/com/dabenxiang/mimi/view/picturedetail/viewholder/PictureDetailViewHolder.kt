@@ -21,7 +21,7 @@ class PictureDetailViewHolder(itemView: View) : BaseViewHolder(itemView) {
     val imgLike: ImageView = itemView.imgLike
     val imgDislike: ImageView = itemView.imgDislike
     val imgShare: ImageView = itemView.imgShare
-    val imgReport: ImageView = itemView.imgReport
+    val imgReport: ImageView = itemView.imgMore
     val imgFavorite: ImageView = itemView.imgFavorite
     val txtLikeCount: TextView = itemView.txtLikeCount
     val txtFavorite: TextView = itemView.txtFavorite

@@ -47,28 +47,10 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     override val isStatusBarDark: Boolean = true
 
     private lateinit var detailItem: MemberPostItem
-    private var reportDialog: ReportDialogFragment? = null
-
-    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
-            if (TextUtils.isEmpty(content)) {
-                GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
-            } else {
-                mainViewModel?.sendPostReport(detailItem,content)
-            }
-            reportDialog?.dismiss()
-        }
-
-        override fun onCancel() {
-            reportDialog?.dismiss()
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getAdContent()
-        imgReport.background = ContextCompat.getDrawable(requireContext(), R.drawable.btn_more_gray_p)
-        text5.text = getString(R.string.text_more)
     }
 
     override fun setupObservers() {
@@ -137,8 +119,8 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         }
     }
 
-    private fun setReportListener() {
-        imgReport.setOnClickListener {
+    private fun setMoreListener() {
+        imgMore.setOnClickListener {
             onMoreClick(detailItem, -1, deducted = detailItem.deducted) {
                 it as MemberPostItem
 
@@ -216,7 +198,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         setUILike()
         setUIFavorite()
         setInteractiveListener()
-        setReportListener()
+        setMoreListener()
     }
 
     private fun setUILike() {

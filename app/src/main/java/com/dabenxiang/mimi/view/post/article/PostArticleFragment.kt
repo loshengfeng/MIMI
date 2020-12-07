@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment.Companion.KEY_DATA
 import com.google.gson.Gson
@@ -114,6 +115,10 @@ class PostArticleFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
+        } else if (isEdit && page == TEXT) {
+            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(PictureDetailFragment.KEY_DATA, item)
+            findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         }

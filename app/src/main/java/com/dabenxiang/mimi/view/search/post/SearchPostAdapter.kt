@@ -24,6 +24,9 @@ class SearchPostAdapter(
     private val getSearchTag: () -> String
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
+        const val UPDATE_LIKE = 0
+        const val UPDATE_FAVORITE = 1
+
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
@@ -94,7 +97,11 @@ class SearchPostAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         val item = getItem(position)
         item?.also {
             when (holder) {
@@ -105,38 +112,63 @@ class SearchPostAdapter(
                     }
                 }
                 is MyPostClipPostHolder -> {
-                    holder.onBind(
-                        it,
-                        position,
-                        myPostListener,
-                        memberPostFuncItem,
-                        getSearchText.invoke(),
-                        getSearchTag.invoke()
-                    )
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            UPDATE_LIKE -> holder.updateLike(item)
+                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                        }
+                    } else {
+                        holder.onBind(
+                            it,
+                            position,
+                            myPostListener,
+                            memberPostFuncItem,
+                            getSearchText.invoke(),
+                            getSearchTag.invoke()
+                        )
+                    }
                 }
                 is MyPostPicturePostHolder -> {
-                    holder.pictureRecycler.tag = position
-                    holder.onBind(
-                        it,
-                        position,
-                        myPostListener,
-                        memberPostFuncItem,
-                        getSearchText.invoke(),
-                        getSearchTag.invoke()
-                    )
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            UPDATE_LIKE -> holder.updateLike(item)
+                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                        }
+                    } else {
+                        holder.pictureRecycler.tag = position
+                        holder.onBind(
+                            it,
+                            position,
+                            myPostListener,
+                            memberPostFuncItem,
+                            getSearchText.invoke(),
+                            getSearchTag.invoke()
+                        )
+                    }
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(
-                        it,
-                        position,
-                        myPostListener,
-                        memberPostFuncItem,
-                        getSearchText.invoke(),
-                        getSearchTag.invoke()
-                    )
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            UPDATE_LIKE -> holder.updateLike(item)
+                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                        }
+                    } else {
+                        holder.onBind(
+                            it,
+                            position,
+                            myPostListener,
+                            memberPostFuncItem,
+                            getSearchText.invoke(),
+                            getSearchTag.invoke()
+                        )
+                    }
                 }
             }
         }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
     }
 
 }

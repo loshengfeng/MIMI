@@ -5,11 +5,11 @@ import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
@@ -18,8 +18,8 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
-import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
@@ -123,10 +123,18 @@ class ClubTextDetailFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem) {
-            moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, true).also {
-                it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
+            onMoreClick(item, -1) {
+                it as MemberPostItem
+
+                val bundle = Bundle()
+                item.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TEXT)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+
+                findNavController().navigate(
+                    R.id.action_to_postArticleFragment,
+                    bundle
                 )
             }
         }
@@ -153,23 +161,6 @@ class ClubTextDetailFragment : BaseFragment() {
                 isAdultTheme = false
             )
             navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
-        }
-    }
-
-    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
-            moreDialog?.dismiss()
-            checkStatus {
-                (requireActivity() as MainActivity).showReportDialog(
-                    item,
-                    memberPostItem,
-                    isComment
-                )
-            }
-        }
-
-        override fun onCancel() {
-            moreDialog?.dismiss()
         }
     }
 
