@@ -261,7 +261,7 @@
     <string name="follow_tab_small_video">小视频</string>
     <string name="follow_tab_post">帖子</string>
     <string name="follow_people">关注的人</string>
-    <string name="follow_circle">关注的圈子</string>
+    <string name="follow_circle">关注的社区</string>
     <string-array name="follow_tabs">
         <item>@string/follow_people</item>
         <item>@string/follow_circle</item>
