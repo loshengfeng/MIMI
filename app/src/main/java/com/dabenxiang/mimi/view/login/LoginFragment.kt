@@ -191,15 +191,7 @@ class LoginFragment : BaseFragment() {
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
                     countDownTimer.start()
-                    GeneralDialog.newInstance(
-                        GeneralDialogData(
-                            titleRes = R.string.login_yet,
-                            message = getString(R.string.send_msg),
-                            messageIcon = R.drawable.ico_default_photo,
-                            secondBtn = getString(R.string.btn_confirm),
-                            isMessageIcon = false
-                        )
-                    ).show(requireActivity().supportFragmentManager)
+                    GeneralUtils.showToast(requireContext(), getString(R.string.send_msg))
                 }
                 is Error -> onApiError(it.throwable)
             }

@@ -15,7 +15,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 val apiModule = module {
@@ -33,8 +32,8 @@ fun provideAuthInterceptor(pref: Pref): AuthInterceptor {
 
 fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
     val httpLoggingInterceptor = HttpLoggingInterceptor {
-        if (!it.contains("�")) Timber.d(it)
-        else Timber.d("base64 image")
+        if (!it.contains("�")) HttpLoggingInterceptor.Logger.DEFAULT.log(it)
+        else HttpLoggingInterceptor.Logger.DEFAULT.log("base64 image")
     }
     httpLoggingInterceptor.level = when (BuildConfig.DEBUG) {
         true -> HttpLoggingInterceptor.Level.BODY
