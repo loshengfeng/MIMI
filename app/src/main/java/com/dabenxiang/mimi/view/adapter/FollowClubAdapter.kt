@@ -51,10 +51,10 @@ class FollowClubAdapter(
         item?.also {
             when (holder) {
                 is ClubFollowViewHolder -> {
-                    holder.onBind(
-                        it,
-                        listener
-                    )
+//                    holder.onBind(
+//                        it,
+//                        listener
+//                    )
                 }
             }
         }
