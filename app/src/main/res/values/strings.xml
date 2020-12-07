@@ -444,6 +444,7 @@
     <!-- My post -->
     <string name="delete_post">删除</string>
     <string name="edit_post">编辑</string>
+    <string name="my_post_no_data">尚无任何帖子，赶快去发帖吧～</string>
 
     <string name="problem_report">问题回报</string>
     <string name="already_reported">您已回报过问题</string>
