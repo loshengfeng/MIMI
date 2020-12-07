@@ -46,7 +46,7 @@
     <string name="invalidate_code_error_1">请填写验证码</string>
     <string name="invited_code_error_1">邀请码无效，请确认</string>
     <string name="receive_mail">请收验证信</string>
-    <string name="send_msg">已发送简讯验证码到注册手机号上，请查收</string>
+    <string name="send_msg">已发送验证码到手机号，请查收</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
     <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
     <string name="desc_mobile">已传送新密码至您的手机号\n%s\n请确认</string>
