@@ -230,6 +230,7 @@
     <string name="btn_cancel">取消</string>
     <string name="btn_register">注册</string>
     <string name="btn_send">送出</string>
+    <string name="btn_complete">完成</string>
     <string name="btn_login">登录</string>
     <string name="btn_retry">重试</string>
     <string name="login_name">请填写名称</string>
