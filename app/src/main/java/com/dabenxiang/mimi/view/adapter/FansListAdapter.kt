@@ -61,7 +61,7 @@ class FansListAdapter(
             decs_fans.text = item?.friendlyName
 
             follow_fnas.setOnClickListener {
-                listener.onFollow(item!!, position, item.isFollow)
+                listener.onFollow(item!!, position, !item.isFollow)
             }
 
             itemView.setOnClickListener {

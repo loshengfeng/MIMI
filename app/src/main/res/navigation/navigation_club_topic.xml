@@ -77,6 +77,9 @@
         <action
             android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
     </fragment>
 
     <fragment
