@@ -35,6 +35,11 @@ class RecommendFragment(
     override fun setupFirstTime() {
         super.setupFirstTime()
 
+        tv_search.text = String.format(
+            getString(R.string.text_search_classification),
+            getString(R.string.recommend)
+        )
+
         viewModel.bannerItems.observe(this, {
             when (it) {
                 is Success -> setupBannerUi(it.result)

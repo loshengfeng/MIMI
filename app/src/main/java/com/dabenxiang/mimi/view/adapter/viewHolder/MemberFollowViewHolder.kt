@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.enums.ClickType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import kotlinx.android.synthetic.main.item_follow_member.view.*
 import org.koin.core.component.KoinComponent
@@ -21,7 +22,11 @@ class MemberFollowViewHolder(
     private val tvSubTitle: TextView = itemView.tv_sub_title
     private val clFollow: ConstraintLayout = itemView.cl_follow
 
-    fun onBind(item: MemberFollowItem, listener: BaseItemListener) {
+    fun onBind(
+        item: MemberFollowItem,
+        listener: BaseItemListener,
+        getBitmap: ((Long?, ImageView, LoadImageType) -> Unit)
+    ) {
         tvName.text = item.friendlyName
         tvSubTitle.text = item.friendlyName
         clFollow.setOnClickListener {
@@ -37,7 +42,6 @@ class MemberFollowViewHolder(
             listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
 
-        Glide.with(ivPhoto.context)
-                .load(item.avatarAttachmentId).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+        getBitmap(item.avatarAttachmentId, ivPhoto, LoadImageType.AVATAR)
     }
 }

@@ -26,6 +26,9 @@ import kotlinx.android.synthetic.main.fragment_actor_videos.layout_refresh
 import kotlinx.android.synthetic.main.fragment_actor_videos.rv_video
 import kotlinx.android.synthetic.main.fragment_actor_videos.tv_empty_data
 import kotlinx.android.synthetic.main.fragment_general_video.*
+import kotlinx.android.synthetic.main.fragment_general_video.tv_filter
+import kotlinx.android.synthetic.main.fragment_general_video.tv_search
+import kotlinx.android.synthetic.main.fragment_recommend.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -44,6 +47,11 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         viewModel.adHeight = (viewModel.adWidth / 7)
 
         rv_video.visibility = View.INVISIBLE
+
+        tv_search.text = String.format(
+            getString(R.string.text_search_classification),
+            category
+        )
 
         tv_search.setOnClickListener {
             navToSearch()

@@ -51,10 +51,10 @@ class FollowPersonalAdapter(
         item?.also {
             when (holder) {
                 is MemberFollowViewHolder -> {
-                    holder.onBind(
-                        it,
-                        listener
-                    )
+//                    holder.onBind(
+//                        it,
+//                        listener
+//                    )
                 }
             }
         }

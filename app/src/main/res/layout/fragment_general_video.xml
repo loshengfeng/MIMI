@@ -107,7 +107,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_video"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:paddingBottom="16dp" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

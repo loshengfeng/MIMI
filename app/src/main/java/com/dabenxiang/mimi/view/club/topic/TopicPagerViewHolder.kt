@@ -82,11 +82,8 @@ class TopicPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         clNoData.visibility = takeIf { itemCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
+    //   enum OrderBy is stable , use when ?
     private fun getOrderType(position: Int): OrderBy {
-        return when (position) {
-            0 -> OrderBy.HOTTEST
-            1 -> OrderBy.NEWEST
-            else -> OrderBy.VIDEO
-        }
+        return OrderBy.values()[position]
     }
 }
