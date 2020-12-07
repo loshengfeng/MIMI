@@ -112,7 +112,8 @@ class ClipAdapter(
     fun pausePlayer() {
         exoPlayer?.also { player ->
             player.playWhenReady = false
-            currentViewHolder?.also { it.ibPlay.visibility = View.VISIBLE }
+            currentViewHolder?.takeUnless { it.ibRetry.visibility == View.VISIBLE }
+                ?.run { this.ibPlay.visibility = View.VISIBLE }
         }
     }
 

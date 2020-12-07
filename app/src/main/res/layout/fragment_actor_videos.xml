@@ -2,9 +2,9 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/color_white_1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/color_white_1">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -32,10 +32,10 @@
                     android:id="@+id/actor_toolbar_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:layout_marginEnd="50dp"
-                    android:textStyle="bold"
+                    android:gravity="center"
                     android:textSize="18sp"
+                    android:textStyle="bold"
                     tools:text="actor_name" />
 
             </androidx.appcompat.widget.Toolbar>
@@ -53,8 +53,8 @@
         android:id="@+id/layout_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/color_white_1"
         android:layout_marginTop="10dp"
+        android:background="@color/color_white_1"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -62,6 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/color_white_1"
+            android:paddingBottom="16dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2" />
 

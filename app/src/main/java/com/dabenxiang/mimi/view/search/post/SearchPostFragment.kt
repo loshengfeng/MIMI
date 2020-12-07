@@ -35,6 +35,8 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_FAVORITE
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
@@ -260,27 +262,23 @@ class SearchPostFragment : BaseFragment() {
         viewModel.likePostResult.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
-                    it.result?.let { position ->
-                        adapter.notifyItemChanged(position)
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_LIKE)
                     }
                 }
 
-                else -> {
-                    onApiError(Exception("Unknown Error!"))
-                }
+                else -> onApiError(Exception("Unknown Error!"))
             }
         })
 
         viewModel.favoriteResult.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
-                    it.result?.let { position ->
-                        adapter.notifyItemChanged(position)
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
                     }
                 }
-                else -> {
-                    onApiError(Exception("Unknown Error!"))
-                }
+                else -> onApiError(Exception("Unknown Error!"))
             }
         })
 

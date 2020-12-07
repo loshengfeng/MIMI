@@ -46,7 +46,7 @@
     <string name="invalidate_code_error_1">请填写验证码</string>
     <string name="invited_code_error_1">邀请码无效，请确认</string>
     <string name="receive_mail">请收验证信</string>
-    <string name="send_msg">已发送简讯验证码到注册手机号上，请查收</string>
+    <string name="send_msg">已发送验证码到手机号，请查收</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
     <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
     <string name="desc_mobile">已传送新密码至您的手机号\n%s\n请确认</string>
@@ -95,7 +95,7 @@
 
     <!-- Club -->
     <string name="club_tab_follow">关注</string>
-    <string name="club_tab_recommend">推薦</string>
+    <string name="club_tab_recommend">推荐</string>
     <string name="club_tab_latest">最新</string>
     <string name="club_tab_clip">短视频</string>
     <string name="club_tab_picture">图片</string>
@@ -275,7 +275,7 @@
 
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
-    <string name="text_search_classification">搜寻 ”该分类” 内容</string>
+    <string name="text_search_classification">搜寻 ”%s” 内容</string>
     <string name="text_follow">关注</string>
     <string name="text_post">帖子</string>
     <string name="text_ranking">排行榜</string>
@@ -334,7 +334,7 @@
     <string name="empty_follow">尚未有任何关注，快去关注一下吧！</string>
 
     <!-- Follow -->
-    <string name="follow">关注</string>
+    <string name="follow">+关注</string>
     <string name="followed">已关注</string>
     <string name="cancel_follow">取消关注</string>
 
@@ -578,6 +578,7 @@
 
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
+    <string name="recommend">推荐</string>
 
     <!-- Category -->
     <string name="category_newest">最新</string>
@@ -593,6 +594,7 @@
     <string name="boo">踩</string>
 
     <string name="video_desc">视频简介</string>
-    <string name="show_more"> 顯示更多</string>
+    <string name="show_more"> 显示更多</string>
     <string name="small_video">小视频</string>
+    <string name="actor">女优</string>
 </resources>

@@ -37,6 +37,9 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter
+import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_FAVORITE
+import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
@@ -135,7 +138,8 @@ class SearchVideoFragment : BaseFragment() {
 
             videoListAdapter.addLoadStateListener(loadStateListener)
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
-            recyclerview_content.adapter = videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
+            recyclerview_content.adapter =
+                videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
         }
     }
 
@@ -158,9 +162,13 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
-                is Success -> videoListAdapter.notifyDataSetChanged()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Success -> {
+                    it.result.let { position ->
+                        videoListAdapter.notifyItemChanged(position, UPDATE_LIKE)
+                    }
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -169,7 +177,11 @@ class SearchVideoFragment : BaseFragment() {
             when (it) {
                 is Loading -> progressHUD.show()
                 is Loaded -> progressHUD.dismiss()
-                is Success -> videoListAdapter.notifyDataSetChanged()
+                is Success -> {
+                    it.result.let { position ->
+                        videoListAdapter.notifyItemChanged(position, UPDATE_FAVORITE)
+                    }
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -245,14 +257,14 @@ class SearchVideoFragment : BaseFragment() {
             )
         }
 
-        override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
+        override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem, position:Int) {
             when (type) {
                 FunctionType.LIKE -> {
                     // 點擊更改喜歡,
                     checkStatus {
                         viewModel.currentItem = item
-                        item.id?.let {
-                            viewModel.modifyLike(it)
+                        item.id.let {
+                            viewModel.modifyLike(it, position)
                         }
                     }
                 }
@@ -262,7 +274,7 @@ class SearchVideoFragment : BaseFragment() {
                     checkStatus {
                         viewModel.currentItem = item
                         item.id?.let {
-                            viewModel.modifyFavorite(it)
+                            viewModel.modifyFavorite(it, position)
                         }
                     }
                 }
