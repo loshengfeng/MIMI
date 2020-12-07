@@ -65,7 +65,7 @@
         android:id="@+id/text_page_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/empty_post"
+        android:text="@string/empty_fans_post"
         android:textColor="@color/color_black_1"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/img_page_empty"
