@@ -170,29 +170,13 @@ class ClubPicDetailFragment : BaseFragment() {
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putString(BasePostFragment.PAGE, BasePostFragment.VIDEO)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.PIC)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
-                when (it.type) {
-                    PostType.TEXT -> {
-                        findNavController().navigate(
-                            R.id.action_to_postArticleFragment,
-                            bundle
-                        )
-                    }
-                    PostType.IMAGE -> {
-                        findNavController().navigate(
-                            R.id.action_to_postPicFragment,
-                            bundle
-                        )
-                    }
-                    PostType.VIDEO -> {
-                        findNavController().navigate(
-                            R.id.action_to_postVideoFragment,
-                            bundle
-                        )
-                    }
-                }
+                findNavController().navigate(
+                    R.id.action_to_postPicFragment,
+                    bundle
+                )
             }
         }
 
