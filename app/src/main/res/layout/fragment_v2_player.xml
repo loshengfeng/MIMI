@@ -31,6 +31,29 @@
         app:layout_constraintBottom_toBottomOf="@+id/player_view"/>
 
     <ImageView
+        android:id="@+id/btn_backup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/btn_arrow_backup"
+        app:layout_constraintStart_toStartOf="@+id/backup_start"
+        app:layout_constraintTop_toTopOf="@+id/backup_top" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/backup_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.025" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/backup_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+
+    <ImageView
         android:id="@+id/iv_player"
         android:layout_width="60dp"
         android:layout_height="60dp"
