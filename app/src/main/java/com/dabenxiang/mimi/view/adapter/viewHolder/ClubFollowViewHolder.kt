@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.enums.ClickType
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import kotlinx.android.synthetic.main.item_follow_club.view.*
 import org.koin.core.component.KoinComponent
@@ -22,7 +23,12 @@ class ClubFollowViewHolder(
     private val tvClubFollow: TextView = itemView.tv_club_follow
     private val tvClubPost: TextView = itemView.tv_club_post
     private val clFollow: ConstraintLayout = itemView.cl_follow
-    fun onBind(item: ClubFollowItem, listener: BaseItemListener) {
+
+    fun onBind(
+        item: ClubFollowItem,
+        listener: BaseItemListener,
+        getBitmap: ((Long?, ImageView, LoadImageType) -> Unit)
+    ) {
         tvName.text = item.name ?: ""
         tvSubTitle.text = item.description
         tvClubFollow.text = item.followerCount.toString()
@@ -43,7 +49,6 @@ class ClubFollowViewHolder(
             listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
 
-        Glide.with(ivPhoto.context)
-                .load(item.avatarAttachmentId).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+        getBitmap(item.avatarAttachmentId, ivPhoto, LoadImageType.AVATAR)
     }
 }

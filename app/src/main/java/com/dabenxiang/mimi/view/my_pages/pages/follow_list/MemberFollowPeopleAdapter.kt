@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.my_pages.pages.follow_list
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.paging.PagingDataAdapter
 
 import androidx.recyclerview.widget.DiffUtil
@@ -10,12 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 
 class MemberFollowPeopleAdapter(
-        val context: Context,
-        private val listener: BaseItemListener
+    val context: Context,
+    private val listener: BaseItemListener,
+    private val getBitmap: ((Long?, ImageView, LoadImageType) -> Unit) = { _, _, _ -> },
 ) : PagingDataAdapter<MemberFollowItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -62,7 +65,7 @@ class MemberFollowPeopleAdapter(
             (holder as MemberFollowViewHolder)
 //                    holder.pictureRecycler.tag = position
             holder.onBind(
-                    it, listener
+                    it, listener, getBitmap
             )
 
         }

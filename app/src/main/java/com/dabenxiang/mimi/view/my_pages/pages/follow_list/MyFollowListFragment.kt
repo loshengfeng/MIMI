@@ -28,11 +28,15 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
 
     private val memberAdapter by lazy {
-        MemberFollowPeopleAdapter(requireContext(), listener)
+        MemberFollowPeopleAdapter(requireContext(), listener) { id, view, type ->
+            viewModel.loadImage(id, view, type)
+        }
     }
 
     private val clubAdapter: ClubFollowPeopleAdapter by lazy {
-        ClubFollowPeopleAdapter(requireContext(), listener)
+        ClubFollowPeopleAdapter(requireContext(), listener) { id, view, type ->
+            viewModel.loadImage(id, view, type)
+        }
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_list
