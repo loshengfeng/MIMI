@@ -48,11 +48,7 @@ class TopicDetailFragment : BaseFragment() {
             }
         }
 
-        val tabTitle = arrayListOf(
-            App.self.getString(R.string.hottest),
-            App.self.getString(R.string.newest),
-            App.self.getString(R.string.video)
-        )
+        val tabTitle = App.self.resources.getStringArray(R.array.club_hot_topic_tabs).toMutableList()
     }
 
     private val viewModel: TopicDetailViewModel by viewModels()
@@ -269,20 +265,20 @@ class TopicDetailFragment : BaseFragment() {
                 when (item.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postArticleFragment,
-                                bundle
+                            R.id.action_topicDetailFragment_to_postArticleFragment,
+                            bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postPicFragment,
-                                bundle
+                            R.id.action_topicDetailFragment_to_postPicFragment,
+                            bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postVideoFragment,
-                                bundle
+                            R.id.action_topicDetailFragment_to_postVideoFragment,
+                            bundle
                         )
                     }
                     else -> {
@@ -423,5 +419,5 @@ fun ViewPager2.reduceDragSensitivity() {
     val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
     touchSlopField.isAccessible = true
     val touchSlop = touchSlopField.get(recyclerView) as Int
-    touchSlopField.set(recyclerView, touchSlop*2)       // "8" was obtained experimentally
+    touchSlopField.set(recyclerView, touchSlop * 2)       // "8" was obtained experimentally
 }

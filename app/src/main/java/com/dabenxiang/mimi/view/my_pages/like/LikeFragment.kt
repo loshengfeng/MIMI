@@ -8,7 +8,6 @@ import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.my_pages.base.BaseMyPagesTabFragment
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
-import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment
 import com.dabenxiang.mimi.view.my_pages.pages.favorites.MyFavoritesFragment
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoFragment
 import kotlinx.android.synthetic.main.fragment_my.*
@@ -33,22 +32,19 @@ class LikeFragment : BaseMyPagesTabFragment() {
         tool_bar.toolbar_title.text = getString(R.string.like_title)
     }
 
-    override fun getTabTitle(position: Int): String? {
-        return when (position) {
-            TAB_MiMI_VIDEO -> getString(R.string.follow_tab_mimi_video)
-            TAB_POST -> getString(R.string.follow_tab_post)
-            else -> null
-        }
+    override fun getTabTitle(position: Int): String {
+        val tabs = resources.getStringArray(R.array.like_tabs)
+        return tabs[position]
     }
 
     override fun deleteAll() {
         CleanDialogFragment.newInstance(
-                listener = onCleanDialogListener,
-                msgResId = R.string.like_delete_all
+            listener = onCleanDialogListener,
+            msgResId = R.string.like_delete_all
         ).also {
             it.show(
-                    requireActivity().supportFragmentManager,
-                    CleanDialogFragment::class.java.simpleName
+                requireActivity().supportFragmentManager,
+                CleanDialogFragment::class.java.simpleName
             )
         }
     }

@@ -20,21 +20,18 @@ class MyFollowFragment : BaseMyPagesTabFragment() {
 
     override val viewModel: MyPagesViewModel by viewModels()
 
-    override val tabFragmentsCreators: Map<Int, () -> Fragment> =mapOf(
-            TAB_FOLLOW_PEOPLE to { MyFollowListFragment(TAB_FOLLOW_PEOPLE) },
-            TAB_FOLLOW_CLUB to { MyFollowListFragment(TAB_FOLLOW_CLUB) }
-            )
+    override val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
+        TAB_FOLLOW_PEOPLE to { MyFollowListFragment(TAB_FOLLOW_PEOPLE) },
+        TAB_FOLLOW_CLUB to { MyFollowListFragment(TAB_FOLLOW_CLUB) }
+    )
 
     override fun setFragmentTitle() {
         tool_bar.toolbar_title.text = getString(R.string.follow_title)
     }
 
-    override fun getTabTitle(position: Int): String? {
-        return when (position) {
-            TAB_FOLLOW_PEOPLE -> getString(R.string.follow_people)
-            TAB_FOLLOW_CLUB -> getString(R.string.follow_circle)
-            else -> null
-        }
+    override fun getTabTitle(position: Int): String {
+        val tabs = resources.getStringArray(R.array.follow_tabs)
+        return tabs[position]
     }
 
     override fun deleteAll() {
