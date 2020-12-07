@@ -354,6 +354,7 @@
     <string name="fans">粉丝</string>
     <string name="total_count_fans">全部粉丝%s人</string>
     <string name="title_fans">我的粉丝</string>
+    <string name="empty_fans_post">尚未有任何粉丝，快去发文吧！</string>
     <!-- fans -->
     <string name="exchange">兑换激活码</string>
 
