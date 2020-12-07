@@ -24,8 +24,10 @@
                 android:background="@drawable/bg_layout_top_mimi"
                 app:layout_constraintBottom_toBottomOf="@+id/every_day_count_hint"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
             <ImageView
                 android:id="@+id/imageView6"
@@ -167,7 +169,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
-                android:text="@string/follow"
+                android:text="@string/text_follow"
                 android:textColor="@color/title_personal"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/like"

@@ -328,7 +328,7 @@
     <string name="empty_follow">尚未有任何关注，快去关注一下吧！</string>
 
     <!-- Follow -->
-    <string name="follow">关注</string>
+    <string name="follow">+关注</string>
     <string name="followed">已关注</string>
     <string name="cancel_follow">取消关注</string>
 
@@ -583,6 +583,6 @@
     <string name="boo">踩</string>
 
     <string name="video_desc">视频简介</string>
-    <string name="show_more"> 顯示更多</string>
+    <string name="show_more"> 显示更多</string>
     <string name="small_video">小视频</string>
 </resources>

@@ -54,7 +54,7 @@ class FansListAdapter(
         private val icon_fans: ImageView = itemView.icon_fans
         private val name_fans: TextView = itemView.name_fans
         private val decs_fans: TextView = itemView.decs_fans
-        private val follow_fnas: TextView = itemView.follow_fnas
+        private val follow_fnas: TextView = itemView.follow_fans
 
         fun onBind(item: FansItem?, listener: FanListener, position: Int, context: Context) {
             name_fans.text = item?.friendlyName
