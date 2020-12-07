@@ -8,7 +8,6 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -299,11 +298,11 @@ class SearchPostFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        iv_clean.setOnClickListener {
+        iv_clear_search_bar.setOnClickListener {
             search_bar.setText("")
         }
 
-        iv_clear_search_text.setOnClickListener {
+        iv_clear_history.setOnClickListener {
             chip_group_search_text.removeAllViews()
             viewModel.clearSearchHistory()
         }

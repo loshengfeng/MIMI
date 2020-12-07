@@ -37,7 +37,6 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
-import com.dabenxiang.mimi.view.search.post.SearchPostAdapter
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_FAVORITE
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -124,16 +123,15 @@ class SearchVideoFragment : BaseFragment() {
             viewModel.category = data.category
             if (data.tag.isNotBlank()) {
                 layout_search_history.visibility = View.GONE
+                layout_search_text.visibility = View.GONE
+                search_bar.setText(data.tag)
                 searchVideo(tag = data.tag)
-            }
-
-            if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
-                layout_search_history.visibility = View.VISIBLE
+                search_bar.clearFocus()
+            } else {
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
-            } else {
-                layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.VISIBLE
+                GeneralUtils.showKeyboard(requireContext())
+                search_bar.requestFocus()
             }
 
             videoListAdapter.addLoadStateListener(loadStateListener)
@@ -149,15 +147,11 @@ class SearchVideoFragment : BaseFragment() {
             else progressHUD.dismiss()
         })
 
-        viewModel.searchTextLiveData.bindingEditText = search_bar
-
-        viewModel.searchTextLiveData.observe(viewLifecycleOwner, Observer {
-
-        })
-
         viewModel.searchingTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            tv_search_text.text = genResultText(count)
-            layout_search_text.visibility = View.VISIBLE
+            if (search_bar.text.isNotBlank()) {
+                tv_search_text.text = genResultText(count)
+                layout_search_text.visibility = View.VISIBLE
+            }
         })
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
@@ -193,28 +187,30 @@ class SearchVideoFragment : BaseFragment() {
             navigateTo(NavigateItem.Up)
         }
 
-        iv_clean.setOnClickListener {
-            viewModel.cleanSearchText()
+        iv_clear_search_bar.setOnClickListener {
+            search_bar.setText("")
+            GeneralUtils.showKeyboard(requireContext())
+            search_bar.requestFocus()
         }
 
         tv_search.setOnClickListener {
             searchText()
         }
 
-        iv_clear_search_text.setOnClickListener {
+        iv_clear_history.setOnClickListener {
             chip_group_search_text.removeAllViews()
             viewModel.clearSearchHistory()
         }
 
         search_bar.addTextChangedListener {
-            if (it.toString() == "" && !TextUtils.isEmpty(viewModel.searchingTag)) {
-                layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.VISIBLE
-            } else if (it.toString() == "") {
-                layout_search_history.visibility = View.VISIBLE
+            if (it.toString() == "") {
+                iv_clear_search_bar.visibility = View.GONE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
                 lifecycleScope.launch { videoListAdapter.submitData(PagingData.empty()) }
+            } else {
+                iv_clear_search_bar.visibility = View.VISIBLE
+                layout_search_text.visibility = View.GONE
             }
         }
 
@@ -242,6 +238,7 @@ class SearchVideoFragment : BaseFragment() {
                 requireContext(),
                 getString(R.string.search_video_input_empty_toast)
             )
+            search_bar.requestFocus()
         }
     }
 
@@ -257,7 +254,12 @@ class SearchVideoFragment : BaseFragment() {
             )
         }
 
-        override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem, position:Int) {
+        override fun onFunctionClick(
+            type: FunctionType,
+            view: View,
+            item: VideoItem,
+            position: Int
+        ) {
             when (type) {
                 FunctionType.LIKE -> {
                     // 點擊更改喜歡,
@@ -339,8 +341,10 @@ class SearchVideoFragment : BaseFragment() {
             layout_search_text.visibility = View.GONE
             viewModel.searchingTag = text
             viewModel.searchingStr = ""
+            search_bar.setText(text)
             searchVideo(tag = text)
             GeneralUtils.hideKeyboard(requireActivity())
+            search_bar.clearFocus()
         }
 
         override fun onAvatarDownload(view: ImageView, id: String) {
@@ -408,9 +412,12 @@ class SearchVideoFragment : BaseFragment() {
                 viewModel.searchingTag = ""
                 searchVideo(keyword = text)
                 GeneralUtils.hideKeyboard(requireActivity())
+                search_bar.clearFocus()
             }
             chip_group_search_text.addView(chip)
         }
+
+        layout_search_history.visibility = if (searchHistories.size > 0) View.VISIBLE else View.GONE
     }
 
     private fun searchVideo(
