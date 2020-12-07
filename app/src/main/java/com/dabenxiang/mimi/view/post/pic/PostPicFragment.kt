@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
@@ -131,6 +132,10 @@ class PostPicFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
+        } else if (isEdit && page == PIC) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(PictureDetailFragment.KEY_DATA, item)
+            findNavController().navigate(R.id.action_postPicFragment_to_clubPicFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         }
