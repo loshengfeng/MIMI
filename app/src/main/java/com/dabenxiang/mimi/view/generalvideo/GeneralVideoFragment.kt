@@ -39,7 +39,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-        viewModel.adWidth = pxToDp(requireContext(), GeneralUtils.getAdSize(requireActivity()).first)
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         rv_video.visibility = View.INVISIBLE

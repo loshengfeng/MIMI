@@ -25,7 +25,7 @@ class MiMiFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
 
-        viewModel.adWidth = pxToDp(requireContext(), GeneralUtils.getAdSize(requireActivity()).first)
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         btn_retry.setOnClickListener { viewModel.getMenu() }
