@@ -110,10 +110,11 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     private fun pausePlayer() {
-        exoPlayer?.also { player ->
-            player.playWhenReady = false
-            ib_play?.visibility = View.VISIBLE
-        }
+        exoPlayer?.takeIf { it.isPlaying }?.takeUnless { ib_retry.visibility == View.VISIBLE }
+            ?.run {
+                ib_play.visibility = View.VISIBLE
+            }
+        exoPlayer?.playWhenReady = false
     }
 
     fun modifyFavorite() {
