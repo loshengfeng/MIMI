@@ -354,7 +354,7 @@ class TopicDetailFragment : BaseFragment() {
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = SearchPostItem(type = type, tag = tag)
+            val item = SearchPostItem(type = PostType.TEXT_IMAGE_VIDEO, tag = tag)
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
