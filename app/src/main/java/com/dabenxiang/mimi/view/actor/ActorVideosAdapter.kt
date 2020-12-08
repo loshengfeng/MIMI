@@ -19,7 +19,7 @@ class ActorVideosAdapter(
 
     private var actorVideosItems: ArrayList<ActorVideosItem>? = null
 
-    private val decorationPosition: ArrayList<Int> = ArrayList()
+    private val decoration = VideosSpaceItemDecoration(GeneralUtils.dpToPx(context, 10))
 
     override fun getItemViewType(position: Int): Int {
         return VIEW_TYPE_ACTOR_VIDEOS
@@ -54,14 +54,8 @@ class ActorVideosAdapter(
         }
         holder.actressesVideos.also{
             it.adapter = actorVideoAdapter
-            if(!decorationPosition.contains(position)){
-                it.addItemDecoration(
-                    VideosSpaceItemDecoration(
-                        GeneralUtils.dpToPx(context, 10),
-                    )
-                )
-                decorationPosition.add(position)
-            }
+            it.removeItemDecoration(decoration)
+            it.addItemDecoration(decoration)
         }
         actorVideoAdapter.submitList(item.videos)
         actorVideosFuncItem.getActorAvatarAttachment.invoke(item?.attachmentId,holder.ivAvatar)
