@@ -138,7 +138,7 @@ class ActorFragment : BaseFragment() {
                 if (actorListAdapter.isDataEmpty()) {
                     rv_all_actresses?.run { this.visibility = View.INVISIBLE }
                 } else {
-                    rv_all_actresses?.scrollBy(0, 1) //FIXME: 滑動後頁面才能點擊，原因未明，查找中...
+//                    rv_all_actresses?.scrollBy(0, 1) //FIXME: 滑動後頁面才能點擊，原因未明，查找中...
                     rv_all_actresses?.run { this.visibility = View.VISIBLE }
                 }
 
