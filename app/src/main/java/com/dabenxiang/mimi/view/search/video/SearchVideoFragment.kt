@@ -124,11 +124,11 @@ class SearchVideoFragment : BaseFragment() {
                 layout_search_history.visibility = View.GONE
                 search_bar.setText(data.tag)
                 searchVideo(tag = data.tag)
-                search_bar.clearFocus()
+//                tv_search.requestFocus()
             } else {
                 getSearchHistory()
                 GeneralUtils.showKeyboard(requireContext())
-                search_bar.requestFocus()
+//                search_bar.requestFocus()
             }
             layout_search_text.visibility = View.GONE
 
@@ -178,13 +178,14 @@ class SearchVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
+            GeneralUtils.hideKeyboard(requireActivity())
             navigateTo(NavigateItem.Up)
         }
 
         iv_clear_search_bar.setOnClickListener {
             search_bar.setText("")
             GeneralUtils.showKeyboard(requireContext())
-            search_bar.requestFocus()
+//            search_bar.requestFocus()
         }
 
         tv_search.setOnClickListener {
@@ -194,7 +195,6 @@ class SearchVideoFragment : BaseFragment() {
         iv_clear_history.setOnClickListener {
             chip_group_search_text.removeAllViews()
             viewModel.clearSearchHistory()
-            layout_search_history.visibility = View.GONE
         }
 
         search_bar.addTextChangedListener {
@@ -232,7 +232,7 @@ class SearchVideoFragment : BaseFragment() {
                 requireContext(),
                 getString(R.string.search_video_input_empty_toast)
             )
-            search_bar.requestFocus()
+//            search_bar.requestFocus()
         }
     }
 
@@ -338,7 +338,7 @@ class SearchVideoFragment : BaseFragment() {
             search_bar.setText(text)
             searchVideo(tag = text)
             GeneralUtils.hideKeyboard(requireActivity())
-            search_bar.clearFocus()
+//            tv_search.requestFocus()
         }
 
         override fun onAvatarDownload(view: ImageView, id: String) {
@@ -406,12 +406,12 @@ class SearchVideoFragment : BaseFragment() {
                 viewModel.searchingTag = ""
                 searchVideo(keyword = text)
                 GeneralUtils.hideKeyboard(requireActivity())
-                search_bar.clearFocus()
+//                tv_search.requestFocus()
             }
             chip_group_search_text.addView(chip)
         }
 
-        layout_search_history.visibility = if (searchHistories.size > 0) View.VISIBLE else View.GONE
+        layout_search_history.visibility = View.VISIBLE
     }
 
     private fun searchVideo(
@@ -436,4 +436,5 @@ class SearchVideoFragment : BaseFragment() {
             }
         }
     }
+
 }
