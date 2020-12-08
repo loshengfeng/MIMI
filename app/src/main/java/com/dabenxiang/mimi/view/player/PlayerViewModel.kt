@@ -514,6 +514,7 @@ class PlayerViewModel : BaseViewModel() {
         viewModelScope.launch {
             val dataSrc = GuessLikeDataSource(
                 isAdult,
+                "",
                 category ?: "",
                 viewModelScope,
                 domainManager.getApiRepository(),

@@ -15,16 +15,16 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/item_setting_bar_bg_selector"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_title"
-        app:tabGravity="center"
+        app:tabIndicatorHeight="4dp"
         app:tabIndicator="@drawable/bg_tab_login"
-        app:tabIndicatorColor="@color/adult_color_bottom_bar_item"
-        app:tabMinWidth="70dp">
+        app:tabTextColor="@color/color_black_1_50"
+        app:tabSelectedTextColor="@color/color_black_1"
+        app:tabTextAppearance="@style/TabLayoutTextStyle_16">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_text_detail"

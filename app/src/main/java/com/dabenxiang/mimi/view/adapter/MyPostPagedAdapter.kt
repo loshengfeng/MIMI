@@ -113,7 +113,7 @@ class MyPostPagedAdapter(
                             it,
                             position,
                             myPostListener,
-                                memberPostFuncItem
+                            memberPostFuncItem
                         )
                     }
                 }

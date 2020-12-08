@@ -1,7 +1,10 @@
 package com.dabenxiang.mimi.view.mimi_home
 
+import android.graphics.Typeface
+import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
@@ -11,8 +14,12 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_mimi_home.*
+import kotlinx.android.synthetic.main.fragment_my.view.*
+import kotlinx.android.synthetic.main.item_choose_club.*
+import java.lang.String
 
 class MiMiFragment : BaseFragment() {
 
@@ -67,8 +74,27 @@ class MiMiFragment : BaseFragment() {
         viewpager.isSaveEnabled = false
         viewpager.adapter = MiMiViewPagerAdapter(this, menusItems)
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->
-            tab.text = menusItems[position].name
+            val view = LayoutInflater.from(requireContext()).inflate(R.layout.custom_tab, null)
+            val textView = view?.findViewById<TextView>(R.id.tv_title)
+            textView?.text = menusItems[position].name
+            textView?.takeIf { position == 0 }?.run { setTextViewSelected(true, this) }
+            tab.customView = view
         }.attach()
+
+        layout_tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
+                setTextViewSelected(true, textView)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
+                setTextViewSelected(false, textView)
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -87,4 +113,16 @@ class MiMiFragment : BaseFragment() {
         }
     }
 
+    private fun setTextViewSelected(selected: Boolean, textView: TextView) {
+        when (selected) {
+            true -> {
+                textView.setTypeface(null, Typeface.BOLD)
+                textView.setTextColor(requireContext().getColor(R.color.color_black_1))
+            }
+            else -> {
+                textView.setTypeface(null, Typeface.NORMAL)
+                textView.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            }
+        }
+    }
 }
