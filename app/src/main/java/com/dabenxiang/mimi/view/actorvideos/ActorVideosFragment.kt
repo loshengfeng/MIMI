@@ -16,7 +16,7 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
-import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
@@ -77,15 +77,13 @@ class ActorVideosFragment : BaseFragment() {
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
 
-        val loadStateAdapter = VideoLoadStateAdapter(generalVideoAdapter)
-
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
             .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
 
         rv_video.also {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
-            it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+            it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.addItemDecoration(
                 GridSpaceItemDecoration(
                     2,
@@ -107,10 +105,12 @@ class ActorVideosFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     val item = it.result
                     tv_name.text = item.name
-                    tv_total_click.text =
-                        item.totalClick.toString() + getString(R.string.actor_hot_unit)
-                    tv_total_video.text =
-                        item.totalVideo.toString() + getString(R.string.actor_videos_unit)
+                    tv_total_click.text = StringBuilder(item.totalClick.toString())
+                        .append(getString(R.string.actor_hot_unit))
+                        .toString()
+                    tv_total_video.text = StringBuilder(item.totalVideo.toString())
+                        .append(getString(R.string.actor_videos_unit))
+                        .toString()
                     viewModel.loadImage(item.attachmentId, iv_avatar, LoadImageType.AVATAR_CS)
                     actorName = item.name
                     tv_name.text = actorName
@@ -143,7 +143,6 @@ class ActorVideosFragment : BaseFragment() {
                 verticalOffset == 0 -> {
                     actor_toolbar_title.visibility = View.VISIBLE
                 }
-
                 abs(verticalOffset) > 10 -> {
                     actor_toolbar_title.visibility = View.GONE
                 }

@@ -113,7 +113,7 @@ class MyPostPagedAdapter(
                             it,
                             position,
                             myPostListener,
-                                memberPostFuncItem
+                            memberPostFuncItem
                         )
                     }
                 }
@@ -121,6 +121,7 @@ class MyPostPagedAdapter(
                     payloads.takeIf { it.isNotEmpty() }?.also {
                         when (it[0] as Int) {
                             PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
                         }
                     } ?: run {
@@ -137,6 +138,7 @@ class MyPostPagedAdapter(
                     payloads.takeIf { it.isNotEmpty() }?.also {
                         when (it[0] as Int) {
                             PAYLOAD_UPDATE_LIKE -> holder.updateLike(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(item)
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
                         }
                     } ?: run {

@@ -17,26 +17,14 @@
         app:layout_constraintTop_toBottomOf="parent"
         tools:visibility="visible">
 
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="56dp"
-            android:text="@string/invite_vip_plus_text"
-            android:textColor="@color/color_invite_vip_text"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_invite_vip_days" />
-
         <ImageView
             android:id="@+id/iv_invite_bg"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="160dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="@+id/gl_background_bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/img_invite_bg" />
 
 
@@ -44,28 +32,13 @@
             android:id="@+id/iv_invite_bg_cover"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="160dp"
             android:background="@drawable/bg_invite_vip_bg_cover"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/gl_background_bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />
-
-        <ImageView
-            android:id="@+id/iv_invite_word"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="85dp"
-            android:layout_marginTop="57dp"
-            android:layout_marginEnd="86dp"
-            android:layout_marginBottom="297dp"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_invite_bg"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/iv_invite_bg"
-            app:srcCompat="@drawable/img_vip_word" />
 
         <ImageView
             android:id="@+id/iv_invite_vip_back"
@@ -89,91 +62,50 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textView2"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/invite_vip_reward_text"
-            android:textColor="@color/color_white_1"
-            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iv_invite_word" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/gl_background_bottom" >
 
-        <ImageView
-            android:id="@+id/iv_invite_vip_qrcode"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_invite_vip_qr_code"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+            <ImageView
+                android:id="@+id/iv_invite_word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="85dp"
+                android:layout_marginTop="57dp"
+                android:layout_marginEnd="86dp"
+                android:layout_marginBottom="297dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/img_vip_word" />
 
-        <TextView
-            android:id="@+id/tv_invite_vip_people"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="45dp"
-            android:text="0"
-            android:textSize="50sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imgShare"
-            tools:text="50" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/invite_vip_reward_text"
+                android:textColor="@color/color_white_1"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_invite_word" />
 
-        <TextView
-            android:id="@+id/tv_invite_vip_days"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="7dp"
-            android:layout_marginBottom="44dp"
-            android:text="0"
-            android:textColor="@color/color_invite_vip_text"
-            android:textSize="50sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView10"
-            tools:text="100" />
+            <ImageView
+                android:id="@+id/iv_invite_vip_qrcode"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_invite_vip_qr_code"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-        <TextView
-            android:id="@+id/tv_invite_vip_people_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="@string/invite_vip_people_text"
-            android:textColor="@color/color_black_1_40"
-            app:layout_constraintStart_toEndOf="@+id/imgShare"
-            app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_people" />
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="55dp"
-            android:text="@string/invite_vip_days_text"
-            android:textColor="@color/color_black_1_40"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_days" />
-
-        <ImageView
-            android:id="@+id/imgShare"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="58dp"
-            android:layout_marginTop="2dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_people"
-            app:srcCompat="@drawable/ico_people" />
-
-        <ImageView
-            android:id="@+id/imageView10"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="4dp"
-            app:layout_constraintEnd_toStartOf="@+id/textView8"
-            app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_days"
-            app:srcCompat="@drawable/ico_vip" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_copy_invite_code"
@@ -181,14 +113,14 @@
             android:layout_height="66dp"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="119dp"
             android:background="@drawable/bg_invite_vip_invite_code"
             android:elevation="3dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/gl_background_bottom"
             app:layout_constraintEnd_toStartOf="@+id/cl_copylink"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintStart_toEndOf="@+id/iv_invite_bg">
+            app:layout_constraintStart_toEndOf="@+id/iv_invite_bg"
+            app:layout_constraintTop_toTopOf="@+id/gl_background_bottom">
 
             <TextView
                 android:id="@+id/tv_invite_code_text"
@@ -235,13 +167,14 @@
             android:layout_height="66dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="15dp"
-            android:layout_marginBottom="119dp"
             android:background="@drawable/bg_invite_vip_invite_code"
             android:elevation="3dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/gl_background_bottom"
             app:layout_constraintEnd_toStartOf="@+id/iv_invite_bg"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/cl_copy_invite_code">
+            app:layout_constraintStart_toEndOf="@+id/cl_copy_invite_code"
+            app:layout_constraintTop_toTopOf="@+id/gl_background_bottom"
+            app:layout_constraintVertical_bias="0.5">
 
             <ImageView
                 android:id="@+id/iv_copylink"
@@ -264,6 +197,89 @@
                 app:layout_constraintStart_toEndOf="@+id/iv_copylink"
                 app:layout_constraintTop_toTopOf="@+id/iv_copylink" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_invite_vip_people"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="0"
+            android:textSize="50sp"
+            app:layout_constraintStart_toEndOf="@+id/imgShare"
+            app:layout_constraintTop_toBottomOf="@+id/cl_copy_invite_code"
+            tools:text="50" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/invite_vip_plus_text"
+            android:textColor="@color/color_invite_vip_text"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_invite_vip_days"
+            app:layout_constraintEnd_toStartOf="@+id/tv_invite_vip_days"
+            app:layout_constraintTop_toTopOf="@+id/tv_invite_vip_days" />
+
+        <TextView
+            android:id="@+id/tv_invite_vip_days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="14dp"
+            android:text="0"
+            android:textColor="@color/color_invite_vip_text"
+            android:textSize="50sp"
+            app:layout_constraintStart_toEndOf="@+id/imageView10"
+            app:layout_constraintTop_toBottomOf="@+id/cl_copylink"
+            tools:text="100" />
+
+        <TextView
+            android:id="@+id/tv_invite_vip_people_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@string/invite_vip_people_text"
+            android:textColor="@color/color_black_1_40"
+            app:layout_constraintStart_toEndOf="@+id/imgShare"
+            app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_people" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="55dp"
+            android:text="@string/invite_vip_days_text"
+            android:textColor="@color/color_black_1_40"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_days" />
+
+        <ImageView
+            android:id="@+id/imgShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="58dp"
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_people"
+            app:srcCompat="@drawable/ico_people" />
+
+        <ImageView
+            android:id="@+id/imageView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintEnd_toStartOf="@+id/textView8"
+            app:layout_constraintTop_toBottomOf="@+id/tv_invite_vip_days"
+            app:srcCompat="@drawable/ico_vip" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_background_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.75"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

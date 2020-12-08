@@ -53,11 +53,12 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         }
     }
 
-    fun setupGuessLikeList(category: String?, isAdult: Boolean) {
+    fun setupGuessLikeList(tags: String?, performers: String?, isAdult: Boolean) {
         viewModelScope.launch {
             val dataSrc = GuessLikeDataSource(
                 isAdult,
-                category ?: "",
+                tags ?: "",
+                performers ?: "",
                 viewModelScope,
                 domainManager.getApiRepository(),
                 pagingCallback

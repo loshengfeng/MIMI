@@ -54,10 +54,10 @@ class MiMiViewModel : BaseViewModel() {
         }
     }
 
-    fun startAnim(inverval: Long){
+    fun startAnim(interval: Long) {
         viewModelScope.launch {
             _inviteVipShake.postValue(true)
-            delay(inverval)
+            delay(interval)
             _inviteVipShake.postValue(false)
         }
     }

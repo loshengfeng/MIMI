@@ -22,7 +22,8 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -37,6 +38,8 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
+import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_FAVORITE
+import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
@@ -110,10 +113,8 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
-        super.setupFirstTime()
-
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
 
@@ -121,21 +122,21 @@ class SearchVideoFragment : BaseFragment() {
             viewModel.category = data.category
             if (data.tag.isNotBlank()) {
                 layout_search_history.visibility = View.GONE
+                search_bar.setText(data.tag)
                 searchVideo(tag = data.tag)
-            }
-
-            if (TextUtils.isEmpty(viewModel.searchingTag) && TextUtils.isEmpty(viewModel.searchingStr)) {
-                layout_search_history.visibility = View.VISIBLE
-                layout_search_text.visibility = View.GONE
-                getSearchHistory()
+//                tv_search.requestFocus()
             } else {
-                layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.VISIBLE
+                iv_clear_search_bar.visibility = View.GONE
+                getSearchHistory()
+                GeneralUtils.showKeyboard(requireContext())
+//                search_bar.requestFocus()
             }
+            layout_search_text.visibility = View.GONE
 
             videoListAdapter.addLoadStateListener(loadStateListener)
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
-            recyclerview_content.adapter = videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
+            recyclerview_content.adapter =
+                videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
         }
     }
 
@@ -145,31 +146,31 @@ class SearchVideoFragment : BaseFragment() {
             else progressHUD.dismiss()
         })
 
-        viewModel.searchTextLiveData.bindingEditText = search_bar
-
-        viewModel.searchTextLiveData.observe(viewLifecycleOwner, Observer {
-
-        })
-
         viewModel.searchingTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            tv_search_text.text = genResultText(count)
-            layout_search_text.visibility = View.VISIBLE
+            if (search_bar.text.isNotBlank()) {
+                tv_search_text.text = genResultText(count)
+                layout_search_text.visibility = View.VISIBLE
+            }
         })
 
         viewModel.likeResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
-                is Success -> videoListAdapter.notifyDataSetChanged()
+                is Success -> {
+                    it.result.let { position ->
+                        videoListAdapter.notifyItemChanged(position, UPDATE_LIKE)
+                    }
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
-                is Success -> videoListAdapter.notifyDataSetChanged()
+                is Success -> {
+                    it.result.let { position ->
+                        videoListAdapter.notifyItemChanged(position, UPDATE_FAVORITE)
+                    }
+                }
                 is Error -> onApiError(it.throwable)
             }
         })
@@ -178,31 +179,33 @@ class SearchVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
+            GeneralUtils.hideKeyboard(requireActivity())
             navigateTo(NavigateItem.Up)
         }
 
-        iv_clean.setOnClickListener {
-            viewModel.cleanSearchText()
+        iv_clear_search_bar.setOnClickListener {
+            search_bar.setText("")
+            GeneralUtils.showKeyboard(requireContext())
+//            search_bar.requestFocus()
         }
 
         tv_search.setOnClickListener {
             searchText()
         }
 
-        iv_clear_search_text.setOnClickListener {
+        iv_clear_history.setOnClickListener {
             chip_group_search_text.removeAllViews()
             viewModel.clearSearchHistory()
         }
 
         search_bar.addTextChangedListener {
-            if (it.toString() == "" && !TextUtils.isEmpty(viewModel.searchingTag)) {
-                layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.VISIBLE
-            } else if (it.toString() == "") {
-                layout_search_history.visibility = View.VISIBLE
+            if (it.toString() == "") {
+                iv_clear_search_bar.visibility = View.GONE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
                 lifecycleScope.launch { videoListAdapter.submitData(PagingData.empty()) }
+            } else {
+                iv_clear_search_bar.visibility = View.VISIBLE
             }
         }
 
@@ -230,6 +233,7 @@ class SearchVideoFragment : BaseFragment() {
                 requireContext(),
                 getString(R.string.search_video_input_empty_toast)
             )
+//            search_bar.requestFocus()
         }
     }
 
@@ -245,14 +249,19 @@ class SearchVideoFragment : BaseFragment() {
             )
         }
 
-        override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
+        override fun onFunctionClick(
+            type: FunctionType,
+            view: View,
+            item: VideoItem,
+            position: Int
+        ) {
             when (type) {
                 FunctionType.LIKE -> {
                     // 點擊更改喜歡,
                     checkStatus {
                         viewModel.currentItem = item
-                        item.id?.let {
-                            viewModel.modifyLike(it)
+                        item.id.let {
+                            viewModel.modifyLike(it, position)
                         }
                     }
                 }
@@ -262,7 +271,7 @@ class SearchVideoFragment : BaseFragment() {
                     checkStatus {
                         viewModel.currentItem = item
                         item.id?.let {
-                            viewModel.modifyFavorite(it)
+                            viewModel.modifyFavorite(it, position)
                         }
                     }
                 }
@@ -327,8 +336,10 @@ class SearchVideoFragment : BaseFragment() {
             layout_search_text.visibility = View.GONE
             viewModel.searchingTag = text
             viewModel.searchingStr = ""
+            search_bar.setText(text)
             searchVideo(tag = text)
             GeneralUtils.hideKeyboard(requireActivity())
+//            tv_search.requestFocus()
         }
 
         override fun onAvatarDownload(view: ImageView, id: String) {
@@ -396,9 +407,12 @@ class SearchVideoFragment : BaseFragment() {
                 viewModel.searchingTag = ""
                 searchVideo(keyword = text)
                 GeneralUtils.hideKeyboard(requireActivity())
+//                tv_search.requestFocus()
             }
             chip_group_search_text.addView(chip)
         }
+
+        layout_search_history.visibility = View.VISIBLE
     }
 
     private fun searchVideo(
@@ -423,4 +437,5 @@ class SearchVideoFragment : BaseFragment() {
             }
         }
     }
+
 }

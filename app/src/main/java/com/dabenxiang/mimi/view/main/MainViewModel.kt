@@ -69,8 +69,8 @@ class MainViewModel : BaseViewModel() {
     private val _dailyCheckInItem = MutableLiveData<DailyCheckInItem>()
     val dailyCheckInItem: LiveData<DailyCheckInItem> = _dailyCheckInItem
 
-    private val _uploadPicItem = MutableLiveData<PicParameter>()
-    val uploadPicItem: LiveData<PicParameter> = _uploadPicItem
+    private val _uploadPicItemResult = MutableLiveData<PicParameter>()
+    val uploadPicItemResult: LiveData<PicParameter> = _uploadPicItemResult
 
     private val _uploadCoverItem = MutableLiveData<PicParameter>()
     val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
@@ -415,7 +415,7 @@ class MainViewModel : BaseViewModel() {
                 when(type) {
                     HomeViewModel.TYPE_PIC -> {
                         val picParameter = PicParameter(ext = ext) //Set extension
-                        _uploadPicItem.postValue(picParameter)
+                        _uploadPicItemResult.postValue(picParameter)
                     }
                     HomeViewModel.TYPE_COVER -> {
                         val picParameter = PicParameter(ext = ext) //Set extension
@@ -528,10 +528,14 @@ class MainViewModel : BaseViewModel() {
         _postPicResult.value = null
         _postCoverResult.value = null
         _postVideoResult.value = null
-        _uploadPicItem.value = null
+        _uploadPicItemResult.value = null
         _uploadCoverItem.value = null
         _postVideoMemberResult.value = null
         _postPicMemberResult.value = null
+    }
+
+    fun clearPicResultValue() {
+        _postPicResult.value = null
     }
 
     fun cancelJob() {

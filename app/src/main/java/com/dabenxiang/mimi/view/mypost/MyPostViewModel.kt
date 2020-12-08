@@ -33,9 +33,6 @@ class MyPostViewModel : BaseViewModel() {
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
-    private var _followResult = MutableLiveData<ApiResult<Nothing>>()
-    val followResult: LiveData<ApiResult<Nothing>> = _followResult
-
     private var _isNoData = MutableLiveData<Boolean>().also { it.value = false }
     val isNoData: LiveData<Boolean> = _isNoData
 
@@ -46,6 +43,10 @@ class MyPostViewModel : BaseViewModel() {
         const val TYPE_COVER = "type_cover"
         const val TYPE_VIDEO = "type_video"
         const val USER_ID_ME: Long = -1
+    }
+
+    fun checkPostEmptyUi(removeListSize: Int) {
+        _isNoData.value = totalCount == removeListSize
     }
 
     fun getMyPost(userId: Long, isAdult: Boolean) {
@@ -94,6 +95,7 @@ class MyPostViewModel : BaseViewModel() {
             totalCount = if (isInitial) count.toInt()
             else totalCount.plus(count.toInt())
             if (isInitial) cleanRemovedPosList()
+
             if (totalCount == 0) {
                 _isNoData.value = true
             }
@@ -140,23 +142,4 @@ class MyPostViewModel : BaseViewModel() {
         }
     }
 
-    fun followPost(items: ArrayList<MemberPostItem>, position: Int, isFollow: Boolean) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = when {
-                    isFollow -> apiRepository.followPost(items[position].creatorId)
-                    else -> apiRepository.cancelFollowPost(items[position].creatorId)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                items.forEach { item ->
-                    item.isFollow = isFollow
-                }
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _followResult.value = it }
-        }
-    }
 }

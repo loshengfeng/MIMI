@@ -58,7 +58,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.Serializable
 import java.net.UnknownHostException
-import java.util.NoSuchElementException
+import java.util.*
 
 abstract class BaseFragment : Fragment() {
 
@@ -170,7 +170,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.uploadPicItem?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.uploadPicItemResult?.observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 return@Observer
             }
@@ -194,6 +194,7 @@ abstract class BaseFragment : Fragment() {
                             uploadPhoto()
                         } else {
                             val pic = uploadPicUri[uploadCurrentPicPosition]
+                            mainViewModel?.clearPicResultValue()
                             mainViewModel?.postAttachment(
                                 pic.uri,
                                 requireContext(),
@@ -288,6 +289,9 @@ abstract class BaseFragment : Fragment() {
             when (it) {
                 is ApiResult.Success -> {
                     picParameter.id = it.result.toString()
+
+                    uploadVideoList[0].picAttachmentId = it.result.toString() // Update video
+
                     mainViewModel?.clearLiveDataValue()
                     val realPath =
                         UriUtils.getPath(requireContext(), Uri.parse(uploadVideoList[0].videoUrl))
@@ -348,6 +352,8 @@ abstract class BaseFragment : Fragment() {
                             val content = Gson().toJson(mediaItem)
                             postMemberRequest.type = memberRequest!!.type
                             postMemberRequest.title = memberRequest.title
+                            postMemberRequest.content = content
+                            postMemberRequest.tags = memberRequest.tags
                             memberPostItem.content = content
                             Timber.d("Post id : $postId")
                             Timber.d("Request : $postMemberRequest")

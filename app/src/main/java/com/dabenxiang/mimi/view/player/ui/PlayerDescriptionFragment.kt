@@ -115,8 +115,8 @@ class PlayerDescriptionFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // for ui init
-        val adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        val adHeight = (adWidth * 0.142).toInt()
+        val adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        val adHeight = GeneralUtils.getAdSize(requireActivity()).second
         descriptionViewModel.getAd(adWidth, adHeight)
     }
 
@@ -244,7 +244,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         imgFavorite.setOnClickListener {
             checkStatus { descriptionViewModel.favorite(videoItem) }
         }
-        imgReport.setOnClickListener {
+        imgMore.setOnClickListener {
             if (videoItem.deducted == true) {
                 if (isReported) {
                     GeneralUtils.showToast(
@@ -281,9 +281,16 @@ class PlayerDescriptionFragment : BaseFragment() {
 
         recyclerview_guess_like.adapter = guessLikeAdapter
 
-        val categoriesString =
-            if (videoItem.categories.isNotEmpty()) videoItem.categories.last() else ""
-        descriptionViewModel.setupGuessLikeList(categoriesString, true)
+        val performers = videoItem.performers
+
+        val tags = ""
+        (videoItem.tags as List<String>).indices.mapNotNull {
+            (videoItem.tags as List<String>)[it]
+        }.forEach {
+            tags.plus(it).plus(",")
+        }
+        Timber.d("@@@ ${videoItem.tags}, tag $tags")
+        descriptionViewModel.setupGuessLikeList(tags, performers, true)
 
         val dateString = videoItem.updateTime?.let { date ->
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)

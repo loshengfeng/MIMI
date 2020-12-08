@@ -65,6 +65,9 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
     </fragment>
 
     <fragment
@@ -77,6 +80,9 @@
         <action
             android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
     </fragment>
 
     <fragment
@@ -314,5 +320,10 @@
             android:id="@+id/action_to_postVideoFragment"
             app:destination="@+id/postVideoFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        tools:layout="@layout/fragment_post_viewer" />
 
 </navigation>

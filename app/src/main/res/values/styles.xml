@@ -15,8 +15,6 @@
         <item name="colorAccent">@color/color_red_1</item>
     </style>
 
-
-
     <style name="login_edit_text">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">42dp</item>
@@ -133,5 +131,9 @@
 
     <style name="TabLayoutTextStyle">
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TabLayoutTextStyle_16">
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>

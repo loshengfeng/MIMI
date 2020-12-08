@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.mypost
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
@@ -107,20 +106,21 @@ class MyPostFragment : BaseFragment() {
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         tv_title.isSelected = isAdultTheme
         tv_back.isSelected = isAdultTheme
-        tv_text.text = getString(R.string.no_data)
+        iv_icon.setImageResource(R.drawable.img_conment_empty)
+        tv_text.text = getString(R.string.my_post_no_data)
         if (isAdultTheme) layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
     override fun setupObservers() {
-        viewModel.showProgress.observe(this, Observer {
+        viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.myPostItemListResult.observe(viewLifecycleOwner, Observer {
+        viewModel.myPostItemListResult.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 
-        viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.likePostResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     adapter.notifyItemChanged(
@@ -132,7 +132,7 @@ class MyPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
+        viewModel.favoriteResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     adapter.notifyItemChanged(
@@ -144,37 +144,24 @@ class MyPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.followResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Empty -> {
-                    adapter.notifyItemRangeChanged(
-                        0,
-                        viewModel.totalCount,
-                        MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
-                    )
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     adapter.removedPosList.add(it.result)
                     adapter.notifyItemChanged(it.result)
+
+                    viewModel.checkPostEmptyUi(adapter.removedPosList.size)
                 }
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, {
             adapter.removedPosList.clear()
         })
 
-        viewModel.isNoData.observe(viewLifecycleOwner, Observer {
-            v_no_data.visibility =
-                if (it) View.VISIBLE
-                else View.GONE
+        viewModel.isNoData.observe(viewLifecycleOwner, {
+            v_no_data.visibility = if (it) View.VISIBLE else View.GONE
         })
     }
 
@@ -232,13 +219,12 @@ class MyPostFragment : BaseFragment() {
                 when (item.type) {
                     PostType.TEXT -> {
                         val bundle = Bundle()
-                        item.id
                         bundle.putBoolean(EDIT, true)
                         bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
-                                R.id.action_myPostFragment_to_postArticleFragment,
-                                bundle
+                            R.id.action_myPostFragment_to_postArticleFragment,
+                            bundle
                         )
                     }
                     PostType.IMAGE -> {
@@ -247,8 +233,8 @@ class MyPostFragment : BaseFragment() {
                         bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
-                                R.id.action_myPostFragment_to_postPicFragment,
-                                bundle
+                            R.id.action_myPostFragment_to_postPicFragment,
+                            bundle
                         )
                     }
                     PostType.VIDEO -> {
@@ -257,8 +243,8 @@ class MyPostFragment : BaseFragment() {
                         bundle.putString(PAGE, MY_POST)
                         bundle.putSerializable(MEMBER_DATA, item)
                         findNavController().navigate(
-                                R.id.action_myPostFragment_to_postVideoFragment,
-                                bundle
+                            R.id.action_myPostFragment_to_postVideoFragment,
+                            bundle
                         )
                     }
                 }
@@ -340,11 +326,9 @@ class MyPostFragment : BaseFragment() {
             position: Int,
             isFollow: Boolean
         ) {
-            checkStatus { viewModel.followPost(ArrayList(items), position, isFollow) }
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
-
         }
     }
 

@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.order
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -21,6 +22,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -47,12 +49,41 @@ class OrderFragment : BaseFragment() {
         OrderPagerAdapter(
             OrderFuncItem(
                 getOrderByPaging3 = { update -> getOrderByPaging3(update) },
-                getOrderByPaging2 = { type, update, updateNoData -> viewModel.getOrderByPaging2(type, update, updateNoData) },
-                getChatList = { update, updateNoData -> viewModel.getChatList(update, updateNoData) },
-                getChatAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
+                getOrderByPaging2 = { type, update, updateNoData ->
+                    viewModel.getOrderByPaging2(
+                        type,
+                        update,
+                        updateNoData
+                    )
+                },
+                getChatList = { update, updateNoData ->
+                    viewModel.getChatList(
+                        update,
+                        updateNoData
+                    )
+                },
+                getChatAttachment = { id, view ->
+                    viewModel.loadImage(
+                        id,
+                        view,
+                        LoadImageType.AVATAR_CS
+                    )
+                },
                 onChatItemClick = { item -> onChatItemClick(item) },
-                getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
-                onContactClick = { chatListItem, orderItem, updateChatId -> onContactClick(chatListItem, orderItem, updateChatId) },
+                getOrderProxyAttachment = { id, view ->
+                    viewModel.loadImage(
+                        id,
+                        view,
+                        LoadImageType.AVATAR_CS
+                    )
+                },
+                onContactClick = { chatListItem, orderItem, updateChatId ->
+                    onContactClick(
+                        chatListItem,
+                        orderItem,
+                        updateChatId
+                    )
+                },
                 getProxyUnread = { update -> getProxyUnread(update) },
                 onTopUpClick = { onTopUpClick() },
                 onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) },
@@ -87,7 +118,7 @@ class OrderFragment : BaseFragment() {
         })
 
         viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Success -> {
                     viewModel.unreadCount = it.result
                     tl_type.getTabAt(2)?.also { tab ->
@@ -101,7 +132,7 @@ class OrderFragment : BaseFragment() {
         })
 
         viewModel.unreadOrderResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Success -> {
                     viewModel.unreadOrderCount = it.result
                     tl_type.getTabAt(1)?.also { tab ->
@@ -120,7 +151,7 @@ class OrderFragment : BaseFragment() {
         })
 
         viewModel.createOrderChatResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+            when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Success -> {
                     val createOrderChatItem = it.result.first
@@ -161,9 +192,35 @@ class OrderFragment : BaseFragment() {
 
         TabLayoutMediator(tl_type, viewPager) { tab, position ->
             tab.setCustomView(R.layout.badged_tab)
-            tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = tabTitle[position]
-            viewPager.setCurrentItem(tab.position, true)
+            val textView = tab.customView?.findViewById<TextView>(R.id.tv_title)
+            textView?.text = tabTitle[position]
+            textView?.takeIf { position == 0 }?.run { setTextViewSelected(true, this) }
         }.attach()
+
+        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
+                setTextViewSelected(true, textView)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
+                setTextViewSelected(false, textView)
+            }
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    private fun setTextViewSelected(selected: Boolean, textView: TextView) {
+        when (selected) {
+            true -> {
+                textView.setTypeface(null, Typeface.BOLD)
+                textView.setTextColor(requireContext().getColor(R.color.color_black_1))
+            }
+            else -> {
+                textView.setTypeface(null, Typeface.NORMAL)
+                textView.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            }
+        }
     }
 
     override fun initSettings() {
@@ -186,13 +243,21 @@ class OrderFragment : BaseFragment() {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_orderFragment_to_chatContentFragment,
-                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.type == OrderType.USER2ONLINE)
+                ChatContentFragment.createBundle(
+                    item,
+                    orderItem.traceLogId,
+                    orderItem.type == OrderType.USER2ONLINE
+                )
             )
         )
     }
 
-    private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem, updateChatId: ((CreateOrderChatItem) -> Unit)) {
-        when(orderItem.type) {
+    private fun onContactClick(
+        chatListItem: ChatListItem,
+        orderItem: OrderItem,
+        updateChatId: ((CreateOrderChatItem) -> Unit)
+    ) {
+        when (orderItem.type) {
             OrderType.USER2ONLINE -> {
                 if (orderItem.chatId != 0L && orderItem.traceLogId != 0L) {
                     onChatItemClick(chatListItem, orderItem)

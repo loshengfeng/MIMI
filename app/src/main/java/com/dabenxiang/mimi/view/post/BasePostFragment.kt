@@ -81,6 +81,8 @@ open class BasePostFragment : BaseFragment() {
         const val CLUB = "club"
         const val TAB = "tab"
         const val VIDEO = "video"
+        const val TEXT = "text"
+        const val PIC = "pic"
     }
 
     override val bottomNavigationVisibility: Int
@@ -123,33 +125,9 @@ open class BasePostFragment : BaseFragment() {
             onBackPressed = { handleBackEvent() }
         )
 
-        edt_hashtag.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > HASHTAG_TEXT_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_hashtag.setText(content)
-                        edt_hashtag.setSelection(content.length)
-                    }
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-        })
-
         edt_title.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > TITLE_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_title.setText(content)
 
-                    }
-                }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -342,9 +320,24 @@ open class BasePostFragment : BaseFragment() {
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
                 setTagCount()
+                enableHastEditText()
             }
             chipGroup.addView(chip)
             setTagCount()
+        }
+
+        enableHastEditText()
+    }
+
+    private fun enableHastEditText() {
+        if (chipGroup.size == HASHTAG_LIMIT) {
+            edt_hashtag.isEnabled = false
+            edt_hashtag.hint = getString(R.string.post_tag_full)
+            hashTagLayout.background  = ContextCompat.getDrawable(requireContext(), R.drawable.post_text_rectangle_tag_full)
+        } else {
+            edt_hashtag.isEnabled = true
+            edt_hashtag.hint = getString(R.string.post_hint_tag)
+            hashTagLayout.background  = ContextCompat.getDrawable(requireContext(), R.drawable.post_text_rectangle)
         }
     }
 

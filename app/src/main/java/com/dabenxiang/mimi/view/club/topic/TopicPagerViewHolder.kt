@@ -46,7 +46,8 @@ class TopicPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                     onItemClick = {},
                     getBitmap = clubDetailFuncItem.getBitmap,
                     onFollowClick = { item, _, isFollow, _ -> onFollowClick(item, isFollow) },
-                    onLikeClick = clubDetailFuncItem.onLikeClick
+                    onLikeClick = clubDetailFuncItem.onLikeClick,
+                    onFavoriteClick =  clubDetailFuncItem.onFavoriteClick
                 )
             )
             rvPost.adapter = adapter
@@ -82,11 +83,8 @@ class TopicPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
         clNoData.visibility = takeIf { itemCount > 0 }?.let { View.GONE } ?: let { View.VISIBLE }
     }
 
+    //   enum OrderBy is stable , use when ?
     private fun getOrderType(position: Int): OrderBy {
-        return when (position) {
-            0 -> OrderBy.HOTTEST
-            1 -> OrderBy.NEWEST
-            else -> OrderBy.VIDEO
-        }
+        return OrderBy.values()[position]
     }
 }

@@ -37,6 +37,7 @@ import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.android.synthetic.main.fragment_tab_club.*
 import kotlinx.android.synthetic.main.fragment_tab_club.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -75,6 +76,7 @@ class ClubTabFragment : BaseFragment() {
     private val topicListAdapter by lazy {
         TopicListAdapter(object : TopicItemListener {
             override fun itemClicked(clubItem: MemberClubItem, position: Int) {
+                Timber.i("clubItem= $clubItem")
                 val bundle = TopicDetailFragment.createBundle(clubItem)
                 navigateTo(
                     NavigateItem.Destination(
@@ -142,6 +144,10 @@ class ClubTabFragment : BaseFragment() {
         view.club_tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 viewModel.currentTab = tab?.position ?: 0
+                view.search_bar.text = String.format(
+                    getString(R.string.text_search_classification),
+                    tab?.text
+                )
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -156,6 +162,7 @@ class ClubTabFragment : BaseFragment() {
         if(viewModel.currentTab == -1)  view.club_tabs.getTabAt(DEFAULT_TAB)?.select()
 
         view.topic_tabs.adapter = topicListAdapter
+
         view.search_bar.setOnClickListener {
             navToSearch(view.club_tabs.selectedTabPosition)
         }

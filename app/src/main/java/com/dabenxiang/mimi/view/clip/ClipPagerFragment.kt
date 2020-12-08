@@ -53,7 +53,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             { item, pos, isLike -> onLikeClick(item, pos, isLike) },
             { item -> onCommentClick(item) },
             { item -> onMoreClick(item) },
-            { id, error -> viewModel.sendVideoReport(id, error) },
+            { id, unhealthy -> viewModel.sendVideoReport(id, unhealthy) },
             { onVipClick() },
             { onPromoteClick() },
             { item, pos, update -> getM3U8(item, pos, update) },

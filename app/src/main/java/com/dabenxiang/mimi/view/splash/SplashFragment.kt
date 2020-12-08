@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.UpdateMessageAlertDialog
 import com.dabenxiang.mimi.view.listener.OnSimpleDialogListener
-import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.installApk
@@ -25,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
 import tw.gov.president.manager.submanager.update.data.VersionStatus
@@ -36,7 +34,6 @@ class SplashFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("onCreate")
         setVersionObserve()
     }
 
@@ -46,7 +43,6 @@ class SplashFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.i("onViewCreated")
         val requestList = getNotGrantedPermissions(externalPermissions)
         if (requestList.size > 0) {
             requestPermissions(
@@ -62,6 +58,9 @@ class SplashFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+    override val isStatusBarDark: Boolean
+        get() = true
+
     override fun setupObservers() {
 
         viewModel.apiError.observe(viewLifecycleOwner, Observer { isError ->
@@ -71,11 +70,9 @@ class SplashFragment : BaseFragment() {
         })
     }
 
-
     private fun setVersionObserve() =
         viewModel.versionStatus.observe(this, Observer {
-
-            Timber.i("versionStatus=$it   isVersionChecked=${mainViewModel?.isVersionChecked}")
+            Timber.i("versionStatus=$it isVersionChecked=${mainViewModel?.isVersionChecked}")
             if (mainViewModel?.isVersionChecked == true) return@Observer
             when (it) {
                 VersionStatus.UPDATE -> {
@@ -93,19 +90,6 @@ class SplashFragment : BaseFragment() {
                 }
             }
         })
-
-
-    override fun setupListeners() {}
-
-//    private fun requestPermissions() {
-//        val requestList = getNotGrantedPermissions(externalPermissions)
-//
-//        if (requestList.size > 0) {
-//            requestPermissions(requestList.toTypedArray(), PERMISSION_EXTERNAL_REQUEST_CODE)
-//        } else {
-//            checkVersion()
-//        }
-//    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

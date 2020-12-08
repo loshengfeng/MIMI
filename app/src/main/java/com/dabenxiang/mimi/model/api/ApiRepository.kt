@@ -344,7 +344,7 @@ class ApiRepository(private val apiService: ApiService) {
 
     suspend fun getMembersClub(
         clubId: Long
-    ): Response<ApiBasePagingItem<MemberClubItem>> {
+    ): Response<ApiBaseItem<MemberClubItem>> {
         return apiService.getMembersClub(clubId)
     }
 

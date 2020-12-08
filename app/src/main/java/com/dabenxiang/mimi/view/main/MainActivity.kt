@@ -45,7 +45,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import java.util.*
 
-class MainActivity : BaseActivity(){
+class MainActivity : BaseActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -84,7 +84,8 @@ class MainActivity : BaseActivity(){
                     when (it.result.status) {
                         StatusItem.NOT_LOGIN -> {
 //                            showNotLoginDialog()
-                            goToLoginPage() }
+                            goToLoginPage()
+                        }
                         StatusItem.LOGIN_BUT_EMAIL_NOT_CONFIRMED -> showEmailConfirmDialog()
                         StatusItem.LOGIN_AND_EMAIL_CONFIRMED -> it.result.onLoginAndEmailConfirmed()
                     }
@@ -194,7 +195,8 @@ class MainActivity : BaseActivity(){
 
     private fun setupStatusBar(isDarkMode: Boolean = false) {
         window.run {
-            this.statusBarColor = getColor(if(isDarkMode) R.color.color_black_1 else  R.color.normal_color_status_bar)
+            this.statusBarColor =
+                getColor(if (isDarkMode) R.color.color_black_1 else R.color.normal_color_status_bar)
             this.decorView.systemUiVisibility =
                 if (isDarkMode) 0 else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
@@ -447,12 +449,12 @@ class MainActivity : BaseActivity(){
         ).show(supportFragmentManager)
     }
 
-    private fun goToLoginPage(){
+    private fun goToLoginPage() {
         val bundle = Bundle()
         bundle.putInt(LoginFragment.KEY_TYPE, LoginFragment.TYPE_LOGIN)
         Navigation.findNavController(this, R.id.nav_host_fragment).navigate(
-                R.id.action_to_loginFragment,
-                bundle
+            R.id.action_to_loginFragment,
+            bundle
         )
     }
 }

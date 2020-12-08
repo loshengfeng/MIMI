@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
@@ -33,6 +34,11 @@ class RecommendFragment(
 
     override fun setupFirstTime() {
         super.setupFirstTime()
+
+        tv_search.text = String.format(
+            getString(R.string.text_search_classification),
+            getString(R.string.recommend)
+        )
 
         viewModel.bannerItems.observe(this, {
             when (it) {

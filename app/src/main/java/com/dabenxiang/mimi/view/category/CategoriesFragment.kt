@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
@@ -24,7 +23,6 @@ import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
-import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -131,8 +129,8 @@ class CategoriesFragment : BaseFragment() {
 
         rv_video?.run { this.visibility = View.INVISIBLE }
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         category = arguments?.getString(KEY_CATEGORY) ?: ""
         orderByType = arguments?.getInt(KEY_ORDER_BY) ?: StatisticsOrderType.LATEST.value
@@ -185,12 +183,12 @@ class CategoriesFragment : BaseFragment() {
 
         lstFilterRV = listOf(rl_filter_0, rl_filter_1)
 
-        viewModel.showProgress.observe(this, Observer { showProgress ->
+        viewModel.showProgress.observe(this, { showProgress ->
             if (showProgress) progressHUD.show()
             else progressHUD.dismiss()
         })
 
-        viewModel.getCategoryResult.observe(this, Observer {
+        viewModel.getCategoryResult.observe(this, {
             when (it) {
                 is Success -> {
                     tv_all_1.visibility = View.VISIBLE
@@ -372,7 +370,7 @@ class CategoriesFragment : BaseFragment() {
                 15
             ),
             0,
-            0
+            GeneralUtils.dpToPx(requireContext(), 20)
         )
     }
 
