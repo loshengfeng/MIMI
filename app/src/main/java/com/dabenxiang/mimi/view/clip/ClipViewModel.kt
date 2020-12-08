@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
+import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -84,11 +85,11 @@ class ClipViewModel : BaseViewModel() {
     /**
      * 影片回報問題(用於內部播放錯誤主動回報)
      */
-    fun sendVideoReport(id: String, error: String) {
+    fun sendVideoReport(id: Long, unhealthy: Boolean) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMemberVideoReport(
-                    videoId = id.toLong(), type = PostType.VIDEO.value
+                    videoId = id, type = VideoType.SHORT_VIDEO.value, unhealthy
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))

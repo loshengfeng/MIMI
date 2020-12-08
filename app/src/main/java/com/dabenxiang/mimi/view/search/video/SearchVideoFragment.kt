@@ -113,8 +113,8 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
 
@@ -126,6 +126,7 @@ class SearchVideoFragment : BaseFragment() {
                 searchVideo(tag = data.tag)
 //                tv_search.requestFocus()
             } else {
+                iv_clear_search_bar.visibility = View.GONE
                 getSearchHistory()
                 GeneralUtils.showKeyboard(requireContext())
 //                search_bar.requestFocus()

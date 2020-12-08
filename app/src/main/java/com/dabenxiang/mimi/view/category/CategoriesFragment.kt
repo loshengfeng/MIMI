@@ -129,8 +129,8 @@ class CategoriesFragment : BaseFragment() {
 
         rv_video?.run { this.visibility = View.INVISIBLE }
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         category = arguments?.getString(KEY_CATEGORY) ?: ""
         orderByType = arguments?.getInt(KEY_ORDER_BY) ?: StatisticsOrderType.LATEST.value

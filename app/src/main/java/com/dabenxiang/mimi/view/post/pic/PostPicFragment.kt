@@ -64,6 +64,7 @@ class PostPicFragment : BasePostFragment() {
         recyclerView.adapter = adapter
 
         edt_hashtag.imeOptions = EditorInfo.IME_ACTION_DONE
+        btn_tag_confirm.setOnClickListener { hashtagConfirm() }
     }
 
     override fun setupListeners() {

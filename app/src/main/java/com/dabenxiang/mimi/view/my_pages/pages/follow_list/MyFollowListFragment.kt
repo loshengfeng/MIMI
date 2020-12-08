@@ -166,8 +166,8 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
             layout_refresh.isRefreshing = it
         }
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
