@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.text.TextUtils
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -51,6 +50,8 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
     val commentImage: ImageView = itemView.iv_comment
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
+    val favoriteImage: ImageView = itemView.iv_favorite
+    val favoriteCount: TextView = itemView.tv_favorite_count
 
     fun onBind(
         item: MemberPostItem,
@@ -148,6 +149,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         memberPostFuncItem: MemberPostFuncItem
     ) {
         likeCount.text = item.likeCount.toString()
+        favoriteCount.text = item.favoriteCount.toString()
         commentCount.text = item.commentCount.toString()
 
         val isFollow = item.isFollow
@@ -170,8 +172,14 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
             likeImage.setImageResource(R.drawable.ico_nice_gray)
         }
 
+        if (item.isFavorite) {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_n)
+        }
+
         // New Adjust: Follow is hidden when it is on the list page, and the follow function is only available on the detailed page
-        follow.visibility =  View.GONE
+        follow.visibility = View.GONE
         follow.setOnClickListener {
             itemList?.also {
                 memberPostFuncItem.onFollowClick(item, itemList, !item.isFollow) { isFollow ->
@@ -185,6 +193,13 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         likeImage.setOnClickListener {
             val isLike = item.likeType == LikeType.LIKE
             memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count) }
+        }
+
+        favoriteImage.setOnClickListener {
+            val isFavorite = item.isFavorite
+            memberPostFuncItem.onFavoriteClick(item, !isFavorite) { favorite, count ->
+                updateFavorite(favorite, count)
+            }
         }
     }
 
@@ -209,4 +224,12 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         likeCount.text = count.toString()
     }
 
+    private fun updateFavorite(isFavorite: Boolean, count: Int) {
+        if (isFavorite) {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_n)
+        }
+        favoriteCount.text = count.toString()
+    }
 }

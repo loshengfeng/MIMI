@@ -68,7 +68,7 @@ class TopicDetailViewModel : BaseViewModel() {
             }
         }
         val clubDetailPostDataSource =
-                TopicDetailPostDataSource(
+            TopicDetailPostDataSource(
                 pagingCallback,
                 viewModelScope,
                 domainManager,
@@ -168,4 +168,34 @@ class TopicDetailViewModel : BaseViewModel() {
                 .collect { _followClubResult.value = it }
         }
     }
+
+    fun favoritePost(item: MemberPostItem, isFavorite: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFavorite -> apiRepository.addFavorite(item.id)
+                    else -> apiRepository.deleteFavorite(item.id)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFavorite = isFavorite
+                item.favoriteCount =
+                    if (isFavorite) item.favoriteCount + 1
+                    else item.favoriteCount - 1
+                emit(ApiResult.success(item.favoriteCount))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    when (it) {
+                        is ApiResult.Success -> {
+                            update(isFavorite, it.result)
+                        }
+                    }
+                }
+        }
+    }
+
 }
