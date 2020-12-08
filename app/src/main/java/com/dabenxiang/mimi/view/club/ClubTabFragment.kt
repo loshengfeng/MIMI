@@ -10,11 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
@@ -26,6 +28,7 @@ import com.dabenxiang.mimi.view.club.ClubTabViewModel.Companion.REFRESH_TASK_CAN
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
 import com.dabenxiang.mimi.view.club.adapter.TopicItemListener
 import com.dabenxiang.mimi.view.club.adapter.TopicListAdapter
+import com.dabenxiang.mimi.view.club.pages.ClubItemFragment
 import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
@@ -72,6 +75,15 @@ class ClubTabFragment : BaseFragment() {
     private val viewModel: ClubTabViewModel by viewModels()
 
     private var file = File("")
+
+    private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
+            TAB_FOLLOW to { ClubItemFragment(ClubTabItemType.FOLLOW) },
+            TAB_RECOMMEND to { ClubItemFragment(ClubTabItemType.RECOMMEND) },
+            TAB_LATEST to { ClubItemFragment(ClubTabItemType.LATEST) },
+            TAB_CLIP to { ClubItemFragment(ClubTabItemType.SHORT_VIDEO) },
+            TAB_PICTURE to { ClubItemFragment(ClubTabItemType.PICTURE) },
+            TAB_NOVEL to { ClubItemFragment(ClubTabItemType.NOVEL) }
+    )
 
     private val topicListAdapter by lazy {
         TopicListAdapter(object : TopicItemListener {
@@ -134,7 +146,7 @@ class ClubTabFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
-        view.club_view_pager.adapter = ClubTabAdapter(childFragmentManager, lifecycle)
+        view.club_view_pager.adapter = ClubTabAdapter(tabFragmentsCreators, childFragmentManager, lifecycle)
         view.club_view_pager.offscreenPageLimit = 7
         val tabs = resources.getStringArray(R.array.club_tabs)
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
