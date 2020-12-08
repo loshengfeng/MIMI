@@ -255,6 +255,9 @@ class ClipSingleFragment : BaseFragment() {
                     "ExoPlayer.STATE_BUFFERING"
                 }
                 ExoPlayer.STATE_READY -> {
+                    viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
+                        viewModel.sendVideoReport(this, false)
+                    }
                     progress_video?.visibility = View.GONE
                     iv_cover?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
@@ -309,8 +312,9 @@ class ClipSingleFragment : BaseFragment() {
             }
             progress_video?.visibility = View.GONE
             ib_retry.visibility = View.VISIBLE
-            viewModel.videoEpisodeItem?.videoStreams?.get(0)
-                ?.run { viewModel.sendVideoReport(this.toString()) }
+            viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
+                viewModel.sendVideoReport(this, true)
+            }
         }
     }
 

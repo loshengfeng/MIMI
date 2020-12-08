@@ -64,8 +64,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it

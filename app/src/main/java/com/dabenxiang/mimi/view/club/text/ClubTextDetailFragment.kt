@@ -92,8 +92,8 @@ class ClubTextDetailFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        adHeight = (adWidth * 0.142).toInt()
+        adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
 

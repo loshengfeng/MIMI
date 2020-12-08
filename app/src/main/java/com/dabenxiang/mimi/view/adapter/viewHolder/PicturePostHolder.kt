@@ -27,6 +27,19 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
+import kotlinx.android.synthetic.main.item_picture_post.view.chip_group_tag
+import kotlinx.android.synthetic.main.item_picture_post.view.img_avatar
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_comment
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_favorite
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_like
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_more
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_comment_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_favorite_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_follow
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_like_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_name
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_time
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_title
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -151,6 +164,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         likeCount.text = item.likeCount.toString()
         favoriteCount.text = item.favoriteCount.toString()
         commentCount.text = item.commentCount.toString()
+        favoriteCount.text = item.commentCount.toString()
 
         val isFollow = item.isFollow
         if (isFollow) {
