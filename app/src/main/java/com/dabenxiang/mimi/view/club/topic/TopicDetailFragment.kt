@@ -48,11 +48,7 @@ class TopicDetailFragment : BaseFragment() {
             }
         }
 
-        val tabTitle = arrayListOf(
-            App.self.getString(R.string.hottest),
-            App.self.getString(R.string.newest),
-            App.self.getString(R.string.video)
-        )
+        val tabTitle = App.self.resources.getStringArray(R.array.club_hot_topic_tabs).toMutableList()
     }
 
     private val viewModel: TopicDetailViewModel by viewModels()
@@ -186,7 +182,7 @@ class TopicDetailFragment : BaseFragment() {
     override fun navigationToText(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_topicDetailFragment_to_clubTextFragment,
+                R.id.action_to_clubTextFragment,
                 bundle
             )
         )
@@ -195,7 +191,7 @@ class TopicDetailFragment : BaseFragment() {
     override fun navigationToPicture(bundle: Bundle) {
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_topicDetailFragment_to_clubPicFragment,
+                R.id.action_to_clubPicFragment,
                 bundle
             )
         )
@@ -207,7 +203,7 @@ class TopicDetailFragment : BaseFragment() {
 
         navigateTo(
             NavigateItem.Destination(
-                R.id.action_topicDetailFragment_to_clipPlayerFragment,
+                R.id.action_to_clipPlayerFragment,
                 bundle
             )
         )
@@ -225,7 +221,7 @@ class TopicDetailFragment : BaseFragment() {
                         val bundle = PictureDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_topicDetailFragment_to_clubPicFragment,
+                                R.id.action_to_clubPicFragment,
                                 bundle
                             )
                         )
@@ -234,7 +230,7 @@ class TopicDetailFragment : BaseFragment() {
                         val bundle = TextDetailFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_topicDetailFragment_to_clubTextFragment,
+                                R.id.action_to_clubTextFragment,
                                 bundle
                             )
                         )
@@ -243,7 +239,7 @@ class TopicDetailFragment : BaseFragment() {
                         val bundle = ClipPlayerFragment.createBundle(item.id, 1)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_topicDetailFragment_to_clipPlayerFragment,
+                                R.id.action_to_clipPlayerFragment,
                                 bundle
                             )
                         )
@@ -269,20 +265,20 @@ class TopicDetailFragment : BaseFragment() {
                 when (item.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postArticleFragment,
-                                bundle
+                            R.id.action_topicDetailFragment_to_postArticleFragment,
+                            bundle
                         )
                     }
                     PostType.IMAGE -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postPicFragment,
-                                bundle
+                            R.id.action_topicDetailFragment_to_postPicFragment,
+                            bundle
                         )
                     }
                     PostType.VIDEO -> {
                         findNavController().navigate(
-                                R.id.action_topicDetailFragment_to_postVideoFragment,
-                                bundle
+                            R.id.action_topicDetailFragment_to_postVideoFragment,
+                            bundle
                         )
                     }
                     else -> {
@@ -297,7 +293,7 @@ class TopicDetailFragment : BaseFragment() {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_topicDetailFragment_to_clubPicFragment,
+                            R.id.action_to_clubPicFragment,
                             bundle
                         )
                     )
@@ -306,7 +302,7 @@ class TopicDetailFragment : BaseFragment() {
                     val bundle = TextDetailFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_topicDetailFragment_to_clubTextFragment,
+                            R.id.action_to_clubTextFragment,
                             bundle
                         )
                     )
@@ -315,7 +311,7 @@ class TopicDetailFragment : BaseFragment() {
                     val bundle = ClipPlayerFragment.createBundle(item.id)
                     navigateTo(
                         NavigateItem.Destination(
-                            R.id.action_topicDetailFragment_to_clipPlayerFragment,
+                            R.id.action_to_clipPlayerFragment,
                             bundle
                         )
                     )
@@ -329,7 +325,7 @@ class TopicDetailFragment : BaseFragment() {
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_topicDetailFragment_to_clipFragment,
+                    R.id.action_to_clipFragment,
                     bundle
                 )
             )
@@ -340,7 +336,7 @@ class TopicDetailFragment : BaseFragment() {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position)
                 navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_topicDetailFragment_to_clipFragment,
+                        R.id.action_to_clipFragment,
                         bundle
                     )
                 )
@@ -423,5 +419,5 @@ fun ViewPager2.reduceDragSensitivity() {
     val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
     touchSlopField.isAccessible = true
     val touchSlop = touchSlopField.get(recyclerView) as Int
-    touchSlopField.set(recyclerView, touchSlop*2)       // "8" was obtained experimentally
+    touchSlopField.set(recyclerView, touchSlop * 2)       // "8" was obtained experimentally
 }

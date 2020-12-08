@@ -3,12 +3,10 @@ package com.dabenxiang.mimi.view.club.pages
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.observe
-import com.bumptech.glide.Glide
+import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
@@ -24,12 +22,11 @@ import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
+import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_item.*
-import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -69,28 +66,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         super.onAttach(context)
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
-
-        viewModel.adResult.observe(this) {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result?.let { item ->
-                        Glide.with(requireContext()).load(item.href).into(layout_ad.iv_ad)
-                        layout_ad.iv_ad.setOnClickListener {
-                            GeneralUtils.openWebView(requireContext(), item.target ?: "")
-                        }
-                    }
-                }
-                is ApiResult.Error -> {
-                    layout_ad.visibility = View.GONE
-                    onApiError(it.throwable)
-                }
-
-                else -> {
-                    layout_ad.visibility = View.GONE
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-        }
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it

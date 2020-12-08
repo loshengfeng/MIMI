@@ -24,7 +24,7 @@ import com.dabenxiang.mimi.view.adapter.FilterTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
-import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -42,7 +42,10 @@ class CategoriesFragment : BaseFragment() {
         const val SORT = 0
         const val CATEGORY = 1
 
-        fun createBundle(category: String, orderByType: Int = StatisticsOrderType.LATEST.value): Bundle {
+        fun createBundle(
+            category: String,
+            orderByType: Int = StatisticsOrderType.LATEST.value
+        ): Bundle {
             return Bundle().also {
                 it.putString(KEY_CATEGORY, category)
                 it.putInt(KEY_ORDER_BY, orderByType)
@@ -125,6 +128,8 @@ class CategoriesFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
 
+        rv_video?.run { this.visibility = View.INVISIBLE }
+
         viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
         viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
 
@@ -160,15 +165,13 @@ class CategoriesFragment : BaseFragment() {
 
         videoListAdapter.addLoadStateListener(loadStateListener)
 
-        val loadStateAdapter = VideoLoadStateAdapter(videoListAdapter)
-
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
             .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
 
         rv_video.also {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
-            it.adapter = videoListAdapter.withLoadStateFooter(loadStateAdapter)
+            it.adapter = videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
             it.addItemDecoration(
                 GridSpaceItemDecoration(
                     2,
@@ -363,9 +366,12 @@ class CategoriesFragment : BaseFragment() {
     private fun adjustContentRV(notEmptyCount: Int) {
         rv_video.setPadding(
             0,
-            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount + GeneralUtils.dpToPx(requireContext(), 15),
+            GeneralUtils.dpToPx(requireContext(), 50) * notEmptyCount + GeneralUtils.dpToPx(
+                requireContext(),
+                15
+            ),
             0,
-            0
+            GeneralUtils.dpToPx(requireContext(), 20)
         )
     }
 

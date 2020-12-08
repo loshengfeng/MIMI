@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
-import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
@@ -22,20 +21,17 @@ import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.decryptSource
-import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.api.vo.DownloadResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
-import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
@@ -51,7 +47,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
-import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
@@ -140,7 +135,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     fun deletePost(
         item: MemberPostItem,
-        position:Int
+        position: Int
     ) {
         viewModelScope.launch {
             flow {
@@ -167,7 +162,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             LoadImageType.PICTURE_FULL -> R.drawable.img_nopic_03
             LoadImageType.CLUB -> R.drawable.ico_group
             LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
-            LoadImageType.CLUB_TOPIC ->  R.drawable.bg_topic_tab
+            LoadImageType.CLUB_TOPIC -> R.drawable.bg_topic_tab
         }
         if ((id == null || id == 0L) && TextUtils.isEmpty(filePath)) {
             Glide.with(view.context).load(defaultResId).into(view)
@@ -210,7 +205,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                     options.transform(CenterCrop(), RoundedCorners(16))
                 }
 
-                LoadImageType.CLUB_TOPIC-> {
+                LoadImageType.CLUB_TOPIC -> {
                     options.transform(CenterInside(), RoundedCorners(15))
                 }
             }
@@ -231,20 +226,29 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         return result
     }
 
-    fun decryptCover(encryptCover: String, decryptItem: DecryptSettingItem, update: (ByteArray) -> Unit) {
+    fun decryptCover(
+        encryptCover: String,
+        decryptItem: DecryptSettingItem,
+        update: (ByteArray) -> Unit
+    ) {
         viewModelScope.launch {
             HttpClient().decryptSource(encryptCover, decryptItem.key ?: "".toByteArray())
                 .catch { update("".toByteArray()) }
                 .collect {
-                when(it) {
-                    is DownloadResult.Success -> update(it.data as ByteArray)
-                    else -> {}
+                    when (it) {
+                        is DownloadResult.Success -> update(it.data as ByteArray)
+                        else -> {
+                        }
+                    }
                 }
-            }
         }
     }
 
-    fun decryptM3U8(encryptM3U8: String, decryptItem: DecryptSettingItem, update: (String) -> Unit) {
+    fun decryptM3U8(
+        encryptM3U8: String,
+        decryptItem: DecryptSettingItem,
+        update: (String) -> Unit
+    ) {
         viewModelScope.launch {
             HttpClient().decryptSource(encryptM3U8, decryptItem.key ?: "".toByteArray())
                 .catch { update("") }
@@ -254,7 +258,8 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                             val path = FileUtil.unzipSourceToFile(it.data as ByteArray)
                             update(path)
                         }
-                        else -> {}
+                        else -> {
+                        }
                     }
                 }
         }

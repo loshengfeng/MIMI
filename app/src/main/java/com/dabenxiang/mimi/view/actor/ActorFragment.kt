@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.actor
 
-import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -68,11 +67,6 @@ class ActorFragment : BaseFragment() {
 
     private val viewModel: ActorViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initSettings()
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_actor
     }
@@ -90,6 +84,10 @@ class ActorFragment : BaseFragment() {
                 ActorsGridSpaceItemDecoration(requireContext())
             )
         }
+        tv_search.text = String.format(
+            getString(R.string.text_search_classification),
+            getString(R.string.actor)
+        )
         viewModel.getActors()
         viewModel.getData(actorListAdapter)
     }
@@ -140,6 +138,7 @@ class ActorFragment : BaseFragment() {
                 if (actorListAdapter.isDataEmpty()) {
                     rv_all_actresses?.run { this.visibility = View.INVISIBLE }
                 } else {
+                    rv_all_actresses?.scrollBy(0, 1) //FIXME: 滑動後頁面才能點擊，原因未明，查找中...
                     rv_all_actresses?.run { this.visibility = View.VISIBLE }
                 }
 
@@ -192,7 +191,7 @@ class ActorFragment : BaseFragment() {
     }
 
     private fun navToSearch() {
-        val bundle = SearchVideoFragment.createBundle(category = "女优")
+        val bundle = SearchVideoFragment.createBundle(category = getString(R.string.actor))
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_to_searchVideoFragment,

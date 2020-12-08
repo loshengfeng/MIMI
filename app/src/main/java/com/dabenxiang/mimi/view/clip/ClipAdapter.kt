@@ -43,8 +43,6 @@ class ClipAdapter(
         const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
         const val PAYLOAD_UPDATE_SCROLL_AWAY = 2
         const val ERROR_CODE_ACCOUNT_OVERDUE = 402
-
-        var playingId: String = ""
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -114,7 +112,8 @@ class ClipAdapter(
     fun pausePlayer() {
         exoPlayer?.also { player ->
             player.playWhenReady = false
-            currentViewHolder?.also { it.ibPlay.visibility = View.VISIBLE }
+            currentViewHolder?.takeUnless { it.ibRetry.visibility == View.VISIBLE }
+                ?.run { this.ibPlay.visibility = View.VISIBLE }
         }
     }
 
@@ -182,8 +181,8 @@ class ClipAdapter(
                 holder.ibPlay.visibility = View.GONE
             }
         }
-        holder.btnRetry.setOnClickListener {
-            holder.btnRetry.visibility = View.GONE
+        holder.ibRetry.setOnClickListener {
+            holder.ibRetry.visibility = View.GONE
             holder.progress.visibility = View.VISIBLE
             getM3U8()
         }
@@ -286,9 +285,9 @@ class ClipAdapter(
             }
 
             currentViewHolder?.progress?.visibility = View.GONE
-            currentViewHolder?.btnRetry?.visibility = View.VISIBLE
-            playingId.takeIf { it.isNotEmpty() }?.also { id->
-                clipFuncItem.onPlayerError(id, error.message ?: "error: UNKNOWN")
+            currentViewHolder?.ibRetry?.visibility = View.VISIBLE
+            getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
+                clipFuncItem.onPlayerError(id.toString(), error.message ?: "error: UNKNOWN")
             }
 
 

@@ -8,7 +8,6 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.R
@@ -17,9 +16,6 @@ import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.dialog.GeneralDialog
-import com.dabenxiang.mimi.view.dialog.GeneralDialogData
-import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
@@ -27,7 +23,6 @@ import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
-import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -107,12 +102,25 @@ class PersonalFragment : BaseFragment() {
             layout_vip_unlimit_unlogin.visibility = View.VISIBLE
             profile.videoOnDemandCount.let { count ->
                 profile.videoOnDemandCountLimit.let { countLimit ->
-                    video_long_count.text = "$count/$countLimit"
+
+                    val longCount = StringBuilder()
+                        .append(GeneralUtils.getMaxCount(count ?: 0))
+                        .append("/")
+                        .append(GeneralUtils.getMaxCount(countLimit ?: 0))
+                        .toString()
+
+                    video_long_count.text = longCount
                 }
             }
             profile.videoCount.let { count ->
                 profile.videoCountLimit.let { countLimit ->
-                    video_short_count.text = "$count/$countLimit"
+                    val shortCount = StringBuilder()
+                        .append(GeneralUtils.getMaxCount(count ?: 0))
+                        .append("/")
+                        .append(GeneralUtils.getMaxCount(countLimit ?: 0))
+                        .toString()
+
+                    video_short_count.text = shortCount
                 }
             }
             vip_buy.visibility = View.VISIBLE
@@ -121,11 +129,14 @@ class PersonalFragment : BaseFragment() {
         }
     }
 
-    private fun likeClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment)) }
+    private fun likeClick() =
+        checkStatus { navigateTo(NavigateItem.Destination(R.id.action_to_likelistFragment)) }
 
-    private fun followClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment)) }
+    private fun followClick() =
+        checkStatus { navigateTo(NavigateItem.Destination(R.id.action_personalFragment_to_myFollowFragment)) }
 
-    private fun fansClick() = checkStatus { navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment)) }
+    private fun fansClick() =
+        checkStatus { navigateTo(NavigateItem.Destination(R.id.action_to_fanslistFragment)) }
 
     @SuppressLint("SetTextI18n")
     override fun setupObservers() {
@@ -158,7 +169,7 @@ class PersonalFragment : BaseFragment() {
         viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-
+                    tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -167,7 +178,7 @@ class PersonalFragment : BaseFragment() {
         viewModel.totalUnreadResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Success -> {
-
+                    iv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
                     mainViewModel?.refreshBottomNavigationBadge?.value = it.result
                 }
                 is Error -> onApiError(it.throwable)
@@ -207,12 +218,14 @@ class PersonalFragment : BaseFragment() {
                     viewModel.signOut()
                 }
                 R.id.vippromote_now -> {
-                    checkStatus { navigateTo(
+                    checkStatus {
+                        navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_to_inviteVipFragment,
-                                    null
+                                R.id.action_to_inviteVipFragment,
+                                null
                             )
-                    ) }
+                        )
+                    }
                 }
                 R.id.tv_register -> navigateTo(
                     NavigateItem.Destination(
@@ -260,10 +273,10 @@ class PersonalFragment : BaseFragment() {
                         navigateTo(NavigateItem.Destination(R.id.action_to_settingFragment))
                     } else {
                         navigateTo(
-                                NavigateItem.Destination(
-                                        R.id.action_personalFragment_to_loginFragment,
-                                        LoginFragment.createBundle(TYPE_LOGIN)
-                                )
+                            NavigateItem.Destination(
+                                R.id.action_personalFragment_to_loginFragment,
+                                LoginFragment.createBundle(TYPE_LOGIN)
+                            )
                         )
                     }
                 }

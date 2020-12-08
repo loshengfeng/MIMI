@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 import kotlinx.android.synthetic.main.item_actor_categories.view.*
 import kotlinx.android.synthetic.main.item_actor_videos.view.tv_name
 import org.koin.core.component.KoinComponent
+import timber.log.Timber
 
 class ActorListViewHolder(
     itemView: View

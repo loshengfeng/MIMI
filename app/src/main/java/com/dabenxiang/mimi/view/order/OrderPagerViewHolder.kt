@@ -67,7 +67,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
 
     private fun setTabPosition(index: Int) {
         tabAdapter.setLastSelectedIndex(index)
-        when(index) {
+        when (index) {
             0 -> {
                 rvOrder.visibility = View.VISIBLE
                 rvChat.visibility = View.GONE
@@ -89,7 +89,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
 
     fun onBind(position: Int, orderFuncItem: OrderFuncItem) {
         this.orderFuncItem = orderFuncItem
-        when(position) {
+        when (position) {
             2 -> {
                 if (rvChat.adapter == null) {
                     rvChat.adapter = chatAdapter
@@ -109,7 +109,11 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             rvOrder.tag = position
             rvOrder.adapter = orderAdapter
 //            orderFuncItem.getOrderByPaging3 { data, scope -> updateOrderList3(data, scope) }
-            orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
+            orderFuncItem.getOrderByPaging2(
+                getOrderType(position),
+                ::updateOrderList2,
+                ::updateOrderNoData
+            )
             swipeRefreshLayout.isRefreshing = true
         }
 
@@ -117,19 +121,27 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
             itemOrderNoData.visibility = View.GONE
             itemChatNoData.visibility = View.GONE
             orderFuncItem.updateTab() //for updating tab count
-            when(position) {
+            when (position) {
                 2 -> {
-                    when(tabAdapter.getSelectedPosition()) {
+                    when (tabAdapter.getSelectedPosition()) {
                         1 -> {
                             orderFuncItem.getChatList(::updateChatList, ::updateChatNoData)
                         }
                         else -> {
-                            orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
+                            orderFuncItem.getOrderByPaging2(
+                                getOrderType(position),
+                                ::updateOrderList2,
+                                ::updateOrderNoData
+                            )
                         }
                     }
                 }
                 else ->
-                    orderFuncItem.getOrderByPaging2(getOrderType(position), ::updateOrderList2, ::updateOrderNoData)
+                    orderFuncItem.getOrderByPaging2(
+                        getOrderType(position),
+                        ::updateOrderList2,
+                        ::updateOrderNoData
+                    )
             }
         }
 
@@ -165,7 +177,7 @@ class OrderPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 
     private fun getOrderType(position: Int): OrderType? {
-        return when(position) {
+        return when (position) {
             0 -> null
             1 -> OrderType.USER2ONLINE
             else -> OrderType.MERCHANT2USER

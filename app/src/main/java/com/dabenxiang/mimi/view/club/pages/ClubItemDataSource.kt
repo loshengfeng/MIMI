@@ -12,16 +12,16 @@ import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 
 class ClubItemDataSource(
-        private val domainManager: DomainManager,
-        private val pagingCallback: PagingCallback,
-        private val adWidth: Int,
-        private val adHeight: Int,
-        private val type: ClubTabItemType
+    private val domainManager: DomainManager,
+    private val pagingCallback: PagingCallback,
+    private val adWidth: Int,
+    private val adHeight: Int,
+    private val type: ClubTabItemType
 ) : PagingSource<Int, MemberPostItem>() {
 
     companion object {
         const val PER_LIMIT = 10
-        private const val AD_GAP: Int = 3
+        private const val AD_GAP: Int = 5
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MemberPostItem> {
@@ -29,51 +29,67 @@ class ClubItemDataSource(
         return try {
 
             val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
-                    ?: AdItem()
+                ?: AdItem()
 
             val result =
-                    when (type) {
-                        ClubTabItemType.FOLLOW -> {
-                            domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
-                        }
-                        ClubTabItemType.RECOMMEND -> {
-                            domainManager.getApiRepository().getMembersPost(PostType.TEXT_IMAGE_VIDEO, OrderBy.HOTTEST, offset, PER_LIMIT)
-                        }
-                        ClubTabItemType.LATEST -> {
-                            domainManager.getApiRepository().getMembersPost(PostType.TEXT_IMAGE_VIDEO, OrderBy.NEWEST, offset, PER_LIMIT)
-                        }
-                        ClubTabItemType.SHORT_VIDEO -> {
-                            domainManager.getApiRepository().getMembersPost(PostType.VIDEO, OrderBy.NEWEST, offset, PER_LIMIT)
-                        }
-                        ClubTabItemType.PICTURE -> {
-                            domainManager.getApiRepository().getMembersPost(PostType.IMAGE, OrderBy.NEWEST,
-                                    offset, PER_LIMIT)
-                        }
-                        ClubTabItemType.NOVEL -> {
-                            domainManager.getApiRepository().getMembersPost(PostType.TEXT, OrderBy.NEWEST, offset, PER_LIMIT)
-                        }
-                        else -> null
+                when (type) {
+                    ClubTabItemType.FOLLOW -> {
+                        domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
                     }
+                    ClubTabItemType.RECOMMEND -> {
+                        domainManager.getApiRepository().getMembersPost(
+                            PostType.TEXT_IMAGE_VIDEO,
+                            OrderBy.HOTTEST,
+                            offset,
+                            PER_LIMIT
+                        )
+                    }
+                    ClubTabItemType.LATEST -> {
+                        domainManager.getApiRepository().getMembersPost(
+                            PostType.TEXT_IMAGE_VIDEO,
+                            OrderBy.NEWEST,
+                            offset,
+                            PER_LIMIT
+                        )
+                    }
+                    ClubTabItemType.SHORT_VIDEO -> {
+                        domainManager.getApiRepository()
+                            .getMembersPost(PostType.VIDEO, OrderBy.NEWEST, offset, PER_LIMIT)
+                    }
+                    ClubTabItemType.PICTURE -> {
+                        domainManager.getApiRepository().getMembersPost(
+                            PostType.IMAGE, OrderBy.NEWEST,
+                            offset, PER_LIMIT
+                        )
+                    }
+                    ClubTabItemType.NOVEL -> {
+                        domainManager.getApiRepository()
+                            .getMembersPost(PostType.TEXT, OrderBy.NEWEST, offset, PER_LIMIT)
+                    }
+                }
 
-            if (result?.isSuccessful == false) throw HttpException(result)
+            if (!result.isSuccessful) throw HttpException(result)
 
-            val body = result?.body()
+            val body = result.body()
             val memberPostItems = body?.content
-
-            memberPostItems?.forEachWithIndex { i, _ ->
-                if (i % AD_GAP == 0)
-                    memberPostItems.add(i, MemberPostItem(type = PostType.AD, adItem = adItem))
+            val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
+            val list = arrayListOf<MemberPostItem>()
+            memberPostItems?.forEachWithIndex { index, item ->
+                if (index == 5) list.add(memberPostAdItem)
+                list.add(item)
             }
+            if(offset == 0) list.add(0, memberPostAdItem)
+            list.add(memberPostAdItem)
 
             val hasNext = hasNextPage(
-                    result?.body()?.paging?.count ?: 0,
-                    result?.body()?.paging?.offset ?: 0,
-                    memberPostItems?.size ?: 0
+                result.body()?.paging?.count ?: 0,
+                result.body()?.paging?.offset ?: 0,
+                memberPostItems?.size ?: 0
             )
             val nextKey = if (hasNext) offset + PER_LIMIT else null
-            if (offset == 0) pagingCallback.onTotalCount(result?.body()?.paging?.count ?: 0)
+            if (offset == 0) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
             pagingCallback.onTotalCount(body?.paging?.count ?: 0)
-            LoadResult.Page(memberPostItems ?: listOf(), null, nextKey)
+            LoadResult.Page(list, null, nextKey)
 
         } catch (e: Exception) {
             LoadResult.Error(e)

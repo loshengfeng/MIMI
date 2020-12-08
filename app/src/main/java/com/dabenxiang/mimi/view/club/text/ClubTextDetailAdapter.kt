@@ -196,7 +196,7 @@ class ClubTextDetailAdapter(
 
     fun updateContent(item: MemberPostItem) {
         memberPostItem.content = item.content
-        notifyItemChanged(VIEW_TYPE_TEXT_DETAIL)
+        notifyItemChanged(1)
     }
 
     fun setupAdItem(item: AdItem) {
@@ -222,7 +222,7 @@ class ClubTextDetailAdapter(
         if (isFavorite) {
             holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_s)
         } else {
-            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_n)
+            holder.imgFavorite.setImageResource(R.drawable.btn_favorite_white_n)
         }
     }
 

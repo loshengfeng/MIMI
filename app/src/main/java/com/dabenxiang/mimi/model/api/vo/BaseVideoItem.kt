@@ -80,6 +80,9 @@ data class VideoItem(
     @SerializedName("timesWatched")
     val timesWatched: Int = 0,
 
+    @SerializedName("performers")
+    val performers: String? = "",
+
     var isAdult: Boolean = false,
     var searchingTag: String = "", // 搜尋的 TAG
     var searchingStr: String = "", // 搜尋的 Name

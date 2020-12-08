@@ -86,6 +86,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
                 }
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
+                    streamId = it.result.id ?: 0
                     parsionM3u8Content(it.result)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -127,10 +128,8 @@ class PlayerV2Fragment : BasePlayerFragment() {
     }
 
     override fun getTabTitle(tab: TabLayout.Tab, position: Int) {
-        when (position) {
-            0 -> tab.text = getString(R.string.video_desc)
-            1 -> tab.text = getString(R.string.comment)
-        }
+        val tabs = resources.getStringArray(R.array.player_short_video_tabs)
+        tab.text = tabs[position]
     }
 
     override fun onResume() {

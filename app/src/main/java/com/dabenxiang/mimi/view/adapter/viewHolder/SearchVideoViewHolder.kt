@@ -13,8 +13,8 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
-import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
 import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
+import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import kotlinx.android.synthetic.main.head_video_info.view.*
@@ -37,48 +37,16 @@ class SearchVideoViewHolder(
 
     init {
         ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
-        tvLike.setOnClickListener {
-            listener.onFunctionClick(
-                FunctionType.LIKE,
-                it,
-                data!!
-            )
-        }
-        tvFavorite.setOnClickListener {
-            listener.onFunctionClick(
-                FunctionType.FAVORITE,
-                it,
-                data!!
-            )
-        }
-        tvMsg.setOnClickListener {
-            listener.onFunctionClick(
-                FunctionType.MSG,
-                it,
-                data!!
-            )
-        }
-        tvShare.setOnClickListener {
-            listener.onFunctionClick(
-                FunctionType.SHARE,
-                it,
-                data!!
-            )
-        }
-        tvMore.setOnClickListener {
-            listener.onFunctionClick(
-                FunctionType.MORE,
-                it,
-                data!!
-            )
-        }
         tvTitle.setOnClickListener { listener.onVideoClick(data!!) }
         tvMore.visibility = View.GONE
     }
 
     override fun updated() {
-        var textColor = android.R.color.black
-        var descTextColor = R.color.color_black_1_50
+    }
+
+    override fun updated(position: Int) {
+//        var textColor = android.R.color.black
+//        var descTextColor = R.color.color_black_1_50
 
         val title = SpannableString(data?.title)
         tvTitle.run {
@@ -103,12 +71,12 @@ class SearchVideoViewHolder(
             } else {
                 data?.title
             }
-            setTextColor(ContextCompat.getColor(itemView.context, textColor))
+//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
         }
 
         tvDesc.run {
             text = data?.description
-            setTextColor(ContextCompat.getColor(itemView.context, descTextColor))
+//            setTextColor(ContextCompat.getColor(itemView.context, descTextColor))
         }
 
         Glide.with(ivPhoto.context)
@@ -129,7 +97,16 @@ class SearchVideoViewHolder(
                 else -> R.drawable.btn_favorite_n
             }
             setCompoundDrawablesRelativeWithIntrinsicBounds(resFavorite, 0, 0, 0)
-            setTextColor(ContextCompat.getColor(itemView.context, textColor))
+//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
+        }
+
+        tvFavorite.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.FAVORITE,
+                it,
+                data!!,
+                position
+            )
         }
 
         tvShare.run {
@@ -140,6 +117,15 @@ class SearchVideoViewHolder(
             setCompoundDrawablesRelativeWithIntrinsicBounds(resShare, 0, 0, 0)
         }
 
+        tvShare.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.SHARE,
+                it,
+                data!!,
+                position
+            )
+        }
+
         tvLike.run {
             text = data?.likeCount.toString()
             val res = when (data?.like) {
@@ -147,19 +133,46 @@ class SearchVideoViewHolder(
                 else -> R.drawable.ico_nice_gray
             }
             setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
-            setTextColor(ContextCompat.getColor(itemView.context, textColor))
+//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
+        }
+
+        tvLike.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.LIKE,
+                it,
+                data!!,
+                position
+            )
         }
 
         tvMsg.run {
             text = data?.commentCount.toString()
             val resMsg = R.drawable.ico_messege_adult_gray
             setCompoundDrawablesRelativeWithIntrinsicBounds(resMsg, 0, 0, 0)
-            setTextColor(ContextCompat.getColor(itemView.context, textColor))
+//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
+        }
+
+        tvMsg.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.MSG,
+                it,
+                data!!,
+                position
+            )
         }
 
         tvMore.run {
             val resMore = R.drawable.btn_more_gray_n
             setCompoundDrawablesRelativeWithIntrinsicBounds(resMore, 0, 0, 0)
+        }
+
+        tvMore.setOnClickListener {
+            listener.onFunctionClick(
+                FunctionType.MORE,
+                it,
+                data!!,
+                position
+            )
         }
     }
 
@@ -189,6 +202,31 @@ class SearchVideoViewHolder(
                 listener.onChipClick((it as Chip).text.toString())
             }
             reflowGroup.addView(chip)
+        }
+    }
+
+
+    fun updateLike(item: VideoItem) {
+        tvLike.run {
+            text = item.likeCount.toString()
+            val res = when (item.like) {
+                true -> R.drawable.ico_nice_s
+                else -> R.drawable.ico_nice_gray
+            }
+            setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
+//            setTextColor(ContextCompat.getColor(tvLike.context, android.R.color.black))
+        }
+    }
+
+    fun updateFavorite(item: VideoItem) {
+        tvFavorite.run {
+            text = item.favoriteCount.toString()
+            val resFavorite = when (item.favorite) {
+                true -> R.drawable.btn_favorite_white_s
+                else -> R.drawable.btn_favorite_n
+            }
+            setCompoundDrawablesRelativeWithIntrinsicBounds(resFavorite, 0, 0, 0)
+//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
         }
     }
 }

@@ -117,7 +117,6 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     fun modifyFavorite() {
-        Timber.d("@@modifyFavorite: ${playItem?.favorite}")
         val favoriteRes =
             takeIf { playItem?.favorite == true }?.let { R.drawable.btn_favorite_forvideo_s }
                 ?: let { R.drawable.btn_favorite_forvideo_n }
@@ -167,9 +166,9 @@ class ClipSingleFragment : BaseFragment() {
 
         ib_back.setOnClickListener { findNavController().navigateUp() }
 
-        btn_retry.setOnClickListener {
+        ib_retry.setOnClickListener {
             playItem?.run {
-                btn_retry.visibility = View.GONE
+                ib_retry.visibility = View.GONE
                 viewModel.getM3U8(this)
             }
         }
@@ -308,8 +307,9 @@ class ClipSingleFragment : BaseFragment() {
                 }
             }
             progress_video?.visibility = View.GONE
-            btn_retry.visibility = View.VISIBLE
-            playItem?.videoId?.run { viewModel.sendVideoReport(this.toString()) }
+            ib_retry.visibility = View.VISIBLE
+            viewModel.videoEpisodeItem?.videoStreams?.get(0)
+                ?.run { viewModel.sendVideoReport(this.toString()) }
         }
     }
 

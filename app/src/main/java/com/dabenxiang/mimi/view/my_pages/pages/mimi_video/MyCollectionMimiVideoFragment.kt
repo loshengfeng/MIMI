@@ -151,7 +151,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.postCount.observe(this) {
             Timber.i("postCount= $it")
             if (it == 0) {
-                text_page_empty.text = getString(R.string.follow_empty_msg)
+                text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
                 id_empty_group.visibility = View.VISIBLE
                 list_short.visibility = View.INVISIBLE
             } else {

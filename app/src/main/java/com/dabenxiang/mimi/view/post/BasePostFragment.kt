@@ -80,6 +80,9 @@ open class BasePostFragment : BaseFragment() {
         const val SEARCH = "search"
         const val CLUB = "club"
         const val TAB = "tab"
+        const val VIDEO = "video"
+        const val TEXT = "text"
+        const val PIC = "pic"
     }
 
     override val bottomNavigationVisibility: Int

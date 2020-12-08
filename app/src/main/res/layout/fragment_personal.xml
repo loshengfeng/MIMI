@@ -24,8 +24,10 @@
                 android:background="@drawable/bg_layout_top_mimi"
                 app:layout_constraintBottom_toBottomOf="@+id/every_day_count_hint"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
             <ImageView
                 android:id="@+id/imageView6"
@@ -86,47 +88,22 @@
 
             <TextView
                 android:id="@+id/like_count"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                app:layout_constraintHorizontal_chainStyle="spread"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="54dp"
                 android:layout_marginTop="13dp"
                 android:gravity="center"
                 android:textColor="@color/title_personal"
                 android:textSize="18sp"
+                app:layout_constraintEnd_toStartOf="@id/split_line_like_follow"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/avatar"
-                tools:text="0" />
-
-            <TextView
-                android:id="@+id/fans_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="54dp"
-                android:gravity="center"
-                android:textColor="@color/title_personal"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="@+id/like_count"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/like_count"
-                tools:text="0" />
-
-            <TextView
-                android:id="@+id/follow_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/title_personal"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="@+id/like_count"
-                app:layout_constraintEnd_toStartOf="@+id/fans_count"
-                app:layout_constraintStart_toEndOf="@+id/like_count"
-                app:layout_constraintTop_toTopOf="@+id/like_count"
-                app:layout_constraintVertical_bias="0.0"
                 tools:text="0" />
 
             <View
                 android:id="@+id/split_line_like_follow"
                 android:layout_width="1dp"
+                app:layout_constraintHorizontal_chainStyle="spread"
                 android:layout_height="16dp"
                 android:background="@color/title_personal"
                 app:layout_constraintBottom_toBottomOf="@+id/like"
@@ -134,10 +111,25 @@
                 app:layout_constraintStart_toEndOf="@+id/like_count"
                 app:layout_constraintTop_toTopOf="@+id/like_count" />
 
+            <TextView
+                android:id="@+id/follow_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                android:gravity="center"
+                android:textColor="@color/title_personal"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="@+id/like_count"
+                app:layout_constraintEnd_toStartOf="@+id/split_line_follow_fans"
+                app:layout_constraintStart_toEndOf="@+id/split_line_like_follow"
+                app:layout_constraintTop_toTopOf="@+id/like_count"
+                tools:text="0" />
+
             <View
                 android:id="@+id/split_line_follow_fans"
                 android:layout_width="1dp"
                 android:layout_height="16dp"
+                app:layout_constraintHorizontal_chainStyle="spread"
                 android:background="@color/title_personal"
                 app:layout_constraintBottom_toBottomOf="@+id/fans"
                 app:layout_constraintEnd_toStartOf="@+id/fans_count"
@@ -145,8 +137,22 @@
                 app:layout_constraintTop_toTopOf="@+id/fans_count" />
 
             <TextView
+                android:id="@+id/fans_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/title_personal"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="@+id/like_count"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toEndOf="@id/split_line_follow_fans"
+                app:layout_constraintTop_toTopOf="@+id/like_count"
+                tools:text="0" />
+
+            <TextView
                 android:id="@+id/like"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
@@ -159,11 +165,11 @@
 
             <TextView
                 android:id="@+id/follow"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
-                android:text="@string/follow"
+                android:text="@string/text_follow"
                 android:textColor="@color/title_personal"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/like"
@@ -173,7 +179,7 @@
 
             <TextView
                 android:id="@+id/fans"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
@@ -288,12 +294,12 @@
             <TextView
                 android:id="@+id/video_long"
                 android:layout_width="wrap_content"
-                android:layout_height="14dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
                 android:text="@string/every_day_length"
                 android:textColor="@color/color_white_1"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="@+id/layout_every_day"
                 app:layout_constraintEnd_toEndOf="@+id/video_long_count"
                 app:layout_constraintStart_toStartOf="@+id/video_long_count"
@@ -314,11 +320,11 @@
             <TextView
                 android:id="@+id/video_short"
                 android:layout_width="wrap_content"
-                android:layout_height="14dp"
+                android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:text="@string/every_day_short"
                 android:textColor="@color/color_white_1"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="@+id/video_long"
                 app:layout_constraintEnd_toEndOf="@+id/video_short_count"
                 app:layout_constraintStart_toStartOf="@+id/video_short_count"

@@ -47,28 +47,10 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     override val isStatusBarDark: Boolean = true
 
     private lateinit var detailItem: MemberPostItem
-    private var reportDialog: ReportDialogFragment? = null
-
-    private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
-        override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
-            if (TextUtils.isEmpty(content)) {
-                GeneralUtils.showToast(App.applicationContext(), getString(R.string.report_error))
-            } else {
-                mainViewModel?.sendPostReport(detailItem,content)
-            }
-            reportDialog?.dismiss()
-        }
-
-        override fun onCancel() {
-            reportDialog?.dismiss()
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getAdContent()
-        imgReport.background = ContextCompat.getDrawable(requireContext(), R.drawable.btn_more_gray_p)
-        text5.text = getString(R.string.text_more)
     }
 
     override fun setupObservers() {
@@ -137,15 +119,15 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         }
     }
 
-    private fun setReportListener() {
-        imgReport.setOnClickListener {
+    private fun setMoreListener() {
+        imgMore.setOnClickListener {
             onMoreClick(detailItem, -1, deducted = detailItem.deducted) {
                 it as MemberPostItem
 
                 val bundle = Bundle()
                 detailItem.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.VIDEO)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, detailItem)
 
                 when (it.type) {
@@ -192,7 +174,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         setupChipGroup(postItem.tags)
 
         tv_follow.setOnClickListener {
-            clipViewModel.followPost(postItem.creatorId, tv_follow.text == getText(R.string.followed))
+            checkStatus { clipViewModel.followPost(postItem.creatorId, tv_follow.text == getText(R.string.followed)) }
         }
 
         clip_icon.setOnClickListener {
@@ -216,7 +198,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         setUILike()
         setUIFavorite()
         setInteractiveListener()
-        setReportListener()
+        setMoreListener()
     }
 
     private fun setUILike() {

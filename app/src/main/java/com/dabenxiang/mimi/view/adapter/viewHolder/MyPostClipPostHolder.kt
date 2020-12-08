@@ -38,6 +38,7 @@ class MyPostClipPostHolder(
     private val tvName: TextView = itemView.tv_name
     private val tvTime: TextView = itemView.tv_time
     private val tvTitle: TextView = itemView.tv_title
+    private val tvTitleMore: TextView = itemView.tv_title_more
     private val tvFollow: TextView = itemView.tv_follow
     private val ivPhoto: ImageView = itemView.iv_photo
     private val tvLength: TextView = itemView.tv_length
@@ -73,11 +74,21 @@ class MyPostClipPostHolder(
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
-        tvTitle.text =  if (searchStr.isNotBlank()) getSpanString(
-            tvTitle.context,
-            item.title,
-            searchStr
-        ) else item.title
+        item.title.let {
+            val title = if (searchStr.isNotBlank()) getSpanString(
+                    tvTitle.context,
+                    item.title,
+                    searchStr).toString() else item.title
+            tvTitle.text = title
+
+            Timber.i("title size=${tvTitle.text.length}")
+            tvTitleMore.visibility = if(tvTitle.text.length >=45){
+                View.VISIBLE
+            }else{
+                View.GONE
+            }
+        }
+
         tvFollow.visibility =
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
@@ -155,6 +166,9 @@ class MyPostClipPostHolder(
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
+            myPostListener.onItemClick(item, AdultTabType.CLIP)
+        }
+        tvTitleMore.setOnClickListener {
             myPostListener.onItemClick(item, AdultTabType.CLIP)
         }
 

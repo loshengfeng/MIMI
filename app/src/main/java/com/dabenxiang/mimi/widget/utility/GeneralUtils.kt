@@ -53,7 +53,9 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.math.ceil
 import kotlin.math.roundToInt
+
 
 object GeneralUtils {
 
@@ -409,6 +411,24 @@ object GeneralUtils {
         }
     }
 
+    fun getStringLength(str: String): Int {
+        Timber.i("getStringLength str =$str 1.0")
+        var valueLength = 0.0
+        val pattern = Pattern.compile("""^[_A-z0-9]*((\s)*[_A-z0-9])*${'$'}""")
+        for (i in str.indices) {
+
+            val temp: String = str.substring(i, i + 1)
+            valueLength += if (pattern.matcher(temp).matches()) {
+                Timber.i("getStringLength temp =$temp 1.0")
+                1.0
+            } else {
+                Timber.i("getStringLength temp =$temp 2.0")
+                2.0
+            }
+        }
+        return ceil(valueLength).toInt()
+    }
+
     fun parseTimeToUTC(date: Date): String {
         var time: String
         try {
@@ -421,5 +441,9 @@ object GeneralUtils {
         }
         Timber.d("parse time to UTC: $time")
         return time
+    }
+
+    fun getMaxCount(count: Int): Int {
+        return if (count > 1000) 999 else count
     }
 }

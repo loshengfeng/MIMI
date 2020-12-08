@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/color_white_1"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/color_white_1">
 
     <TextView
         android:id="@+id/tv_favorite"
@@ -61,22 +60,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="46dp"
+        android:src="@drawable/ico_new"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/tv_topup_history"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_follow" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_favorite" />
 
     <TextView
         android:id="@+id/tv_new"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginRight="46dp"
+        android:layout_marginEnd="46dp"
         android:gravity="center"
         android:text="N"
         android:textColor="@color/color_white_1"
         android:textSize="10sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/tv_topup_history"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_follow" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_favorite"
+        tools:background="@drawable/bg_unread_text" />
 
     <TextView
         android:id="@+id/tv_my_post"
@@ -90,7 +93,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view2" />
-<!--               app:layout_constraintTop_toBottomOf="@id/tv_chat_history"-->
 
     <View
         android:id="@+id/view3"

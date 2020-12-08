@@ -67,7 +67,7 @@
             android:id="@+id/action_myPostFragment_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
         <action
-            android:id="@+id/action_searchPostFragment_to_clubPicFragment"
+            android:id="@+id/action_to_clubPicFragment"
             app:destination="@id/clipPlayerFragment" />
     </fragment>
 
@@ -97,13 +97,13 @@
         android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
         tools:layout="@layout/fragment_search_post" >
         <action
-            android:id="@+id/action_searchPostFragment_to_clubPicFragment"
+            android:id="@+id/action_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
         <action
-            android:id="@+id/action_searchPostFragment_to_clubTextFragment"
+            android:id="@+id/action_to_clubTextFragment"
             app:destination="@id/clubTextFragment" />
         <action
-            android:id="@+id/action_searchPostFragment_to_clipPlayerFragment"
+            android:id="@+id/action_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
         <action
             android:id="@+id/action_searchPostFragment_to_postArticleFragment"
@@ -248,6 +248,9 @@
         <action
             android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@+id/postArticleFragment" />
     </fragment>
 
     <fragment
@@ -266,6 +269,9 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@+id/postPicFragment" />
     </fragment>
 
     <fragment
@@ -282,6 +288,9 @@
         <action
             android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@+id/postVideoFragment" />
     </fragment>
 
 </navigation>

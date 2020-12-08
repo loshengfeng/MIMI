@@ -16,7 +16,7 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
-import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
@@ -69,10 +69,6 @@ class ActorVideosFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-    }
-
-    override fun initSettings() {
-        super.initSettings()
         actor_toolbar_title.text = getString(R.string.actor_videos_title)
         arguments?.getSerializable(KEY_DATA)?.let { id ->
             id as Long
@@ -81,15 +77,13 @@ class ActorVideosFragment : BaseFragment() {
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
 
-        val loadStateAdapter = VideoLoadStateAdapter(generalVideoAdapter)
-
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
             .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
 
         rv_video.also {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
-            it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+            it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.addItemDecoration(
                 GridSpaceItemDecoration(
                     2,
@@ -99,6 +93,10 @@ class ActorVideosFragment : BaseFragment() {
                 )
             )
         }
+    }
+
+    override fun initSettings() {
+        super.initSettings()
     }
 
     override fun setupObservers() {
@@ -139,7 +137,6 @@ class ActorVideosFragment : BaseFragment() {
         }
 
         app_bar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-
             when {
                 verticalOffset == 0 -> {
                     actor_toolbar_title.visibility = View.VISIBLE
@@ -149,7 +146,6 @@ class ActorVideosFragment : BaseFragment() {
                     actor_toolbar_title.visibility = View.GONE
                 }
             }
-
         })
     }
 

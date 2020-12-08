@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.view.generalvideo.GeneralVideoFragment
 import com.dabenxiang.mimi.view.recommend.RecommendFragment
 
 class MiMiViewPagerAdapter(
-    private val fragment: Fragment,
+    fragment: Fragment,
     private val secondMenuItems: List<SecondMenuItem>
 ) : FragmentStateAdapter(fragment) {
 

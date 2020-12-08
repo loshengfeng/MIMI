@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Html
 import android.text.TextUtils
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -245,7 +244,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         imgFavorite.setOnClickListener {
             checkStatus { descriptionViewModel.favorite(videoItem) }
         }
-        imgReport.setOnClickListener {
+        imgMore.setOnClickListener {
             if (videoItem.deducted == true) {
                 if (isReported) {
                     GeneralUtils.showToast(
@@ -282,9 +281,16 @@ class PlayerDescriptionFragment : BaseFragment() {
 
         recyclerview_guess_like.adapter = guessLikeAdapter
 
-        val categoriesString =
-            if (videoItem.categories.isNotEmpty()) videoItem.categories.last() else ""
-        descriptionViewModel.setupGuessLikeList(categoriesString, true)
+        val performers = videoItem.performers
+
+        val tags = ""
+        (videoItem.tags as List<String>).indices.mapNotNull {
+            (videoItem.tags as List<String>)[it]
+        }.forEach {
+            tags.plus(it).plus(",")
+        }
+        Timber.d("@@@ ${videoItem.tags}, tag $tags")
+        descriptionViewModel.setupGuessLikeList(tags, performers, true)
 
         val dateString = videoItem.updateTime?.let { date ->
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
@@ -321,6 +327,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         setUILike()
         setUIFavorite()
         setInteractiveListener()
+        setStreamInfo()
     }
 
     private fun setUILike() {
@@ -353,6 +360,32 @@ class PlayerDescriptionFragment : BaseFragment() {
                 null
             )
         )
+    }
+
+    private fun setStreamInfo() {
+        val videoStream = arrayListOf<VideoEpisodeItem.VideoStream>()
+        videoItem.sources?.get(0)?.videoEpisodes?.get(0)?.videoStreams?.forEach {
+            videoStream.add(
+                VideoEpisodeItem.VideoStream(
+                    it.id,
+                    it.sign,
+                    it.streamName,
+                    it.utcTime,
+                    false
+                ))
+        }
+        val videoEpisode = videoItem.sources?.get(0)?.videoEpisodes?.get(0).run {
+            val videoEpisodeItem = VideoEpisodeItem(
+                this?.episode,
+                this?.episodePublishTime,
+                this?.id,
+                this?.reported,
+                videoStream)
+            videoEpisodeItem
+        }.let {
+            it
+        }
+        updateStreamInfo(videoEpisode)
     }
 
     private fun updateStreamInfo(videoEpisodeItem: VideoEpisodeItem) {

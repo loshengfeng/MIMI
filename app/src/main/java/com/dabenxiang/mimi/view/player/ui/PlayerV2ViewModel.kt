@@ -179,6 +179,7 @@ class PlayerV2ViewModel: BaseViewModel() {
                         }
                         is DownloadResult.Error -> {
                             Timber.d("error ${it.cause}")
+                            sourceNotFound.postValue("")
                         }
                         is DownloadResult.Progress -> {
                             Timber.d("progress ${it.progress}")
