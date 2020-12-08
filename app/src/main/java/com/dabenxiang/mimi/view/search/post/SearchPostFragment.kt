@@ -310,6 +310,7 @@ class SearchPostFragment : BaseFragment() {
 
         iv_clear_search_bar.setOnClickListener {
             search_bar.setText("")
+            GeneralUtils.hideKeyboard(requireActivity())
             GeneralUtils.showKeyboard(requireContext())
             search_bar.requestFocus()
         }
