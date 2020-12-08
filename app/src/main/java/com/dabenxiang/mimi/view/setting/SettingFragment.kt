@@ -61,8 +61,6 @@ class SettingFragment : BaseFragment() {
     override fun setupObservers() {
         viewModel.profileItem.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
                 is Success -> {
                     tv_name.text = viewModel.profileData?.friendlyName
                     tv_account.text = viewModel.profileData?.username
@@ -85,8 +83,6 @@ class SettingFragment : BaseFragment() {
 
         viewModel.resendResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
                 is Empty -> {
                     GeneralUtils.showToast(
                         requireContext(),
@@ -99,8 +95,6 @@ class SettingFragment : BaseFragment() {
 
         viewModel.updateResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
                 is Empty -> {
                     GeneralUtils.showToast(
                         requireContext(),
@@ -113,8 +107,6 @@ class SettingFragment : BaseFragment() {
 
         viewModel.postResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
                 is Success -> viewModel.putAvatar(it.result)
                 is Error -> onApiError(it.throwable)
             }
