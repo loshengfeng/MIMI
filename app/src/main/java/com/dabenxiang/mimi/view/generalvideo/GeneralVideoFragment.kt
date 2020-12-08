@@ -18,7 +18,6 @@ import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_actor_videos.layout_empty_data
 import kotlinx.android.synthetic.main.fragment_actor_videos.layout_refresh
@@ -74,10 +73,11 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 GridSpaceItemDecoration(
                     2,
                     GeneralUtils.dpToPx(requireContext(), 10),
-                    GeneralUtils.dpToPx(requireContext(), 20),
+                    GeneralUtils.dpToPx(requireContext(), 10),
                     true
                 )
             )
+            rv_video.itemAnimator = null
         }
 
         lifecycleScope.launch {

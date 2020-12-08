@@ -84,6 +84,7 @@ abstract class ClubViewModel : BaseViewModel(){
         position: Int,
         isFavorite: Boolean
     ) {
+
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()

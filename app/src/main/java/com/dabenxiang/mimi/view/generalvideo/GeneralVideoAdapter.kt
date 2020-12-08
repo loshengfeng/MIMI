@@ -38,15 +38,13 @@ class GeneralVideoAdapter(
                 oldItem == newItem
         }
 
-        const val VIEW_TYPE_NETWORK = 0
-        const val VIEW_TYPE_AD = 1
-        const val VIEW_TYPE_VIDEO = 2
+        const val VIEW_TYPE_AD = 0
+        const val VIEW_TYPE_VIDEO = 1
     }
 
     override fun getItemViewType(position: Int): Int {
         return when {
             position == 0 && isNoNeedAD -> VIEW_TYPE_AD
-            position == itemCount -> VIEW_TYPE_NETWORK
             else -> VIEW_TYPE_VIDEO
         }
     }
@@ -70,8 +68,13 @@ class GeneralVideoAdapter(
         val item = getItem(position) ?: StatisticsItem()
         when (holder) {
             is AdHolder -> {
+                val options = RequestOptions()
+                    .priority(Priority.NORMAL)
+                    .placeholder(R.drawable.img_nopic_03)
+                    .error(R.drawable.img_nopic_03)
                 Glide.with(holder.adImg.context)
                     .load(item.adItem?.href)
+                    .apply(options)
                     .into(holder.adImg)
 
                 holder.adImg.setOnClickListener {
