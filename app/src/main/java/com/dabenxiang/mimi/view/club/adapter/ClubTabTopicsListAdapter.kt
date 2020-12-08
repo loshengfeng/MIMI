@@ -49,7 +49,7 @@ class TopicListAdapter(
                 listener.itemClicked(item, position)
             }
             listener.getAttachment(
-                item.avatarAttachmentId,
+                item.backgroundAttachmentId,
                 holder.topicBg,
                 LoadImageType.CLUB_TOPIC
             )
