@@ -18,6 +18,7 @@ import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
@@ -236,6 +237,14 @@ object GeneralUtils {
             val inputManager =
                 activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputManager.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
+    fun hideKeyboard(fragment: Fragment) {
+        fragment.view?.run {
+            val inputManager =
+                fragment.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputManager.hideSoftInputFromWindow(this.windowToken, 0)
         }
     }
 
