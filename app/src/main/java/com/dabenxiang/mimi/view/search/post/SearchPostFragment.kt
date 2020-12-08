@@ -251,6 +251,11 @@ class SearchPostFragment : BaseFragment() {
             searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
         }
 
+        search_bar.post {
+            GeneralUtils.showKeyboard(search_bar.context)
+            search_bar.requestFocus()
+        }
+        
         viewModel.adWidth =
             GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
@@ -263,7 +268,7 @@ class SearchPostFragment : BaseFragment() {
         } else {
             iv_clear_search_bar.visibility = View.GONE
             getSearchHistory()
-            GeneralUtils.showKeyboard(requireContext())
+//            GeneralUtils.showKeyboard(requireContext())
 //            search_bar.requestFocus()
         }
         layout_search_text.visibility = View.GONE

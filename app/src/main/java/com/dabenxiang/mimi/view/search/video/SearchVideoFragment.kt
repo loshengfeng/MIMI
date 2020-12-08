@@ -116,6 +116,11 @@ class SearchVideoFragment : BaseFragment() {
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
+        search_bar.post {
+            GeneralUtils.showKeyboard(search_bar.context)
+            search_bar.requestFocus()
+        }
+
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
 
             viewModel.searchingTag = data.tag
@@ -128,7 +133,7 @@ class SearchVideoFragment : BaseFragment() {
             } else {
                 iv_clear_search_bar.visibility = View.GONE
                 getSearchHistory()
-                GeneralUtils.showKeyboard(requireContext())
+//                GeneralUtils.showKeyboard(requireContext())
 //                search_bar.requestFocus()
             }
             layout_search_text.visibility = View.GONE
