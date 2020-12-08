@@ -193,18 +193,22 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         }
 
         btn_vip.setOnClickListener {
-            val bundle = TopUpFragment.createBundle(this::class.java.simpleName)
-            navigateTo(NavigateItem.Destination(R.id.action_to_topup, bundle))
+            checkStatus {
+                val bundle = TopUpFragment.createBundle(this::class.java.simpleName)
+                navigateTo(NavigateItem.Destination(R.id.action_to_topup, bundle))
+            }
         }
 
         btn_promote.setOnClickListener {
-            val bundle = Bundle()
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_to_inviteVipFragment,
-                    bundle
+            checkStatus {
+                val bundle = Bundle()
+                navigateTo(
+                        NavigateItem.Destination(
+                                R.id.action_to_inviteVipFragment,
+                                bundle
+                        )
                 )
-            )
+            }
         }
 
         btn_backup.setOnClickListener {
