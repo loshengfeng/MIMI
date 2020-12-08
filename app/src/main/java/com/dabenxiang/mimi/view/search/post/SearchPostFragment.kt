@@ -42,6 +42,16 @@ import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_L
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
+import kotlinx.android.synthetic.main.fragment_search_post.chip_group_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.ib_back
+import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_history
+import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_search_bar
+import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
+import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.search_bar
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
+import kotlinx.android.synthetic.main.fragment_search_video.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -249,6 +259,7 @@ class SearchPostFragment : BaseFragment() {
             search(tag = searchTag)
 //            search_bar.clearFocus()
         } else {
+            iv_clear_search_bar.visibility = View.GONE
             getSearchHistory()
             GeneralUtils.showKeyboard(requireContext())
 //            search_bar.requestFocus()
