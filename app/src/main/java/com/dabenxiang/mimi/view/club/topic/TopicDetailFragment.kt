@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.club.topic
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -13,17 +14,18 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.OrderBy
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.pages.ClubItemAdapter
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -34,6 +36,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_topic.*
+import timber.log.Timber
 
 class TopicDetailFragment : BaseFragment() {
 
@@ -53,7 +56,7 @@ class TopicDetailFragment : BaseFragment() {
 
     private val viewModel: TopicDetailViewModel by viewModels()
 
-    private val memberClubItem by lazy { arguments?.getSerializable(KEY_DATA) as MemberClubItem }
+    lateinit var memberClubItem:MemberClubItem
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -62,23 +65,50 @@ class TopicDetailFragment : BaseFragment() {
         return R.layout.fragment_club_topic
     }
 
-    override fun setupFirstTime() {
-        super.setupFirstTime()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.getClubInfo.observe(this, {
+            when (it) {
+                is Success -> {
+                    setUpUI(it.result)
+                }
+                is Error -> onApiError(it.throwable)
+            }
 
-        setUpUI()
+        })
     }
 
-    private fun setUpUI() {
-        tv_title.text = memberClubItem.title
-        tv_desc.text = memberClubItem.description
-        tv_follow_count.text = memberClubItem.followerCount.toString()
-        tv_post_count.text = memberClubItem.postCount.toString()
-        updateFollow()
-        val bitmap = LruCacheUtils.getLruCache(memberClubItem.avatarAttachmentId.toString())
-        bitmap?.also { Glide.with(requireContext()).load(it).circleCrop().into(iv_avatar) }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
+        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+    }
+
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+        (arguments?.getSerializable(KEY_DATA) as MemberClubItem)?.id?.let {
+            viewModel.getMembersClub(it)
+        }
+    }
+
+    private fun setUpUI(item:MemberClubItem) {
+        memberClubItem = item
+        Timber.i("MemberClubItem =$item")
+        memberClubItem?.let{item->
+            tv_title.text = item.title
+            tv_desc.text = item.description
+            tv_follow_count.text = item.followerCount.toString()
+            tv_post_count.text = item.postCount.toString()
+            updateFollow()
+            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
+
+            bitmap.takeIf { it !=null }?.also {
+                Glide.with(requireContext()).load(bitmap).circleCrop().into(iv_avatar)
+            } ?: run {
+                viewModel.loadImage(item.avatarAttachmentId, iv_avatar, LoadImageType.AVATAR_CS)
+            }
+        }
 
         viewPager.reduceDragSensitivity()
 
@@ -97,7 +127,9 @@ class TopicDetailFragment : BaseFragment() {
                 },
                     { id, view, resId -> viewModel.loadImage(id, view, resId) },
                     { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
-                    { item, isLike, func -> likePost(item, isLike, func) }
+                    { item, isLike, func -> likePost(item, isLike, func) },
+                    { item -> },
+                    { item, isFavorite, func -> favoritePost(item, isFavorite, func)    }
                 ),
                 adultListener
             )
@@ -147,6 +179,7 @@ class TopicDetailFragment : BaseFragment() {
         viewModel.updateCountVideo.observe(viewLifecycleOwner, Observer {
             updateCountVideo.invoke(it)
         })
+
     }
 
     override fun setupListeners() {
@@ -212,9 +245,27 @@ class TopicDetailFragment : BaseFragment() {
     private val adultListener = object : AdultListener {
         override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {}
 
-        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {}
+        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
+        }
+
+        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean) {
+            Timber.i("adultListener onFavoriteClick")
+//            if (viewModel.accountManager.isLogin()) {
+//                viewModel.favoritePost(item, position, isFavorite)
+//            } else {
+//                item.favoriteCount -= 1
+//                item.isFavorite = !item.isFavorite
+//                navigateTo(
+//                        NavigateItem.Destination(
+//                                R.id.action_to_loginFragment,
+//                                LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+//                        )
+//                )
+//            }
+        }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            Timber.i("adultListener onCommentClick")
             checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
@@ -251,6 +302,7 @@ class TopicDetailFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
+            Timber.i("adultListener onMoreClick")
             onMoreClick(item, position) {
 
                 val searchPostItem = arguments?.getSerializable(KEY_DATA)
@@ -288,6 +340,7 @@ class TopicDetailFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            Timber.i("adultListener onItemClick")
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
                     val bundle = PictureDetailFragment.createBundle(item, 0)
@@ -367,10 +420,6 @@ class TopicDetailFragment : BaseFragment() {
                 )
             )
         }
-
-        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean) {
-
-        }
     }
 
     private lateinit var updateCountHottest: (Int) -> Unit
@@ -405,6 +454,14 @@ class TopicDetailFragment : BaseFragment() {
         update: (Boolean, Int) -> Unit
     ) {
         checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
+    }
+
+    private fun favoritePost(
+            memberPostItem: MemberPostItem,
+            isFavorite: Boolean,
+            update: (Boolean, Int) -> Unit
+    ) {
+        checkStatus {  viewModel.favoritePost(memberPostItem, isFavorite, update)}
     }
 }
 

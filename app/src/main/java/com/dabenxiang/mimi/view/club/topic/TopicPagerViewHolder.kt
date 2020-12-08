@@ -46,7 +46,8 @@ class TopicPagerViewHolder(itemView: View) : BaseViewHolder(itemView) {
                     onItemClick = {},
                     getBitmap = clubDetailFuncItem.getBitmap,
                     onFollowClick = { item, _, isFollow, _ -> onFollowClick(item, isFollow) },
-                    onLikeClick = clubDetailFuncItem.onLikeClick
+                    onLikeClick = clubDetailFuncItem.onLikeClick,
+                    onFavoriteClick =  clubDetailFuncItem.onFavoriteClick
                 )
             )
             rvPost.adapter = adapter
