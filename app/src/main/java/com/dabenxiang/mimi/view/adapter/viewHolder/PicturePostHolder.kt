@@ -164,7 +164,6 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         likeCount.text = item.likeCount.toString()
         favoriteCount.text = item.favoriteCount.toString()
         commentCount.text = item.commentCount.toString()
-        favoriteCount.text = item.commentCount.toString()
 
         val isFollow = item.isFollow
         if (isFollow) {
