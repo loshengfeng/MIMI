@@ -40,7 +40,7 @@ import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
 import com.dabenxiang.mimi.view.club.member.ClubMemberAdapter
 import com.dabenxiang.mimi.view.club.member.MiMiLinearLayoutManager
-import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
+import com.dabenxiang.mimi.view.club.topic_detail.TopicTabFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.dialog.login_request.LoginRequestDialog
@@ -1076,7 +1076,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private fun onItemClick(item: MemberClubItem) {
-        val bundle = TopicDetailFragment.createBundle(item)
+        val bundle = TopicTabFragment.createBundle(item)
         findNavController().navigate(R.id.action_adultHomeFragment_to_topicDetailFragment, bundle)
     }
 

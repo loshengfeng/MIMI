@@ -13,14 +13,12 @@ import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pages.ClubItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
-import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -266,7 +264,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
 
-                val searchPostItem = arguments?.getSerializable(TopicDetailFragment.KEY_DATA)
+                val searchPostItem = arguments?.getSerializable(KEY_DATA)
 
                 val bundle = Bundle()
                 bundle.putBoolean(MyPostFragment.EDIT, true)

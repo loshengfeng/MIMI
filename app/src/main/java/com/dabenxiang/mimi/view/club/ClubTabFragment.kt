@@ -24,12 +24,11 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.ClubTabViewModel.Companion.REFRESH_TASK
-import com.dabenxiang.mimi.view.club.ClubTabViewModel.Companion.REFRESH_TASK_CANCEL
 import com.dabenxiang.mimi.view.club.adapter.ClubTabAdapter
 import com.dabenxiang.mimi.view.club.adapter.TopicItemListener
 import com.dabenxiang.mimi.view.club.adapter.TopicListAdapter
 import com.dabenxiang.mimi.view.club.pages.ClubItemFragment
-import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
+import com.dabenxiang.mimi.view.club.topic_detail.TopicTabFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.post.BasePostFragment
@@ -89,7 +88,7 @@ class ClubTabFragment : BaseFragment() {
         TopicListAdapter(object : TopicItemListener {
             override fun itemClicked(clubItem: MemberClubItem, position: Int) {
                 Timber.i("clubItem= $clubItem")
-                val bundle = TopicDetailFragment.createBundle(clubItem)
+                val bundle = TopicTabFragment.createBundle(clubItem)
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_topicDetailFragment,
