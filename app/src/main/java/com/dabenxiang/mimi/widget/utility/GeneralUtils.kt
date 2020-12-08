@@ -437,8 +437,6 @@ object GeneralUtils {
         return ceil(valueLength).toInt()
     }
 
-
-
     fun parseTimeToUTC(date: Date): String {
         var time: String
         try {
@@ -451,5 +449,9 @@ object GeneralUtils {
         }
         Timber.d("parse time to UTC: $time")
         return time
+    }
+
+    fun getAdSize(activity: Activity): Pair<Int, Int> {
+        return Pair(getScreenSize(activity).first / 3, getScreenSize(activity).first / 3 / 3)
     }
 }

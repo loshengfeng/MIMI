@@ -65,8 +65,8 @@ class TopicDetailFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         setUpUI()
     }

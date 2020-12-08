@@ -18,7 +18,6 @@ import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_actor_videos.layout_empty_data
@@ -26,9 +25,6 @@ import kotlinx.android.synthetic.main.fragment_actor_videos.layout_refresh
 import kotlinx.android.synthetic.main.fragment_actor_videos.rv_video
 import kotlinx.android.synthetic.main.fragment_actor_videos.tv_empty_data
 import kotlinx.android.synthetic.main.fragment_general_video.*
-import kotlinx.android.synthetic.main.fragment_general_video.tv_filter
-import kotlinx.android.synthetic.main.fragment_general_video.tv_search
-import kotlinx.android.synthetic.main.fragment_recommend.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -43,8 +39,8 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
-        viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
-        viewModel.adHeight = (viewModel.adWidth / 7)
+        viewModel.adWidth = pxToDp(requireContext(), GeneralUtils.getAdSize(requireActivity()).first)
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         rv_video.visibility = View.INVISIBLE
 

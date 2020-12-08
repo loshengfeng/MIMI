@@ -9,7 +9,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_mimi_home.*
@@ -25,8 +25,8 @@ class MiMiFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
 
-        viewModel.adWidth = pxToDp(requireContext(), getScreenSize(requireActivity()).first)
-        viewModel.adHeight = (viewModel.adWidth / 7)
+        viewModel.adWidth = pxToDp(requireContext(), GeneralUtils.getAdSize(requireActivity()).first)
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         btn_retry.setOnClickListener { viewModel.getMenu() }
 
