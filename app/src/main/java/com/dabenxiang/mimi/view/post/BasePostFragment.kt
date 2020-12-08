@@ -320,9 +320,24 @@ open class BasePostFragment : BaseFragment() {
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
                 setTagCount()
+                enableHastEditText()
             }
             chipGroup.addView(chip)
             setTagCount()
+        }
+
+        enableHastEditText()
+    }
+
+    private fun enableHastEditText() {
+        if (chipGroup.size == HASHTAG_LIMIT) {
+            edt_hashtag.isEnabled = false
+            edt_hashtag.hint = getString(R.string.post_tag_full)
+            hashTagLayout.background  = ContextCompat.getDrawable(requireContext(), R.drawable.post_text_rectangle_tag_full)
+        } else {
+            edt_hashtag.isEnabled = true
+            edt_hashtag.hint = getString(R.string.post_hint_tag)
+            hashTagLayout.background  = ContextCompat.getDrawable(requireContext(), R.drawable.post_text_rectangle)
         }
     }
 

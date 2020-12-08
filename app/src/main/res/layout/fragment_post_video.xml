@@ -149,7 +149,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout"
+                android:id="@+id/hashTagLayout"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginStart="20dp"
@@ -206,9 +206,9 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="10dp"
-                app:layout_constraintEnd_toEndOf="@+id/constraintLayout"
-                app:layout_constraintStart_toStartOf="@+id/constraintLayout"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+                app:layout_constraintEnd_toEndOf="@+id/hashTagLayout"
+                app:layout_constraintStart_toStartOf="@+id/hashTagLayout"
+                app:layout_constraintTop_toBottomOf="@+id/hashTagLayout">
 
 
             </com.google.android.material.chip.ChipGroup>
