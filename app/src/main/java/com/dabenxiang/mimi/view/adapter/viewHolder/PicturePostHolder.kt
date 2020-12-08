@@ -44,6 +44,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
     val title: TextView = itemView.tv_title
     val pictureRecycler: RecyclerView = itemView.recycler_picture
     val pictureCount: TextView = itemView.tv_picture_count
+    val tvTitleMore: TextView = itemView.tv_title_more
     val tagChipGroup: ChipGroup = itemView.chip_group_tag
     val likeImage: ImageView = itemView.iv_like
     val likeCount: TextView = itemView.tv_like_count
@@ -62,6 +63,13 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
+
+        tvTitleMore.visibility = if (title.text.length >= 45) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
         follow.visibility =
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
