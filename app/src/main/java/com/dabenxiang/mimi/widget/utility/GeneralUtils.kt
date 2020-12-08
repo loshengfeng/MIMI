@@ -443,6 +443,10 @@ object GeneralUtils {
         return time
     }
 
+    fun getAdSize(activity: Activity): Pair<Int, Int> {
+        return Pair(getScreenSize(activity).first / 3, getScreenSize(activity).first / 3 / 3)
+    }
+
     fun getMaxCount(count: Int): Int {
         return if (count > 1000) 999 else count
     }

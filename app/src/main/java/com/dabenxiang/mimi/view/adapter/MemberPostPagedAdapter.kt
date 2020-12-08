@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import timber.log.Timber
 
 class MemberPostPagedAdapter(
     val context: Context,
@@ -110,6 +111,8 @@ class MemberPostPagedAdapter(
     ) {
         viewHolderMap[position] = holder
         val item = getItem(position)
+
+        Timber.i("MemberPostPagedAdapter item=$item")
         when (holder) {
             is AdHolder -> {
                 Glide.with(context).load(item?.adItem?.href).into(holder.adImg)

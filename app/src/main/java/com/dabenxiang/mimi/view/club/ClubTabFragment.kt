@@ -76,6 +76,7 @@ class ClubTabFragment : BaseFragment() {
     private val topicListAdapter by lazy {
         TopicListAdapter(object : TopicItemListener {
             override fun itemClicked(clubItem: MemberClubItem, position: Int) {
+                Timber.i("clubItem= $clubItem")
                 val bundle = TopicDetailFragment.createBundle(clubItem)
                 navigateTo(
                     NavigateItem.Destination(

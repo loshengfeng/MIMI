@@ -284,8 +284,8 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     private fun getAdContent() {
         // for ui init
-        val adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        val adHeight = (adWidth * 0.142).toInt()
+        val adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        val adHeight = GeneralUtils.getAdSize(requireActivity()).second
         clipViewModel.getAd(adWidth, adHeight)
     }
 }
