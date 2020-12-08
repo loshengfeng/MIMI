@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.search.post
 
-import android.content.Context
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -9,7 +8,6 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -44,16 +42,6 @@ import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_L
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
-import kotlinx.android.synthetic.main.fragment_search_post.chip_group_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.ib_back
-import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_history
-import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_search_bar
-import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
-import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.search_bar
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
-import kotlinx.android.synthetic.main.fragment_search_video.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -251,11 +239,6 @@ class SearchPostFragment : BaseFragment() {
             searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
         }
 
-        search_bar.post {
-            GeneralUtils.showKeyboard(search_bar.context)
-            search_bar.requestFocus()
-        }
-        
         viewModel.adWidth =
             GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
@@ -264,12 +247,16 @@ class SearchPostFragment : BaseFragment() {
             layout_search_history.visibility = View.GONE
             search_bar.setText(searchTag)
             search(tag = searchTag)
-//            search_bar.clearFocus()
+            search_bar.post {
+                search_bar.clearFocus()
+            }
         } else {
             iv_clear_search_bar.visibility = View.GONE
             getSearchHistory()
-//            GeneralUtils.showKeyboard(requireContext())
-//            search_bar.requestFocus()
+            search_bar.post {
+                GeneralUtils.showKeyboard(search_bar.context)
+                search_bar.requestFocus()
+            }
         }
         layout_search_text.visibility = View.GONE
 
@@ -326,7 +313,7 @@ class SearchPostFragment : BaseFragment() {
         iv_clear_search_bar.setOnClickListener {
             search_bar.setText("")
             GeneralUtils.showKeyboard(requireContext())
-//            search_bar.requestFocus()
+            search_bar.requestFocus()
         }
 
         iv_clear_history.setOnClickListener {
@@ -494,7 +481,7 @@ class SearchPostFragment : BaseFragment() {
                 layout_search_history.visibility = View.GONE
                 search(text = text)
                 GeneralUtils.hideKeyboard(requireActivity())
-//                search_bar.clearFocus()
+                search_bar.clearFocus()
             }
             chip_group_search_text.addView(chip)
         }
