@@ -7,6 +7,14 @@
 
     <ImageView
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/img_welcome_03"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:src="@drawable/img_welcome_01"
         app:layout_constraintDimensionRatio="h,36:28.7"
@@ -15,6 +23,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="gone"
         android:src="@drawable/img_welcome_02"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="h,6:7" />
@@ -30,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:textColor="#1e233a"
+        android:textColor="@color/color_white_1"
         android:text="@string/splash_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
