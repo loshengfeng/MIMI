@@ -40,6 +40,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
     private val tagChipGroup: ChipGroup = itemView.chip_group_tag
     private val likeImage: ImageView = itemView.iv_like
     private val likeCount: TextView = itemView.tv_like_count
+    private val tvTitleMore: TextView = itemView.tv_title_more
 
 
     private val favoriteImage: ImageView = itemView.iv_favorite
@@ -62,6 +63,12 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
+
+        tvTitleMore.visibility = if (title.text.length >= 45) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
 
         // New Adjust: Follow is hidden when it is on the list page, and the follow function is only available on the detailed page
 //        follow.visibility =

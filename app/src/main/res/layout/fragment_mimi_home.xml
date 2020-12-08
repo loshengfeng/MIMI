@@ -13,11 +13,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tabIndicatorHeight="4dp"
-        app:tabMode="scrollable"
         app:tabIndicator="@drawable/bg_tab_home"
+        app:tabIndicatorHeight="4dp"
+        app:tabMaxWidth="70dp"
         app:tabMinWidth="70dp"
-        app:tabMaxWidth="70dp" />
+        app:tabMode="scrollable" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewpager"

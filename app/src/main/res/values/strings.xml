@@ -565,7 +565,7 @@
     <!-- Check In -->
     <string name="daily_check_in_success">签到成功</string>
     <string name="daily_check_in">每日签到</string>
-    <string name="daily_check_in_hint">赠送秘密视频 %1$d 部、短视频 %2$d 部</string>
+    <string name="daily_check_in_hint">赠送蜜蜜视频 %1$d 部、小视频 %2$d 部</string>
 
     <!-- Actor -->
     <string name="actor_hot_actresses">人气女优</string>

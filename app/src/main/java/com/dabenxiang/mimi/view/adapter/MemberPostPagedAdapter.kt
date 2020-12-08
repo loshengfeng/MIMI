@@ -26,6 +26,7 @@ class MemberPostPagedAdapter(
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
         const val PAYLOAD_UPDATE_FOLLOW = 1
+        const val PAYLOAD_UPDATE_FAVORITE= 2
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
@@ -118,11 +119,11 @@ class MemberPostPagedAdapter(
             }
             is ClipPostHolder -> {
                 item?.also {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
-                        }
-                    } ?: run {
+//                    payloads.takeIf { it.isNotEmpty() }?.also {
+//                        when (it[0] as Int) {
+//                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+//                        }
+//                    } ?: run {
                         holder.onBind(
                             item,
                             currentList,
@@ -132,21 +133,21 @@ class MemberPostPagedAdapter(
                             memberPostFuncItem,
                             isClipList
                         )
-                    }
+//                    }
                 }
             }
             is PicturePostHolder -> {
                 item?.also {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
-                            PAYLOAD_UPDATE_LIKE -> holder.updateLikeAndFollowItem(
-                                item,
-                                currentList,
-                                memberPostFuncItem
-                            )
-                        }
-                    } ?: run {
+//                    payloads.takeIf { it.isNotEmpty() }?.also {
+//                        when (it[0] as Int) {
+//                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+//                            PAYLOAD_UPDATE_LIKE -> holder.updateLikeAndFollowItem(
+//                                item,
+//                                currentList,
+//                                memberPostFuncItem
+//                            )
+//                        }
+//                    } ?: run {
                         holder.pictureRecycler.tag = position
                         holder.onBind(
                             item,
@@ -156,16 +157,16 @@ class MemberPostPagedAdapter(
                             mTag,
                             memberPostFuncItem
                         )
-                    }
+//                    }
                 }
             }
             is TextPostHolder -> {
                 item?.also {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
-                        }
-                    } ?: run {
+//                    payloads.takeIf { it.isNotEmpty() }?.also {
+//                        when (it[0] as Int) {
+//                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+//                        }
+//                    } ?: run {
                         holder.onBind(
                             it,
                             currentList,
@@ -174,7 +175,7 @@ class MemberPostPagedAdapter(
                             mTag,
                             memberPostFuncItem
                         )
-                    }
+//                    }
                 }
             }
         }
