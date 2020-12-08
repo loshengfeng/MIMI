@@ -226,12 +226,14 @@ class SearchVideoFragment : BaseFragment() {
 
     private fun searchText() {
         if (search_bar.text.isNotBlank()) {
+            layout_search_text.visibility = View.GONE
             layout_search_history.visibility = View.GONE
             viewModel.searchingTag = ""
             viewModel.searchingStr = search_bar.text.toString()
             searchVideo(keyword = search_bar.text.toString())
             viewModel.updateSearchHistory(viewModel.searchingStr)
             GeneralUtils.hideKeyboard(requireActivity())
+            search_bar.clearFocus()
         } else {
             GeneralUtils.showToast(
                 requireContext(),
@@ -411,7 +413,7 @@ class SearchVideoFragment : BaseFragment() {
                 viewModel.searchingTag = ""
                 searchVideo(keyword = text)
                 GeneralUtils.hideKeyboard(requireActivity())
-                tv_search.requestFocus()
+                search_bar.clearFocus()
             }
             chip_group_search_text.addView(chip)
         }

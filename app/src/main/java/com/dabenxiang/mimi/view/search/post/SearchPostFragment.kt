@@ -223,11 +223,10 @@ class SearchPostFragment : BaseFragment() {
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
 
         override fun onChipClick(type: PostType, tag: String) {
-            layout_search_text.visibility = View.GONE
             search_bar.setText(tag)
             search(tag = tag)
             GeneralUtils.hideKeyboard(requireActivity())
-//            search_bar.clearFocus()
+            search_bar.clearFocus()
         }
     }
 
@@ -244,13 +243,13 @@ class SearchPostFragment : BaseFragment() {
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         if (!TextUtils.isEmpty(searchTag)) {
-            layout_search_history.visibility = View.GONE
             search_bar.setText(searchTag)
             search(tag = searchTag)
             search_bar.post {
                 search_bar.clearFocus()
             }
         } else {
+            layout_search_text.visibility = View.GONE
             iv_clear_search_bar.visibility = View.GONE
             getSearchHistory()
             search_bar.post {
@@ -258,7 +257,6 @@ class SearchPostFragment : BaseFragment() {
                 search_bar.requestFocus()
             }
         }
-        layout_search_text.visibility = View.GONE
 
         adapter.addLoadStateListener(loadStateListener)
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
@@ -382,9 +380,10 @@ class SearchPostFragment : BaseFragment() {
                 requireContext(),
                 getString(R.string.search_video_input_empty_toast)
             )
-//            search_bar.requestFocus()
+            search_bar.requestFocus()
             return
         }
+        layout_search_text.visibility = View.GONE
         layout_search_history.visibility = View.GONE
         text?.let {
             viewModel.updateSearchHistory(text)
@@ -408,6 +407,7 @@ class SearchPostFragment : BaseFragment() {
             }
         }
         GeneralUtils.hideKeyboard(requireActivity())
+        search_bar.clearFocus()
     }
 
     private fun setSearchResultText(
@@ -478,7 +478,6 @@ class SearchPostFragment : BaseFragment() {
             chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             chip.setOnClickListener {
                 search_bar.setText(text)
-                layout_search_history.visibility = View.GONE
                 search(text = text)
                 GeneralUtils.hideKeyboard(requireActivity())
                 search_bar.clearFocus()
