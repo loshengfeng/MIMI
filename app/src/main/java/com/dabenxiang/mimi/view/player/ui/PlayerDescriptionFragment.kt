@@ -29,6 +29,7 @@ import com.dabenxiang.mimi.view.player.SelectEpisodeAdapter
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
+import kotlinx.android.synthetic.main.fragment_player_description.*
 import kotlinx.android.synthetic.main.head_guess_like.*
 import kotlinx.android.synthetic.main.head_source.*
 import kotlinx.android.synthetic.main.head_video_info.*
@@ -81,6 +82,7 @@ class PlayerDescriptionFragment : BaseFragment() {
                 if(viewModel.selectEpisodePosition.value != 0) viewModel.selectStreamSourceIndex(0)
                 viewModel.videoContentId = (baseVideoItem as BaseVideoItem.Video).id!!
                 viewModel.getVideoContent()
+                nestedScrollView.smoothScrollTo(0, 0)
             }
 
             override fun onTagClick(tag: String) {

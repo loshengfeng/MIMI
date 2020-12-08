@@ -42,16 +42,6 @@ import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_L
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
-import kotlinx.android.synthetic.main.fragment_search_post.chip_group_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.ib_back
-import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_history
-import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_search_bar
-import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
-import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.search_bar
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
-import kotlinx.android.synthetic.main.fragment_search_video.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -233,11 +223,10 @@ class SearchPostFragment : BaseFragment() {
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
 
         override fun onChipClick(type: PostType, tag: String) {
-            layout_search_text.visibility = View.GONE
             search_bar.setText(tag)
             search(tag = tag)
             GeneralUtils.hideKeyboard(requireActivity())
-//            search_bar.clearFocus()
+            search_bar.clearFocus()
         }
     }
 
@@ -254,17 +243,20 @@ class SearchPostFragment : BaseFragment() {
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         if (!TextUtils.isEmpty(searchTag)) {
-            layout_search_history.visibility = View.GONE
             search_bar.setText(searchTag)
             search(tag = searchTag)
-//            search_bar.clearFocus()
+            search_bar.post {
+                search_bar.clearFocus()
+            }
         } else {
+            layout_search_text.visibility = View.GONE
             iv_clear_search_bar.visibility = View.GONE
             getSearchHistory()
-            GeneralUtils.showKeyboard(requireContext())
-//            search_bar.requestFocus()
+            search_bar.post {
+                GeneralUtils.showKeyboard(search_bar.context)
+                search_bar.requestFocus()
+            }
         }
-        layout_search_text.visibility = View.GONE
 
         adapter.addLoadStateListener(loadStateListener)
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
@@ -312,13 +304,15 @@ class SearchPostFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
+            GeneralUtils.hideKeyboard(requireActivity())
             findNavController().navigateUp()
         }
 
         iv_clear_search_bar.setOnClickListener {
             search_bar.setText("")
+            GeneralUtils.hideKeyboard(requireActivity())
             GeneralUtils.showKeyboard(requireContext())
-//            search_bar.requestFocus()
+            search_bar.requestFocus()
         }
 
         iv_clear_history.setOnClickListener {
@@ -387,9 +381,10 @@ class SearchPostFragment : BaseFragment() {
                 requireContext(),
                 getString(R.string.search_video_input_empty_toast)
             )
-//            search_bar.requestFocus()
+            search_bar.requestFocus()
             return
         }
+        layout_search_text.visibility = View.GONE
         layout_search_history.visibility = View.GONE
         text?.let {
             viewModel.updateSearchHistory(text)
@@ -413,6 +408,7 @@ class SearchPostFragment : BaseFragment() {
             }
         }
         GeneralUtils.hideKeyboard(requireActivity())
+        search_bar.clearFocus()
     }
 
     private fun setSearchResultText(
@@ -483,10 +479,9 @@ class SearchPostFragment : BaseFragment() {
             chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             chip.setOnClickListener {
                 search_bar.setText(text)
-                layout_search_history.visibility = View.GONE
                 search(text = text)
                 GeneralUtils.hideKeyboard(requireActivity())
-//                search_bar.clearFocus()
+                search_bar.clearFocus()
             }
             chip_group_search_text.addView(chip)
         }
