@@ -189,7 +189,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             } else {
                 item.likeCount -= 1
                 item.likeType =
-                    if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
+                    if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_loginFragment,
@@ -304,7 +304,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            Timber.d("onItemClick =${adultTabType}")
+            Timber.d("onItemClick =${adultTabType}, ${item.likeType}")
             when (adultTabType) {
                 AdultTabType.TEXT -> {
                     val bundle = ClubTextFragment.createBundle(item)

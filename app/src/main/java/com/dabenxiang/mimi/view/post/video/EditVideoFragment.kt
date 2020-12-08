@@ -137,7 +137,7 @@ class EditVideoFragment : BaseFragment() {
 
         tv_title.text = getString(R.string.post_title)
         tv_clean.visibility = View.VISIBLE
-        tv_clean.text = getString(R.string.btn_send)
+        tv_clean.text = getString(R.string.btn_complete)
 
         val img = requireContext().getDrawable(R.drawable.btn_close_n)
         tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)

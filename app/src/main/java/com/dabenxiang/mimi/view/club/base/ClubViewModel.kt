@@ -131,6 +131,7 @@ abstract class ClubViewModel : BaseViewModel(){
                 emit(ApiResult.success(adResult.body()?.content))
             }
                 .flowOn(Dispatchers.IO)
+                .catch { emit(ApiResult.error(it)) }
                 .collect { _adResult.value = it}
         }
 

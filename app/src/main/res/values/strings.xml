@@ -230,6 +230,7 @@
     <string name="btn_cancel">取消</string>
     <string name="btn_register">注册</string>
     <string name="btn_send">送出</string>
+    <string name="btn_complete">完成</string>
     <string name="btn_login">登录</string>
     <string name="btn_retry">重试</string>
     <string name="login_name">请填写名称</string>
@@ -404,6 +405,7 @@
     <string name="post_tag_already_have">已存在相同标签，请确认</string>
     <string name="post_error">发布失败</string>
     <string name="post_video_length_error">影片长度最短为3秒最长为15秒</string>
+    <string name="post_tag_full">标签已满</string>
 
     <!-- Problem report -->
     <string name="report_item_can_not_play">视频无法播放</string>
