@@ -197,7 +197,7 @@ class CommentDialogFragment : BaseDialogFragment() {
 
             rv_comment.adapter = playerInfoAdapter
             lifecycleScope.launchWhenResumed {
-                viewModel.setupCommentDataSource(memberPostItem.id ?: 0, playerInfoAdapter)
+                viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
             }
 
             takeIf { memberPostItem.commentCount == 0L }?.also {
@@ -241,12 +241,7 @@ class CommentDialogFragment : BaseDialogFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
-                        if (view != null) {
-                            val inputManager =
-                                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            inputManager.hideSoftInputFromWindow(view?.windowToken, 0)
-                        }
-                        
+                        GeneralUtils.hideKeyboard(this)
                         et_message.text = null
                         et_message.tag = null
                         tv_replay_name.text = null
@@ -261,7 +256,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                         )
 
                         data?.also { memberPostItem ->
-                            viewModel.setupCommentDataSource(memberPostItem.id ?: 0, playerInfoAdapter)
+                            viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
                         }
                         commentListener?.onUpdateCommentCount(data?.commentCount?.toInt() ?: 0)
                     }
