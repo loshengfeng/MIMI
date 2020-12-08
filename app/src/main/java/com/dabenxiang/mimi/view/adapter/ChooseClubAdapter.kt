@@ -116,7 +116,7 @@ class ChooseClubAdapter(
     }
 
     class ChooseClubViewHolder(itemView: View) : BaseViewHolder(itemView) {
-        val rootLayout: RelativeLayout = itemView.rootLayout
+        val rootLayout: ConstraintLayout = itemView.rootLayout
         val avatar: ImageView = itemView.iv_avatar
         val clubName: TextView = itemView.txt_clubName
         val hashTag: TextView = itemView.txt_hashtagName
