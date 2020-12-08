@@ -11,9 +11,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class GuessLikeDataSource(
     private val isAdult: Boolean,
+    private val tags: String,
     private val category: String,
     private val viewModelScope: CoroutineScope,
     private val apiRepository: ApiRepository,
@@ -39,12 +41,13 @@ class GuessLikeDataSource(
 //                    category, isAdult, "0",
 //                    PER_LIMIT
 //                )
+                // note: category is deprecated, so the category parameter is tags.
                 val result = apiRepository.statisticsHomeVideos(
                     "",
                     "",
                     StatisticsOrderType.HOTTEST.value,
-                    category,
                     "",
+                    category,
                     true,
                     true,
                     0,
@@ -54,6 +57,28 @@ class GuessLikeDataSource(
 
                 val item = result.body()
                 val videos = item?.content
+                Timber.d("@@@ video size ${videos?.size}")
+                if(videos?.size != 10) {
+                    Timber.d("@@@ 3 video size ${videos?.size}")
+                    val res = apiRepository.statisticsHomeVideos(
+                        "",
+                        "",
+                        StatisticsOrderType.HOTTEST.value,
+                        "",
+                        tags,
+                        true,
+                        true,
+                        0,
+                        PER_LIMIT.toInt()
+                    )
+                    if (!res.isSuccessful) throw HttpException(res)
+                    res.body()?.content?.map {
+                        if(videos?.size != 10)
+                            videos?.add(it)
+                        else return@map
+                    }
+                }
+
                 if (videos != null) {
                     returnList.addAll(videos.statisticsItemToVideoItem())
                 }

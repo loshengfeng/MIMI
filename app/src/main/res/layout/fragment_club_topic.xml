@@ -170,21 +170,20 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_gravity="center_horizontal"
             android:orientation="horizontal"
-            app:tabMinWidth="70dp"
-            app:tabGravity="center"
             app:tabIndicator="@drawable/bg_tab_login"
             app:tabIndicatorColor="@color/adult_color_bottom_bar_item"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/color_black_1"
-            app:tabTextColor="@color/color_black_1_50">
+            app:tabTextColor="@color/color_black_1_50"
+            app:tabTextAppearance="@style/TabLayoutTextStyle_16">
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/ti_hottest"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:clickable="false"
                 android:text="@string/hottest" />

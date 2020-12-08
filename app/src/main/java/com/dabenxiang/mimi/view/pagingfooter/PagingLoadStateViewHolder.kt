@@ -19,21 +19,21 @@ class PagingLoadStateViewHolder(
     private val retry = itemView.retry_button.also { it.setOnClickListener { retryCallback() } }
 
     fun bindTo(loadState: LoadState) {
-        progressBar.visibility = takeIf { loadState is LoadState.Loading }?.let { View.VISIBLE }
+        progressBar.visibility = takeIf { loadState is LoadState.Loading }
+            ?.let { View.VISIBLE }
             ?: let { View.GONE }
 
         val errMsg = (loadState as? LoadState.Error)?.error?.message
         when {
-            errMsg.isNullOrBlank() || errMsg.contains("List is empty") -> {
+            errMsg.isNullOrBlank() -> {
                 errorMsg.visibility = View.GONE
                 retry.visibility = View.GONE
             }
             else -> {
                 errorMsg.visibility = View.VISIBLE
                 retry.visibility = View.VISIBLE
+                errorMsg.text = errMsg
             }
         }
-        errorMsg.text = (loadState as? LoadState.Error)?.error?.message
     }
-
 }

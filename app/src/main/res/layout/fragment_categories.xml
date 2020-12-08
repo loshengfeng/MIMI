@@ -55,7 +55,6 @@
                 android:id="@+id/rv_video"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@color/color_white_1"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingTop="150dp"
@@ -136,12 +135,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:alpha="0"
+                android:gravity="center_vertical"
+                android:visibility="gone"
                 android:background="@color/color_gray_12"
                 android:orientation="horizontal"
-                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible"
+                tools:alpha="1">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -153,12 +155,19 @@
                 <TextView
                     android:id="@+id/tv_collapsing_filter"
                     android:layout_width="match_parent"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="6dp"
                     android:textColor="@color/color_black_1"
                     android:textSize="14sp"
                     tools:text="第二层, 第三层, 第四层" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/btn_arrowdown_gray_n"/>
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

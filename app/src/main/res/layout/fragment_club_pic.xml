@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/color_gray_2">
 
     <include
         android:id="@+id/layout_title"
@@ -15,16 +16,17 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:background="@drawable/item_setting_bar_bg_selector"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_title"
-        app:tabGravity="center"
+        app:tabIndicatorHeight="4dp"
         app:tabIndicator="@drawable/bg_tab_login"
-        app:tabIndicatorColor="@color/adult_color_bottom_bar_item"
-        app:tabMinWidth="70dp">
+        app:tabTextColor="@color/color_black_1_50"
+        app:tabSelectedTextColor="@color/color_black_1"
+        app:tabTextAppearance="@style/TabLayoutTextStyle_16">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_text_detail"
@@ -51,5 +53,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/snackBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

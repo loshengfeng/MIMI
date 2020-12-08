@@ -88,7 +88,10 @@ class GeneralVideoAdapter(
                     .into(holder.videoImage)
 
                 holder.videoTitleText.text = item.title
-                holder.videoLayout.setOnClickListener { onItemClick(item) }
+
+                holder.videoLayout.setOnClickListener {
+                    onItemClick(item)
+                }
             }
         }
     }

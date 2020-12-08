@@ -20,7 +20,6 @@ import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_follow_list.*
-import kotlinx.android.synthetic.main.fragment_my_follow_list.layout_refresh
 
 class MyFollowListFragment(val type: Int) : BaseFragment() {
 
@@ -28,18 +27,22 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
 
     private val memberAdapter by lazy {
-        MemberFollowPeopleAdapter(requireContext(), listener)
+        MemberFollowPeopleAdapter(requireContext(), listener) { id, view, type ->
+            viewModel.loadImage(id, view, type)
+        }
     }
 
     private val clubAdapter: ClubFollowPeopleAdapter by lazy {
-        ClubFollowPeopleAdapter(requireContext(), listener)
+        ClubFollowPeopleAdapter(requireContext(), listener) { id, view, type ->
+            viewModel.loadImage(id, view, type)
+        }
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_list
 
     override fun initSettings() {
         super.initSettings()
-        tv_title_count.text = getString(R.string.follow_members_total_num, "0")
+//        tv_title_count.text = getString(R.string.follow_members_total_num, "0")
     }
 
     override val bottomNavigationVisibility: Int
@@ -140,7 +143,14 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
         }
 
         viewModel.postCount.observe(this) {
-            tv_title_count.text = getString(R.string.follow_members_total_num, it.toString())
+            when (type) {
+                MyFollowFragment.TAB_FOLLOW_PEOPLE -> {
+                    tv_title_count.text = getString(R.string.follow_members_total_num, "".plus(it))
+                }
+                MyFollowFragment.TAB_FOLLOW_CLUB -> {
+                    tv_title_count.text = getString(R.string.follow_circle_total_num, "".plus(it))
+                }
+            }
             if (it == 0) {
                 text_page_empty.text = getString(R.string.follow_no_data)
                 id_empty_group.visibility = View.VISIBLE

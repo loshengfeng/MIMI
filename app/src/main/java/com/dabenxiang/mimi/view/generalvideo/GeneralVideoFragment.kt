@@ -14,7 +14,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.category.CategoriesFragment
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_VIDEO
-import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
@@ -22,7 +21,14 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getScreenSize
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
+import kotlinx.android.synthetic.main.fragment_actor_videos.layout_empty_data
+import kotlinx.android.synthetic.main.fragment_actor_videos.layout_refresh
+import kotlinx.android.synthetic.main.fragment_actor_videos.rv_video
+import kotlinx.android.synthetic.main.fragment_actor_videos.tv_empty_data
 import kotlinx.android.synthetic.main.fragment_general_video.*
+import kotlinx.android.synthetic.main.fragment_general_video.tv_filter
+import kotlinx.android.synthetic.main.fragment_general_video.tv_search
+import kotlinx.android.synthetic.main.fragment_recommend.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -42,6 +48,11 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
         rv_video.visibility = View.INVISIBLE
 
+        tv_search.text = String.format(
+            getString(R.string.text_search_classification),
+            category
+        )
+
         tv_search.setOnClickListener {
             navToSearch()
         }
@@ -55,8 +66,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
         }
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
-
-        val loadStateAdapter = VideoLoadStateAdapter(generalVideoAdapter)
 
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
             .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
@@ -81,6 +90,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     generalVideoAdapter.submitData(it)
                 }
         }
+
     }
 
     override fun getLayoutId(): Int {
@@ -114,6 +124,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     tv_empty_data?.run { this.text = getString(R.string.empty_video) }
                     rv_video?.run { this.visibility = View.INVISIBLE }
                 } else {
+                    rv_video?.scrollBy(0, 1) //FIXME: 滑動後頁面才能點擊，原因未明，查找中...
                     layout_empty_data?.run { this.visibility = View.INVISIBLE }
                     rv_video?.run { this.visibility = View.VISIBLE }
                 }

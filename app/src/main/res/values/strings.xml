@@ -46,7 +46,7 @@
     <string name="invalidate_code_error_1">请填写验证码</string>
     <string name="invited_code_error_1">邀请码无效，请确认</string>
     <string name="receive_mail">请收验证信</string>
-    <string name="send_msg">已发送简讯验证码到注册手机号上，请查收</string>
+    <string name="send_msg">已发送验证码到手机号，请查收</string>
     <string name="desc_register">请至信箱查看验证信以完成账号注册</string>
     <string name="desc_email">已传送新密码至您的邮箱\n%s\n请至邮箱确认</string>
     <string name="desc_mobile">已传送新密码至您的手机号\n%s\n请确认</string>
@@ -95,7 +95,7 @@
 
     <!-- Club -->
     <string name="club_tab_follow">关注</string>
-    <string name="club_tab_recommend">推薦</string>
+    <string name="club_tab_recommend">推荐</string>
     <string name="club_tab_latest">最新</string>
     <string name="club_tab_clip">短视频</string>
     <string name="club_tab_picture">图片</string>
@@ -117,6 +117,12 @@
         <item>@string/club_tab_novel</item>
     </string-array>
 
+    <string-array name="club_hot_topic_tabs">
+        <item>@string/hottest</item>
+        <item>@string/newest</item>
+        <item>@string/video</item>
+    </string-array>
+
     <!-- Favorite -->
     <string name="favorite_title">我的收藏</string>
     <string name="favorite_clean">清除所有收藏</string>
@@ -129,8 +135,8 @@
     <string name="favorite_delete_favorite">取消收藏</string>
     <string name="favorite_no_data">尚未收藏影片，快去看片吧！</string>
     <string name="favorite_delete_this_favorite">是否要清除此收藏</string>
-    <string name="favorite_tab1">蜜蜜影視</string>
-    <string name="favorite_tab2">小視頻</string>
+    <string name="favorite_tab1">蜜蜜影视</string>
+    <string name="favorite_tab2">小视频</string>
     <string name="favorite_tab3">帖子</string>
     <string-array name="favorite_tabs">
         <item>@string/favorite_tab1</item>
@@ -209,7 +215,7 @@
     <string name="topup_completed">交易成功</string>
     <string name="topup_canceled">Canceled</string>
     <string name="topup_failed">交易失败</string>
-<!--    <string name="topup_teaching"><a href="https://www.google.com/?hl=zh_tw">充值教学 ></a></string>-->
+    <!--    <string name="topup_teaching"><a href="https://www.google.com/?hl=zh_tw">充值教学 ></a></string>-->
     <string name="topup_teaching">充值教学 ></string>
     <string name="title_chat_history">对话记录</string>
     <string name="edit_hint_chat">留下评论</string>
@@ -224,6 +230,7 @@
     <string name="btn_cancel">取消</string>
     <string name="btn_register">注册</string>
     <string name="btn_send">送出</string>
+    <string name="btn_complete">完成</string>
     <string name="btn_login">登录</string>
     <string name="btn_retry">重试</string>
     <string name="login_name">请填写名称</string>
@@ -255,21 +262,22 @@
     <string name="follow_tab_small_video">小视频</string>
     <string name="follow_tab_post">帖子</string>
     <string name="follow_people">关注的人</string>
-    <string name="follow_circle">关注的圈子</string>
+    <string name="follow_circle">关注的社区</string>
     <string-array name="follow_tabs">
         <item>@string/follow_people</item>
         <item>@string/follow_circle</item>
     </string-array>
     <string name="follow_members_total_num">全部关注%s人</string>
+    <string name="follow_circle_total_num">全部关注%s社区</string>
     <string name="follow_clubs_total_num">全部关注%s圈子</string>
     <string name="follow_clean">清除</string>
-    <string name="follow_clean_member_dlg_msg">是否要清除所有关注的人</string>
+    <string name="follow_clean_member_dlg_msg">是否要清除所有关注的社区</string>
     <string name="follow_clean_club_dlg_msg">是否要清除所有关注的圈子</string>
     <string name="follow_no_data">尚未有任何关注，快去关注一下吧！</string>
 
     <string name="text_more">更多</string>
     <string name="text_search">搜寻</string>
-    <string name="text_search_classification">搜寻 ”该分类” 内容</string>
+    <string name="text_search_classification">搜寻 ”%s” 内容</string>
     <string name="text_follow">关注</string>
     <string name="text_post">帖子</string>
     <string name="text_ranking">排行榜</string>
@@ -328,15 +336,15 @@
     <string name="empty_follow">尚未有任何关注，快去关注一下吧！</string>
 
     <!-- Follow -->
-    <string name="follow">关注</string>
+    <string name="follow">+关注</string>
     <string name="followed">已关注</string>
     <string name="cancel_follow">取消关注</string>
 
     <!-- like -->
     <string name="like">喜欢</string>
     <string name="like_title">我喜欢</string>
-    <string name="like_tab1">帖子</string>
-    <string name="like_tab2">蜜蜜影視</string>
+    <string name="like_tab1">蜜蜜影视</string>
+    <string name="like_tab2">帖子</string>
     <string name="like_empty_msg">尚未有任何喜欢的内容，快去浏览一下吧！</string>
     <string name="like_delete_all">是否要清除所有喜歡的內容?</string>
     <string-array name="like_tabs">
@@ -347,13 +355,14 @@
     <string name="fans">粉丝</string>
     <string name="total_count_fans">全部粉丝%s人</string>
     <string name="title_fans">我的粉丝</string>
+    <string name="empty_fans_post">尚未有任何粉丝，快去发文吧！</string>
     <!-- fans -->
     <string name="exchange">兑换激活码</string>
 
     <!-- every day -->
     <string name="every_day_count">每日观看次数</string>
-    <string name="every_day_length">長視頻</string>
-    <string name="every_day_short">@string/short_video</string>
+    <string name="every_day_length">蜜蜜视频</string>
+    <string name="every_day_short">小视频</string>
     <string name="every_day_video_count_unlimit">无限</string>
     <!-- vip -->
     <string name="vip_hint">VIP享无限观影</string>
@@ -396,6 +405,7 @@
     <string name="post_tag_already_have">已存在相同标签，请确认</string>
     <string name="post_error">发布失败</string>
     <string name="post_video_length_error">影片长度最短为3秒最长为15秒</string>
+    <string name="post_tag_full">标签已满</string>
 
     <!-- Problem report -->
     <string name="report_item_can_not_play">视频无法播放</string>
@@ -438,6 +448,7 @@
     <!-- My post -->
     <string name="delete_post">删除</string>
     <string name="edit_post">编辑</string>
+    <string name="my_post_no_data">尚无任何帖子，赶快去发帖吧～</string>
 
     <string name="problem_report">问题回报</string>
     <string name="already_reported">您已回报过问题</string>
@@ -511,6 +522,7 @@
     <string name="order_contact_mimi_service">蜜蜜客服</string>
     <string name="order_no_data">尚未有充值纪录，快去充值吧！</string>
     <string name="payment_title">打款资讯</string>
+    <string name="chat_no_data">目前尚无聊天记录唷！</string>
 
     <!-- Order Result -->
     <string name="order_result_create_order">建立订单</string>
@@ -565,9 +577,14 @@
     <!-- Clip -->
     <string name="clip_newest">最新</string>
     <string name="clip_top_hit">热门</string>
+    <string-array name="clip_play_tabs">
+        <item>@string/video_desc</item>
+        <item>@string/comment</item>
+    </string-array>
 
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
+    <string name="recommend">推荐</string>
 
     <!-- Category -->
     <string name="category_newest">最新</string>
@@ -583,6 +600,7 @@
     <string name="boo">踩</string>
 
     <string name="video_desc">视频简介</string>
-    <string name="show_more"> 顯示更多</string>
+    <string name="show_more"> 显示更多</string>
     <string name="small_video">小视频</string>
+    <string name="actor">女优</string>
 </resources>

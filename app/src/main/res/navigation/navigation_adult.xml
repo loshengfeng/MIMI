@@ -369,4 +369,5 @@
         android:id="@+id/inviteVipRecordFragment"
         android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
         android:label="InviteVipRecordFragment" />
+
 </navigation>

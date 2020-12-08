@@ -16,7 +16,7 @@ import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
-import com.dabenxiang.mimi.view.generalvideo.paging.VideoLoadStateAdapter
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
@@ -77,15 +77,13 @@ class ActorVideosFragment : BaseFragment() {
 
         generalVideoAdapter.addLoadStateListener(loadStateListener)
 
-        val loadStateAdapter = VideoLoadStateAdapter(generalVideoAdapter)
-
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
             .also { it.spanSizeLookup = gridLayoutSpanSizeLookup }
 
         rv_video.also {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
-            it.adapter = generalVideoAdapter.withLoadStateFooter(loadStateAdapter)
+            it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.addItemDecoration(
                 GridSpaceItemDecoration(
                     2,
