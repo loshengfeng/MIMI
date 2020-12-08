@@ -41,13 +41,12 @@ class GuessLikeDataSource(
 //                    category, isAdult, "0",
 //                    PER_LIMIT
 //                )
-                // note: category is deprecated, so the category parameter is tags.
                 val result = apiRepository.statisticsHomeVideos(
                     "",
                     "",
                     StatisticsOrderType.HOTTEST.value,
-                    "",
                     category,
+                    "",
                     true,
                     true,
                     0,

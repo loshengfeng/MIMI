@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.search.post
 
+import android.content.Context
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -8,6 +9,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -249,6 +251,11 @@ class SearchPostFragment : BaseFragment() {
             searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
         }
 
+        search_bar.post {
+            GeneralUtils.showKeyboard(search_bar.context)
+            search_bar.requestFocus()
+        }
+        
         viewModel.adWidth =
             GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
@@ -261,7 +268,7 @@ class SearchPostFragment : BaseFragment() {
         } else {
             iv_clear_search_bar.visibility = View.GONE
             getSearchHistory()
-            GeneralUtils.showKeyboard(requireContext())
+//            GeneralUtils.showKeyboard(requireContext())
 //            search_bar.requestFocus()
         }
         layout_search_text.visibility = View.GONE
@@ -312,6 +319,7 @@ class SearchPostFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
+            GeneralUtils.hideKeyboard(requireActivity())
             findNavController().navigateUp()
         }
 
