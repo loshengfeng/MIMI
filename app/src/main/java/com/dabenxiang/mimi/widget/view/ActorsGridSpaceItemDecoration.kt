@@ -23,7 +23,7 @@ class ActorsGridSpaceItemDecoration(
         val position = parent.getChildLayoutPosition(view)
         when(view.id){
             R.id.cl_actor_videos -> {
-                outRect.left = GeneralUtils.dpToPx(context, 20)
+                outRect.left = GeneralUtils.dpToPx(context, 0)
             }
             R.id.cl_category -> {
                 if(minCategoryPos == 0) minCategoryPos = position
