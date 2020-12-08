@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.dabenxiang.mimi",
+  "variantName": "processMimiSit_releaseResources",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 20000000,
+      "versionName": "2.0.0",
+      "outputFile": "MiMi-v2.0.0-mimi-sit_release.apk"
+    }
+  ]
+}
