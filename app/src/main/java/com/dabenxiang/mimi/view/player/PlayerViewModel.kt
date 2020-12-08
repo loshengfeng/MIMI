@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
+import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.CheckStatusItem
 import com.dabenxiang.mimi.model.vo.StatusItem
@@ -904,11 +905,11 @@ class PlayerViewModel : BaseViewModel() {
         }
     }
 
-    fun sendVideoReport(){
+    fun sendVideoReport(unhealthy: Boolean){
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMemberVideoReport(
-                    videoId= videoId, type = PostType.VIDEO_ON_DEMAND.value)
+                    videoId= videoId, type = VideoType.VIDEO_ON_DEMAND.value, unhealthy)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

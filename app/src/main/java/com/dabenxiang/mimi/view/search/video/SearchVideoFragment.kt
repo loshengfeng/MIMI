@@ -126,6 +126,7 @@ class SearchVideoFragment : BaseFragment() {
                 searchVideo(tag = data.tag)
 //                tv_search.requestFocus()
             } else {
+                iv_clear_search_bar.visibility = View.GONE
                 getSearchHistory()
                 GeneralUtils.showKeyboard(requireContext())
 //                search_bar.requestFocus()

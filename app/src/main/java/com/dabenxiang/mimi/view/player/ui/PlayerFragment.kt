@@ -1279,6 +1279,7 @@ class PlayerFragment : BaseFragment() {
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
+                    viewModel.sendVideoReport(false)
                     viewModel.activateLoading(false)
                     player_view.visibility = VISIBLE
                     "ExoPlayer.STATE_READY"
@@ -1333,7 +1334,7 @@ class PlayerFragment : BaseFragment() {
                     //showErrorDialog("UNKNOWN")
                 }
             }
-            viewModel.sendVideoReport()
+            viewModel.sendVideoReport(true)
         }
     }
 
