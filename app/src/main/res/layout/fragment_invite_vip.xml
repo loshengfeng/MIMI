@@ -20,7 +20,8 @@
         <ImageView
             android:id="@+id/iv_invite_bg"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="@+id/gl_background_bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,22 +39,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0" />
-
-        <ImageView
-            android:id="@+id/iv_invite_word"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="85dp"
-            android:layout_marginTop="57dp"
-            android:layout_marginEnd="86dp"
-            android:layout_marginBottom="297dp"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_invite_bg"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.515"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.06"
-            app:srcCompat="@drawable/img_vip_word" />
 
         <ImageView
             android:id="@+id/iv_invite_vip_back"
@@ -76,6 +61,22 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_invite_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="85dp"
+            android:layout_marginTop="57dp"
+            android:layout_marginEnd="86dp"
+            android:layout_marginBottom="297dp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_invite_bg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.515"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.06"
+            app:srcCompat="@drawable/img_vip_word" />
 
         <TextView
             android:id="@+id/textView2"
