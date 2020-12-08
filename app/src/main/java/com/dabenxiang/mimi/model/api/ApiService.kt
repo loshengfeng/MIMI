@@ -263,7 +263,7 @@ interface ApiService {
     @GET("/v1/Members/Club/{id}")
     suspend fun getMembersClub(
         @Path("id") clubId: Long
-    ): Response<ApiBasePagingItem<MemberClubItem>>
+    ): Response<ApiBaseItem<MemberClubItem>>
 
     @GET("/v1/Members/Club/Post")
     suspend fun getMembersClubPost(

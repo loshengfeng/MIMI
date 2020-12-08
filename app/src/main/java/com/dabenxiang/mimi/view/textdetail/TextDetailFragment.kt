@@ -74,8 +74,8 @@ class TextDetailFragment : BaseFragment() {
             arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
         val position = arguments?.getInt(PictureDetailFragment.KEY_POSITION) ?: 0
 
-        adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        adHeight = (adWidth * 0.142).toInt()
+        adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         text_toolbar_title.text = getString(R.string.text_detail_title)
         toolbarContainer.toolbar.navigationIcon =

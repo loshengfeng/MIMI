@@ -227,7 +227,7 @@ class SearchPostFragment : BaseFragment() {
             search_bar.setText(tag)
             search(tag = tag)
             GeneralUtils.hideKeyboard(requireActivity())
-            search_bar.clearFocus()
+//            search_bar.clearFocus()
         }
     }
 
@@ -240,18 +240,18 @@ class SearchPostFragment : BaseFragment() {
         }
 
         viewModel.adWidth =
-            ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+            GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         if (!TextUtils.isEmpty(searchTag)) {
             layout_search_history.visibility = View.GONE
             search_bar.setText(searchTag)
             search(tag = searchTag)
-            search_bar.clearFocus()
+//            search_bar.clearFocus()
         } else {
             getSearchHistory()
             GeneralUtils.showKeyboard(requireContext())
-            search_bar.requestFocus()
+//            search_bar.requestFocus()
         }
         layout_search_text.visibility = View.GONE
 
@@ -307,13 +307,12 @@ class SearchPostFragment : BaseFragment() {
         iv_clear_search_bar.setOnClickListener {
             search_bar.setText("")
             GeneralUtils.showKeyboard(requireContext())
-            search_bar.requestFocus()
+//            search_bar.requestFocus()
         }
 
         iv_clear_history.setOnClickListener {
             chip_group_search_text.removeAllViews()
             viewModel.clearSearchHistory()
-            layout_search_history.visibility = View.GONE
         }
 
         tv_search.setOnClickListener {
@@ -377,7 +376,7 @@ class SearchPostFragment : BaseFragment() {
                 requireContext(),
                 getString(R.string.search_video_input_empty_toast)
             )
-            search_bar.requestFocus()
+//            search_bar.requestFocus()
             return
         }
         layout_search_history.visibility = View.GONE
@@ -476,12 +475,12 @@ class SearchPostFragment : BaseFragment() {
                 layout_search_history.visibility = View.GONE
                 search(text = text)
                 GeneralUtils.hideKeyboard(requireActivity())
-                search_bar.clearFocus()
+//                search_bar.clearFocus()
             }
             chip_group_search_text.addView(chip)
         }
 
-        layout_search_history.visibility = if (searchHistories.size > 0) View.VISIBLE else View.GONE
+        layout_search_history.visibility = View.VISIBLE
     }
 
     private fun searchPostFollow(

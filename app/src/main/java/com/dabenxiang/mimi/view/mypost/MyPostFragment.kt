@@ -144,19 +144,6 @@ class MyPostFragment : BaseFragment() {
             }
         })
 
-        viewModel.followResult.observe(viewLifecycleOwner, {
-            when (it) {
-                is Empty -> {
-                    adapter.notifyItemRangeChanged(
-                        0,
-                        viewModel.totalCount,
-                        MyPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
-                    )
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
         mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
@@ -339,11 +326,9 @@ class MyPostFragment : BaseFragment() {
             position: Int,
             isFollow: Boolean
         ) {
-            checkStatus { viewModel.followPost(ArrayList(items), position, isFollow) }
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
-
         }
     }
 
