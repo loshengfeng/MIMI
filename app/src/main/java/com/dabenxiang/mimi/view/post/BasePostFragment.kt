@@ -158,27 +158,31 @@ open class BasePostFragment : BaseFragment() {
 
         edt_hashtag.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (chipGroup.size == HASHTAG_LIMIT) {
-                    Toast.makeText(
-                        requireContext(),
-                        R.string.post_warning_tag_limit,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    val tag = edt_hashtag.text.toString()
-                    if (isTagExist(tag)) {
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.post_tag_already_have,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        addTag(tag)
-                        edt_hashtag.text.clear()
-                    }
-                }
+                hashtagConfirm()
             }
             false
+        }
+    }
+
+    fun hashtagConfirm(){
+        if (chipGroup.size == HASHTAG_LIMIT) {
+            Toast.makeText(
+                    requireContext(),
+                    R.string.post_warning_tag_limit,
+                    Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            val tag = edt_hashtag.text.toString()
+            if (isTagExist(tag)) {
+                Toast.makeText(
+                        requireContext(),
+                        R.string.post_tag_already_have,
+                        Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                addTag(tag)
+                edt_hashtag.text.clear()
+            }
         }
     }
 
