@@ -34,7 +34,7 @@ class PostArticleFragment : BasePostFragment() {
 
     override fun setupListeners() {
         super.setupListeners()
-
+        btn_tag_confirm.setOnClickListener { hashtagConfirm() }
         edt_content.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
