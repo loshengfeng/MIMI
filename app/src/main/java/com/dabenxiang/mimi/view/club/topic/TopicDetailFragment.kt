@@ -34,6 +34,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_topic.*
+import timber.log.Timber
 
 class TopicDetailFragment : BaseFragment() {
 
@@ -48,7 +49,8 @@ class TopicDetailFragment : BaseFragment() {
             }
         }
 
-        val tabTitle = App.self.resources.getStringArray(R.array.club_hot_topic_tabs).toMutableList()
+        val tabTitle =
+            App.self.resources.getStringArray(R.array.club_hot_topic_tabs).toMutableList()
     }
 
     private val viewModel: TopicDetailViewModel by viewModels()
@@ -95,9 +97,17 @@ class TopicDetailFragment : BaseFragment() {
                         funUpdateCount
                     )
                 },
-                    { id, view, resId -> viewModel.loadImage(id, view, resId) },
-                    { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
-                    { item, isLike, func -> likePost(item, isLike, func) }
+                    getBitmap = { id, view, resId -> viewModel.loadImage(id, view, resId) },
+                    onFollowClick = { item, items, isFollow, func ->
+                        followMember(
+                            item,
+                            items,
+                            isFollow,
+                            func
+                        )
+                    },
+                    onLikeClick = { item, isLike, func -> likePost(item, isLike, func) },
+                    onFavoriteClick = { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
                 ),
                 adultListener
             )
@@ -405,6 +415,14 @@ class TopicDetailFragment : BaseFragment() {
         update: (Boolean, Int) -> Unit
     ) {
         checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
+    }
+
+    private fun favoritePost(
+        memberPostItem: MemberPostItem,
+        isFavorite: Boolean,
+        update: (Boolean, Int) -> Unit
+    ) {
+        checkStatus { viewModel.favoritePost(memberPostItem, isFavorite, update) }
     }
 }
 
