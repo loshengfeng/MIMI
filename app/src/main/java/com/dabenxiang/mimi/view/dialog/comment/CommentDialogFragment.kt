@@ -1,10 +1,13 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
+import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -234,11 +237,16 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
         })
 
-        viewModel.apiPostCommentResult.observe(this, { event ->
+        viewModel.apiPostCommentResult.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
-                        GeneralUtils.hideKeyboard(requireActivity())
+                        if (view != null) {
+                            val inputManager =
+                                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                            inputManager.hideSoftInputFromWindow(view?.windowToken, 0)
+                        }
+                        
                         et_message.text = null
                         et_message.tag = null
                         tv_replay_name.text = null
