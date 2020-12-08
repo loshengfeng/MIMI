@@ -321,4 +321,9 @@
             app:destination="@+id/postVideoFragment" />
     </fragment>
 
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        tools:layout="@layout/fragment_post_viewer" />
+
 </navigation>
