@@ -158,6 +158,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
                 id_empty_group.visibility = View.GONE
                 list_short.visibility = View.VISIBLE
             }
+            myPagesViewModel.changeDataCount(tab, it)
             layout_refresh.isRefreshing = false
         }
 
