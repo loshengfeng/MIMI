@@ -225,7 +225,7 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
             })
 
             dialog.setMsg(
-                    if(isLike) getString(R.string.like_delete_all)
+                    if(isLike) getString(R.string.like_delete_favorite_message)
                     else getString(R.string.follow_delete_favorite_message)
             )
 
