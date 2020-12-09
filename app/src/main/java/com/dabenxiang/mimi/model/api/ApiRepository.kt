@@ -483,7 +483,8 @@ class ApiRepository(private val apiService: ApiService) {
         isRandom: Boolean = false,
         offset: Int,
         limit: Int,
-        lastId: Long = 0L
+        lastId: Long = 0L,
+        excludeId: String = ""
     ) = apiService.statisticsHomeVideos(
         startTime = startTime,
         endTime = endTime,
@@ -494,7 +495,8 @@ class ApiRepository(private val apiService: ApiService) {
         isRandom = isRandom,
         offset = offset,
         limit = limit,
-        lastId = lastId
+        lastId = lastId,
+        excludeId = excludeId
     )
 
     /**
