@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -129,7 +131,11 @@ class PlayerV2Fragment : BasePlayerFragment() {
 
     override fun getTabTitle(tab: TabLayout.Tab, position: Int) {
         val tabs = resources.getStringArray(R.array.player_short_video_tabs)
-        tab.text = tabs[position]
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.custom_tab, null)
+        val textView = view?.findViewById<TextView>(R.id.tv_title)
+        textView?.text = tabs[position]
+        textView?.textSize = 16f
+        tab.customView = view
     }
 
     override fun onResume() {
