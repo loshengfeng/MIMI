@@ -260,8 +260,8 @@ class LoginFragment : BaseFragment() {
                 R.id.btnClose -> navigateTo(NavigateItem.Up)
 
                 R.id.btn_register_cancel, R.id.btn_login_cancel -> {
-                    mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
                     navigateTo(NavigateItem.Up)
+                    mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
                 }
 
                 R.id.btn_register -> {

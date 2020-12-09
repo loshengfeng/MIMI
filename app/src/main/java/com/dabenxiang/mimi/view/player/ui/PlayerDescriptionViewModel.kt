@@ -53,7 +53,7 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         }
     }
 
-    fun setupGuessLikeList(tags: String?, performers: String?, isAdult: Boolean) {
+    fun setupGuessLikeList(tags: String?, performers: String?, isAdult: Boolean, videoContentId: Long) {
         viewModelScope.launch {
             val dataSrc = GuessLikeDataSource(
                 isAdult,
@@ -61,7 +61,8 @@ class PlayerDescriptionViewModel : BaseViewModel() {
                 performers ?: "",
                 viewModelScope,
                 domainManager.getApiRepository(),
-                pagingCallback
+                pagingCallback,
+                videoContentId
             )
             val factory = GuessLikeFactory(dataSrc)
             val config = PagedList.Config.Builder()

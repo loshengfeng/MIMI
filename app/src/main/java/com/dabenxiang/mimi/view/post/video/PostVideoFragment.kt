@@ -60,7 +60,7 @@ class PostVideoFragment : BasePostFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
-        btn_tag_confirm.setOnClickListener { hashtagConfirm() }
+        btn_tag_confirm.setOnClickListener { hashTagConfirm() }
     }
 
     override fun initSettings() {

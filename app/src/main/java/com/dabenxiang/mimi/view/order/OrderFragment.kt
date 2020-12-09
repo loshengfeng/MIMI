@@ -96,7 +96,15 @@ class OrderFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initSettings()
+
+        layout_payment_prompt.visibility = View.VISIBLE
+
+        iv_payment_prompt_close.setOnClickListener {
+            layout_payment_prompt.visibility = View.GONE
+        }
+
+        viewModel.getUnread()
+        updateProxyTab?.also { getProxyUnread(it) }
     }
 
     override fun getLayoutId(): Int {
@@ -202,10 +210,12 @@ class OrderFragment : BaseFragment() {
                 val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
                 setTextViewSelected(true, textView)
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab?) {
                 val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
                 setTextViewSelected(false, textView)
             }
+
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
     }
@@ -221,12 +231,6 @@ class OrderFragment : BaseFragment() {
                 textView.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             }
         }
-    }
-
-    override fun initSettings() {
-        super.initSettings()
-        viewModel.getUnread()
-        updateProxyTab?.also { getProxyUnread(it) }
     }
 
     private var getOrderJob: Job? = null
