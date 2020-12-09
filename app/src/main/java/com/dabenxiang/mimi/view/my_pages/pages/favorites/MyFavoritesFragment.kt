@@ -73,6 +73,7 @@ class MyFavoritesFragment(
                 id_empty_group.visibility = View.GONE
                 recycler_view.visibility = View.VISIBLE
             }
+            myPagesViewModel.changeDataCount(tab, it)
             layout_refresh.isRefreshing = false
         })
 
