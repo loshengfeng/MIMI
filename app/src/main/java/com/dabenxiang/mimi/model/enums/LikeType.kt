@@ -5,11 +5,11 @@ enum class LikeType(val value: Int) {
     DISLIKE(1);
 
     companion object {
-        fun getByValue(target: Int): LikeType {
+        fun getByValue(target: Int?): LikeType? {
             return when(target){
                 0->LIKE
                 1->DISLIKE
-                else->DISLIKE
+                else-> null
             }
         }
     }
