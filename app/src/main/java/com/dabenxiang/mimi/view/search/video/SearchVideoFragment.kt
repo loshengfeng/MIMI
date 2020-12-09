@@ -145,19 +145,19 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.showProgress.observe(this, Observer { showProgress ->
+        viewModel.showProgress.observe(this, { showProgress ->
             if (showProgress) progressHUD.show()
             else progressHUD.dismiss()
         })
 
-        viewModel.searchingTotalCount.observe(viewLifecycleOwner, Observer { count ->
+        viewModel.searchingTotalCount.observe(viewLifecycleOwner, { count ->
             if (search_bar.text.isNotBlank()) {
                 tv_search_text.text = genResultText(count)
                 layout_search_text.visibility = View.VISIBLE
             }
         })
 
-        viewModel.likeResult.observe(viewLifecycleOwner, Observer {
+        viewModel.likeResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     it.result.let { position ->
@@ -168,7 +168,7 @@ class SearchVideoFragment : BaseFragment() {
             }
         })
 
-        viewModel.favoriteResult.observe(viewLifecycleOwner, Observer {
+        viewModel.favoriteResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     it.result.let { position ->
@@ -268,7 +268,7 @@ class SearchVideoFragment : BaseFragment() {
                     checkStatus {
                         viewModel.currentItem = item
                         item.id.let {
-                            viewModel.modifyLike(it, position)
+                            viewModel.modifyLike(position)
                         }
                     }
                 }

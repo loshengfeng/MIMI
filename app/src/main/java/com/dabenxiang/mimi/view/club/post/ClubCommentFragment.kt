@@ -73,7 +73,7 @@ class ClubCommentFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_club_comment
 
     override fun setupObservers() {
-        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     textDetailAdapter?.setupAdItem(it.result)
@@ -83,7 +83,7 @@ class ClubCommentFragment : BaseFragment() {
             }
         })
 
-        viewModel.replyCommentResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.replyCommentResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is ApiResult.Empty -> replyCommentBlock?.also { it() }
@@ -92,7 +92,7 @@ class ClubCommentFragment : BaseFragment() {
             }
         })
 
-        viewModel.commentLikeResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.commentLikeResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is ApiResult.Empty -> commentLikeBlock?.also { it() }
@@ -101,7 +101,7 @@ class ClubCommentFragment : BaseFragment() {
             }
         })
 
-        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is ApiResult.Empty -> commentLikeBlock?.also { it() }
@@ -110,7 +110,7 @@ class ClubCommentFragment : BaseFragment() {
             }
         })
 
-        viewModel.postCommentResult.observe(this, Observer { event ->
+        viewModel.postCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is ApiResult.Empty -> {

@@ -292,7 +292,7 @@ class PlayerDescriptionFragment : BaseFragment() {
             tags.plus(it).plus(",")
         }
         Timber.d("@@@ ${videoItem.tags}, tag $tags")
-        descriptionViewModel.setupGuessLikeList(tags, performers, true)
+        descriptionViewModel.setupGuessLikeList(tags, performers, true, viewModel.videoContentId)
 
         val dateString = videoItem.updateTime?.let { date ->
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)

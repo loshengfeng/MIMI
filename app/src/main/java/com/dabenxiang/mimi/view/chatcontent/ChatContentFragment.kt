@@ -151,6 +151,7 @@ class ChatContentFragment : BaseFragment() {
         )
 
         toolbarContainer.toolbar.setNavigationOnClickListener {
+            GeneralUtils.hideKeyboard(this)
             findNavController().navigateUp()
         }
 
@@ -167,7 +168,7 @@ class ChatContentFragment : BaseFragment() {
     override fun setupObservers() {
         Timber.d("${ChatContentFragment::class.java.simpleName}_setupObservers")
 
-        viewModel.chatListResult.observe(viewLifecycleOwner, Observer {
+        viewModel.chatListResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     viewModel.isLoading = false
@@ -177,7 +178,7 @@ class ChatContentFragment : BaseFragment() {
             }
         })
 
-        viewModel.attachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.attachmentResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> {
                     // 更新為下載中
@@ -199,13 +200,13 @@ class ChatContentFragment : BaseFragment() {
             }
         })
 
-        viewModel.postAttachmentResult.observe(viewLifecycleOwner, Observer {
+        viewModel.postAttachmentResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.fileAttachmentTooLarge.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.fileAttachmentTooLarge.observe(viewLifecycleOwner, { result ->
             if (result) {
                 GeneralUtils.showToast(
                     requireContext(),
@@ -214,30 +215,30 @@ class ChatContentFragment : BaseFragment() {
             }
         })
 
-        viewModel.cachePushData.observe(viewLifecycleOwner, Observer {
+        viewModel.cachePushData.observe(viewLifecycleOwner, {
             adapter.insertItem(it)
             file = FileUtil.getTakePhoto(System.currentTimeMillis().toString() + ".jpg")
         })
 
-        viewModel.updatePushData.observe(viewLifecycleOwner, Observer {
+        viewModel.updatePushData.observe(viewLifecycleOwner, {
             if (!TextUtils.isEmpty(it.payload?.ext)) {
                 adapter.updateCacheData(it, viewModel.fileUploadCache)
             }
         })
 
-        viewModel.setLastReadResult.observe(viewLifecycleOwner, Observer {
+        viewModel.setLastReadResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.updateOrderChatStatusResult.observe(viewLifecycleOwner, Observer {
+        viewModel.updateOrderChatStatusResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.mqttSendErrorResult.observe(viewLifecycleOwner, Observer {
+        viewModel.mqttSendErrorResult.observe(viewLifecycleOwner, {
             switchConnectErrorState(it)
         })
     }

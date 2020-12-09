@@ -28,7 +28,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class TopicListFragment(private val orderBy: OrderBy, private val topicTag:String) : BaseFragment() {
@@ -76,7 +75,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             if (it == 0) {
                 id_empty_group.visibility = View.VISIBLE
                 text_page_empty.text = getText(R.string.empty_post)
-                list_short.visibility = View.INVISIBLE
+//                list_short.visibility = View.INVISIBLE
             } else {
                 id_empty_group.visibility = View.GONE
                 list_short.visibility = View.VISIBLE
@@ -149,6 +148,17 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             )
         }
 
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    Timber.i("deletePostResult $it")
+                    adapter.removedPosList.add(it.result)
+                    adapter.notifyItemChanged(it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
     }
 
 
@@ -170,7 +180,22 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
         if (adapter.snapshot().items.isEmpty()) {
             viewModel.getData(adapter, topicTag, orderBy)
+        } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
+            val idList = adapter.snapshot().items.map { item ->
+                item.id
+            }
+            Timber.i("idList =$idList")
+            idList.forEach { id ->
+                if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
+                    val pos = idList.indexOf(id)
+                    Timber.i("id =$id pos =$pos")
+                    adapter.removedPosList.add(pos)
+                    adapter.notifyItemChanged(pos)
+                }
+            }
+
         }
+
         viewModel.getAd()
     }
 
@@ -262,6 +287,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
+            Timber.i("TopicListFragment onMoreClick")
             onMoreClick(item, position) {
 
                 val searchPostItem = arguments?.getSerializable(KEY_DATA)

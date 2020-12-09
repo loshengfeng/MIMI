@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.NotifyType
@@ -35,6 +36,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
+import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 import java.io.File
 import java.net.URLEncoder
 import java.util.*
@@ -315,26 +317,44 @@ class MainViewModel : BaseViewModel() {
     private val extendedCallback = object : ExtendedCallback {
         override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
             Timber.d("Reconnect: $reconnect, ServerURI: $serverURI")
+            SendLogManager.v(
+                PROJECT_NAME,
+                "MQTT - Reconnect: $reconnect, ServerURI: $serverURI"
+            )
         }
 
         override fun onMessageArrived(topic: String, message: MqttMessage) {
             Timber.d("Incoming topic: $topic")
             Timber.d("Incoming message: ${String(message.payload)}")
+
+            SendLogManager.v(
+                PROJECT_NAME,
+                "MQTT - Topic: $topic, Message: ${String(message.payload)}"
+            )
             messageListenerMap[topic]?.onMsgReceive(message)
         }
 
         override fun onConnectionLost(cause: Throwable?) {
             Timber.e("The Connection was lost: $cause")
+            SendLogManager.e(
+                PROJECT_NAME,
+                "MQTT - The Connection was lost: $cause"
+            )
         }
 
         override fun onDeliveryComplete(token: IMqttDeliveryToken) {
-            Timber.d("DeliveryComplete message:: ${String(token.message.payload)}")
+            Timber.d("DeliveryComplete message: ${String(token.message.payload)}")
+            SendLogManager.e(
+                PROJECT_NAME,
+                "MQTT - DeliveryComplete message:: ${String(token.message.payload)}"
+            )
         }
     }
 
     private val connectCallback = object : ConnectCallback {
         override fun onSuccess(asyncActionToken: IMqttToken) {
             Timber.d("Connection onSuccess")
+            SendLogManager.v(PROJECT_NAME, "MQTT - Connection onSuccess")
             val topic = getNotificationTopic()
             messageListenerMap[topic] = messageListener
             subscribeToTopic(topic)
@@ -342,6 +362,7 @@ class MainViewModel : BaseViewModel() {
 
         override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
             Timber.e("Connection onFailure: $exception")
+            SendLogManager.e(PROJECT_NAME, "MQTT - Connection onFailure: $exception")
         }
     }
 
@@ -412,7 +433,7 @@ class MainViewModel : BaseViewModel() {
                 val ext = "." + extSplit?.last()
                 var mime: String? = null
 
-                when(type) {
+                when (type) {
                     HomeViewModel.TYPE_PIC -> {
                         val picParameter = PicParameter(ext = ext) //Set extension
                         _uploadPicItemResult.postValue(picParameter)

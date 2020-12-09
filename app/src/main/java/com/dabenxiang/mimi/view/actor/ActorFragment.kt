@@ -93,10 +93,10 @@ class ActorFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.actorVideosResult.observe(viewLifecycleOwner, Observer {
+        viewModel.actorVideosResult.observe(viewLifecycleOwner, {
             when (it.first) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
                     val actorVideos = (it.first as ApiResult.Success).result
                     actorVideosAdapter.submitList(actorVideos)
@@ -105,7 +105,7 @@ class ActorFragment : BaseFragment() {
             }
         })
 
-        viewModel.actorsCount.observe(viewLifecycleOwner, Observer {
+        viewModel.actorsCount.observe(viewLifecycleOwner, {
             Timber.d("All actors count is $it")
         })
     }

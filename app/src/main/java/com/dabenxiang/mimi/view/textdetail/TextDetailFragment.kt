@@ -113,14 +113,14 @@ class TextDetailFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followPostResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> textDetailAdapter?.notifyItemChanged(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.likePostResult.observe(this, Observer {
+        viewModel.likePostResult.observe(this, {
             when (it) {
                 is Success -> {
                     val item = it.result
@@ -136,7 +136,7 @@ class TextDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.postCommentResult.observe(this, Observer { event ->
+        viewModel.postCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
@@ -167,7 +167,7 @@ class TextDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.replyCommentResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.replyCommentResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> replyCommentBlock?.also { it() }
@@ -176,7 +176,7 @@ class TextDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.commentLikeResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.commentLikeResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
@@ -185,7 +185,7 @@ class TextDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
@@ -194,7 +194,7 @@ class TextDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+        viewModel.postDetailResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     val item = it.result.content
@@ -204,7 +204,7 @@ class TextDetailFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     textDetailAdapter?.setupAdItem(it.result)

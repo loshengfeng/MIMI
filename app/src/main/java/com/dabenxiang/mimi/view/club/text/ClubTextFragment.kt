@@ -70,4 +70,13 @@ class ClubTextFragment : BaseFragment() {
             viewPager.currentItem = position!!
         }
     }
+
+    override fun navigationToText(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_clubTextFragment,
+                bundle
+            )
+        )
+    }
 }

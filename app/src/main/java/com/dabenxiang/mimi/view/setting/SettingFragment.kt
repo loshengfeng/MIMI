@@ -59,7 +59,7 @@ class SettingFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.profileItem.observe(viewLifecycleOwner, Observer {
+        viewModel.profileItem.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     tv_name.text = viewModel.profileData?.friendlyName
@@ -81,7 +81,7 @@ class SettingFragment : BaseFragment() {
             }
         })
 
-        viewModel.resendResult.observe(viewLifecycleOwner, Observer {
+        viewModel.resendResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
                     GeneralUtils.showToast(
@@ -93,7 +93,7 @@ class SettingFragment : BaseFragment() {
             }
         })
 
-        viewModel.updateResult.observe(viewLifecycleOwner, Observer {
+        viewModel.updateResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
                     GeneralUtils.showToast(
@@ -105,14 +105,14 @@ class SettingFragment : BaseFragment() {
             }
         })
 
-        viewModel.postResult.observe(viewLifecycleOwner, Observer {
+        viewModel.postResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> viewModel.putAvatar(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.putResult.observe(viewLifecycleOwner, Observer {
+        viewModel.putResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
@@ -123,7 +123,7 @@ class SettingFragment : BaseFragment() {
             }
         })
 
-        viewModel.isBinding.observe(this.viewLifecycleOwner, Observer { success ->
+        viewModel.isBinding.observe(this.viewLifecycleOwner, { success ->
             val result = if (success) getString(R.string.setting_binding_success)
             else getString(R.string.setting_binding_failed)
             GeneralUtils.showToast(requireContext(), result)

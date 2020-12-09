@@ -182,6 +182,12 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchPostFragment"

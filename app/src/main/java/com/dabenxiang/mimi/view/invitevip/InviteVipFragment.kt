@@ -32,7 +32,7 @@ class InviteVipFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.promotionItem.observe(viewLifecycleOwner, Observer {
+        viewModel.promotionItem.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()

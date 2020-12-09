@@ -46,7 +46,7 @@ class UpdateProfileFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.error.observe(viewLifecycleOwner, Observer {
+        viewModel.error.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_content.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_content_error.visibility = View.INVISIBLE
@@ -57,7 +57,7 @@ class UpdateProfileFragment : BaseFragment() {
             }
         })
 
-        viewModel.updateResult.observe(viewLifecycleOwner, Observer {
+        viewModel.updateResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()

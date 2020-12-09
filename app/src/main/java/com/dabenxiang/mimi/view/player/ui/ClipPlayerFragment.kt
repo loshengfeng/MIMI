@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -11,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BasePlayerFragment
 import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_v2_player.*
@@ -52,7 +55,11 @@ class ClipPlayerFragment : BasePlayerFragment() {
 
     override fun getTabTitle(tab: TabLayout.Tab, position: Int) {
         val tabs = resources.getStringArray(R.array.clip_play_tabs)
-        tab.text = tabs[position]
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.custom_tab, null)
+        val textView = view?.findViewById<TextView>(R.id.tv_title)
+        textView?.text = tabs[position]
+        textView?.textSize = 16f
+        tab.customView = view
     }
 
     override fun onResume() {
