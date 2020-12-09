@@ -193,7 +193,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 item.id
             }
             Timber.i("idList =$idList")
-            idList.map { id ->
+            idList.forEach { id ->
                 if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
                     val pos = idList.indexOf(id)
                     Timber.i("id =$id pos =$pos")
