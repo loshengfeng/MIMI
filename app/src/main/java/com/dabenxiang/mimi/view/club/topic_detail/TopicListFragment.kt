@@ -19,7 +19,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pages.ClubItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
-import com.dabenxiang.mimi.view.club.topic.TopicPagerAdapter
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -27,10 +26,8 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_item.*
-import kotlinx.android.synthetic.main.fragment_club_topic.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class TopicListFragment(private val orderBy: OrderBy, private val topicTag:String) : BaseFragment() {
@@ -78,7 +75,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             if (it == 0) {
                 id_empty_group.visibility = View.VISIBLE
                 text_page_empty.text = getText(R.string.empty_post)
-                list_short.visibility = View.INVISIBLE
+//                list_short.visibility = View.INVISIBLE
             } else {
                 id_empty_group.visibility = View.GONE
                 list_short.visibility = View.VISIBLE
@@ -188,7 +185,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
                 item.id
             }
             Timber.i("idList =$idList")
-            idList.map { id ->
+            idList.forEach { id ->
                 if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
                     val pos = idList.indexOf(id)
                     Timber.i("id =$id pos =$pos")
