@@ -127,20 +127,20 @@ class MemberPostPagedAdapter(
 //                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
 //                        }
 //                    } ?: run {
-                        holder.onBind(
-                            item,
-                            currentList,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem,
-                            isClipList
-                        )
+//                        holder.onBind(
+//                            item,
+//                            currentList,
+//                            position,
+//                            adultListener,
+//                            mTag,
+//                            memberPostFuncItem,
+//                            isClipList
+//                        )
 //                    }
                 }
             }
-            is PicturePostHolder -> {
-                item?.also {
+//            is PicturePostHolder -> {
+//                item?.also {
 //                    payloads.takeIf { it.isNotEmpty() }?.also {
 //                        when (it[0] as Int) {
 //                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
@@ -151,18 +151,18 @@ class MemberPostPagedAdapter(
 //                            )
 //                        }
 //                    } ?: run {
-                        holder.pictureRecycler.tag = position
-                        holder.onBind(
-                            item,
-                            currentList,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem
-                        )
+//                        holder.pictureRecycler.tag = position
+//                        holder.onBind(
+//                            item,
+//                            currentList,
+//                            position,
+//                            adultListener,
+//                            mTag,
+//                            memberPostFuncItem
+//                        )
 //                    }
-                }
-            }
+//                }
+//            }
             is TextPostHolder -> {
                 item?.also {
 //                    payloads.takeIf { it.isNotEmpty() }?.also {
@@ -187,15 +187,4 @@ class MemberPostPagedAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
     }
 
-    fun updateInternalItem(holder: BaseViewHolder) {
-        when (holder) {
-            is PicturePostHolder -> {
-                holder.pictureRecycler.adapter?.notifyDataSetChanged()
-            }
-        }
-    }
-
-    fun setupTag(tag: String?) {
-        mTag = tag
-    }
 }

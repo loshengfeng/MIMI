@@ -18,10 +18,13 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -57,7 +60,7 @@ class MyPostClipPostHolder(
             item: MemberPostItem,
             position: Int,
             myPostListener: MyPostListener,
-            memberPostFuncItem: MemberPostFuncItem,
+            viewModelScope: CoroutineScope,
             searchStr: String = "",
             searchTag: String = ""
     ) {
@@ -92,7 +95,9 @@ class MyPostClipPostHolder(
         tvFollow.visibility =
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        memberPostFuncItem.getBitmap(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
+        viewModelScope.launch {
+            LoadImageUtils.loadImage(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
+        }
         ivAvatar.setOnClickListener {
             myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
         }
@@ -119,11 +124,12 @@ class MyPostClipPostHolder(
                 Glide.with(ivPhoto.context)
                     .load(images[0].url).into(ivPhoto)
             } else {
-                memberPostFuncItem.getBitmap(
-                    images[0].id.toLongOrNull(),
-                    ivPhoto,
-                    LoadImageType.PICTURE_EMPTY
-                )
+                viewModelScope.launch {
+                    LoadImageUtils.loadImage(
+                            images[0].id.toLongOrNull(),
+                            ivPhoto,
+                            LoadImageType.PICTURE_EMPTY)
+                }
             }
         }
 

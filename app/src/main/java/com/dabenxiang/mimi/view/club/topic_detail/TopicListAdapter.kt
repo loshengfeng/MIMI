@@ -8,19 +8,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.coroutines.CoroutineScope
 
 class TopicListAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
-        private val memberPostFuncItem: MemberPostFuncItem
+        private val viewModelScope: CoroutineScope
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -117,19 +116,23 @@ class TopicListAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                     )
 
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(it, position, myPostListener, memberPostFuncItem)
+                    holder.onBind(it,
+                            position,
+                            myPostListener,
+                            viewModelScope
+                    )
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                     )
                 }
             }

@@ -16,12 +16,13 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 class ClubItemAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
-        private val memberPostFuncItem: MemberPostFuncItem
+        private val viewModelScope: CoroutineScope
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -118,19 +119,23 @@ class ClubItemAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                     )
 
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(it, position, myPostListener, memberPostFuncItem)
+                    holder.onBind(it,
+                            position,
+                            myPostListener,
+                            viewModelScope
+                    )
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                     )
                 }
             }
