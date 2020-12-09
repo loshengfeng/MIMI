@@ -16,9 +16,7 @@ import com.dabenxiang.mimi.extension.setBtnSolidColor
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.yulichswift.roundedview.widget.RoundedTextView
-import me.codeboy.android.aligntextview.CBAlignTextView
 import timber.log.Timber
-import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -340,10 +338,18 @@ abstract class BaseCommentProvider(
         holder.setTextColorRes(R.id.tv_name, getTextColor())
         holder.setTextColorRes(R.id.tv_date, getTextColor())
 
-//        holder.setText(R.id.tv_message, data.content)
-        holder.getView<CBAlignTextView>(R.id.tv_message).text = data.content
-//        holder.getView<CBAlignTextView>(R.id.tv_message).setTextColor(getMessageTextColor())
-//        holder.setTextColorRes(R.id.tv_message, getMessageTextColor())
+        val commentTextView = holder.getView<TextView>(R.id.tv_message)
+        commentTextView.text = data.content
+        commentTextView.viewTreeObserver.addOnGlobalLayoutListener {
+            val newText = com.dabenxiang.mimi.widget.utility.TextUtils.autoSplitText(commentTextView)
+            if (!TextUtils.isEmpty(newText)) {
+                commentTextView.text = newText;
+            } else {
+                commentTextView.text = data.content
+            }
+        }
+
+        holder.setTextColorRes(R.id.tv_message, getMessageTextColor())
         holder.setTextColorRes(R.id.tv_like, getMessageTextColor())
         holder.setTextColorRes(R.id.tv_unlike, getMessageTextColor())
 

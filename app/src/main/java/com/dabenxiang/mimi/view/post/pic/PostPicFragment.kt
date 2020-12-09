@@ -200,7 +200,7 @@ class PostPicFragment : BasePostFragment() {
     }
 
     private fun handleMultiPics(clipData: ClipData) {
-        val uriList = PostManager().getPicsUri(clipData, requireContext())
+        val uriList = PostManager().getPicsUri(clipData, requireContext(), adapter.getData().size)
         for (uri in uriList) {
             val uriDataList = adapter.getData()
             val postAttachmentItem = PostAttachmentItem(uri = uri)
