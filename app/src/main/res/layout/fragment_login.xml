@@ -26,7 +26,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tabIndicatorColor="@color/color_red_1"
         app:tabIndicatorHeight="4dp"
-        app:tabIndicator="@drawable/bg_tab_login"
+        app:tabIndicator="@drawable/bg_tab_90"
         app:tabSelectedTextColor="@color/color_black_1"
         app:tabTextAppearance="@style/login_tab_item_text"
         app:tabTextColor="@color/color_black_1_50"
