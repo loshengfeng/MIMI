@@ -134,6 +134,15 @@ class TopicTabFragment : BaseFragment() {
         memberClubItem?.let{item->
             tv_title.text = item.title
             tv_desc.text = item.description
+
+            tv_desc.post {
+                if (tv_desc.lineCount > 1) {
+                    val params = toolbar_layout.layoutParams
+                    params.height = toolbar_layout.height +tv_desc.height/2
+                    toolbar_layout.layoutParams = params
+                }
+            }
+            
             tv_follow_count.text = item.followerCount.toString()
             tv_post_count.text = item.postCount.toString()
             updateFollow()

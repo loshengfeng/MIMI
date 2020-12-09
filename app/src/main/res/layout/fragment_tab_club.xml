@@ -92,13 +92,18 @@
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-        <com.google.android.material.tabs.TabLayout
+        <com.dabenxiang.mimi.view.customview.CustomTabLayout
             android:id="@+id/club_tabs"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimaryDark"
+            app:tabIndicator="@drawable/bg_tab_70"
             app:tabIndicatorFullWidth="false"
             app:tabIndicatorHeight="4dp"
+            app:tabMaxWidth="70dp"
+            app:tabMinWidth="70dp"
+            app:tabPaddingStart="0dp"
+            app:tabPaddingEnd="0dp"
             app:tabMode="scrollable"
             app:tabTextAppearance="@style/club_tab_item_type_text" />
     </com.google.android.material.appbar.AppBarLayout>
