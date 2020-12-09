@@ -55,7 +55,7 @@ class ClipPlayerFragment : BasePlayerFragment() {
 
     override fun getTabTitle(tab: TabLayout.Tab, position: Int) {
         val tabs = resources.getStringArray(R.array.clip_play_tabs)
-        val view = LayoutInflater.from(requireContext()).inflate(R.layout.custom_tab, null)
+        val view = View.inflate(requireContext(), R.layout.custom_tab, null)
         val textView = view?.findViewById<TextView>(R.id.tv_title)
         textView?.text = tabs[position]
         textView?.textSize = 16f

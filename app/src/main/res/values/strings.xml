@@ -500,6 +500,12 @@
     <string name="ranking_week">周排行</string>
     <string name="ranking_moon">月排行</string>
 
+    <string-array name="ranking_tabs">
+        <item>@string/ranking_day</item>
+        <item>@string/ranking_week</item>
+        <item>@string/ranking_moon</item>
+    </string-array>
+
     <!-- Version check  -->
     <string name="check_version">检查版本…</string>
     <string name="update_version">%d%%  更新中…</string>
