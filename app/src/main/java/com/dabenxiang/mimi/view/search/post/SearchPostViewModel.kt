@@ -63,8 +63,11 @@ class SearchPostViewModel : BaseViewModel() {
                     isLike -> LikeType.LIKE
                     else -> LikeType.DISLIKE
                 }
-                val request = LikeRequest(likeType)
-                val result = apiRepository.like(item.id, request)
+                val request =  LikeRequest(likeType)
+                val result = when {
+                    isLike -> apiRepository.like(item.id, request)
+                    else -> apiRepository.deleteLike(item.id)
+                }
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(position))
             }

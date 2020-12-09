@@ -80,7 +80,7 @@ data class PostFavoriteItem(
             creationDate = postDate,
             isFavorite = isFavorite,
             likeCount = likeCount,
-            likeType = if (likeType == null) LikeType.DISLIKE else LikeType.getByValue(likeType!!),
+            likeType = LikeType.getByValue(likeType),
             dislikeCount = dislikeCount,
             favoriteCount = favoriteCount,
             commentCount = commentCount,

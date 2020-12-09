@@ -268,7 +268,7 @@ class SearchVideoFragment : BaseFragment() {
                     checkStatus {
                         viewModel.currentItem = item
                         item.id.let {
-                            viewModel.modifyLike(it, position)
+                            viewModel.modifyLike(position)
                         }
                     }
                 }
