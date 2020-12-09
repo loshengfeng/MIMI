@@ -144,7 +144,7 @@ class TopicDetailFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.followClubResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followClubResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     updateFollow()
@@ -153,7 +153,7 @@ class TopicDetailFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     val adapter =
@@ -165,21 +165,21 @@ class TopicDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer {
+        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, {
             val adapter =
                 (viewPager.adapter as TopicPagerAdapter).getListAdapter(tabLayout.selectedTabPosition)
             adapter.removedPosList.clear()
         })
 
-        viewModel.updateCountHottest.observe(viewLifecycleOwner, Observer {
+        viewModel.updateCountHottest.observe(viewLifecycleOwner, {
             updateCountHottest.invoke(it)
         })
 
-        viewModel.updateCountNewest.observe(viewLifecycleOwner, Observer {
+        viewModel.updateCountNewest.observe(viewLifecycleOwner, {
             updateCountNewest.invoke(it)
         })
 
-        viewModel.updateCountVideo.observe(viewLifecycleOwner, Observer {
+        viewModel.updateCountVideo.observe(viewLifecycleOwner, {
             updateCountVideo.invoke(it)
         })
 

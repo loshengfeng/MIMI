@@ -61,9 +61,9 @@ class ChatHistoryFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.chatHistory.observe(viewLifecycleOwner, Observer { adapter.submitList(it) })
+        viewModel.chatHistory.observe(viewLifecycleOwner, { adapter.submitList(it) })
 
-        viewModel.pagingResult.observe(viewLifecycleOwner, Observer {
+        viewModel.pagingResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loaded,
                 is Error -> {

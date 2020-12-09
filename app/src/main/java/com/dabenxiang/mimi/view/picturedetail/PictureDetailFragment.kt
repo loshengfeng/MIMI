@@ -111,14 +111,14 @@ class PictureDetailFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followPostResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.replyCommentResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.replyCommentResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> replyCommentBlock?.also { it() }
@@ -127,7 +127,7 @@ class PictureDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.commentLikeResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.commentLikeResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
@@ -136,7 +136,7 @@ class PictureDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, Observer { event ->
+        viewModel.commentDeleteLikeResult.observe(viewLifecycleOwner, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> commentLikeBlock?.also { it() }
@@ -145,7 +145,7 @@ class PictureDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.postCommentResult.observe(this, Observer { event ->
+        viewModel.postCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
@@ -176,7 +176,7 @@ class PictureDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.likePostResult.observe(this, Observer {
+        viewModel.likePostResult.observe(this, {
             when (it) {
                 is Success -> {
                     val item = it.result
@@ -192,7 +192,7 @@ class PictureDetailFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     pictureDetailAdapter?.setupAdItem(it.result)

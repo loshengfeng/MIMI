@@ -142,7 +142,7 @@ class AdultHomeFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mainViewModel?.categoriesData?.observe(this, Observer {
+        mainViewModel?.categoriesData?.observe(this, {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
                 is Loaded -> refresh.isRefreshing = false
@@ -178,7 +178,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdHomeResult?.observe(this, Observer {
+        mainViewModel?.getAdHomeResult?.observe(this, {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeBannerViewHolderMap[it.first]
@@ -188,16 +188,16 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.showProgress.observe(this, Observer { showProgress ->
+        viewModel.showProgress.observe(this, { showProgress ->
             showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
         })
 
-        viewModel.videoList.observe(this, Observer {
+        viewModel.videoList.observe(this, {
             videoListAdapter.submitList(it)
 //            videoListAdapter.notifyDataSetChanged()
         })
 
-        viewModel.carouselResult.observe(this, Observer {
+        viewModel.carouselResult.observe(this, {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeCarouselViewHolderMap[it.first]
@@ -211,7 +211,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.videosResult.observe(this, Observer {
+        viewModel.videosResult.observe(this, {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
@@ -228,7 +228,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.clipsResult.observe(this, Observer {
+        viewModel.clipsResult.observe(this, {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeClipViewHolderMap[it.first]
@@ -243,7 +243,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.pictureResult.observe(this, Observer {
+        viewModel.pictureResult.observe(this, {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homePictureViewHolderMap[it.first]
@@ -258,7 +258,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.clubResult.observe(this, Observer {
+        viewModel.clubResult.observe(this, {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeClubViewHolderMap[it.first]
@@ -273,27 +273,27 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.postFollowItemListResult.observe(this, Observer {
+        viewModel.postFollowItemListResult.observe(this, {
             followPostPagedAdapter.submitList(it)
         })
 
-        viewModel.clipPostItemListResult.observe(this, Observer {
+        viewModel.clipPostItemListResult.observe(this, {
             clipPostPagedAdapter.submitList(it)
         })
 
-        viewModel.picturePostItemListResult.observe(this, Observer {
+        viewModel.picturePostItemListResult.observe(this, {
             picturePostPagedAdapter.submitList(it)
         })
 
-        viewModel.textPostItemListResult.observe(this, Observer {
+        viewModel.textPostItemListResult.observe(this, {
             textPostPagedAdapter.submitList(it)
         })
 
-        viewModel.clubItemListResult.observe(this, Observer {
+        viewModel.clubItemListResult.observe(this, {
             clubMemberAdapter.submitList(it)
         })
 
-        viewModel.totalCountResult.observe(this, Observer {
+        viewModel.totalCountResult.observe(this, {
             it?.also {
                 val type = it.first
                 val totalCount = it.second
@@ -309,7 +309,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.followResult.observe(this, Observer {
+        viewModel.followResult.observe(this, {
             when (it) {
                 is Empty -> {
                     getCurrentAdapter()?.notifyItemRangeChanged(
@@ -322,7 +322,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(this, Observer {
+        mainViewModel?.deletePostResult?.observe(this, {
             when (categoryTypeList[lastPosition]) {
                 CategoryType.FOLLOW, CategoryType.VIDEO, CategoryType.IMAGE, CategoryType.TEXT -> {
                     when (it) {
@@ -337,7 +337,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(this, Observer {
+        viewModel.cleanRemovedPosList.observe(this, {
             when (categoryTypeList[lastPosition]) {
                 CategoryType.FOLLOW, CategoryType.VIDEO, CategoryType.IMAGE, CategoryType.TEXT -> {
                     val adapter = getCurrentAdapter() as MemberPostPagedAdapter
@@ -346,7 +346,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.inviteVipShake.observe(this, Observer {
+        viewModel.inviteVipShake.observe(this, {
             if (layout_invitevip.visibility != View.GONE) {
                 if (it == true)
                     iv_invitevip.startAnimation(

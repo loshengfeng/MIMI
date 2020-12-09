@@ -90,7 +90,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         viewModel.followResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Empty -> {
-                    adapter?.notifyItemRangeChanged(
+                    adapter.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
                         ClubItemAdapter.PAYLOAD_UPDATE_FOLLOW

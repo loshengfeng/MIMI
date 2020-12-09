@@ -57,7 +57,7 @@ class ClubTextDetailFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_club_text_detail
 
     override fun setupObservers() {
-        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+        viewModel.postDetailResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     val item = it.result.content
@@ -67,7 +67,7 @@ class ClubTextDetailFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     textDetailAdapter?.setupAdItem(it.result)
@@ -77,7 +77,7 @@ class ClubTextDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followPostResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> textDetailAdapter?.notifyItemChanged(it.result)
                 is ApiResult.Error -> onApiError(it.throwable)

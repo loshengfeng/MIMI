@@ -91,7 +91,7 @@ class OrderInfoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.createOrderResult.observe(viewLifecycleOwner, Observer {
+        viewModel.createOrderResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
                     navigateTo(NavigateItem.Destination(R.id.action_orderInfoFragment_to_orderResultFragment))
