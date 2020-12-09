@@ -6,9 +6,9 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -36,7 +36,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
     private val topicviewmodel: TopicViewModel by viewModels({requireParentFragment()})
 
     private val adapter: TopicListAdapter by lazy {
-        TopicListAdapter(requireContext(), postListener, memberPostFuncItem)
+        TopicListAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item
@@ -48,16 +48,6 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
                 it.putSerializable(KEY_DATA, item)
             }
         }
-    }
-
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-                {},
-                { id, view, type -> viewModel.loadImage(id, view, type) },
-                { item, items, isFollow, func -> },
-                { item, isLike, func -> },
-                { item, isFavorite, func -> }
-        )
     }
 
     override fun onAttach(context: Context) {

@@ -14,14 +14,19 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.coroutines.CoroutineScope
 
 class FavoritesAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
-        private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
+        private val viewModelScope: CoroutineScope
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
+        const val PAYLOAD_UPDATE_LIKE = 0
+        const val PAYLOAD_UPDATE_FAVORITE = 1
+
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
@@ -92,6 +97,13 @@ class FavoritesAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         val item = getItem(position)
         item?.also {
             when (holder) {
@@ -102,24 +114,48 @@ class FavoritesAdapter(
                     }
                 }
                 is MyPostClipPostHolder -> {
-                    holder.onBind(
-                            it,
-                            position,
-                            myPostListener,
-                            memberPostFuncItem
-                    )
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(it)
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
+                        }
+                    } else {
+                        holder.onBind(
+                                it,
+                                position,
+                                myPostListener,
+                                viewModelScope
+                        )
+                    }
                 }
                 is MyPostPicturePostHolder -> {
-                    holder.pictureRecycler.tag = position
-                    holder.onBind(
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(it)
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
+                        }
+                    } else {
+                        holder.pictureRecycler.tag = position
+                        holder.onBind(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
-                    )
+                            viewModelScope
+                        )
+                    }
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(it,  position, myPostListener, memberPostFuncItem)
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(it)
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
+                        }
+                    } else {
+                        holder.onBind(it,
+                                position,
+                                myPostListener,
+                                viewModelScope)
+                    }
                 }
             }
         }

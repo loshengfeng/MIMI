@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -38,7 +39,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubItemAdapter by lazy {
-        ClubItemAdapter(requireContext(), postListener, memberPostFuncItem)
+        ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item
@@ -50,16 +51,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 it.putSerializable(KEY_DATA, item)
             }
         }
-    }
-
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, view, type -> viewModel.loadImage(id, view, type) },
-            { item, items, isFollow, func -> },
-            { item, isLike, func -> },
-            { item, isFavorite, func -> }
-        )
     }
 
     override fun onAttach(context: Context) {

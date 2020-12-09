@@ -7,7 +7,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MiMiLikeListDataSource
+import com.dabenxiang.mimi.view.my_pages.pages.like.MiMiLikeListDataSource
 import retrofit2.HttpException
 
 class TopicPostDataSource(

@@ -27,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:tabGravity="center"
-        app:tabIndicatorColor="@color/color_red_1"
+        app:tabIndicator="@drawable/bg_tab_clip"
         app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="4dp"
         app:tabMode="fixed"
