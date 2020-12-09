@@ -196,6 +196,8 @@
     <string name="choose_camera">使用相机</string>
     <string name="choose_album">使用相薄</string>
     <string name="file_type_not_supported">不支援的档案格式，请重新上传</string>
+
+    <string name="topup_refresh_payment_prompt">下拉刷新支付状态</string>
     <string name="topup_all">全部</string>
     <string name="topup_online_pay">在线支付</string>
     <string name="topup_proxy_pay">代理支付</string>
