@@ -519,7 +519,8 @@ class PlayerViewModel : BaseViewModel() {
                 category ?: "",
                 viewModelScope,
                 domainManager.getApiRepository(),
-                pagingCallback
+                pagingCallback,
+                0
             )
             val factory = GuessLikeFactory(dataSrc)
             val config = PagedList.Config.Builder()

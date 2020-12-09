@@ -67,7 +67,7 @@ class TopUpFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        viewModel.agentListIsEmpty.observe(this, Observer {
+        viewModel.agentListIsEmpty.observe(this, {
             if (it) {
                 tv_proxy_empty.visibility = View.VISIBLE
             } else {
@@ -95,7 +95,7 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.meItem.observe(viewLifecycleOwner, Observer {
+        viewModel.meItem.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     tv_name.text = it.result.friendlyName
@@ -120,7 +120,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.createChatRoomResult.observe(viewLifecycleOwner, Observer {
+        viewModel.createChatRoomResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     ChatListItem(
@@ -141,7 +141,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.isEmailConfirmed.observe(viewLifecycleOwner, Observer {
+        viewModel.isEmailConfirmed.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     if (!it.result) {
@@ -154,7 +154,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.orderPackageResult.observe(viewLifecycleOwner, Observer {
+        viewModel.orderPackageResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loaded -> tv_proxy_empty.visibility = View.GONE
                 is Success -> {
@@ -168,7 +168,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.pendingOrderResult.observe(viewLifecycleOwner, Observer {
+        viewModel.pendingOrderResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     val item = it.result
@@ -197,11 +197,11 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.agentList.observe(viewLifecycleOwner, Observer {
+        viewModel.agentList.observe(viewLifecycleOwner, {
             agentAdapter.submitList(it)
         })
 
-        viewModel.totalUnreadResult.observe(viewLifecycleOwner, Observer {
+        viewModel.totalUnreadResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     iv_new_badge.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
@@ -211,7 +211,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.packageStatusResult.observe(viewLifecycleOwner, Observer {
+        viewModel.packageStatusResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     if (it.result.onlinePayDisabled) {

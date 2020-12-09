@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -38,7 +39,11 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val isLike: Boolean = false) : BaseFragment() {
+class MyFavoritesFragment(
+    val tab: Int,
+    val type: MyCollectionTabItemType,
+    val isLike: Boolean = false
+) : BaseFragment() {
 
     private val viewModel: MyFavoritesViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
@@ -74,8 +79,8 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
         viewModel.likePostResult.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
-                    it.result?.let { position ->
-                        adapter.notifyItemChanged(position)
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, FavoritesAdapter.PAYLOAD_UPDATE_LIKE)
                     }
                 }
 
@@ -87,11 +92,7 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
 
         viewModel.favoriteResult.observe(this, {
             when (it) {
-                is ApiResult.Success -> {
-                    it.result?.let { position ->
-                        adapter.notifyItemChanged(position)
-                    }
-                }
+                is ApiResult.Success -> viewModel.getData(adapter, isLike)
                 else -> {
                     onApiError(Exception("Unknown Error!"))
                 }
@@ -109,7 +110,13 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(this, {
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
+    }
+
+    override fun setupObservers() {
+        super.setupObservers()
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     adapter.removedPosList.add(it.result)
@@ -118,9 +125,6 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
-
-        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
-        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -135,19 +139,22 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
 
         myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
             if (it == tab) {
-                if(isLike) viewModel.deleteAllLike(adapter.snapshot().items)
+                if (isLike) viewModel.deleteAllLike(adapter.snapshot().items)
                 else viewModel.deleteFavorites(adapter.snapshot().items)
             }
         })
 
-        text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
+        text_page_empty.text =
+            if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
         img_page_empty.setImageDrawable(
-            ContextCompat.getDrawable(requireContext(),
-            when(isLike) {
-                false -> R.drawable.img_history_empty_2
-                true -> R.drawable.img_love_empty
-            }
-        ))
+            ContextCompat.getDrawable(
+                requireContext(),
+                when (isLike) {
+                    false -> R.drawable.img_history_empty_2
+                    true -> R.drawable.img_love_empty
+                }
+            )
+        )
     }
 
     override fun onResume() {
@@ -161,7 +168,7 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
     private val memberPostFuncItem by lazy {
         MemberPostFuncItem(
             {},
-            { id, view, type -> viewModel.loadImage(id, view, type)},
+            { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, items, isFollow, func -> },
             { item, isLike, func -> },
             { item, isFavorite, func -> }
@@ -216,18 +223,18 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
         ) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    checkStatus {viewModel.favoritePost(item, position, isFavorite)}
+                    checkStatus { viewModel.favoritePost(item, position, isFavorite) }
                 }
             })
 
             dialog.setMsg(
-                    if(isLike) getString(R.string.like_delete_all)
-                    else getString(R.string.follow_delete_favorite_message)
+                if (isLike) getString(R.string.like_delete_favorite_message)
+                else getString(R.string.follow_delete_favorite_message)
             )
 
             dialog.show(
-                    requireActivity().supportFragmentManager,
-                    CleanDialogFragment::class.java.simpleName
+                requireActivity().supportFragmentManager,
+                CleanDialogFragment::class.java.simpleName
             )
         }
 

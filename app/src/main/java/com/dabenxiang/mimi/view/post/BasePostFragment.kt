@@ -49,7 +49,7 @@ open class BasePostFragment : BaseFragment() {
 
     companion object {
         const val CONTENT_LIMIT = 2000
-        const val PHOTO_LIMIT = 20
+        const val PHOTO_LIMIT = 10
         const val RECORD_LIMIT_TIME = 15
 
         const val INTENT_SELECT_IMG = 10001
@@ -97,7 +97,7 @@ open class BasePostFragment : BaseFragment() {
     override fun getLayoutId() = 0
 
     override fun setupObservers() {
-        viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
+        viewModel.clubItemResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     txt_clubName.text = it.result.first().title
@@ -158,13 +158,13 @@ open class BasePostFragment : BaseFragment() {
 
         edt_hashtag.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                hashtagConfirm()
+                hashTagConfirm()
             }
             false
         }
     }
 
-    fun hashtagConfirm(){
+    fun hashTagConfirm(){
         if (chipGroup.size == HASHTAG_LIMIT) {
             Toast.makeText(
                     requireContext(),
@@ -267,6 +267,7 @@ open class BasePostFragment : BaseFragment() {
             chip.setCloseIconSizeResource(R.dimen.dp_24)
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
+                setTagCount()
             }
         } else {
             viewModel.getClub(tag)

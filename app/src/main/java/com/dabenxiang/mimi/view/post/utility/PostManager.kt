@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
@@ -89,8 +90,18 @@ class PostManager {
         return videoTime
     }
 
-    fun getPicsUri(clipData: ClipData, context: Context): ArrayList<String> {
+    fun getPicsUri(clipData: ClipData, context: Context, currentSize: Int = 0): ArrayList<String> {
         val picsUri = arrayListOf<String>()
+        val limitCount = BasePostFragment.PHOTO_LIMIT - currentSize
+
+        if (clipData.itemCount > limitCount) {
+            Toast.makeText(
+                context,
+                String.format(context.getString(R.string.post_pic_limit), BasePostFragment.PHOTO_LIMIT),
+                Toast.LENGTH_SHORT
+            ).show()
+            return picsUri
+        }
 
         for (i in 0 until clipData.itemCount) {
             val item = clipData.getItemAt(i)

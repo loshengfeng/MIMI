@@ -93,10 +93,10 @@ class ActorFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.actorVideosResult.observe(viewLifecycleOwner, Observer {
+        viewModel.actorVideosResult.observe(viewLifecycleOwner, {
             when (it.first) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
                     val actorVideos = (it.first as ApiResult.Success).result
                     actorVideosAdapter.submitList(actorVideos)
@@ -105,7 +105,7 @@ class ActorFragment : BaseFragment() {
             }
         })
 
-        viewModel.actorsCount.observe(viewLifecycleOwner, Observer {
+        viewModel.actorsCount.observe(viewLifecycleOwner, {
             Timber.d("All actors count is $it")
         })
     }
@@ -138,7 +138,6 @@ class ActorFragment : BaseFragment() {
                 if (actorListAdapter.isDataEmpty()) {
                     rv_all_actresses?.run { this.visibility = View.INVISIBLE }
                 } else {
-//                    rv_all_actresses?.scrollBy(0, 1) //FIXME: 滑動後頁面才能點擊，原因未明，查找中...
                     rv_all_actresses?.run { this.visibility = View.VISIBLE }
                 }
 

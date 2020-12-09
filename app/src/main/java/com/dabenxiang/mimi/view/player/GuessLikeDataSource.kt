@@ -19,7 +19,8 @@ class GuessLikeDataSource(
     private val category: String,
     private val viewModelScope: CoroutineScope,
     private val apiRepository: ApiRepository,
-    private val pagingCallback: GuessLikePagingCallBack
+    private val pagingCallback: GuessLikePagingCallBack,
+    private val excludeId: Long
 ) : PageKeyedDataSource<Long, BaseVideoItem>() {
 
     companion object {
@@ -50,7 +51,8 @@ class GuessLikeDataSource(
                     true,
                     true,
                     0,
-                    PER_LIMIT.toInt()
+                    PER_LIMIT.toInt(),
+                    excludeId = excludeId.toString()
                 )
                 if (!result.isSuccessful) throw HttpException(result)
 
@@ -68,7 +70,8 @@ class GuessLikeDataSource(
                         true,
                         true,
                         0,
-                        PER_LIMIT.toInt()
+                        PER_LIMIT.toInt(),
+                        excludeId = excludeId.toString()
                     )
                     if (!res.isSuccessful) throw HttpException(res)
                     res.body()?.content?.map {

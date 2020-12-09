@@ -242,9 +242,9 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         player?.clearVideoDecoderOutputBufferRenderer()
     }
 
-    fun sendVideoReport() {
+    fun sendVideoReport(unhealthy: Boolean) {
         if(streamId != 0L)
-            playerViewModel.sendVideoReport(streamId)
+            playerViewModel.sendVideoReport(streamId, unhealthy)
     }
 
     private fun backupEvent() {
@@ -451,6 +451,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
             ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
             ExoPlayer.STATE_READY -> {
 //                viewModel.activateLoading(false)
+                sendVideoReport(false)
                 player_view.visibility = View.VISIBLE
                 "ExoPlayer.STATE_READY"
             }
@@ -516,7 +517,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
                 //showErrorDialog("UNKNOWN")
             }
         }
-        sendVideoReport()
+        sendVideoReport(true)
     }
 
     /**

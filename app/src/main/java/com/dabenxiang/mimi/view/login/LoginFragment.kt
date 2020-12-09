@@ -66,7 +66,7 @@ class LoginFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.accountError.observe(viewLifecycleOwner, Observer {
+        viewModel.accountError.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_account.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_account_error.visibility = View.INVISIBLE
@@ -77,7 +77,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.mobileError.observe(viewLifecycleOwner, Observer {
+        viewModel.mobileError.observe(viewLifecycleOwner, {
             if (it == "") {
                 layout_mobile.setBackgroundResource(R.drawable.layout_rectangle)
                 tv_mobile_error.visibility = View.INVISIBLE
@@ -88,7 +88,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.validateCodeError.observe(viewLifecycleOwner, Observer {
+        viewModel.validateCodeError.observe(viewLifecycleOwner, {
             if (it == "") {
                 layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle)
                 tv_validate_code_error.visibility = View.INVISIBLE
@@ -99,7 +99,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.registerPasswordError.observe(viewLifecycleOwner, Observer {
+        viewModel.registerPasswordError.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_register_pw.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_register_pw_error.visibility = View.INVISIBLE
@@ -110,7 +110,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.confirmPasswordError.observe(viewLifecycleOwner, Observer {
+        viewModel.confirmPasswordError.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_register_confirm_pw.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_register_confirm_pw_error.visibility = View.INVISIBLE
@@ -121,7 +121,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.loginAccountError.observe(viewLifecycleOwner, Observer {
+        viewModel.loginAccountError.observe(viewLifecycleOwner, {
             if (it == "") {
                 layout_login.setBackgroundResource(R.drawable.layout_rectangle)
                 tv_login_account_error.visibility = View.INVISIBLE
@@ -132,7 +132,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.loginPasswordError.observe(viewLifecycleOwner, Observer {
+        viewModel.loginPasswordError.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_login_pw.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_login_pw_error.visibility = View.INVISIBLE
@@ -143,7 +143,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.registerResult.observe(viewLifecycleOwner, Observer {
+        viewModel.registerResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
                     viewModel.mobile.value?.let { it1 ->
@@ -156,7 +156,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.loginResult.observe(viewLifecycleOwner, Observer {
+        viewModel.loginResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
@@ -170,7 +170,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.mobile.observe(viewLifecycleOwner, Observer {
+        viewModel.mobile.observe(viewLifecycleOwner, {
             it?.let {
                 val callPrefix = tv_call_prefix.text.toString()
                 if (callPrefix == getString(R.string.login_mobile_call_prefix_taiwan) && it.length == 9) {
@@ -185,7 +185,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.validateMessageResult.observe(viewLifecycleOwner, Observer {
+        viewModel.validateMessageResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
@@ -197,7 +197,7 @@ class LoginFragment : BaseFragment() {
             }
         })
 
-        viewModel.invitedCodeError.observe(viewLifecycleOwner, Observer {
+        viewModel.invitedCodeError.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_invite_code.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_invite_code_error.visibility = View.INVISIBLE
@@ -260,8 +260,8 @@ class LoginFragment : BaseFragment() {
                 R.id.btnClose -> navigateTo(NavigateItem.Up)
 
                 R.id.btn_register_cancel, R.id.btn_login_cancel -> {
-                    mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
                     navigateTo(NavigateItem.Up)
+                    mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
                 }
 
                 R.id.btn_register -> {

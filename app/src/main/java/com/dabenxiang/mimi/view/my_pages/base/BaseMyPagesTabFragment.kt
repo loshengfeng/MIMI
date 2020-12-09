@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_my.*
 import kotlinx.android.synthetic.main.fragment_my.view.*
@@ -21,6 +22,8 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
     abstract val tabFragmentsCreators: Map<Int, () -> Fragment>
 
     override fun getLayoutId() = R.layout.fragment_my
+
+    private val dataCountByTab: ArrayList<Int> = arrayListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +41,7 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
             tab.text = getTabTitle(position)
         }
         tabLayoutMediator.attach()
-
+        onTabSelectedListener?.let { view.tabs.addOnTabSelectedListener(it) }
         return view
     }
 
@@ -58,6 +61,17 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
             }
             true
         }
+
+        dataCountByTab.clear()
+        repeat(tabFragmentsCreators.count()) { dataCountByTab.add(0) }
+
+        viewModel.changeDataCount.observe(viewLifecycleOwner, {
+            val tabIndex = it.first
+            val count = it.second
+            dataCountByTab[tabIndex] = count
+            changeCleanBtnIsEnable(tabIndex)
+        })
+
     }
 
     override fun onDestroy() {
@@ -67,7 +81,6 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
 
     abstract fun setFragmentTitle()
     abstract fun getTabTitle(position: Int): String?
-
 
     open fun deleteAll() {
         CleanDialogFragment.newInstance(onCleanDialogListener).also {
@@ -84,5 +97,11 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
                 viewModel.setDeleteNotify(it.selectedTabPosition)
             }
         }
+    }
+
+    open val onTabSelectedListener: TabLayout.OnTabSelectedListener? = null
+
+    fun changeCleanBtnIsEnable(tabIndex: Int) {
+        tool_bar.menu.getItem(0).isEnabled = dataCountByTab[tabIndex] > 0
     }
 }

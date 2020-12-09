@@ -60,7 +60,7 @@ class ClubPicDetailFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_club_pic_detail
 
     override fun setupObservers() {
-        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+        viewModel.postDetailResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     val item = it.result.content
@@ -70,7 +70,7 @@ class ClubPicDetailFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     pictureDetailAdapter?.setupAdItem(it.result)
@@ -80,7 +80,7 @@ class ClubPicDetailFragment : BaseFragment() {
             }
         })
 
-        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followPostResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> pictureDetailAdapter?.notifyItemChanged(it.result)
                 is ApiResult.Error -> onApiError(it.throwable)

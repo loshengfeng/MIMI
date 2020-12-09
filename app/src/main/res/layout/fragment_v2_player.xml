@@ -113,7 +113,7 @@
         app:layout_constraintStart_toStartOf="@id/player_view"
         app:layout_constraintTop_toTopOf="@id/player_view" />
 
-    <com.google.android.material.tabs.TabLayout
+    <com.dabenxiang.mimi.view.customview.CustomTabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_height"

@@ -3,12 +3,15 @@ package com.dabenxiang.mimi.view.club
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -50,6 +53,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
+
 class ClubTabFragment : BaseFragment() {
 
     companion object {
@@ -76,12 +80,12 @@ class ClubTabFragment : BaseFragment() {
     private var file = File("")
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            TAB_FOLLOW to { ClubItemFragment(ClubTabItemType.FOLLOW) },
-            TAB_RECOMMEND to { ClubItemFragment(ClubTabItemType.RECOMMEND) },
-            TAB_LATEST to { ClubItemFragment(ClubTabItemType.LATEST) },
-            TAB_CLIP to { ClubItemFragment(ClubTabItemType.SHORT_VIDEO) },
-            TAB_PICTURE to { ClubItemFragment(ClubTabItemType.PICTURE) },
-            TAB_NOVEL to { ClubItemFragment(ClubTabItemType.NOVEL) }
+        TAB_FOLLOW to { ClubItemFragment(ClubTabItemType.FOLLOW) },
+        TAB_RECOMMEND to { ClubItemFragment(ClubTabItemType.RECOMMEND) },
+        TAB_LATEST to { ClubItemFragment(ClubTabItemType.LATEST) },
+        TAB_CLIP to { ClubItemFragment(ClubTabItemType.SHORT_VIDEO) },
+        TAB_PICTURE to { ClubItemFragment(ClubTabItemType.PICTURE) },
+        TAB_NOVEL to { ClubItemFragment(ClubTabItemType.NOVEL) }
     )
 
     private val topicListAdapter by lazy {
@@ -127,9 +131,10 @@ class ClubTabFragment : BaseFragment() {
         })
 
         viewModel.doTask.observe(this, {
-            when(it){
+            when (it) {
                 REFRESH_TASK -> getClubItemList()
-                else ->{}
+                else -> {
+                }
             }
         })
     }
@@ -149,7 +154,10 @@ class ClubTabFragment : BaseFragment() {
         view.club_view_pager.offscreenPageLimit = 7
         val tabs = resources.getStringArray(R.array.club_tabs)
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
-            tab.text = tabs[position]
+            val tabView = LayoutInflater.from(requireContext()).inflate(R.layout.custom_tab, null)
+            val textView = tabView?.findViewById<TextView>(R.id.tv_title)
+            textView?.text = tabs[position]
+            tab.customView = tabView
         }
         tabLayoutMediator.attach()
         view.club_tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
@@ -157,16 +165,14 @@ class ClubTabFragment : BaseFragment() {
                 viewModel.currentTab = tab?.position ?: 0
                 view.search_bar.text = String.format(
                     getString(R.string.text_search_classification),
-                    tab?.text
+                    tabs[tab?.position?:0]
                 )
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
-
             }
 
         })
@@ -178,11 +184,6 @@ class ClubTabFragment : BaseFragment() {
             navToSearch(view.club_tabs.selectedTabPosition)
         }
         return view
-    }
-
-    override fun setupFirstTime() {
-        super.setupFirstTime()
-
     }
 
     override fun onResume() {
@@ -271,6 +272,10 @@ class ClubTabFragment : BaseFragment() {
             } else {
                 pciUri.add(file.absolutePath)
             }
+        }
+
+        if (pciUri.isEmpty()) {
+            return
         }
 
         val bundle = Bundle()

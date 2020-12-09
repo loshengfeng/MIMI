@@ -264,7 +264,7 @@ class SearchPostFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
+        viewModel.searchTotalCount.observe(viewLifecycleOwner, { count ->
             if(search_bar.text.isNotBlank()) setSearchResultText(count)
         })
 

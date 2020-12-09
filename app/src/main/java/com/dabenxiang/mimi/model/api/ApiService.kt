@@ -363,7 +363,8 @@ interface ApiService {
         @Query("isRandom") isRandom: Boolean,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        @Query("lastId") lastId: Long
+        @Query("lastId") lastId: Long,
+        @Query("excludeId") excludeId: String?
     ): Response<ApiBasePagingItem<ArrayList<StatisticsItem>>>
 
     @GET("/v1/Members/Home/Videos/PostStatistics")

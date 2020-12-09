@@ -56,11 +56,11 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
     override fun setupObservers() {
         super.setupObservers()
 
-        viewModel.postList.observe(viewLifecycleOwner, Observer {
+        viewModel.postList.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 
-        viewModel.loadingStatus.observe(viewLifecycleOwner, Observer {
+        viewModel.loadingStatus.observe(viewLifecycleOwner, {
             if (it) {
                 progress_bar.visibility = View.VISIBLE
                 recyclerView.visibility = View.GONE
@@ -70,7 +70,7 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
             }
         })
 
-        viewModel.totalCount.observe(viewLifecycleOwner, Observer {
+        viewModel.totalCount.observe(viewLifecycleOwner, {
             adapter.totalCount = it.toInt()
         })
     }

@@ -22,7 +22,9 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
 
-class PlayerV2ViewModel: BaseViewModel() {
+class
+
+PlayerV2ViewModel: BaseViewModel() {
 
     private val VIDEO_CUCUMBER: String = "cucumber"
 

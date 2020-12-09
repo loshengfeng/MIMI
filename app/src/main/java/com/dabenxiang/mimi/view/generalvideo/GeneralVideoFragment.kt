@@ -67,24 +67,20 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
         rv_video.also {
             it.layoutManager = gridLayoutManager
-            it.setHasFixedSize(true)
             it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
-            it.addItemDecoration(
-                GridSpaceItemDecoration(
-                    2,
-                    GeneralUtils.dpToPx(requireContext(), 10),
-                    GeneralUtils.dpToPx(requireContext(), 10),
-                    true
-                )
+            it.setHasFixedSize(true)
+            val itemDecoration = GridSpaceItemDecoration(
+                2,
+                GeneralUtils.dpToPx(requireContext(), 10),
+                GeneralUtils.dpToPx(requireContext(), 10),
+                true
             )
-            rv_video.itemAnimator = null
+            it.addItemDecoration(itemDecoration)
         }
 
         lifecycleScope.launch {
             viewModel.getVideoByCategory(category)
-                .collectLatest {
-                    generalVideoAdapter.submitData(it)
-                }
+                .collectLatest { generalVideoAdapter.submitData(it) }
         }
 
     }
@@ -120,7 +116,6 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                     tv_empty_data?.run { this.text = getString(R.string.empty_video) }
                     rv_video?.run { this.visibility = View.INVISIBLE }
                 } else {
-                    rv_video?.scrollBy(0, 1) //FIXME: 滑動後頁面才能點擊，原因未明，查找中...
                     layout_empty_data?.run { this.visibility = View.INVISIBLE }
                     rv_video?.run { this.visibility = View.VISIBLE }
                 }

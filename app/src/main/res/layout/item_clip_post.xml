@@ -109,13 +109,18 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:src="@drawable/img_nopic_02"
+                android:scaleType="fitCenter" />
+
+            <ImageView
                 android:background="@color/color_black_1_20"
                 android:id="@+id/iv_photo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
-                android:scaleType="centerCrop"
-                android:src="@drawable/img_nopic_03" />
+                android:scaleType="centerCrop" />
         </androidx.cardview.widget.CardView>
 
         <TextView

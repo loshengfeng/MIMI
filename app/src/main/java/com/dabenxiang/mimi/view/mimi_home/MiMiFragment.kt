@@ -75,24 +75,8 @@ class MiMiFragment : BaseFragment() {
             val view = LayoutInflater.from(requireContext()).inflate(R.layout.custom_tab, null)
             val textView = view?.findViewById<TextView>(R.id.tv_title)
             textView?.text = menusItems[position].name
-            textView?.takeIf { position == 0 }?.run { setupTextViewSelected(true, this) }
             tab.customView = view
         }.attach()
-
-        layout_tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
-                setupTextViewSelected(true, textView)
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
-                setupTextViewSelected(false, textView)
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-            }
-        })
     }
 
     override fun setupListeners() {
