@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.tabs.TabLayout
+    <com.dabenxiang.mimi.view.customview.CustomTabLayout
         android:id="@+id/layout_tab"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_height"
@@ -12,7 +12,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tabIndicator="@drawable/bg_tab_home"
+        app:tabIndicator="@drawable/bg_tab"
         app:tabIndicatorHeight="4dp"
         app:tabMaxWidth="70dp"
         app:tabMinWidth="70dp"

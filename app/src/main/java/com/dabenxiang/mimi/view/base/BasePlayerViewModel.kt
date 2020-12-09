@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.VideoType
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -94,11 +95,11 @@ class BasePlayerViewModel: BaseViewModel() {
         }
     }
 
-    fun sendVideoReport(videoContentId: Long){
+    fun sendVideoReport(videoContentId: Long, unhealthy: Boolean){
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMemberVideoReport(
-                    videoId= videoContentId, type = PostType.VIDEO_ON_DEMAND.value)
+                    videoId= videoContentId, type = VideoType.VIDEO_ON_DEMAND.value, unhealthy = unhealthy)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

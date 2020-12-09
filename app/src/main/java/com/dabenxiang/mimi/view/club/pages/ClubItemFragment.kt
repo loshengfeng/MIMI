@@ -159,6 +159,19 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     }
 
+    override fun setupObservers() {
+        super.setupObservers()
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    adapter.removedPosList.add(it.result)
+                    adapter.notifyItemChanged(it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+    }
+
     private fun loginPageToggle(isLogin: Boolean) {
         Timber.i("loginPageToggle= $isLogin")
         if (isLogin) {
