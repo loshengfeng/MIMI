@@ -413,7 +413,6 @@ dependencies {
     // QrCode
     implementation "com.journeyapps:zxing-android-embedded:$zxing_android_embedded_version"
     implementation "com.google.zxing:core:$zxing_core_version"
-    implementation 'me.codeboy.android:align-text-view:2.3.2'
 }
 
 class Version {
