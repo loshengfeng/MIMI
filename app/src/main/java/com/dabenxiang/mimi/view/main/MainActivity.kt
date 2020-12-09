@@ -69,7 +69,7 @@ class MainActivity : BaseActivity() {
 
         setupBottomNavigationBar()
 
-        viewModel.postReportResult.observe(this, Observer {
+        viewModel.postReportResult.observe(this, {
             when (it) {
                 is Empty -> {
                     GeneralUtils.showToast(this, getString(R.string.report_success))
@@ -78,7 +78,7 @@ class MainActivity : BaseActivity() {
             }
         })
 
-        viewModel.checkStatusResult.observe(this, Observer {
+        viewModel.checkStatusResult.observe(this, {
             when (it) {
                 is Success -> {
                     when (it.result.status) {
@@ -94,7 +94,7 @@ class MainActivity : BaseActivity() {
             }
         })
 
-        viewModel.totalUnreadResult.observe(this, Observer {
+        viewModel.totalUnreadResult.observe(this, {
             when (it) {
                 is Success -> {
                     refreshBottomNavigationBadge(it.result)
@@ -102,7 +102,7 @@ class MainActivity : BaseActivity() {
             }
         })
 
-        viewModel.dailyCheckInItem.observe(this, Observer {
+        viewModel.dailyCheckInItem.observe(this, {
             DailyCheckInDialogFragment.newInstance().show(
                 supportFragmentManager,
                 DailyCheckInDialogFragment::class.simpleName
@@ -183,7 +183,7 @@ class MainActivity : BaseActivity() {
             onEmailUnconfirmed = { showEmailConfirmDialog() }
         )
 
-        controller.observe(this, Observer {
+        controller.observe(this, {
             setupStatusBar()
             setUiMode()
         })

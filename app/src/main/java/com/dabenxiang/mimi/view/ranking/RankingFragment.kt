@@ -149,19 +149,19 @@ class RankingFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.showProgress.observe(viewLifecycleOwner, Observer {
+        viewModel.showProgress.observe(viewLifecycleOwner, {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.rankingVideosList.observe(viewLifecycleOwner, Observer {
+        viewModel.rankingVideosList.observe(viewLifecycleOwner, {
             videosAdapter.submitList(it)
         })
 
-        viewModel.rankingList.observe(viewLifecycleOwner, Observer {
+        viewModel.rankingList.observe(viewLifecycleOwner, {
             pictureAdapter.submitList(it)
         })
 
-        viewModel.rankingClipList.observe(viewLifecycleOwner, Observer {
+        viewModel.rankingClipList.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Loading -> layout_refresh.isRefreshing = true
                 is ApiResult.Loaded -> layout_refresh.isRefreshing = false

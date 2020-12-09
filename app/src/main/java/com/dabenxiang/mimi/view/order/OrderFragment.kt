@@ -112,7 +112,7 @@ class OrderFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.balanceResult.observe(viewLifecycleOwner, Observer {
+        viewModel.balanceResult.observe(viewLifecycleOwner, {
             for (i in 0 until tl_type.tabCount) {
                 val title = tabTitle[i]
                 tl_type.getTabAt(i)?.also { tab ->
@@ -125,7 +125,7 @@ class OrderFragment : BaseFragment() {
             }
         })
 
-        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
+        viewModel.unreadResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     viewModel.unreadCount = it.result
@@ -139,7 +139,7 @@ class OrderFragment : BaseFragment() {
             viewModel.getUnReadOrderCount()
         })
 
-        viewModel.unreadOrderResult.observe(viewLifecycleOwner, Observer {
+        viewModel.unreadOrderResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     viewModel.unreadOrderCount = it.result
@@ -158,7 +158,7 @@ class OrderFragment : BaseFragment() {
             }
         })
 
-        viewModel.createOrderChatResult.observe(viewLifecycleOwner, Observer {
+        viewModel.createOrderChatResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Success -> {
@@ -287,7 +287,6 @@ class OrderFragment : BaseFragment() {
 
     private fun onTopUpClick() {
         findNavController().navigateUp()
-//        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
     }
 
     private fun onPaymentInfoClick(orderItem: OrderItem = OrderItem()) {

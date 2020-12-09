@@ -69,20 +69,20 @@ class FavoriteFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.playList.observe(this, Observer {
+        viewModel.playList.observe(this, {
             if (lastPrimaryIndex != TYPE_SHORT_VIDEO)
                 favoriteAdapter.submitList(it)
         })
-        viewModel.postList.observe(this, Observer {
+        viewModel.postList.observe(this, {
             if (lastPrimaryIndex == TYPE_SHORT_VIDEO)
                 favoriteAdapter.submitList(it)
         })
-        viewModel.dataCount.observe(this, Observer { refreshUi(it) })
+        viewModel.dataCount.observe(this, { refreshUi(it) })
 
-        viewModel.cleanResult.observe(this, Observer {
+        viewModel.cleanResult.observe(this, {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Empty -> {
                     viewModel.videoIDList.clear()
                     viewModel.initData(lastPrimaryIndex)
@@ -91,28 +91,28 @@ class FavoriteFragment : BaseFragment() {
             }
         })
 
-        viewModel.likeResult.observe(this, Observer {
+        viewModel.likeResult.observe(this, {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Success -> favoriteAdapter.notifyDataSetChanged()
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.followResult.observe(this, Observer {
+        viewModel.followResult.observe(this, {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Success -> favoriteAdapter.notifyDataSetChanged()
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.favoriteResult.observe(this, Observer {
+        viewModel.favoriteResult.observe(this, {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Success -> {
                     viewModel.initData(lastPrimaryIndex)
                     GeneralUtils.showToast(
@@ -124,15 +124,15 @@ class FavoriteFragment : BaseFragment() {
             }
         })
 
-        viewModel.reportResult.observe(this, Observer {
+        viewModel.reportResult.observe(this, {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.isEmailConfirmed.observe(this, Observer {
+        viewModel.isEmailConfirmed.observe(this, {
             when (it) {
                 is Success -> {
                     if (!it.result) {

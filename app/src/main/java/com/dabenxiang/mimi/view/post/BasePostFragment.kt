@@ -97,7 +97,7 @@ open class BasePostFragment : BaseFragment() {
     override fun getLayoutId() = 0
 
     override fun setupObservers() {
-        viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
+        viewModel.clubItemResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     txt_clubName.text = it.result.first().title

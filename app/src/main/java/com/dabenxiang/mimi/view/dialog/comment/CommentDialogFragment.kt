@@ -237,7 +237,7 @@ class CommentDialogFragment : BaseDialogFragment() {
             }
         })
 
-        viewModel.apiPostCommentResult.observe(this, Observer { event ->
+        viewModel.apiPostCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {

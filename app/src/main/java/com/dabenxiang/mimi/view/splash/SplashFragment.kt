@@ -63,7 +63,7 @@ class SplashFragment : BaseFragment() {
 
     override fun setupObservers() {
 
-        viewModel.apiError.observe(viewLifecycleOwner, Observer { isError ->
+        viewModel.apiError.observe(viewLifecycleOwner, { isError ->
             if (isError) {
                 initSettings()
             }
@@ -114,7 +114,7 @@ class SplashFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.autoLoginResult.observe(viewLifecycleOwner, Observer {
+        viewModel.autoLoginResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
                     mainViewModel?.startMQTT()

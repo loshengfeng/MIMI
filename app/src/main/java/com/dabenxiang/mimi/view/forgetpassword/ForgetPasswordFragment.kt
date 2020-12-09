@@ -34,7 +34,7 @@ class ForgetPasswordFragment : BaseFragment() {
     override val bottomNavigationVisibility = View.GONE
 
     override fun setupObservers() {
-        viewModel.mobileError.observe(viewLifecycleOwner, Observer {
+        viewModel.mobileError.observe(viewLifecycleOwner, {
             if (it == "") {
                 layout_mobile.setBackgroundResource(R.drawable.layout_rectangle)
                 tv_mobile_error.visibility = View.INVISIBLE
@@ -45,9 +45,9 @@ class ForgetPasswordFragment : BaseFragment() {
             }
         })
 
-        viewModel.result.observe(viewLifecycleOwner, Observer {
+        viewModel.result.observe(viewLifecycleOwner, {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
+                is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Error -> onApiError(it.throwable)
                 is ApiResult.Empty -> {
                     progressHUD?.dismiss()

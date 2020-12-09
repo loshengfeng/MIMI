@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -109,7 +110,13 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(this, {
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
+    }
+
+    override fun setupObservers() {
+        super.setupObservers()
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     adapter.removedPosList.add(it.result)
@@ -118,9 +125,6 @@ class MyFavoritesFragment(val tab:Int, val type: MyCollectionTabItemType, val is
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
-
-        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
-        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
