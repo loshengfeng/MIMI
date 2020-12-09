@@ -218,6 +218,8 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
     // AndroidX
     implementation "androidx.appcompat:appcompat:$appcompat_version"
     implementation "androidx.core:core-ktx:$ktx_version"
@@ -255,14 +257,12 @@ dependencies {
 
     // Room
     implementation "androidx.room:room-runtime:$room_version"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
     // Koin
     implementation "org.koin:koin-core:$koin_version"
     implementation "org.koin:koin-core-ext:$koin_version"
-//    implementation "org.koin:koin-java:$koin_version"
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-android-scope:$koin_version"
     implementation "org.koin:koin-android-viewmodel:$koin_version"
@@ -319,7 +319,7 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
     // Ktor
-    implementation "io.ktor:ktor-client-android:1.2.5"
+    implementation "io.ktor:ktor-client-android:$ktor_version"
 
     // Epoxy
     implementation "com.airbnb.android:epoxy:$epoxy_version"
@@ -370,7 +370,6 @@ dependencies {
     implementation "org.cks.utils:utils_gson_factory:$cks_utils_gson_factory"
     implementation "org.cks.utils:updatemanager:$cks_update_version"
 
-
     // Domain GoLib
     implementation project(path: ':domain_libs')
 
@@ -381,7 +380,8 @@ dependencies {
     //Video compressor
     implementation "org.cks.utils.video:videocompressor:$video_compressor"
 
-    implementation 'tm.charlie.androidlib:expandable-textview:2.0.2'
+    implementation "tm.charlie.androidlib:expandable-textview:$expandable_textview_version"
+    implementation "me.codeboy.android:align-text-view:$align_textview_version"
 
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
@@ -413,7 +413,6 @@ dependencies {
     // QrCode
     implementation "com.journeyapps:zxing-android-embedded:$zxing_android_embedded_version"
     implementation "com.google.zxing:core:$zxing_core_version"
-    implementation 'me.codeboy.android:align-text-view:2.3.2'
 }
 
 class Version {
