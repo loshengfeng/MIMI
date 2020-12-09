@@ -174,7 +174,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal"
-            app:tabIndicator="@drawable/bg_tab_90"
+            app:tabIndicator="@drawable/bg_tab"
             app:tabIndicatorColor="@color/adult_color_bottom_bar_item"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/color_black_1"

@@ -97,7 +97,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimaryDark"
-            app:tabIndicator="@drawable/bg_tab_70"
+            app:tabIndicator="@drawable/bg_tab"
             app:tabIndicatorFullWidth="false"
             app:tabIndicatorHeight="4dp"
             app:tabMaxWidth="70dp"

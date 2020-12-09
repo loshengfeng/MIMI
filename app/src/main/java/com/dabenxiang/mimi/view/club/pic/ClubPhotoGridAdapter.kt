@@ -51,12 +51,12 @@ class ClubPhotoGridAdapter(
         }
         if (!TextUtils.isEmpty(imageItem.url)) {
             Glide.with(holder.picture.context)
-                .load(imageItem.url).placeholder(R.drawable.img_nopic_03).into(holder.picture)
+                .load(imageItem.url).into(holder.picture)
         } else {
             onPictureDetailListener.onGetAttachment(
                 imageItem.id.toLongOrNull(),
                 holder.picture,
-                LoadImageType.PICTURE_THUMBNAIL
+                LoadImageType.PICTURE_EMPTY
             )
         }
 
