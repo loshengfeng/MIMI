@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.mypost
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
@@ -96,7 +97,8 @@ class MyPostFragment : BaseFragment() {
             requireContext(),
             isAdultTheme,
             myPostListener,
-            memberPostFuncItem
+            memberPostFuncItem,
+           viewModel.viewModelScope
         )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter

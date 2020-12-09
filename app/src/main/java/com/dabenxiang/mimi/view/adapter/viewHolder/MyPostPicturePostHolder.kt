@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
@@ -41,6 +42,9 @@ import kotlinx.android.synthetic.main.item_picture_post.view.tv_name
 import kotlinx.android.synthetic.main.item_picture_post.view.tv_time
 import kotlinx.android.synthetic.main.item_picture_post.view.tv_title
 import kotlinx.android.synthetic.main.item_picture_post.view.v_separator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -52,13 +56,13 @@ class MyPostPicturePostHolder(
 
     private val accountManager: AccountManager by inject()
 
+    val pictureRecycler: RecyclerView = itemView.recycler_picture
     private val picturePostItemLayout: ConstraintLayout = itemView.layout_picture_post_item
     private val imgAvatar: ImageView = itemView.img_avatar
     private val tvName: TextView = itemView.tv_name
     private val tvTime: TextView = itemView.tv_time
     private val tvTitle: TextView = itemView.tv_title
     private val tvTitleMore: TextView = itemView.tv_title_more
-    val pictureRecycler: RecyclerView = itemView.recycler_picture
     private val tvPictureCount: TextView = itemView.tv_picture_count
     private val tagChipGroup: ChipGroup = itemView.chip_group_tag
     private val ivLike: ImageView = itemView.iv_like
@@ -72,12 +76,13 @@ class MyPostPicturePostHolder(
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
 
     fun onBind(
-        item: MemberPostItem,
-        position: Int,
-        myPostListener: MyPostListener,
-        memberPostFuncItem: MemberPostFuncItem,
-        searchStr: String = "",
-        searchTag: String = ""
+            item: MemberPostItem,
+            position: Int,
+            myPostListener: MyPostListener,
+            viewModelScope: CoroutineScope,
+            searchStr: String = "",
+            searchTag: String = "",
+
     ) {
         picturePostItemLayout.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(R.color.color_black_1))
@@ -106,7 +111,10 @@ class MyPostPicturePostHolder(
         }
         tvFollow.visibility = if(accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        memberPostFuncItem.getBitmap(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        viewModelScope.launch {
+            LoadImageUtils.loadImage(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        }
+
         imgAvatar.setOnClickListener {
             myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
         }
@@ -138,8 +146,7 @@ class MyPostPicturePostHolder(
                     override fun onItemClick() {
                         item.also { myPostListener.onItemClick(item, AdultTabType.PICTURE) }
                     }
-                },
-                memberPostFuncItem
+                }, viewModelScope
             )
             pictureRecycler.onFlingListener = null
             PagerSnapHelper().attachToRecyclerView(pictureRecycler)

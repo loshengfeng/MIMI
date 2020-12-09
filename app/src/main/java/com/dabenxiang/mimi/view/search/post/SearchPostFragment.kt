@@ -13,6 +13,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
@@ -74,7 +75,7 @@ class SearchPostFragment : BaseFragment() {
         SearchPostAdapter(
             requireActivity(),
             postListener,
-            memberPostFuncItem,
+            viewModel.viewModelScope,
             { searchText ?: "" },
             { searchTag ?: "" })
     }
@@ -456,16 +457,6 @@ class SearchPostFragment : BaseFragment() {
 
         tv_search_text.text = word
         layout_search_text.visibility = View.VISIBLE
-    }
-
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, view, type -> viewModel.loadImage(id, view, type)},
-            { item, items, isFollow, func -> },
-            { item, isLike, func -> },
-            { item, isFavorite, func -> }
-        )
     }
 
     private fun getSearchHistory() {
