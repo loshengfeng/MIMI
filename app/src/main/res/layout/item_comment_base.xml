@@ -57,12 +57,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/iv_avatar" />
 
-    <me.codeboy.android.aligntextview.CBAlignTextView
+    <TextView
         android:id="@+id/tv_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="11dp"
-        android:textColor="@color/color_black_1"
         android:gravity="start"
         app:layout_constraintEnd_toStartOf="@id/btn_more"
         app:layout_constraintStart_toStartOf="@id/tv_date"
