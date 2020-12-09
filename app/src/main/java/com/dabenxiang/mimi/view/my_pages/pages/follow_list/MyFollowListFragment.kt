@@ -40,11 +40,6 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_my_follow_list
 
-    override fun initSettings() {
-        super.initSettings()
-//        tv_title_count.text = getString(R.string.follow_members_total_num, "0")
-    }
-
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -159,6 +154,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                 id_empty_group.visibility = View.GONE
                 recycler_view.visibility = View.VISIBLE
             }
+            myPagesViewModel.changeDataCount(type, it)
             layout_refresh.isRefreshing = false
         }
 
@@ -194,7 +190,6 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
             getData()
         }
     }
-
 
     fun getData() {
         when (type) {
