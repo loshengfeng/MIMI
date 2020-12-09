@@ -8,8 +8,9 @@ import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.my_pages.base.BaseMyPagesTabFragment
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
-import com.dabenxiang.mimi.view.my_pages.pages.favorites.MyFavoritesFragment
-import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoFragment
+import com.dabenxiang.mimi.view.my_pages.pages.like.LikeMimiVideoFragment
+import com.dabenxiang.mimi.view.my_pages.pages.like.LikePostFragment
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my.*
 import kotlinx.android.synthetic.main.fragment_my.view.*
 
@@ -24,8 +25,8 @@ class LikeFragment : BaseMyPagesTabFragment() {
     }
 
     override val tabFragmentsCreators: Map<Int, () -> Fragment> =mapOf(
-           TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(TAB_MiMI_VIDEO, MyCollectionTabItemType.MIMI_VIDEO, true) },
-           TAB_POST to {  MyFavoritesFragment(TAB_POST, MyCollectionTabItemType.POST,true)  }
+           TAB_MiMI_VIDEO to { LikeMimiVideoFragment(TAB_MiMI_VIDEO, MyCollectionTabItemType.MIMI_VIDEO) },
+           TAB_POST to {  LikePostFragment(TAB_POST, MyCollectionTabItemType.POST)  }
     )
 
     override fun setFragmentTitle() {
@@ -51,5 +52,20 @@ class LikeFragment : BaseMyPagesTabFragment() {
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
+
+    override val onTabSelectedListener: TabLayout.OnTabSelectedListener
+        get() = object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.position?.let { changeCleanBtnIsEnable(it) }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+        }
 
 }

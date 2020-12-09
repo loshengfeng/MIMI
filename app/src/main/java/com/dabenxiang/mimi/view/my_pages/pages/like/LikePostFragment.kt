@@ -1,16 +1,12 @@
-package com.dabenxiang.mimi.view.my_pages.pages.favorites
+package com.dabenxiang.mimi.view.my_pages.pages.like
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -23,6 +19,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
+import com.dabenxiang.mimi.view.my_pages.pages.favorites.FavoritesAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -39,13 +36,9 @@ import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyFavoritesFragment(
-    val tab: Int,
-    val type: MyCollectionTabItemType,
-    val isLike: Boolean = false
-) : BaseFragment() {
+class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFragment() {
 
-    private val viewModel: MyFavoritesViewModel by viewModels()
+    private val viewModel: LikePostViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
@@ -74,16 +67,12 @@ class MyFavoritesFragment(
                 recycler_view.visibility = View.VISIBLE
             }
             layout_refresh.isRefreshing = false
+            myPagesViewModel.changeDataCount(tab, it)
         })
 
         viewModel.likePostResult.observe(this, {
             when (it) {
-                is ApiResult.Success -> {
-                    it.result.let { position ->
-                        adapter.notifyItemChanged(position, FavoritesAdapter.PAYLOAD_UPDATE_LIKE)
-                    }
-                }
-
+                is ApiResult.Success -> viewModel.getData(adapter)
                 else -> {
                     onApiError(Exception("Unknown Error!"))
                 }
@@ -92,7 +81,11 @@ class MyFavoritesFragment(
 
         viewModel.favoriteResult.observe(this, {
             when (it) {
-                is ApiResult.Success -> viewModel.getData(adapter, isLike)
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, FavoritesAdapter.PAYLOAD_UPDATE_FAVORITE)
+                    }
+                }
                 else -> {
                     onApiError(Exception("Unknown Error!"))
                 }
@@ -103,8 +96,16 @@ class MyFavoritesFragment(
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Empty -> {
-                    viewModel.getData(adapter, isLike)
+                is ApiResult.Empty -> viewModel.getData(adapter)
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        mainViewModel?.deletePostResult?.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    adapter.removedPosList.add(it.result)
+                    adapter.notifyItemChanged(it.result)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -114,19 +115,6 @@ class MyFavoritesFragment(
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
     }
 
-    override fun setupObservers() {
-        super.setupObservers()
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    adapter.removedPosList.add(it.result)
-                    adapter.notifyItemChanged(it.result)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -134,25 +122,18 @@ class MyFavoritesFragment(
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter, isLike)
+            viewModel.getData(adapter)
         }
 
         myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
-            if (it == tab) {
-                if (isLike) viewModel.deleteAllLike(adapter.snapshot().items)
-                else viewModel.deleteFavorites(adapter.snapshot().items)
-            }
+            if (it == tab) viewModel.deleteAllLike(adapter.snapshot().items)
         })
 
-        text_page_empty.text =
-            if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
+        text_page_empty.text = getString(R.string.like_empty_msg)
         img_page_empty.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
-                when (isLike) {
-                    false -> R.drawable.img_history_empty_2
-                    true -> R.drawable.img_love_empty
-                }
+                R.drawable.img_love_empty
             )
         )
     }
@@ -161,7 +142,7 @@ class MyFavoritesFragment(
         super.onResume()
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
-            viewModel.getData(adapter, isLike)
+            viewModel.getData(adapter)
         }
     }
 
@@ -178,7 +159,18 @@ class MyFavoritesFragment(
     private val postListener = object : MyPostListener {
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            checkStatus { viewModel.likePost(item, position, isLike) }
+            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+                override fun onClean() {
+                    viewModel.likePost(item, position, isLike)
+                }
+            })
+
+            dialog.setMsg(getString(R.string.like_delete_favorite_message))
+
+            dialog.show(
+                requireActivity().supportFragmentManager,
+                CleanDialogFragment::class.java.simpleName
+            )
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
@@ -221,21 +213,7 @@ class MyFavoritesFragment(
             isFavorite: Boolean,
             type: AttachmentType
         ) {
-            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
-                override fun onClean() {
-                    checkStatus { viewModel.favoritePost(item, position, isFavorite) }
-                }
-            })
-
-            dialog.setMsg(
-                if (isLike) getString(R.string.like_delete_favorite_message)
-                else getString(R.string.follow_delete_favorite_message)
-            )
-
-            dialog.show(
-                requireActivity().supportFragmentManager,
-                CleanDialogFragment::class.java.simpleName
-            )
+            viewModel.favoritePost(item, position, isFavorite)
         }
 
         override fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean) {

@@ -1,24 +1,21 @@
-package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
+package com.dabenxiang.mimi.view.my_pages.pages.like
 
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -26,23 +23,30 @@ import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
+import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
+import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoAdapter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.fragment_home.view.*
 import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.item_ad.view.*
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemType, val isLike: Boolean = false) : BaseFragment() {
-    private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
-    private val myPagesViewModel: MyPagesViewModel by viewModels({requireParentFragment()})
-    private val accountManager: AccountManager by inject()
+class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFragment() {
+    private val viewModel: LikeMimiVideoViewModel by viewModels()
+    private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
 
     private val clipFuncItem by lazy {
         CollectionFuncItem(
-                { source -> viewModel.getDecryptSetting(source) },
-                { videoItem, decryptSettingItem, function -> viewModel.decryptCover(videoItem, decryptSettingItem, function) }
+            { source -> viewModel.getDecryptSetting(source) },
+            { videoItem, decryptSettingItem, function ->
+                viewModel.decryptCover(
+                    videoItem,
+                    decryptSettingItem,
+                    function
+                )
+            }
         )
     }
 
@@ -67,10 +71,17 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         }
 
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
-            checkStatus {
-                viewModel.likePost(MemberPostItem(id = item.videoId
-                        ?: 0, likeType = LikeType.LIKE), position, isLike)
-            }
+            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+                override fun onClean() {
+                    viewModel.like(VideoItem(id = item.videoId ?: 0), LikeType.DISLIKE)
+                }
+            })
+
+            dialog.setMsg(getString(R.string.like_delete_favorite_message))
+            dialog.show(
+                requireActivity().supportFragmentManager,
+                CleanDialogFragment::class.java.simpleName
+            )
         }
 
         override fun onClipCommentClick(item: List<PlayItem>, position: Int) {
@@ -81,57 +92,50 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
             Timber.d("onChipClick")
             val bundle = SearchVideoFragment.createBundle(tag)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_searchVideoFragment,
-                            bundle
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_searchVideoFragment,
+                    bundle
+                )
             )
         }
 
         override fun onItemClick(item: PlayItem, type: MyCollectionTabItemType) {
-            if (this@MyCollectionMimiVideoFragment.type == MyCollectionTabItemType.MIMI_VIDEO) {
+            if (this@LikeMimiVideoFragment.type == MyCollectionTabItemType.MIMI_VIDEO) {
                 val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_playerV2Fragment,
                         bundle
-                    ))
+                    )
+                )
             } else {
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_clipSingleFragment,
                         ClipSingleFragment.createBundle(item)
-                    ))
+                    )
+                )
             }
         }
 
         override fun onCommentClick(item: PlayItem, type: MyCollectionTabItemType) {
-            Timber.d("onCommentClick, item = ${item}")
+            Timber.d("onCommentClick, item = $item")
             val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0), true)
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_playerV2Fragment,
-                            bundle
-                    ))
+                NavigateItem.Destination(
+                    R.id.action_to_playerV2Fragment,
+                    bundle
+                )
+            )
         }
 
-        override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyCollectionTabItemType) {
-            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
-                override fun onClean() {
-                    checkStatus { viewModel.deleteMIMIVideoFavorite(item.videoId.toString()) }
-                }
-            })
-
-            dialog.setMsg(getString(
-                when(isLike) {
-                    true -> R.string.like_delete_favorite_message
-                    false -> R.string.follow_delete_favorite_message
-            }))
-            dialog.show(
-                        requireActivity().supportFragmentManager,
-                        CleanDialogFragment::class.java.simpleName
-                )
-
+        override fun onFavoriteClick(
+            item: PlayItem,
+            position: Int,
+            isFavorite: Boolean,
+            type: MyCollectionTabItemType
+        ) {
+            viewModel.favorite(item, position)
         }
     }
 
@@ -141,7 +145,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         viewModel.deleteFavoriteResult.observe(this) {
-            viewModel.getData(adapter, type, isLike)
+            viewModel.getData(adapter)
         }
 
         viewModel.showProgress.observe(this) {
@@ -151,24 +155,20 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.postCount.observe(this) {
             Timber.i("postCount= $it")
             if (it == 0) {
-                text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
+                text_page_empty.text = getString(R.string.like_empty_msg)
                 id_empty_group.visibility = View.VISIBLE
                 list_short.visibility = View.INVISIBLE
             } else {
                 id_empty_group.visibility = View.GONE
                 list_short.visibility = View.VISIBLE
             }
+            myPagesViewModel.changeDataCount(tab, it)
             layout_refresh.isRefreshing = false
         }
 
-        viewModel.likePostResult.observe(this, Observer {
+        viewModel.likeResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
-                        MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_LIKE
-                    )
-                }
+                is ApiResult.Success -> viewModel.getData(adapter)
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })
@@ -187,20 +187,15 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
         viewModel.cleanResult.observe(this, {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Empty -> {
-                    viewModel.getData(adapter, type, isLike)
-                }
+                is ApiResult.Loading -> layout_refresh.isRefreshing = true
+                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
+                is ApiResult.Empty -> viewModel.getData(adapter)
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
-        myPagesViewModel.deleteAll.observe(this,  {
-            if(tab == it){
-                if(isLike) viewModel.deleteAllLike(adapter.snapshot().items)
-                else viewModel.deleteVideos(adapter.snapshot().items)
-            }
+        myPagesViewModel.deleteAll.observe(this, {
+            if (tab == it) viewModel.deleteAllLike(adapter.snapshot().items)
         })
     }
 
@@ -210,15 +205,14 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter, type, isLike)
+            viewModel.getData(adapter)
         }
 
-        img_page_empty.setImageDrawable(ContextCompat.getDrawable(requireContext(),
-            when(isLike) {
-                false -> R.drawable.img_history_empty_2
-                true -> R.drawable.img_love_empty
-            }
-        ))
+        img_page_empty.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(), R.drawable.img_love_empty
+            )
+        )
     }
 
     override fun initSettings() {
@@ -229,17 +223,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         super.onResume()
 
         if (viewModel.postCount.value ?: -1 <= 0) {
-            viewModel.getData(adapter, type, isLike)
-        }
-    }
-
-
-    private val attachmentListener = object : AttachmentListener {
-        override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {
-            viewModel.loadImage(id, view, type)
-        }
-
-        override fun onGetAttachment(id: String, parentPosition: Int, position: Int) {
+            viewModel.getData(adapter)
         }
     }
 }

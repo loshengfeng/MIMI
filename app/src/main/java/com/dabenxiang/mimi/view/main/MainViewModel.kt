@@ -382,8 +382,7 @@ class MainViewModel : BaseViewModel() {
                     accountManager.setupProfile(profileItem)
                     _dailyCheckInItem.postValue(data)
                 }
-                NotifyType.CREATE_ORDER.value,
-                NotifyType.TX_SUCCESS.value -> {
+                NotifyType.CREATE_ORDER.value -> {
                     val data = gson.fromJson(String(message.payload), OrderItem::class.java)
                     _orderItem.postValue(data)
                 }
