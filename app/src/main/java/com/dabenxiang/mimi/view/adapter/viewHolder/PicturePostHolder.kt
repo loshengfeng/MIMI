@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.adapter.viewHolder
 
 import android.text.TextUtils
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -28,6 +27,19 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
+import kotlinx.android.synthetic.main.item_picture_post.view.chip_group_tag
+import kotlinx.android.synthetic.main.item_picture_post.view.img_avatar
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_comment
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_favorite
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_like
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_more
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_comment_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_favorite_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_follow
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_like_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_name
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_time
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_title
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -44,12 +56,15 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
     val title: TextView = itemView.tv_title
     val pictureRecycler: RecyclerView = itemView.recycler_picture
     val pictureCount: TextView = itemView.tv_picture_count
+    val tvTitleMore: TextView = itemView.tv_title_more
     val tagChipGroup: ChipGroup = itemView.chip_group_tag
     val likeImage: ImageView = itemView.iv_like
     val likeCount: TextView = itemView.tv_like_count
     val commentImage: ImageView = itemView.iv_comment
     val commentCount: TextView = itemView.tv_comment_count
     val moreImage: ImageView = itemView.iv_more
+    val favoriteImage: ImageView = itemView.iv_favorite
+    val favoriteCount: TextView = itemView.tv_favorite_count
 
     fun onBind(
         item: MemberPostItem,
@@ -62,6 +77,13 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate ?: Date(), Date())
         title.text = item.title
+
+        tvTitleMore.visibility = if (title.text.length >= 45) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
         follow.visibility =
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
@@ -140,6 +162,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         memberPostFuncItem: MemberPostFuncItem
     ) {
         likeCount.text = item.likeCount.toString()
+        favoriteCount.text = item.favoriteCount.toString()
         commentCount.text = item.commentCount.toString()
 
         val isFollow = item.isFollow
@@ -162,8 +185,14 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
             likeImage.setImageResource(R.drawable.ico_nice_gray)
         }
 
+        if (item.isFavorite) {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_n)
+        }
+
         // New Adjust: Follow is hidden when it is on the list page, and the follow function is only available on the detailed page
-        follow.visibility =  View.GONE
+        follow.visibility = View.GONE
         follow.setOnClickListener {
             itemList?.also {
                 memberPostFuncItem.onFollowClick(item, itemList, !item.isFollow) { isFollow ->
@@ -177,6 +206,13 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         likeImage.setOnClickListener {
             val isLike = item.likeType == LikeType.LIKE
             memberPostFuncItem.onLikeClick(item, !isLike) { like, count -> updateLike(like, count) }
+        }
+
+        favoriteImage.setOnClickListener {
+            val isFavorite = item.isFavorite
+            memberPostFuncItem.onFavoriteClick(item, !isFavorite) { favorite, count ->
+                updateFavorite(favorite, count)
+            }
         }
     }
 
@@ -201,4 +237,12 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
         likeCount.text = count.toString()
     }
 
+    private fun updateFavorite(isFavorite: Boolean, count: Int) {
+        if (isFavorite) {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_white_s)
+        } else {
+            favoriteImage.setImageResource(R.drawable.btn_favorite_n)
+        }
+        favoriteCount.text = count.toString()
+    }
 }

@@ -11,9 +11,9 @@
 
     <fragment
         android:id="@+id/topicDetailFragment"
-        android:name="com.dabenxiang.mimi.view.club.topic.TopicDetailFragment"
+        android:name="com.dabenxiang.mimi.view.club.topic_detail.TopicTabFragment"
         android:label="TopicDetailFragment"
-        tools:layout="@layout/fragment_club_topic">
+        tools:layout="@layout/fragment_club_topic_v2">
         <action
             android:id="@+id/action_to_clipFragment"
             app:destination="@id/clipFragment" />
@@ -320,5 +320,10 @@
             android:id="@+id/action_to_postVideoFragment"
             app:destination="@+id/postVideoFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        tools:layout="@layout/fragment_post_viewer" />
 
 </navigation>

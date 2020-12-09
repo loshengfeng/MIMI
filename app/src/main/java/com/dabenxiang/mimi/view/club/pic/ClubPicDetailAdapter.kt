@@ -28,7 +28,7 @@ import java.util.*
 
 class ClubPicDetailAdapter(
     val context: Context,
-    private val memberPostItem: MemberPostItem,
+    private var memberPostItem: MemberPostItem,
     private val onPictureDetailListener: OnPictureDetailListener,
     private val onPhotoGridItemClickListener: ClubPhotoGridAdapter.OnItemClickListener,
     private var mAdItem: AdItem? = null,
@@ -212,7 +212,7 @@ class ClubPicDetailAdapter(
     }
 
     fun updateContent(item: MemberPostItem) {
-        memberPostItem.content = item.content
+        memberPostItem = item
         notifyItemChanged(VIEW_TYPE_PICTURE_DETAIL)
     }
 

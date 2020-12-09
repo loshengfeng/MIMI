@@ -221,11 +221,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/postViewerFragment"
-        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
-        android:label="PostViewerFragment" />
-
-    <fragment
         android:id="@+id/pictureFragment"
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
@@ -292,5 +287,10 @@
             android:id="@+id/action_to_postVideoFragment"
             app:destination="@+id/postVideoFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        tools:layout="@layout/fragment_post_viewer" />
 
 </navigation>

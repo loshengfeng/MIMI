@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.order
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -21,6 +22,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -190,9 +192,35 @@ class OrderFragment : BaseFragment() {
 
         TabLayoutMediator(tl_type, viewPager) { tab, position ->
             tab.setCustomView(R.layout.badged_tab)
-            tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = tabTitle[position]
-            viewPager.setCurrentItem(tab.position, true)
+            val textView = tab.customView?.findViewById<TextView>(R.id.tv_title)
+            textView?.text = tabTitle[position]
+            textView?.takeIf { position == 0 }?.run { setTextViewSelected(true, this) }
         }.attach()
+
+        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
+                setTextViewSelected(true, textView)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
+                setTextViewSelected(false, textView)
+            }
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    private fun setTextViewSelected(selected: Boolean, textView: TextView) {
+        when (selected) {
+            true -> {
+                textView.setTypeface(null, Typeface.BOLD)
+                textView.setTextColor(requireContext().getColor(R.color.color_black_1))
+            }
+            else -> {
+                textView.setTypeface(null, Typeface.NORMAL)
+                textView.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            }
+        }
     }
 
     override fun initSettings() {

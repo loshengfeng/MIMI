@@ -113,8 +113,8 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         (arguments?.getSerializable(KEY_DATA) as SearchingVideoItem?)?.also { data ->
 
@@ -124,11 +124,16 @@ class SearchVideoFragment : BaseFragment() {
                 layout_search_history.visibility = View.GONE
                 search_bar.setText(data.tag)
                 searchVideo(tag = data.tag)
-                search_bar.clearFocus()
+                search_bar.post {
+                    search_bar.clearFocus()
+                }
             } else {
+                iv_clear_search_bar.visibility = View.GONE
                 getSearchHistory()
-                GeneralUtils.showKeyboard(requireContext())
-                search_bar.requestFocus()
+                search_bar.post {
+                    GeneralUtils.showKeyboard(search_bar.context)
+                    search_bar.requestFocus()
+                }
             }
             layout_search_text.visibility = View.GONE
 
@@ -178,11 +183,13 @@ class SearchVideoFragment : BaseFragment() {
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
+            GeneralUtils.hideKeyboard(requireActivity())
             navigateTo(NavigateItem.Up)
         }
 
         iv_clear_search_bar.setOnClickListener {
             search_bar.setText("")
+            GeneralUtils.hideKeyboard(requireActivity())
             GeneralUtils.showKeyboard(requireContext())
             search_bar.requestFocus()
         }
@@ -194,7 +201,6 @@ class SearchVideoFragment : BaseFragment() {
         iv_clear_history.setOnClickListener {
             chip_group_search_text.removeAllViews()
             viewModel.clearSearchHistory()
-            layout_search_history.visibility = View.GONE
         }
 
         search_bar.addTextChangedListener {
@@ -221,12 +227,14 @@ class SearchVideoFragment : BaseFragment() {
 
     private fun searchText() {
         if (search_bar.text.isNotBlank()) {
+            layout_search_text.visibility = View.GONE
             layout_search_history.visibility = View.GONE
             viewModel.searchingTag = ""
             viewModel.searchingStr = search_bar.text.toString()
             searchVideo(keyword = search_bar.text.toString())
             viewModel.updateSearchHistory(viewModel.searchingStr)
             GeneralUtils.hideKeyboard(requireActivity())
+            search_bar.clearFocus()
         } else {
             GeneralUtils.showToast(
                 requireContext(),
@@ -411,7 +419,7 @@ class SearchVideoFragment : BaseFragment() {
             chip_group_search_text.addView(chip)
         }
 
-        layout_search_history.visibility = if (searchHistories.size > 0) View.VISIBLE else View.GONE
+        layout_search_history.visibility = View.VISIBLE
     }
 
     private fun searchVideo(
@@ -436,4 +444,5 @@ class SearchVideoFragment : BaseFragment() {
             }
         }
     }
+
 }

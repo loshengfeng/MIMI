@@ -41,7 +41,7 @@ class DailyCheckInDialogFragment : BaseDialogFragment() {
                     requireContext(),
                     R.color.color_red_1
                 )
-            ), hint.indexOf("秘密视频 ") + 5, hint.indexOf(" 部"), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            ), hint.indexOf("蜜蜜视频 ") + 5, hint.indexOf(" 部"), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         hint.setSpan(
             ForegroundColorSpan(
@@ -49,7 +49,7 @@ class DailyCheckInDialogFragment : BaseDialogFragment() {
                     requireContext(),
                     R.color.color_red_1
                 )
-            ), hint.indexOf("短视频 ") + 4, hint.lastIndexOf(" 部"), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            ), hint.indexOf("小视频 ") + 4, hint.lastIndexOf(" 部"), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         tv_message_info.text = hint
     }

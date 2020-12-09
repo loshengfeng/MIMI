@@ -110,11 +110,11 @@ class ClipAdapter(
     }
 
     fun pausePlayer() {
-        exoPlayer?.also { player ->
-            player.playWhenReady = false
+        exoPlayer?.takeIf { it.isPlaying }?.run {
             currentViewHolder?.takeUnless { it.ibRetry.visibility == View.VISIBLE }
                 ?.run { this.ibPlay.visibility = View.VISIBLE }
         }
+        exoPlayer?.playWhenReady = false
     }
 
     override fun onBindViewHolder(
@@ -226,6 +226,9 @@ class ClipAdapter(
                     "ExoPlayer.STATE_BUFFERING"
                 }
                 ExoPlayer.STATE_READY -> {
+                    getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
+                        clipFuncItem.onVideoReport(id, false)
+                    }
                     currentViewHolder?.progress?.visibility = View.GONE
                     currentViewHolder?.ivCover?.visibility = View.GONE
                     "ExoPlayer.STATE_READY"
@@ -287,10 +290,8 @@ class ClipAdapter(
             currentViewHolder?.progress?.visibility = View.GONE
             currentViewHolder?.ibRetry?.visibility = View.VISIBLE
             getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
-                clipFuncItem.onPlayerError(id.toString(), error.message ?: "error: UNKNOWN")
+                clipFuncItem.onVideoReport(id, true)
             }
-
-
         }
     }
 }

@@ -18,6 +18,7 @@ import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
@@ -239,6 +240,14 @@ object GeneralUtils {
         }
     }
 
+    fun hideKeyboard(fragment: Fragment) {
+        fragment.view?.run {
+            val inputManager =
+                fragment.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputManager.hideSoftInputFromWindow(this.windowToken, 0)
+        }
+    }
+
     fun showKeyboard(context: Context) {
         val inputMethodManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -441,6 +450,10 @@ object GeneralUtils {
         }
         Timber.d("parse time to UTC: $time")
         return time
+    }
+
+    fun getAdSize(activity: Activity): Pair<Int, Int> {
+        return Pair(getScreenSize(activity).first / 3, getScreenSize(activity).first / 3 / 3)
     }
 
     fun getMaxCount(count: Int): Int {

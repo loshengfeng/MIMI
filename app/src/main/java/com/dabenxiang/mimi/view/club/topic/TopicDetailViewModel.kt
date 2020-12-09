@@ -4,16 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.club.base.ClubViewModel
+import com.dabenxiang.mimi.view.club.pages.ClubItemDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -34,6 +36,9 @@ class TopicDetailViewModel : BaseViewModel() {
     private var _updateCountVideo = MutableLiveData<Int>()
     val updateCountVideo: LiveData<Int> = _updateCountVideo
 
+    private var _getClubInfo = MutableLiveData<ApiResult<MemberClubItem>>()
+    val getClubInfo: LiveData<ApiResult<MemberClubItem>> = _getClubInfo
+
     fun getMemberPosts(
         tag: String,
         orderBy: OrderBy,
@@ -42,6 +47,26 @@ class TopicDetailViewModel : BaseViewModel() {
         viewModelScope.launch {
             getMemberPostPagingItems(tag, orderBy).asFlow()
                 .collect { update(it) }
+        }
+    }
+
+    fun getMembersClub(clubId: Long) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.getMembersClub(clubId)
+
+                Timber.i("getMembersClub clubId=$clubId result=$result")
+
+                if (!result.isSuccessful) throw HttpException(result)
+
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _getClubInfo.value = it }
         }
     }
 
@@ -68,7 +93,7 @@ class TopicDetailViewModel : BaseViewModel() {
             }
         }
         val clubDetailPostDataSource =
-                TopicDetailPostDataSource(
+            TopicDetailPostDataSource(
                 pagingCallback,
                 viewModelScope,
                 domainManager,
@@ -149,6 +174,38 @@ class TopicDetailViewModel : BaseViewModel() {
         }
     }
 
+    fun favoritePost(item: MemberPostItem, isFavorite: Boolean, update: (Boolean, Int) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                Timber.i("favoritePost isFavorite=$isFavorite")
+                val result = when {
+                    isFavorite -> apiRepository.addFavorite(item.id)
+                    else -> apiRepository.deleteFavorite(item.id)
+                }
+                Timber.i("favoritePost result=$result")
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFavorite = isFavorite
+                item.favoriteCount = when {
+                    isFavorite -> item.favoriteCount + 1
+                    else -> item.favoriteCount - 1
+                }
+                emit(ApiResult.success(item.favoriteCount))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect {
+                        when (it) {
+                            is ApiResult.Success -> {
+                                update(isFavorite, it.result)
+                            }
+                        }
+                    }
+        }
+    }
+
     fun followClub(item: MemberClubItem, isFollow: Boolean) {
         viewModelScope.launch {
             flow {
@@ -168,4 +225,5 @@ class TopicDetailViewModel : BaseViewModel() {
                 .collect { _followClubResult.value = it }
         }
     }
+
 }

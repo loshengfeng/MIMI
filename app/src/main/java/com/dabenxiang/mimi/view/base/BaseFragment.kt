@@ -58,7 +58,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.Serializable
 import java.net.UnknownHostException
-import java.util.NoSuchElementException
+import java.util.*
 
 abstract class BaseFragment : Fragment() {
 
@@ -170,7 +170,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.uploadPicItem?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.uploadPicItemResult?.observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 return@Observer
             }
@@ -194,6 +194,7 @@ abstract class BaseFragment : Fragment() {
                             uploadPhoto()
                         } else {
                             val pic = uploadPicUri[uploadCurrentPicPosition]
+                            mainViewModel?.clearPicResultValue()
                             mainViewModel?.postAttachment(
                                 pic.uri,
                                 requireContext(),

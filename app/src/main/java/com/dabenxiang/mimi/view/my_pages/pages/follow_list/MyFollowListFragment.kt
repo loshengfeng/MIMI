@@ -14,7 +14,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.enums.ClickType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.club.topic.TopicDetailFragment
+import com.dabenxiang.mimi.view.club.topic_detail.TopicTabFragment
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -98,7 +98,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                                 isFollow = true
                             )
 
-                            val bundle = TopicDetailFragment.createBundle(clubItem)
+                            val bundle = TopicTabFragment.createBundle(clubItem)
                             navigateTo(
                                 NavigateItem.Destination(
                                     R.id.action_to_topicDetailFragment,
@@ -166,8 +166,8 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
             layout_refresh.isRefreshing = it
         }
 
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
