@@ -162,11 +162,12 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         val defaultResId = when (type) {
             LoadImageType.AVATAR -> R.drawable.default_profile_picture
             LoadImageType.AVATAR_CS -> R.drawable.icon_cs_photo
-            LoadImageType.PICTURE_THUMBNAIL -> R.drawable.img_nopic_03
+            LoadImageType.PICTURE_THUMBNAIL -> R.drawable.img_nopic_02
             LoadImageType.PICTURE_FULL -> R.drawable.img_nopic_03
             LoadImageType.CLUB -> R.drawable.ico_group
             LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
             LoadImageType.CLUB_TOPIC -> R.drawable.bg_topic_tab
+            LoadImageType.PICTURE_EMPTY -> 0
         }
         if ((id == null || id == 0L) && TextUtils.isEmpty(filePath)) {
             Glide.with(view.context).load(defaultResId).into(view)

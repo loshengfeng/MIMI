@@ -15,7 +15,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.club.topic_detail.TopicListAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import timber.log.Timber
 

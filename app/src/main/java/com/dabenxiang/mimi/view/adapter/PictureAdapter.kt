@@ -50,12 +50,12 @@ class PictureAdapter(
         ) {
             if (!TextUtils.isEmpty(item.url)) {
                 Glide.with(picture.context)
-                    .load(item.url).placeholder(R.drawable.img_nopic_03).into(picture)
+                    .load(item.url).into(picture)
             } else {
                 memberPostFuncItem.getBitmap(
                     item.id.toLongOrNull(),
                     picture,
-                    LoadImageType.PICTURE_THUMBNAIL
+                    LoadImageType.PICTURE_EMPTY
                 )
             }
 

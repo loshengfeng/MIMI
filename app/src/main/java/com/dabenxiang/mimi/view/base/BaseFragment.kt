@@ -159,7 +159,7 @@ abstract class BaseFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        mainViewModel?.postArticleResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postArticleResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     setSnackBarPostStatus(it.result)
@@ -182,7 +182,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postPicResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postPicResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     val data = arguments?.getSerializable(MyPostFragment.MEMBER_DATA)
@@ -221,6 +221,7 @@ abstract class BaseFragment : Fragment() {
                             mainViewModel?.postPicOrVideo(postId!!, postMemberRequest, content, HomeViewModel.TYPE_PIC)
                         } else {
                             val pic = uploadPicList[uploadCurrentPicPosition]
+                            mainViewModel?.clearPicResultValue()
                             mainViewModel?.postAttachment(
                                 pic.url, requireContext(),
                                 MyPostFragment.TYPE_PIC
@@ -234,7 +235,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postPicMemberResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postPicMemberResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     deleteTempFile()
@@ -249,7 +250,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postVideoMemberResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postVideoMemberResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     deleteTempFile()
@@ -285,7 +286,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postCoverResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postCoverResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     picParameter.id = it.result.toString()
@@ -306,7 +307,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postVideoResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postVideoResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     arguments?.let { bundle ->
@@ -368,7 +369,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postDeleteAttachment?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postDeleteAttachment?.observe(viewLifecycleOwner, {
             deleteCurrentPicPosition += 1
             if (deleteCurrentPicPosition > deletePicList.size - 1) {
                 setSnackBarPostStatus(postId)
@@ -378,7 +379,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postDeleteCoverAttachment?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postDeleteCoverAttachment?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> mainViewModel?.deleteVideoAttachment(
                     deleteVideoItem[0].picAttachmentId,
@@ -388,7 +389,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postDeleteVideoAttachment?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.postDeleteVideoAttachment?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     setSnackBarPostStatus(postId)
@@ -397,7 +398,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.uploadVideoParameter?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.uploadVideoParameter?.observe(viewLifecycleOwner, {
             videoParameter.ext = it
         })
     }

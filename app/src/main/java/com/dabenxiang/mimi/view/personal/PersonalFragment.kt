@@ -140,11 +140,11 @@ class PersonalFragment : BaseFragment() {
 
     @SuppressLint("SetTextI18n")
     override fun setupObservers() {
-        viewModel.showProgress.observe(this, Observer {
+        viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.meItem.observe(viewLifecycleOwner, Observer {
+        viewModel.meItem.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> layout_refresh.isRefreshing = true
                 is Loaded -> layout_refresh.isRefreshing = false
@@ -153,7 +153,7 @@ class PersonalFragment : BaseFragment() {
             }
         })
 //
-        viewModel.apiSignOut.observe(viewLifecycleOwner, Observer {
+        viewModel.apiSignOut.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> layout_refresh.isRefreshing = true
                 is Loaded -> layout_refresh.isRefreshing = false
@@ -166,7 +166,7 @@ class PersonalFragment : BaseFragment() {
             }
         })
 
-        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
+        viewModel.unreadResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     tv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
@@ -175,7 +175,7 @@ class PersonalFragment : BaseFragment() {
             }
         })
 
-        viewModel.totalUnreadResult.observe(viewLifecycleOwner, Observer {
+        viewModel.totalUnreadResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     iv_new.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
