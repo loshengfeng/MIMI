@@ -106,7 +106,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
         }
 
         viewModel.sourceNotFound.observe(viewLifecycleOwner) {
-            sendVideoReport()
+            sendVideoReport(true)
         }
     }
 
