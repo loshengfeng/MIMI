@@ -164,9 +164,9 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.likePostResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    adapter?.notifyItemChanged(
-                            it.result,
-                            MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_LIKE
+                    adapter.notifyItemChanged(
+                        it.result,
+                        MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
@@ -176,9 +176,9 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.favoriteResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    adapter?.notifyItemChanged(
-                            it.result,
-                            MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
+                    adapter.notifyItemChanged(
+                        it.result,
+                        MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)

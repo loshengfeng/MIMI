@@ -82,8 +82,8 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
         viewModel.favoriteResult.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
-                    it.result?.let { position ->
-                        adapter.notifyItemChanged(position)
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, FavoritesAdapter.PAYLOAD_UPDATE_FAVORITE)
                     }
                 }
                 else -> {
