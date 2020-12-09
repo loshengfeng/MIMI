@@ -273,6 +273,10 @@ class ClubTabFragment : BaseFragment() {
             }
         }
 
+        if (pciUri.isEmpty()) {
+            return
+        }
+
         val bundle = Bundle()
         bundle.putStringArrayList(BasePostFragment.BUNDLE_PIC_URI, pciUri)
 
