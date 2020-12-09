@@ -406,6 +406,7 @@
     <string name="post_error">发布失败</string>
     <string name="post_video_length_error">影片长度最短为3秒最长为15秒</string>
     <string name="post_tag_full">标签已满</string>
+    <string name="post_pic_limit">照片超过%1$d张</string>
 
     <!-- Problem report -->
     <string name="report_item_can_not_play">视频无法播放</string>

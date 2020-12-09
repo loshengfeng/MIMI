@@ -49,7 +49,7 @@ open class BasePostFragment : BaseFragment() {
 
     companion object {
         const val CONTENT_LIMIT = 2000
-        const val PHOTO_LIMIT = 20
+        const val PHOTO_LIMIT = 10
         const val RECORD_LIMIT_TIME = 15
 
         const val INTENT_SELECT_IMG = 10001
