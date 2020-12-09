@@ -208,7 +208,7 @@
     <string name="topup_completion_time">充值完成時間</string>
     <string name="topup_check_info">查看打款资讯</string>
     <string name="topup_contact">联系客服</string>
-    <string name="topup_pending">交易进行中</string>
+    <string name="topup_pending">交易未完成</string>
     <string name="topup_transaction">Transaction</string>
     <string name="topup_order_creating">订单建立中</string>
     <string name="topup_order_create_fail">订单建立失败</string>
