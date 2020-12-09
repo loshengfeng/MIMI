@@ -7,16 +7,12 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagingData
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.api.vo.error.SUCCESS
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
@@ -25,16 +21,12 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
-import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_picture_detail.toolbarContainer
 import kotlinx.android.synthetic.main.fragment_ranking.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class RankingFragment : BaseFragment() {

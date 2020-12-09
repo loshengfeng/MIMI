@@ -79,21 +79,29 @@ class SearchVideoViewModel : BaseViewModel() {
             .cachedIn(viewModelScope)
     }
 
-    fun modifyLike(videoID: Long, position: Int) {
-        val likeType = if (currentItem?.like == true) LikeType.DISLIKE else LikeType.LIKE
-        val likeRequest = LikeRequest(likeType)
+    fun modifyLike(position: Int) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository()
-                    .like(videoID, likeRequest)
-                if (!result.isSuccessful) {
-                    throw HttpException(result)
+                currentItem?.also { item ->
+                    val apiRepository = domainManager.getApiRepository()
+                    val likeType = when (item.like) {
+                        true -> null
+                        else -> LikeType.LIKE
+                    }
+                    val request =  LikeRequest(likeType)
+                    val result = when (item.like) {
+                        true -> apiRepository.deleteLike(item.id)
+                        else -> apiRepository.like(item.id, request)
+                    }
+                    if (!result.isSuccessful) throw HttpException(result)
+                    when (item.like) {
+                        true -> item.likeCount -= 1
+                        else -> item.likeCount += 1
+                    }
+                    item.likeType = likeType
+                    item.like = item.like != true
+                    emit(ApiResult.success(position))
                 }
-                currentItem?.run {
-                    like = like != true
-                    likeCount = if (like == true) (likeCount ?: 0) + 1 else (likeCount ?: 0) - 1
-                }
-                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
