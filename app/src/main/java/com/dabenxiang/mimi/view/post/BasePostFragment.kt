@@ -158,13 +158,13 @@ open class BasePostFragment : BaseFragment() {
 
         edt_hashtag.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                hashtagConfirm()
+                hashTagConfirm()
             }
             false
         }
     }
 
-    fun hashtagConfirm(){
+    fun hashTagConfirm(){
         if (chipGroup.size == HASHTAG_LIMIT) {
             Toast.makeText(
                     requireContext(),
@@ -267,6 +267,7 @@ open class BasePostFragment : BaseFragment() {
             chip.setCloseIconSizeResource(R.dimen.dp_24)
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
+                setTagCount()
             }
         } else {
             viewModel.getClub(tag)
