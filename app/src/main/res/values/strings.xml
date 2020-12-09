@@ -269,10 +269,9 @@
     </string-array>
     <string name="follow_members_total_num">全部关注%s人</string>
     <string name="follow_circle_total_num">全部关注%s社区</string>
-    <string name="follow_clubs_total_num">全部关注%s圈子</string>
     <string name="follow_clean">清除</string>
-    <string name="follow_clean_member_dlg_msg">是否要清除所有关注的社区</string>
-    <string name="follow_clean_club_dlg_msg">是否要清除所有关注的圈子</string>
+    <string name="follow_clean_member_dlg_msg">是否要清除所有关注的人</string>
+    <string name="follow_clean_club_dlg_msg">是否要清除所有关注的社区</string>
     <string name="follow_no_data">尚未有任何关注，快去关注一下吧！</string>
 
     <string name="text_more">更多</string>
