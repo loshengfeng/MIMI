@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.club.topic_detail.TopicListAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import timber.log.Timber
 
@@ -56,7 +57,9 @@ class ClubItemAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return when (item?.type) {
+        return if (removedPosList.contains(position)) {
+            VIEW_TYPE_DELETED
+        }else when (item?.type) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
             PostType.IMAGE -> VIEW_TYPE_PICTURE
             PostType.AD -> VIEW_TYPE_AD

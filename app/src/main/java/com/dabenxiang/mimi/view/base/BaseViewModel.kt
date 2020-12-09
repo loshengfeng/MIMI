@@ -133,6 +133,8 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private val _cleanRemovedPosList = MutableLiveData<Nothing>()
     val cleanRemovedPosList: LiveData<Nothing> = _cleanRemovedPosList
 
+    var deletePostIdList = MutableLiveData<ArrayList<Long>>().also { it.value = arrayListOf() }
+
     fun deletePost(
         item: MemberPostItem,
         position: Int
@@ -146,7 +148,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _deletePostResult.value = it }
+                .collect {
+                    deletePostIdList.value?.add(item.id)
+                    _deletePostResult.value = it }
         }
     }
 
