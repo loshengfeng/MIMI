@@ -21,15 +21,21 @@ class CustomTabLayout @JvmOverloads constructor(
 ) : TabLayout(context, attrs, defStyleAttr) {
 
     init {
+        this.getTabAt(0)?.customView?.findViewById<TextView>(R.id.tv_title)?.run {
+            setupTextViewSelected(true, this)
+        }
+
         addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: Tab?) {
-                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
-                setupTextViewSelected(true, textView)
+                tab?.customView?.findViewById<TextView>(R.id.tv_title)?.run {
+                    setupTextViewSelected(true, this)
+                }
             }
 
             override fun onTabUnselected(tab: Tab?) {
-                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
-                setupTextViewSelected(false, textView)
+                tab?.customView?.findViewById<TextView>(R.id.tv_title)?.run {
+                    setupTextViewSelected(false, this)
+                }
             }
 
             override fun onTabReselected(tab: Tab?) {
@@ -44,6 +50,12 @@ class CustomTabLayout @JvmOverloads constructor(
         } else {
             textView.setTypeface(null, Typeface.NORMAL)
             textView.setTextColor(context.getColor(R.color.color_black_1_50))
+        }
+    }
+
+    fun setTitle(title: String, position: Int) {
+        this.getTabAt(position)?.customView?.findViewById<TextView>(R.id.tv_title)?.let {
+            it.text = title
         }
     }
 }
