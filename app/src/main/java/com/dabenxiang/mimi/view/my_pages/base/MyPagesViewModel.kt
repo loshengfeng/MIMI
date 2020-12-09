@@ -9,8 +9,15 @@ class MyPagesViewModel : BaseViewModel() {
     private val _deleteAll = MutableLiveData<Int>()
     val deleteAll: LiveData<Int> = _deleteAll
 
-    open fun setDeleteNotify(tabIndex:Int){
+    private val _changeDataCount = MutableLiveData<Pair<Int, Int>>()
+    val changeDataCount: LiveData<Pair<Int, Int>> = _changeDataCount
+
+    open fun setDeleteNotify(tabIndex: Int) {
         _deleteAll.value = tabIndex
+    }
+
+    fun changeDataCount(tabIndex: Int, count: Int) {
+        _changeDataCount.value = Pair(tabIndex, count)
     }
 
 }

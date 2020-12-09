@@ -35,15 +35,15 @@ class MyCollectionMimiVideoAdapter(
 
         val diffCallback = object : DiffUtil.ItemCallback<PlayItem>() {
             override fun areItemsTheSame(
-                    oldItem: PlayItem,
-                    newItem: PlayItem
+                oldItem: PlayItem,
+                newItem: PlayItem
             ): Boolean {
                 return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
-                    oldItem: PlayItem,
-                    newItem: PlayItem
+                oldItem: PlayItem,
+                newItem: PlayItem
             ): Boolean {
                 return oldItem == newItem
             }
@@ -67,33 +67,40 @@ class MyCollectionMimiVideoAdapter(
         return when (viewType) {
             VIEW_TYPE_AD -> {
                 AdHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_ad, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_ad, parent, false)
                 )
             }
             MIMI_VIDEO -> {
                 MyCollectionMIMIVideoViewHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_my_follow_video, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_my_follow_video, parent, false)
                 )
             }
             SHORT_VIDEO -> {
                 MyCollectionShortVideoViewHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_my_follow_short_video, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_my_follow_short_video, parent, false)
                 )
 
             }
             else -> {
                 MyCollectionMIMIVideoViewHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_my_follow_video, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_my_follow_video, parent, false)
                 )
             }
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         val item = getItem(position)
         item?.also {
             when (holder) {
@@ -104,19 +111,26 @@ class MyCollectionMimiVideoAdapter(
                     }
                 }
                 is MyCollectionMIMIVideoViewHolder -> {
-                    holder.onBind(
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(it)
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
+                        }
+                    } else {
+                        holder.onBind(
                             it,
                             position,
                             listener,
                             funcItem
-                    )
+                        )
+                    }
                 }
                 is MyCollectionShortVideoViewHolder -> {
                     holder.onBind(
-                            it,
-                            position,
-                            listener,
-                            funcItem
+                        it,
+                        position,
+                        listener,
+                        funcItem
                     )
                 }
             }

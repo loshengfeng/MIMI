@@ -126,7 +126,7 @@
             app:destination="@id/navigation_clip_player" />
         <action
             android:id="@+id/action_to_playerV2Fragment"
-            app:destination="@id/playerV2Fragment" />
+            app:destination="@id/navigation_player" />
         <action
             android:id="@+id/action_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
@@ -169,7 +169,7 @@
 
         <action
             android:id="@+id/action_to_playerV2Fragment"
-            app:destination="@id/playerV2Fragment" />
+            app:destination="@id/navigation_player" />
         <action
             android:id="@+id/action_to_searchVideoFragment"
             app:destination="@id/searchVideoFragment" />
@@ -280,11 +280,6 @@
         android:id="@+id/pictureFragment"
         android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
         tools:layout="@layout/fragment_full_picture" />
-
-    <fragment
-        android:id="@+id/playerV2Fragment"
-        android:name="com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment"
-        android:label="PlayerV2Fragment" />
 
     <fragment
         android:id="@+id/clipPlayerFragment"
