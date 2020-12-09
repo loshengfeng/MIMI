@@ -1,10 +1,13 @@
 package com.dabenxiang.mimi.view.dialog.comment
 
+import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -194,7 +197,7 @@ class CommentDialogFragment : BaseDialogFragment() {
 
             rv_comment.adapter = playerInfoAdapter
             lifecycleScope.launchWhenResumed {
-                viewModel.setupCommentDataSource(memberPostItem.id ?: 0, playerInfoAdapter)
+                viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
             }
 
             takeIf { memberPostItem.commentCount == 0L }?.also {
@@ -238,7 +241,7 @@ class CommentDialogFragment : BaseDialogFragment() {
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
-                        GeneralUtils.hideKeyboard(requireActivity())
+                        GeneralUtils.hideKeyboard(this)
                         et_message.text = null
                         et_message.tag = null
                         tv_replay_name.text = null
@@ -253,7 +256,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                         )
 
                         data?.also { memberPostItem ->
-                            viewModel.setupCommentDataSource(memberPostItem.id ?: 0, playerInfoAdapter)
+                            viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
                         }
                         commentListener?.onUpdateCommentCount(data?.commentCount?.toInt() ?: 0)
                     }

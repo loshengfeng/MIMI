@@ -61,7 +61,7 @@ class FansListFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.fansCount.observe(this, Observer {
+        viewModel.fansCount.observe(this, {
             tv_title_count.text = String.format(
                 getString(R.string.total_count_fans),
                 it
@@ -78,7 +78,7 @@ class FansListFragment : BaseFragment() {
             }
         })
 
-        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.followPostResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> adapter?.notifyItemChanged(it.result)
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -96,6 +96,7 @@ class FansListFragment : BaseFragment() {
         }
 
         layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
         }
     }
 

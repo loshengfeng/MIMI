@@ -96,7 +96,15 @@ class OrderFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initSettings()
+
+        layout_payment_prompt.visibility = View.VISIBLE
+
+        iv_payment_prompt_close.setOnClickListener {
+            layout_payment_prompt.visibility = View.GONE
+        }
+
+        viewModel.getUnread()
+        updateProxyTab?.also { getProxyUnread(it) }
     }
 
     override fun getLayoutId(): Int {
@@ -104,7 +112,7 @@ class OrderFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.balanceResult.observe(viewLifecycleOwner, Observer {
+        viewModel.balanceResult.observe(viewLifecycleOwner, {
             for (i in 0 until tl_type.tabCount) {
                 val title = tabTitle[i]
                 tl_type.getTabAt(i)?.also { tab ->
@@ -117,7 +125,7 @@ class OrderFragment : BaseFragment() {
             }
         })
 
-        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
+        viewModel.unreadResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     viewModel.unreadCount = it.result
@@ -131,7 +139,7 @@ class OrderFragment : BaseFragment() {
             viewModel.getUnReadOrderCount()
         })
 
-        viewModel.unreadOrderResult.observe(viewLifecycleOwner, Observer {
+        viewModel.unreadOrderResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     viewModel.unreadOrderCount = it.result
@@ -150,7 +158,7 @@ class OrderFragment : BaseFragment() {
             }
         })
 
-        viewModel.createOrderChatResult.observe(viewLifecycleOwner, Observer {
+        viewModel.createOrderChatResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Success -> {
@@ -202,10 +210,12 @@ class OrderFragment : BaseFragment() {
                 val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
                 setTextViewSelected(true, textView)
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab?) {
                 val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
                 setTextViewSelected(false, textView)
             }
+
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
     }
@@ -221,12 +231,6 @@ class OrderFragment : BaseFragment() {
                 textView.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             }
         }
-    }
-
-    override fun initSettings() {
-        super.initSettings()
-        viewModel.getUnread()
-        updateProxyTab?.also { getProxyUnread(it) }
     }
 
     private var getOrderJob: Job? = null
@@ -283,7 +287,6 @@ class OrderFragment : BaseFragment() {
 
     private fun onTopUpClick() {
         findNavController().navigateUp()
-//        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
     }
 
     private fun onPaymentInfoClick(orderItem: OrderItem = OrderItem()) {

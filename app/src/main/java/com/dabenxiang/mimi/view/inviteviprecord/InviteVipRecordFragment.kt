@@ -51,7 +51,7 @@ class InviteVipRecordFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.onTotalCountResult.observe(viewLifecycleOwner, Observer {
+        viewModel.onTotalCountResult.observe(viewLifecycleOwner, {
             cl_no_data.visibility =
                 it.takeIf { it == 0L }?.let { View.VISIBLE } ?: let { View.GONE }
         })

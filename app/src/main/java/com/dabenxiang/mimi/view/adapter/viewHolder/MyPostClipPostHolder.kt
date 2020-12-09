@@ -117,12 +117,12 @@ class MyPostClipPostHolder(
             Timber.i("images $images")
             if (!TextUtils.isEmpty(images[0].url)) {
                 Glide.with(ivPhoto.context)
-                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+                    .load(images[0].url).into(ivPhoto)
             } else {
                 memberPostFuncItem.getBitmap(
                     images[0].id.toLongOrNull(),
                     ivPhoto,
-                    LoadImageType.PICTURE_THUMBNAIL
+                    LoadImageType.PICTURE_EMPTY
                 )
             }
         }

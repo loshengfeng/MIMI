@@ -28,7 +28,7 @@ import java.util.*
 
 class ClubTextDetailAdapter(
     val context: Context,
-    private val memberPostItem: MemberPostItem,
+    private var memberPostItem: MemberPostItem,
     private val onTextDetailListener: OnTextDetailListener,
     private var mAdItem: AdItem? = null,
     private val clubPostFuncItem: ClubPostFuncItem = ClubPostFuncItem()
@@ -95,7 +95,6 @@ class ClubTextDetailAdapter(
                     Timber.e(e)
                     TextContentItem()
                 }
-
                 holder.posterName.text = memberPostItem.postFriendlyName
                 holder.posterTime.text = GeneralUtils.getTimeDiff(
                     memberPostItem.creationDate, Date()
@@ -195,7 +194,7 @@ class ClubTextDetailAdapter(
     }
 
     fun updateContent(item: MemberPostItem) {
-        memberPostItem.content = item.content
+        memberPostItem = item
         notifyItemChanged(1)
     }
 

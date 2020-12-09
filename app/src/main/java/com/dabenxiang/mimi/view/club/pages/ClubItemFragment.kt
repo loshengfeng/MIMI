@@ -90,7 +90,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         viewModel.followResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Empty -> {
-                    adapter?.notifyItemRangeChanged(
+                    adapter.notifyItemRangeChanged(
                         0,
                         viewModel.totalCount,
                         ClubItemAdapter.PAYLOAD_UPDATE_FOLLOW
@@ -153,6 +153,16 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             )
         }
 
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    adapter.removedPosList.add(it.result)
+                    adapter.notifyItemChanged(it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
     }
 
     override fun initSettings() {
@@ -176,9 +186,24 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 if(type == ClubTabItemType.FOLLOW) accountManager.isLogin()
                 else true)
 
-        if (viewModel.postCount.value ?: -1 <= 0) {
+        if (adapter.snapshot().items.isEmpty()) {
             viewModel.getData(adapter, type)
+        } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
+            val idList = adapter.snapshot().items.map { item ->
+                item.id
+            }
+            Timber.i("idList =$idList")
+            idList.map { id ->
+                if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
+                    val pos = idList.indexOf(id)
+                    Timber.i("id =$id pos =$pos")
+                    adapter.removedPosList.add(pos)
+                    adapter.notifyItemChanged(pos)
+                }
+            }
+
         }
+
         viewModel.getAd()
     }
 
