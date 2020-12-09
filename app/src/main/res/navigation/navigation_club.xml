@@ -69,6 +69,9 @@
         <action
             android:id="@+id/action_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
     </fragment>
 
     <fragment
@@ -93,6 +96,9 @@
         <action
             android:id="@+id/action_to_postPicFragment"
             app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
     </fragment>
 
     <fragment
