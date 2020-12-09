@@ -221,6 +221,7 @@ abstract class BaseFragment : Fragment() {
                             mainViewModel?.postPicOrVideo(postId!!, postMemberRequest, content, HomeViewModel.TYPE_PIC)
                         } else {
                             val pic = uploadPicList[uploadCurrentPicPosition]
+                            mainViewModel?.clearPicResultValue()
                             mainViewModel?.postAttachment(
                                 pic.url, requireContext(),
                                 MyPostFragment.TYPE_PIC
