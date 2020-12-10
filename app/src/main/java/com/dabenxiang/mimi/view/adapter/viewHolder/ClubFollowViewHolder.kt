@@ -11,11 +11,14 @@ import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.enums.ClickType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import kotlinx.android.synthetic.main.item_follow_club.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
 class ClubFollowViewHolder(
-    itemView: View
+        itemView: View
 ) : BaseViewHolder(itemView), KoinComponent {
     private val ivPhoto: ImageView = itemView.iv_photo
     private val tvName: TextView = itemView.tv_name
@@ -25,10 +28,11 @@ class ClubFollowViewHolder(
     private val clFollow: ConstraintLayout = itemView.cl_follow
 
     fun onBind(
-        item: ClubFollowItem,
-        listener: BaseItemListener,
-        getBitmap: ((Long?, ImageView, LoadImageType) -> Unit)
-    ) {
+            item: ClubFollowItem,
+            listener: BaseItemListener,
+            viewModelScope: CoroutineScope
+    )
+    {
         tvName.text = item.name ?: ""
         tvSubTitle.text = item.description
         tvClubFollow.text = item.followerCount.toString()
@@ -48,7 +52,8 @@ class ClubFollowViewHolder(
         ivPhoto.setOnClickListener {
             listener.onItemClick(item, ClickType.TYPE_ITEM)
         }
-
-        getBitmap(item.avatarAttachmentId, ivPhoto, LoadImageType.AVATAR)
+        viewModelScope.launch {
+            LoadImageUtils.loadImage(item.avatarAttachmentId, ivPhoto, LoadImageType.AVATAR)
+        }
     }
 }
