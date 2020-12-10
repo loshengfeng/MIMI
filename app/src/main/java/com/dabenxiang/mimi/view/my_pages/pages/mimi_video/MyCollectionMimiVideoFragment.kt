@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AttachmentListener
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
@@ -34,17 +35,9 @@ import timber.log.Timber
 class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemType, val isLike: Boolean = false) : BaseFragment() {
     private val viewModel: MyCollectionMimiVideoViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({requireParentFragment()})
-    private val accountManager: AccountManager by inject()
-
-    private val clipFuncItem by lazy {
-        CollectionFuncItem(
-                { source -> viewModel.getDecryptSetting(source) },
-                { videoItem, decryptSettingItem, function -> viewModel.decryptCover(videoItem, decryptSettingItem, function) }
-        )
-    }
 
     private val adapter: MyCollectionMimiVideoAdapter by lazy {
-        MyCollectionMimiVideoAdapter(requireContext(), clipFuncItem, listener, type)
+        MyCollectionMimiVideoAdapter(requireContext(), viewModel.viewModelScope, listener, type)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_collection_videos

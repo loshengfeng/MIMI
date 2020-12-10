@@ -11,7 +11,10 @@ import com.dabenxiang.mimi.model.api.vo.MemberFollowItem
 import com.dabenxiang.mimi.model.enums.ClickType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import kotlinx.android.synthetic.main.item_follow_member.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
 class MemberFollowViewHolder(
@@ -25,7 +28,7 @@ class MemberFollowViewHolder(
     fun onBind(
         item: MemberFollowItem,
         listener: BaseItemListener,
-        getBitmap: ((Long?, ImageView, LoadImageType) -> Unit)
+        viewModelScope: CoroutineScope
     ) {
         tvName.text = item.friendlyName
         tvSubTitle.text = item.friendlyName
@@ -43,6 +46,8 @@ class MemberFollowViewHolder(
         }
         tvSubTitle.visibility = View.INVISIBLE
 
-        getBitmap(item.avatarAttachmentId, ivPhoto, LoadImageType.AVATAR)
+        viewModelScope.launch {
+            LoadImageUtils.loadImage(item.avatarAttachmentId, ivPhoto, LoadImageType.AVATAR)
+        }
     }
 }

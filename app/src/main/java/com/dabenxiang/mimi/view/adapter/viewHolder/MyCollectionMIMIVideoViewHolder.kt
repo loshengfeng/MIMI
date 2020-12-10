@@ -14,9 +14,11 @@ import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import kotlinx.android.synthetic.main.item_my_follow_video.view.*
+import kotlinx.coroutines.CoroutineScope
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -46,7 +48,7 @@ class MyCollectionMIMIVideoViewHolder(
             item: PlayItem,
             position: Int,
             listener: MyCollectionVideoListener,
-            funcItem: CollectionFuncItem,
+            viewModelScope: CoroutineScope,
             searchTag: String = ""
     ) {
         clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
@@ -73,24 +75,14 @@ class MyCollectionMIMIVideoViewHolder(
             tagChipGroup.addView(chip)
         }
 
-//        item.cover?.let { images ->
-//            Glide.with(ivPhoto.context)
-//                    .load(images).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
-//        } ?: kotlin.run {
-//            Glide.with(ivPhoto.context)
-//                    .load(0).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
-//        }
+        LoadImageUtils.setNormalOrDecryptImage(
+                viewModelScope,
+                item.source ?: "",
+                item.cover ?: "",
+                ivPhoto
 
-        funcItem.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
-                ?.let { decryptSettingItem ->
-                    funcItem.decryptCover(item.cover ?: "", decryptSettingItem) {
-                        Glide.with(ivPhoto.context)
-                                .load(it).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
-                    }
-                } ?: run {
-            Glide.with(ivPhoto.context)
-                    .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
-        }
+        )
+
         ivMore.setOnClickListener {
             listener.onMoreClick(item, position)
         }
