@@ -32,8 +32,21 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
 
     private val viewModel: GeneralVideoViewModel by viewModels()
 
+    private val videoFuncItem by lazy {
+        GeneralVideoFuncItem(
+            { source -> viewModel.getDecryptSetting(source) },
+            { videoItem, decryptSettingItem, function ->
+                viewModel.decryptCover(
+                    videoItem,
+                    decryptSettingItem,
+                    function
+                )
+            }
+        )
+    }
+
     private val generalVideoAdapter by lazy {
-        GeneralVideoAdapter(true, onItemClick)
+        GeneralVideoAdapter(true, onItemClick, videoFuncItem)
     }
 
     override fun setupFirstTime() {

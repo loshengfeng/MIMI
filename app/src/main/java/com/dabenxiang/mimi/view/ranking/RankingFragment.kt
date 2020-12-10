@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
@@ -60,6 +59,14 @@ class RankingFragment : BaseFragment() {
                         id,
                         view,
                         LoadImageType.PICTURE_THUMBNAIL
+                    )
+                },
+                getDecryptSetting = { source -> viewModel.getDecryptSetting(source) },
+                decryptCover = { videoItem, decryptSettingItem, function ->
+                    viewModel.decryptCover(
+                        videoItem,
+                        decryptSettingItem,
+                        function
                     )
                 }
             )

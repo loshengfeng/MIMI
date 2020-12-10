@@ -154,6 +154,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun clearDeletePostResult() {
+        _deletePostResult.value = null
+    }
+
     fun cleanRemovedPosList() {
         _cleanRemovedPosList.value = null
     }
@@ -161,7 +165,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     fun loadImage(id: Long? = 0, view: ImageView, type: LoadImageType, filePath: String = "") {
         val defaultResId = when (type) {
             LoadImageType.AVATAR -> R.drawable.default_profile_picture
-            LoadImageType.AVATAR_CS -> R.drawable.icon_cs_photo
+            LoadImageType.AVATAR_CS -> R.drawable.img_nopic_04
             LoadImageType.PICTURE_THUMBNAIL -> R.drawable.img_nopic_02
             LoadImageType.PICTURE_FULL -> R.drawable.img_nopic_03
             LoadImageType.CLUB -> R.drawable.ico_group

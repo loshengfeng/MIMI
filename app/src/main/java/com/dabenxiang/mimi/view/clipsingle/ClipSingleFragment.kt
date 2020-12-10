@@ -110,7 +110,7 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     private fun pausePlayer() {
-        exoPlayer?.takeIf { it.isPlaying }?.takeUnless { ib_retry.visibility == View.VISIBLE }
+        exoPlayer?.takeIf { it.isPlaying }?.takeUnless { tv_retry.visibility == View.VISIBLE }
             ?.run {
                 ib_play.visibility = View.VISIBLE
             }
@@ -167,9 +167,9 @@ class ClipSingleFragment : BaseFragment() {
 
         ib_back.setOnClickListener { findNavController().navigateUp() }
 
-        ib_retry.setOnClickListener {
+        tv_retry.setOnClickListener {
             playItem?.run {
-                ib_retry.visibility = View.GONE
+                tv_retry.visibility = View.GONE
                 viewModel.getM3U8(this)
             }
         }
@@ -311,7 +311,7 @@ class ClipSingleFragment : BaseFragment() {
                 }
             }
             progress_video?.visibility = View.GONE
-            ib_retry.visibility = View.VISIBLE
+            tv_retry.visibility = View.VISIBLE
             viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
                 viewModel.sendVideoReport(this, true)
             }
