@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_follow_list.*
+import timber.log.Timber
 
 class MyFollowListFragment(val type: Int) : BaseFragment() {
 
@@ -76,11 +77,10 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                 // 關注的圈子
                 MyFollowFragment.TAB_FOLLOW_CLUB -> {
                     (item as ClubFollowItem)
-
                     when (type) {
                         ClickType.TYPE_ITEM -> {
                             val clubItem = MemberClubItem(
-                                id = item.id,
+                                id = item.clubId,
                                 avatarAttachmentId = item.avatarAttachmentId,
                                 tag = item.tag,
                                 title = item.name,
