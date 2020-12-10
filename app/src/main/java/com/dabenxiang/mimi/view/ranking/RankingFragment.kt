@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.ranking
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -63,6 +62,14 @@ class RankingFragment : BaseFragment() {
                         view,
                         LoadImageType.PICTURE_THUMBNAIL
                     )
+                },
+                getDecryptSetting = { source -> viewModel.getDecryptSetting(source) },
+                decryptCover = { videoItem, decryptSettingItem, function ->
+                    viewModel.decryptCover(
+                        videoItem,
+                        decryptSettingItem,
+                        function
+                    )
                 }
             )
         )
@@ -115,7 +122,8 @@ class RankingFragment : BaseFragment() {
                                 )
                             )
                         }
-                        else -> {}
+                        else -> {
+                        }
                     }
 
                 },
@@ -261,7 +269,8 @@ class RankingFragment : BaseFragment() {
             PostType.VIDEO_ON_DEMAND -> viewModel.getVideosRanking()
             PostType.VIDEO -> viewModel.getRankingClipList()
             PostType.IMAGE -> viewModel.getRankingPostList()
-            else -> {}
+            else -> {
+            }
         }
     }
 }
