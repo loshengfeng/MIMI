@@ -185,6 +185,13 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             checkRemovedItems()
         }
 
+        if (adapter.snapshot().items.isEmpty()) {
+            viewModel.getData(adapter, type)
+        } else if (mainViewModel?.itemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.itemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
+        }
+
         viewModel.getAd()
     }
 

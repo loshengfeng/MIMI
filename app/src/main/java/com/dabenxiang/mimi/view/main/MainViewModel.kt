@@ -113,6 +113,9 @@ class MainViewModel : BaseViewModel() {
     private val _isStatusBardDark = MutableLiveData<Boolean>()
     val isStatusBardDark: LiveData<Boolean> = _isStatusBardDark
 
+    private val _isShowSnackBar = MutableLiveData<Boolean>()
+    val isShowSnackBar: LiveData<Boolean> = _isShowSnackBar
+
     private var _normal: CategoriesItem? = null
     val normal
         get() = _normal
@@ -601,5 +604,9 @@ class MainViewModel : BaseViewModel() {
 
     fun setStatusBarMode(isDark: Boolean = false) {
         _isStatusBardDark.value = isDark
+    }
+
+    fun setIsShowSnackBar(isShow: Boolean) {
+        _isShowSnackBar.value = isShow
     }
 }
