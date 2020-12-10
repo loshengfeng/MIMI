@@ -14,11 +14,12 @@ import com.dabenxiang.mimi.model.api.vo.ClubFollowItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import kotlinx.coroutines.CoroutineScope
 
 class ClubFollowPeopleAdapter(
     val context: Context,
     private val listener: BaseItemListener,
-    private val getBitmap: ((Long?, ImageView, LoadImageType) -> Unit) = { _, _, _ -> },
+    private val viewModelScope: CoroutineScope
 ) : PagingDataAdapter<ClubFollowItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -55,7 +56,7 @@ class ClubFollowPeopleAdapter(
             (holder as ClubFollowViewHolder)
 //                    holder.pictureRecycler.tag = position
             holder.onBind(
-                it, listener, getBitmap
+                it, listener, viewModelScope
             )
 
         }
