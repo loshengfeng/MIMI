@@ -53,7 +53,8 @@ class RecommendVideoAdapter(
                     recommendFuncItem.getDecryptSetting(JOEY)?.takeIf { it.isImageDecrypt }
                         ?.let { decryptSettingItem ->
                             recommendFuncItem.decryptCover(video.cover, decryptSettingItem) {
-                                Glide.with(holder.videoImage.context).load(it)
+                                Glide.with(holder.videoImage.context)
+                                    .load(it)
                                     .apply(options)
                                     .into(holder.videoImage)
                             }
