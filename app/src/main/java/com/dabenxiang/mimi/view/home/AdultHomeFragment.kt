@@ -9,7 +9,6 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
@@ -416,7 +415,7 @@ class AdultHomeFragment : BaseFragment() {
 
         iv_bg_search.setOnClickListener {
             val item: SearchPostItem = when (categoryTypeList[lastPosition]) {
-                CategoryType.HOME -> SearchPostItem(type = PostType.HYBRID)
+                CategoryType.HOME -> SearchPostItem(type = PostType.SMALL_CLIP)
                 CategoryType.VIDEO_ON_DEMAND -> SearchPostItem(type = PostType.VIDEO_ON_DEMAND)
                 CategoryType.FOLLOW -> SearchPostItem(type = PostType.FOLLOWED)
                 CategoryType.VIDEO -> SearchPostItem(type = PostType.VIDEO)
