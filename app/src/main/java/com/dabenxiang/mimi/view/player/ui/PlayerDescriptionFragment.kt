@@ -22,11 +22,13 @@ import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.player.GuessLikeVideoAdapter
 import com.dabenxiang.mimi.view.player.GuessLikeVideoAdapter.OnGarbageItemClick
 import com.dabenxiang.mimi.view.player.SelectEpisodeAdapter
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
+import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_player_description.*
@@ -274,6 +276,11 @@ class PlayerDescriptionFragment : BaseFragment() {
                                 ReportDialogFragment::class.java.simpleName
                             )
                         }
+                }
+            } else {
+                checkStatus {
+                    val bundle = TopUpFragment.createBundle(this::class.java.simpleName)
+                    navigateTo(NavigateItem.Destination(R.id.action_to_topup, bundle))
                 }
             }
         }
