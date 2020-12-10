@@ -6,6 +6,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -166,7 +168,7 @@ open class BasePostFragment : BaseFragment() {
     }
 
     fun hashTagConfirm(){
-        if (chipGroup.size == HASHTAG_LIMIT) {
+        if (chipGroup.size >= HASHTAG_LIMIT) {
             Toast.makeText(
                     requireContext(),
                     R.string.post_warning_tag_limit,
@@ -281,6 +283,12 @@ open class BasePostFragment : BaseFragment() {
     private fun setTagCount() {
         txt_hashtagCount.text =
             String.format(getString(R.string.typing_count, chipGroup.size, HASHTAG_LIMIT))
+
+        if (chipGroup.size >= HASHTAG_LIMIT) {
+            btn_tag_confirm.visibility = GONE
+        } else {
+            btn_tag_confirm.visibility = VISIBLE
+        }
     }
 
     private fun addTag(tag: String, isMainTag: Boolean = false) {
@@ -336,7 +344,7 @@ open class BasePostFragment : BaseFragment() {
     }
 
     private fun enableHastEditText() {
-        if (chipGroup.size == HASHTAG_LIMIT) {
+        if (chipGroup.size >= HASHTAG_LIMIT) {
             edt_hashtag.isEnabled = false
             edt_hashtag.hint = getString(R.string.post_tag_full)
             hashTagLayout.background  = ContextCompat.getDrawable(requireContext(), R.drawable.post_text_rectangle_tag_full)
@@ -373,18 +381,10 @@ open class BasePostFragment : BaseFragment() {
                 .circleCrop()
                 .into(iv_avatar)
 
-            if (chipGroup.size == HASHTAG_LIMIT) {
-                Toast.makeText(
-                    requireContext(),
-                    R.string.post_warning_tag_limit,
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                addTag(item.tag, true)
-                txt_placeholder.visibility = View.GONE
-                txt_clubName.visibility = View.VISIBLE
-                txt_hashtagName.visibility = View.VISIBLE
-            }
+            addTag(item.tag, true)
+            txt_placeholder.visibility = View.GONE
+            txt_clubName.visibility = View.VISIBLE
+            txt_hashtagName.visibility = View.VISIBLE
         }
     }
 
@@ -432,5 +432,18 @@ open class BasePostFragment : BaseFragment() {
             type = type,
             tags = getTags()
         )
+    }
+
+    fun checkTagCountIsValid(): Boolean {
+        return if (chipGroup.size > HASHTAG_LIMIT) {
+            Toast.makeText(
+                requireContext(),
+                R.string.post_warning_tag_limit,
+                Toast.LENGTH_SHORT
+            ).show()
+            false
+        } else {
+            true
+        }
     }
 }

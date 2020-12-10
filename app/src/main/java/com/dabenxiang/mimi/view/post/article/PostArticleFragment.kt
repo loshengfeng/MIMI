@@ -3,7 +3,9 @@ package com.dabenxiang.mimi.view.post.article
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Toast
+import androidx.core.view.size
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ArticleItem
@@ -27,6 +29,11 @@ class PostArticleFragment : BasePostFragment() {
         return R.layout.fragment_post_article
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        txt_contentCount.text = String.format(getString(R.string.typing_count, edt_content.text.count(), CONTENT_LIMIT))
+    }
+
     override fun setUI(item: MediaItem) {
         edt_content.setText(item.textContent)
         txt_contentCount.text = String.format(getString(R.string.typing_count, item.textContent.length, CONTENT_LIMIT))
@@ -37,12 +44,6 @@ class PostArticleFragment : BasePostFragment() {
         btn_tag_confirm.setOnClickListener { hashTagConfirm() }
         edt_content.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > CONTENT_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_title.setText(content)
-                    }
-                }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -63,6 +64,10 @@ class PostArticleFragment : BasePostFragment() {
 
             if (content.isBlank()) {
                 Toast.makeText(requireContext(), R.string.post_warning_content, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!checkTagCountIsValid()) {
                 return@setOnClickListener
             }
 
