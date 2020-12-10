@@ -15,11 +15,12 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.coroutines.CoroutineScope
 
 class SearchPostAdapter(
     val context: Context,
     private val myPostListener: MyPostListener,
-    private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
+    private val viewModelScope: CoroutineScope,
     private val getSearchText: () -> String,
     private val getSearchTag: () -> String
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
@@ -122,7 +123,7 @@ class SearchPostAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem,
+                            viewModelScope,
                             getSearchText.invoke(),
                             getSearchTag.invoke()
                         )
@@ -140,7 +141,7 @@ class SearchPostAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem,
+                            viewModelScope,
                             getSearchText.invoke(),
                             getSearchTag.invoke()
                         )
@@ -157,7 +158,7 @@ class SearchPostAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem,
+                            viewModelScope,
                             getSearchText.invoke(),
                             getSearchTag.invoke()
                         )

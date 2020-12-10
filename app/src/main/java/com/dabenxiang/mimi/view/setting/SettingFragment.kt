@@ -31,8 +31,9 @@ import com.dabenxiang.mimi.view.listener.OnSimpleEditorDialogListener
 import com.dabenxiang.mimi.view.updateprofile.UpdateProfileFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_setting.*
+import kotlinx.android.synthetic.main.fragment_setting_v2.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 import java.io.File
 
 class SettingFragment : BaseFragment() {
@@ -55,15 +56,18 @@ class SettingFragment : BaseFragment() {
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_setting
+        return R.layout.fragment_setting_v2
     }
 
-    override fun setupObservers() {
-        viewModel.profileItem.observe(viewLifecycleOwner, {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        viewModel.profileItem.observe(this, {
             when (it) {
                 is Success -> {
                     tv_name.text = viewModel.profileData?.friendlyName
-                    tv_account.text = viewModel.profileData?.username
+                    tv_account_phone.text = viewModel.profileData?.username
+                    tv_account_phone.visibility =View.VISIBLE
                     gender_info.text = getString(viewModel.profileData!!.getGenderRes())
 
                     val birthday = viewModel.profileData?.birthday ?: ""
@@ -72,14 +76,17 @@ class SettingFragment : BaseFragment() {
                     }
 
                     viewModel.loadImage(
-                        viewModel.profileData?.avatarAttachmentId,
-                        iv_photo,
-                        LoadImageType.AVATAR
+                            viewModel.profileData?.avatarAttachmentId,
+                            iv_photo,
+                            LoadImageType.AVATAR
                     )
                 }
                 is Error -> onApiError(it.throwable)
             }
         })
+    }
+    override fun setupObservers() {
+
 
         viewModel.resendResult.observe(viewLifecycleOwner, {
             when (it) {
@@ -137,6 +144,7 @@ class SettingFragment : BaseFragment() {
                     if (mainViewModel?.isFromPlayer == true) activity?.onBackPressed()
                     else navigateTo(NavigateItem.Up)
                 }
+                R.id.view_field_photo,
                 R.id.btn_photo -> {
                     ChoosePickerDialogFragment.newInstance(onChoosePickerDialogListener).also {
                         it.show(
@@ -145,6 +153,7 @@ class SettingFragment : BaseFragment() {
                         )
                     }
                 }
+                R.id.view_field_name,
                 R.id.btn_name -> {
                     navigateTo(
                         NavigateItem.Destination(R.id.updateProfileFragment,
@@ -157,6 +166,8 @@ class SettingFragment : BaseFragment() {
                     )
                 }
                 R.id.btn_chang_pw -> navigateTo(NavigateItem.Destination(R.id.action_settingFragment_to_changePasswordFragment))
+
+                R.id.view_field_gender,
                 R.id.btn_gender -> {
                     navigateTo(
                         NavigateItem.Destination(R.id.updateProfileFragment,
@@ -168,6 +179,8 @@ class SettingFragment : BaseFragment() {
                             })
                     )
                 }
+
+                R.id.view_field_birthday,
                 R.id.btn_birthday -> {
                     navigateTo(
                         NavigateItem.Destination(R.id.updateProfileFragment,
@@ -185,18 +198,22 @@ class SettingFragment : BaseFragment() {
             }
         }.also {
             tv_back.setOnClickListener(it)
+            view_field_photo.setOnClickListener(it)
             btn_photo.setOnClickListener(it)
             btn_name.setOnClickListener(it)
             btn_chang_pw.setOnClickListener(it)
             btn_gender.setOnClickListener(it)
             btn_birthday.setOnClickListener(it)
+            view_field_name.setOnClickListener(it)
+            view_field_birthday.setOnClickListener(it)
+            view_field_gender.setOnClickListener(it)
 //            btn_binding_invitation.setOnClickListener(it)
         }
+
     }
 
     override fun initSettings() {
         Glide.with(this).load(R.drawable.default_profile_picture).into(iv_photo)
-        useAdultTheme(false)
         viewModel.getProfile()
     }
 

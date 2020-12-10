@@ -229,6 +229,12 @@
             app:destination="@id/searchPostFragment"
             app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_postArticleFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment"
+            app:popUpTo="@+id/myCollectionFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -319,6 +325,9 @@
         <action
             android:id="@+id/action_searchVideoFragment_to_navigation_player"
             app:destination="@id/navigation_player" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
     </fragment>
 
     <fragment
@@ -343,6 +352,12 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_to_topup"
+            app:destination="@id/navigation_topup" />
     </fragment>
 
     <fragment

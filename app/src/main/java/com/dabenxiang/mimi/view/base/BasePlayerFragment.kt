@@ -8,6 +8,7 @@ import android.view.*
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
@@ -39,7 +40,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     private var player: SimpleExoPlayer? = null
     private var orientationDetector: OrientationDetector? = null
 
-    private val playerViewModel: BasePlayerViewModel by activityViewModels()
+    private val playerViewModel: BasePlayerViewModel by viewModels()
     override val isStatusBarDark: Boolean = true
 
     open var contentId: Long = 0
@@ -166,17 +167,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
             }
 
         exo_play_pause.setOnClickListener {
-            Timber.d("exo_play_pause confirmed")
-            player?.also {
-                it.playWhenReady.also { playing ->
-                    it.playWhenReady = !playing
-                    playerViewModel.setPlaying(!playing)
-                    if (!playing)
-                        exo_play_pause.setImageDrawable(requireContext().getDrawable(R.drawable.exo_icon_pause))
-                    else
-                        exo_play_pause.setImageDrawable(requireContext().getDrawable(R.drawable.exo_icon_play))
-                }
-            }
+            playerPause()
         }
 
         iv_player.setOnClickListener {
@@ -245,6 +236,20 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     fun sendVideoReport(unhealthy: Boolean) {
         if(streamId != 0L)
             playerViewModel.sendVideoReport(streamId, unhealthy)
+    }
+
+    private fun playerPause() {
+        Timber.d("exo_play_pause confirmed")
+        player?.also {
+            it.playWhenReady.also { playing ->
+                it.playWhenReady = !playing
+                playerViewModel.setPlaying(!playing)
+                if (!playing)
+                    exo_play_pause.setImageDrawable(requireContext().getDrawable(R.drawable.exo_icon_pause))
+                else
+                    exo_play_pause.setImageDrawable(requireContext().getDrawable(R.drawable.exo_icon_play))
+            }
+        }
     }
 
     private fun backupEvent() {
@@ -463,6 +468,10 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
 //        if (playbackState == ExoPlayer.STATE_ENDED && (viewModel.episodePosition.value!! < episodeAdapter.itemCount - 1)) {
 //            viewModel.setStreamPosition(viewModel.episodePosition.value!! + 1)
 //        }
+        if(playbackState == ExoPlayer.STATE_ENDED && playWhenReady) {
+            playerPause()
+            player?.seekTo(0)
+        }
     }
 
     /**

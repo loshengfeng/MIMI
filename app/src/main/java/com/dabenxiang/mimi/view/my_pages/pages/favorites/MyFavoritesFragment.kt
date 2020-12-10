@@ -3,19 +3,19 @@ package com.dabenxiang.mimi.view.my_pages.pages.favorites
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.*
+import com.dabenxiang.mimi.model.enums.AdultTabType
+import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -31,11 +31,6 @@ import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
-import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -50,7 +45,7 @@ class MyFavoritesFragment(
     private val accountManager: AccountManager by inject()
 
     private val adapter: FavoritesAdapter by lazy {
-        FavoritesAdapter(requireActivity(), postListener, memberPostFuncItem)
+        FavoritesAdapter(requireActivity(), postListener, viewModel.viewModelScope)
     }
 
     override val bottomNavigationVisibility: Int
@@ -73,6 +68,7 @@ class MyFavoritesFragment(
                 id_empty_group.visibility = View.GONE
                 recycler_view.visibility = View.VISIBLE
             }
+            myPagesViewModel.changeDataCount(tab, it)
             layout_refresh.isRefreshing = false
         })
 
@@ -165,16 +161,6 @@ class MyFavoritesFragment(
         }
     }
 
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, view, type -> viewModel.loadImage(id, view, type) },
-            { item, items, isFollow, func -> },
-            { item, isLike, func -> },
-            { item, isFavorite, func -> }
-        )
-    }
-
     private val postListener = object : MyPostListener {
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
@@ -249,7 +235,7 @@ class MyFavoritesFragment(
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.FAVORITE)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
                 when (it.type) {

@@ -14,14 +14,17 @@ import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import kotlinx.android.synthetic.main.item_picture.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.util.*
 
 class PictureAdapter(
-    val context: Context,
+    private val context: Context,
     private val imageItems: ArrayList<ImageItem>,
     private val onItemClickListener: OnItemClickListener,
-    private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
+    private val viewModelScope: CoroutineScope
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -37,7 +40,7 @@ class PictureAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder as PictureViewHolder
         val item = imageItems[position]
-        holder.onBind(item, onItemClickListener, memberPostFuncItem)
+        holder.onBind(item, onItemClickListener, viewModelScope)
     }
 
     class PictureViewHolder(itemView: View) : BaseViewHolder(itemView) {
@@ -46,17 +49,15 @@ class PictureAdapter(
         fun onBind(
             item: ImageItem,
             onItemClickListener: OnItemClickListener,
-            memberPostFuncItem: MemberPostFuncItem
+            viewModelScope: CoroutineScope
         ) {
             if (!TextUtils.isEmpty(item.url)) {
                 Glide.with(picture.context)
                     .load(item.url).into(picture)
             } else {
-                memberPostFuncItem.getBitmap(
-                    item.id.toLongOrNull(),
-                    picture,
-                    LoadImageType.PICTURE_EMPTY
-                )
+                viewModelScope.launch {
+                    LoadImageUtils.loadImage(item.id.toLongOrNull(), picture, LoadImageType.PICTURE_EMPTY)
+                }
             }
 
             picture.setOnClickListener {

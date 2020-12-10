@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -43,7 +44,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
     private val accountManager: AccountManager by inject()
 
     private val adapter: FavoritesAdapter by lazy {
-        FavoritesAdapter(requireActivity(), postListener, memberPostFuncItem)
+        FavoritesAdapter(requireActivity(), postListener, viewModel.viewModelScope)
     }
 
     override val bottomNavigationVisibility: Int
@@ -144,16 +145,6 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter)
         }
-    }
-
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, view, type -> viewModel.loadImage(id, view, type) },
-            { item, items, isFollow, func -> },
-            { item, isLike, func -> },
-            { item, isFavorite, func -> }
-        )
     }
 
     private val postListener = object : MyPostListener {

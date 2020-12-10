@@ -96,6 +96,7 @@ class FansListFragment : BaseFragment() {
         }
 
         layout_refresh.setOnRefreshListener {
+            viewModel.getData(adapter)
             layout_refresh.isRefreshing = false
         }
     }

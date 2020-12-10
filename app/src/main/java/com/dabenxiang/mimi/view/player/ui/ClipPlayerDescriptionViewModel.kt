@@ -84,7 +84,9 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
+                .collect {
+                    _postChangedResult.value = it
+                    _favoriteResult.value = it }
         }
     }
 
@@ -118,7 +120,9 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likeResult.value = it }
+                .collect {
+                    _postChangedResult.value = it
+                    _likeResult.value = it }
         }
     }
 

@@ -50,7 +50,6 @@ class MyCollectionShortVideoViewHolder(
             funcItem: CollectionFuncItem,
             searchTag: String = ""
     ) {
-        Timber.d("neo, item = ${item}")
         clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvTitle.setTextColor(App.self.getColor(R.color.color_black_1))
 //        tvLikeCount.setTextColor(App.self.getColor(R.color.color_black_1))
@@ -70,7 +69,7 @@ class MyCollectionShortVideoViewHolder(
             if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
             else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
-                listener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
+                listener.onChipClick(VideoType.SHORT_VIDEO, (view as Chip).text.toString())
             }
             tagChipGroup.addView(chip)
         }

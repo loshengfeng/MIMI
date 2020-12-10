@@ -3,14 +3,12 @@ package com.dabenxiang.mimi.view.club
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -42,7 +40,6 @@ import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_general_video.*
 import kotlinx.android.synthetic.main.fragment_tab_club.*
 import kotlinx.android.synthetic.main.fragment_tab_club.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -108,7 +105,15 @@ class ClubTabFragment : BaseFragment() {
     }
 
     override fun getLayoutId() = R.layout.fragment_tab_club
-    override fun setupObservers() {}
+    override fun setupObservers() {
+        mainViewModel?.isShowSnackBar?.observe(viewLifecycleOwner, {
+            if (it) {
+                iv_post.isEnabled = false
+            } else {
+                iv_post.isEnabled = true
+            }
+        })
+    }
     override fun setupListeners() {
         iv_post.setOnClickListener {
             checkStatus {
@@ -154,7 +159,7 @@ class ClubTabFragment : BaseFragment() {
         view.club_view_pager.offscreenPageLimit = 7
         val tabs = resources.getStringArray(R.array.club_tabs)
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
-            val tabView = LayoutInflater.from(requireContext()).inflate(R.layout.custom_tab, null)
+            val tabView = View.inflate(requireContext(), R.layout.custom_tab, null)
             val textView = tabView?.findViewById<TextView>(R.id.tv_title)
             textView?.text = tabs[position]
             tab.customView = tabView
@@ -167,6 +172,7 @@ class ClubTabFragment : BaseFragment() {
                     getString(R.string.text_search_classification),
                     tabs[tab?.position?:0]
                 )
+                Timber.d("tabs[${tab?.position}]=${tabs[tab?.position?:0]}")
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -189,7 +195,11 @@ class ClubTabFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         Timber.i("ClubTabFragment onResume")
-
+        val tabs = resources.getStringArray(R.array.club_tabs)
+        search_bar.text = String.format(
+            getString(R.string.text_search_classification),
+            tabs[club_tabs.selectedTabPosition]
+        )
     }
 
     override fun onDestroy() {

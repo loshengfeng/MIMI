@@ -29,6 +29,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.*
+import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -404,7 +405,7 @@ class PlayerFragment : BaseFragment() {
                 is Empty -> loadVideo()
                 is Error -> {
                     when (it.throwable) {
-                        is PlayerViewModel.NotDeductedException -> {
+                        is NotDeductedException -> {
                             showRechargeReminder(true)
                             scrollToBottom()
                         }

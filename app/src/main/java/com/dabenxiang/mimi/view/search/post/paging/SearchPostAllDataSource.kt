@@ -42,10 +42,10 @@ class SearchPostAllDataSource constructor(
             val list = arrayListOf<MemberPostItem>()
             val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
             memberPostItems?.forEachIndexed { index, item ->
-                if (index == 5) list.add(memberPostAdItem)
                 list.add(item)
+                if (index % 5 == 4) list.add(memberPostAdItem)
             }
-            list.add(memberPostAdItem)
+            if ((memberPostItems?.size ?: 0) % 5 != 0) list.add(memberPostAdItem)
 
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,

@@ -6,9 +6,9 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import timber.log.Timber
+import java.util.*
 
 class TopicListFragment(private val orderBy: OrderBy, private val topicTag:String) : BaseFragment() {
 
@@ -36,7 +37,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
     private val topicviewmodel: TopicViewModel by viewModels({requireParentFragment()})
 
     private val adapter: TopicListAdapter by lazy {
-        TopicListAdapter(requireContext(), postListener, memberPostFuncItem)
+        TopicListAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item
@@ -48,16 +49,6 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
                 it.putSerializable(KEY_DATA, item)
             }
         }
-    }
-
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-                {},
-                { id, view, type -> viewModel.loadImage(id, view, type) },
-                { item, items, isFollow, func -> },
-                { item, isLike, func -> },
-                { item, isFavorite, func -> }
-        )
     }
 
     override fun onAttach(context: Context) {
@@ -119,6 +110,8 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -148,12 +141,11 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             )
         }
 
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
-                    Timber.i("deletePostResult $it")
-                    adapter.removedPosList.add(it.result)
-                    adapter.notifyItemChanged(it.result)
+                    Timber.i("deletePostResult")
+                    checkRemovedItems()
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -181,22 +173,25 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         if (adapter.snapshot().items.isEmpty()) {
             viewModel.getData(adapter, topicTag, orderBy)
         } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
-            val idList = adapter.snapshot().items.map { item ->
-                item.id
-            }
-            Timber.i("idList =$idList")
-            idList.forEach { id ->
-                if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
-                    val pos = idList.indexOf(id)
-                    Timber.i("id =$id pos =$pos")
-                    adapter.removedPosList.add(pos)
-                    adapter.notifyItemChanged(pos)
-                }
-            }
-
+            checkRemovedItems()
         }
 
         viewModel.getAd()
+    }
+
+    private fun checkRemovedItems(){
+        val idList = adapter.snapshot().items.map { item ->
+            item.id
+        }
+        Timber.i("idList =$idList")
+        idList.forEach { id ->
+            if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
+                val pos = idList.indexOf(id)
+                Timber.i("id =$id pos =$pos")
+                adapter.removedPosList.add(id)
+                adapter.notifyItemChanged(pos)
+            }
+        }
     }
 
     private val postListener = object : MyPostListener {

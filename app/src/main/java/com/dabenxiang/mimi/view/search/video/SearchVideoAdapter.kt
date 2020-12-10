@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -107,5 +108,7 @@ class SearchVideoAdapter(
         fun onFunctionClick(type: FunctionType, view: View, item: VideoItem, position: Int)
         fun onChipClick(text: String)
         fun onAvatarDownload(view: ImageView, id: String)
+        fun getDecryptSetting(source: String): DecryptSettingItem?
+        fun decryptCover(source: String, item: DecryptSettingItem, block: (ByteArray?) -> Unit)
     }
 }

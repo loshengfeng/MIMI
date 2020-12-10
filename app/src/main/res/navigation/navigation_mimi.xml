@@ -120,6 +120,9 @@
         <action
             android:id="@+id/action_searchVideoFragment_to_navigation_player"
             app:destination="@id/navigation_player" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
     </fragment>
 
     <fragment
