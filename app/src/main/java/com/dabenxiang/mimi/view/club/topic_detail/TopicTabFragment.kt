@@ -82,6 +82,7 @@ class TopicTabFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     updateFollow()
+                    viewModel.getMembersClub(topicItem.id)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
