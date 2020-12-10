@@ -219,11 +219,13 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.postCount.value ?: -1 <= 0) {
+        if (adapter.snapshot().items.isEmpty()) {
             viewModel.getData(adapter, type, isLike)
+        } else if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
         }
     }
-
 
     private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {

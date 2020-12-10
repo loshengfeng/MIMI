@@ -155,9 +155,11 @@ class MyFavoritesFragment(
 
     override fun onResume() {
         super.onResume()
-        Timber.i("onResume isLogin:${accountManager.isLogin()}")
-        if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
+        if (accountManager.isLogin() && adapter.snapshot().items.isEmpty()) {
             viewModel.getData(adapter, isLike)
+        } else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
         }
     }
 

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
@@ -187,6 +188,15 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.videoChangedResult.observe(viewLifecycleOwner){
+            when (it) {
+                is ApiResult.Success -> {
+                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.getM3U8Result.observe(this, {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
@@ -215,7 +225,7 @@ class ClipSingleFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Empty -> modifyFavorite()
+                is ApiResult.Success -> modifyFavorite()
                 is ApiResult.Error -> onApiError(it.throwable)
                 else -> {
                 }
