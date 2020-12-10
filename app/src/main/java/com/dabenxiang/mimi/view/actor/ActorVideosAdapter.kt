@@ -9,7 +9,6 @@ import com.dabenxiang.mimi.model.api.vo.ActorVideosItem
 import com.dabenxiang.mimi.view.actor.ActorFragment.Companion.VIEW_TYPE_ACTOR_VIDEOS
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.VideosSpaceItemDecoration
-import timber.log.Timber
 
 class ActorVideosAdapter(
     val context: Context,
