@@ -20,7 +20,8 @@ import kotlinx.android.synthetic.main.item_general_video.view.*
 
 class GeneralVideoAdapter(
     private val isNoNeedAD: Boolean = true,
-    val onItemClick: (StatisticsItem) -> Unit
+    val onItemClick: (StatisticsItem) -> Unit,
+    private val videoFuncItem: GeneralVideoFuncItem? = null,
 ) : PagingDataAdapter<StatisticsItem, RecyclerView.ViewHolder>(COMPARATOR) {
 
     companion object {
@@ -82,13 +83,28 @@ class GeneralVideoAdapter(
                 }
             }
             is GeneralVideoViewHolder -> {
+
                 val options = RequestOptions()
                     .priority(Priority.NORMAL)
                     .placeholder(R.drawable.img_nopic_03)
                     .error(R.drawable.img_nopic_03)
-                Glide.with(holder.videoImage.context).load(item.cover)
-                    .apply(options)
-                    .into(holder.videoImage)
+
+                videoFuncItem?.getDecryptSetting?.invoke(item.source ?: "")
+                    ?.takeIf { it.isImageDecrypt }
+                    ?.let { decryptSettingItem ->
+                        videoFuncItem.decryptCover(item.cover ?: "", decryptSettingItem) {
+                            Glide.with(holder.videoImage.context)
+                                .load(it).placeholder(R.drawable.img_nopic_03)
+                                .apply(options)
+                                .into(holder.videoImage)
+                        }
+                    } ?: run {
+                    Glide.with(holder.videoImage.context)
+                        .load(item.cover)
+                        .placeholder(R.drawable.img_nopic_03)
+                        .apply(options)
+                        .into(holder.videoImage)
+                }
 
                 holder.videoTitleText.text = item.title
 
