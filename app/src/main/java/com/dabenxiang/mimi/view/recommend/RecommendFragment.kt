@@ -97,6 +97,14 @@ class RecommendFragment(
                     getString(R.string.recommend_today) -> navToRanking()
                     else -> navToCategory(thirdMenuItem.category)
                 }
+            },
+            { source -> viewModel.getDecryptSetting(source) },
+            { videoItem, decryptSettingItem, function ->
+                viewModel.decryptCover(
+                    videoItem,
+                    decryptSettingItem,
+                    function
+                )
             }
         )
     }
