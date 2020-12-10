@@ -290,7 +290,7 @@ class ClipAdapter(
             currentViewHolder?.ibPlay?.visibility = View.GONE
             currentViewHolder?.progress?.visibility = View.GONE
             currentViewHolder?.tvRetry?.visibility = View.VISIBLE
-            currentViewHolder?.tvRetry?.text = error.localizedMessage
+//            currentViewHolder?.tvRetry?.text = error.localizedMessage
             getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
                 clipFuncItem.onVideoReport(id, true)
             }
