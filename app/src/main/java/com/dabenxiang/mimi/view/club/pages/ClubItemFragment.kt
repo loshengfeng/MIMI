@@ -35,7 +35,7 @@ import timber.log.Timber
 class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     private val viewModel: ClubItemViewModel by viewModels()
-    private val clubTabViewModel: ClubTabViewModel by viewModels({requireParentFragment()})
+    private val clubTabViewModel: ClubTabViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubItemAdapter by lazy {
@@ -66,7 +66,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             Timber.i("postCount= $it")
             if (it == 0) {
                 id_empty_group.visibility = View.VISIBLE
-                text_page_empty.text = when(type){
+                text_page_empty.text = when (type) {
                     ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
                     else -> getText(R.string.empty_post)
                 }
@@ -128,19 +128,19 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         tv_register.setOnClickListener {
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_loginFragment,
-                            LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
             )
         }
 
         tv_login.setOnClickListener {
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_loginFragment,
-                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
             )
         }
 
@@ -174,8 +174,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     override fun onResume() {
         super.onResume()
         loginPageToggle(
-                if(type == ClubTabItemType.FOLLOW) accountManager.isLogin()
-                else true)
+            if (type == ClubTabItemType.FOLLOW) accountManager.isLogin()
+            else true
+        )
 
         if (adapter.snapshot().items.isEmpty()) {
             viewModel.getData(adapter, type)
@@ -364,6 +365,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             Timber.d("onChipClick")
             val item = SearchPostItem(
                 if (type == ClubTabItemType.RECOMMEND || type == ClubTabItemType.LATEST) PostType.TEXT_IMAGE_VIDEO
+                else if (type == ClubTabItemType.FOLLOW) PostType.FOLLOWED
                 else postType, tag = tag
             )
             val bundle = SearchPostFragment.createBundle(item)

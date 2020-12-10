@@ -43,10 +43,10 @@ class SearchVideoListDataSource(
             val list = arrayListOf<VideoItem>()
             val memberPostAdItem = VideoItem(type = PostType.AD, adItem = adItem)
             memberPostItems?.forEachIndexed { index, item ->
-                if (index == 5) list.add(memberPostAdItem)
                 list.add(item)
+                if (index % 5 == 4) list.add(memberPostAdItem)
             }
-            list.add(memberPostAdItem)
+            if ((memberPostItems?.size ?: 0) % 5 != 0) list.add(memberPostAdItem)
             adjustData(list)
 
             val hasNext = hasNextPage(
