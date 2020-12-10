@@ -210,6 +210,9 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
 
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter)
+        }else if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
         }
     }
 }

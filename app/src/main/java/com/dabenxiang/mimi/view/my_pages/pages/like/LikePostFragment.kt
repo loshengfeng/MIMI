@@ -140,6 +140,9 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter)
+        } else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
         }
     }
 

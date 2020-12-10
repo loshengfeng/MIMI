@@ -12,19 +12,21 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 class LikeMimiVideoAdapter(
-        val context: Context,
-        val viewModelScope: CoroutineScope,
-        val listener: MyCollectionVideoListener,
-        val itemType: MyCollectionTabItemType
+    val context: Context,
+    val viewModelScope: CoroutineScope,
+    val listener: MyCollectionVideoListener,
+    val itemType: MyCollectionTabItemType
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -35,6 +37,7 @@ class LikeMimiVideoAdapter(
         const val MIMI_VIDEO = 3
         const val SHORT_VIDEO = 5
         const val VIEW_TYPE_AD = 4
+        const val VIEW_TYPE_DELETED = 6
 
         val diffCallback = object : DiffUtil.ItemCallback<PlayItem>() {
             override fun areItemsTheSame(
@@ -57,7 +60,10 @@ class LikeMimiVideoAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (item?.playlistType?.toInt() == PostType.AD.value) {
+        val changedItem = changedPosList[item?.videoId]
+        return if (changedItem != null && changedItem.like != true) {
+            VIEW_TYPE_DELETED
+        } else if (item?.playlistType?.toInt() == PostType.AD.value) {
             VIEW_TYPE_AD
         } else if (itemType == MyCollectionTabItemType.MIMI_VIDEO) {
             MIMI_VIDEO
@@ -88,9 +94,9 @@ class LikeMimiVideoAdapter(
 
             }
             else -> {
-                MyCollectionMIMIVideoViewHolder(
+                DeletedItemViewHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_my_follow_video, parent, false)
+                        .inflate(R.layout.item_deleted, parent, false)
                 )
             }
         }
@@ -107,7 +113,6 @@ class LikeMimiVideoAdapter(
         val item = getItem(position)
         val changedItem = changedPosList[item?.videoId]
         if (changedItem != null) {
-            Timber.d("changedItem: $changedItem\nitem: $item")
             item?.like = changedItem.like
             item?.likeCount = changedItem.likeCount.toInt()
             item?.favorite = changedItem.favorite
