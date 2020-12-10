@@ -68,7 +68,7 @@ class MyCollectionMIMIVideoViewHolder(
             if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
             else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
-                listener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
+                listener.onChipClick(VideoType.VIDEO_ON_DEMAND, (view as Chip).text.toString())
             }
             tagChipGroup.addView(chip)
         }

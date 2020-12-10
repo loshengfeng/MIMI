@@ -5,6 +5,7 @@ import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.search.post.paging.SearchPostAllDataSource
 import retrofit2.HttpException
@@ -16,7 +17,8 @@ class SearchVideoListDataSource(
     private val tag: String? = null,
     private val keyword: String? = null,
     private val adWidth: Int,
-    private val adHeight: Int
+    private val adHeight: Int,
+    private val videoType: VideoType? = null
 ) : PagingSource<Long, VideoItem>() {
 
     companion object {
@@ -35,6 +37,7 @@ class SearchVideoListDataSource(
                     q = keyword,
                     tag = tag,
                     category = category,
+                    type = videoType,
                     offset = offset.toString(),
                     limit = PER_LIMIT
                 )
@@ -43,10 +46,10 @@ class SearchVideoListDataSource(
             val list = arrayListOf<VideoItem>()
             val memberPostAdItem = VideoItem(type = PostType.AD, adItem = adItem)
             memberPostItems?.forEachIndexed { index, item ->
-                if (index == 5) list.add(memberPostAdItem)
                 list.add(item)
+                if (index % 5 == 4) list.add(memberPostAdItem)
             }
-            list.add(memberPostAdItem)
+            if ((memberPostItems?.size ?: 0) % 5 != 0) list.add(memberPostAdItem)
             adjustData(list)
 
             val hasNext = hasNextPage(

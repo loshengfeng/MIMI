@@ -25,7 +25,6 @@ class ClubItemAdapter(
         private val viewModelScope: CoroutineScope
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
-
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
         const val PAYLOAD_UPDATE_FAVORITE = 1
@@ -42,7 +41,7 @@ class ClubItemAdapter(
                     oldItem: MemberPostItem,
                     newItem: MemberPostItem
             ): Boolean {
-                return oldItem == newItem
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
@@ -54,12 +53,12 @@ class ClubItemAdapter(
         }
     }
 
-    var removedPosList = ArrayList<Int>()
     var changedPosList = HashMap<Long,MemberPostItem>()
+    var removedPosList = ArrayList<Long>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(position)) {
+        return if (removedPosList.contains(item?.id)) {
             VIEW_TYPE_DELETED
         }else when (item?.type) {
             PostType.VIDEO -> VIEW_TYPE_CLIP

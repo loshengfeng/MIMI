@@ -184,6 +184,9 @@
         <action
             android:id="@+id/action_searchVideoFragment_to_navigation_player"
             app:destination="@id/navigation_player" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
     </fragment>
 
     <fragment
@@ -369,5 +372,14 @@
         android:id="@+id/inviteVipRecordFragment"
         android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
         android:label="InviteVipRecordFragment" />
+
+    <fragment
+        android:id="@+id/clipSingleFragment"
+        android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
+        android:label="ClipSingleFragment">
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
 
 </navigation>

@@ -35,7 +35,7 @@ import timber.log.Timber
 class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     private val viewModel: ClubItemViewModel by viewModels()
-    private val clubTabViewModel: ClubTabViewModel by viewModels({requireParentFragment()})
+    private val clubTabViewModel: ClubTabViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubItemAdapter by lazy {
@@ -66,7 +66,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             Timber.i("postCount= $it")
             if (it == 0) {
                 id_empty_group.visibility = View.VISIBLE
-                text_page_empty.text = when(type){
+                text_page_empty.text = when (type) {
                     ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
                     else -> getText(R.string.empty_post)
                 }
@@ -114,6 +114,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -128,27 +129,27 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         tv_register.setOnClickListener {
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_loginFragment,
-                            LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
             )
         }
 
         tv_login.setOnClickListener {
             navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_loginFragment,
-                            LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
-                    )
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
             )
         }
 
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
-                    adapter.removedPosList.add(it.result)
-                    adapter.notifyItemChanged(it.result)
+                    Timber.i("deletePostResult")
+                    checkRemovedItems()
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -174,25 +175,14 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     override fun onResume() {
         super.onResume()
         loginPageToggle(
-                if(type == ClubTabItemType.FOLLOW) accountManager.isLogin()
-                else true)
+            if (type == ClubTabItemType.FOLLOW) accountManager.isLogin()
+            else true
+        )
 
         if (adapter.snapshot().items.isEmpty()) {
             viewModel.getData(adapter, type)
         } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
-            val idList = adapter.snapshot().items.map { item ->
-                item.id
-            }
-            Timber.i("idList =$idList")
-            idList.forEach { id ->
-                if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
-                    val pos = idList.indexOf(id)
-                    Timber.i("id =$id pos =$pos")
-                    adapter.removedPosList.add(pos)
-                    adapter.notifyItemChanged(pos)
-                }
-            }
-
+            checkRemovedItems()
         }
 
         if (adapter.snapshot().items.isEmpty()) {
@@ -203,6 +193,21 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
 
         viewModel.getAd()
+    }
+
+    private fun checkRemovedItems(){
+        val idList = adapter.snapshot().items.map { item ->
+            item.id
+        }
+        Timber.i("idList =$idList")
+        idList.forEach { id ->
+            if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
+                val pos = idList.indexOf(id)
+                Timber.i("id =$id pos =$pos")
+                adapter.removedPosList.add(id)
+                adapter.notifyItemChanged(pos)
+            }
+        }
     }
 
     private val postListener = object : MyPostListener {
@@ -371,6 +376,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             Timber.d("onChipClick")
             val item = SearchPostItem(
                 if (type == ClubTabItemType.RECOMMEND || type == ClubTabItemType.LATEST) PostType.TEXT_IMAGE_VIDEO
+                else if (type == ClubTabItemType.FOLLOW) PostType.FOLLOWED
                 else postType, tag = tag
             )
             val bundle = SearchPostFragment.createBundle(item)

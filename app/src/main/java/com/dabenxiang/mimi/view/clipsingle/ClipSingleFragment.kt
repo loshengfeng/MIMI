@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
@@ -189,7 +190,12 @@ class ClipSingleFragment : BaseFragment() {
                         setupPlayer(player_view, it.result)
                     }
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> {
+                    when (it.throwable) {
+                        is NotDeductedException -> recharge_reminder.visibility = View.VISIBLE
+                        else -> onApiError(it.throwable)
+                    }
+                }
                 else -> {
                 }
             }
@@ -312,6 +318,7 @@ class ClipSingleFragment : BaseFragment() {
             }
             progress_video?.visibility = View.GONE
             tv_retry.visibility = View.VISIBLE
+            tv_retry.text = error.localizedMessage
             viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
                 viewModel.sendVideoReport(this, true)
             }

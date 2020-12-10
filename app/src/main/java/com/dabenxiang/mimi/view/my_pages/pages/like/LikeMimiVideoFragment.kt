@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -88,9 +89,9 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
 
         }
 
-        override fun onChipClick(type: PostType, tag: String) {
+        override fun onChipClick(type: VideoType, tag: String) {
             Timber.d("onChipClick")
-            val bundle = SearchVideoFragment.createBundle(tag)
+            val bundle = SearchVideoFragment.createBundle(tag = tag, videoType = type)
             navigateTo(
                 NavigateItem.Destination(
                     R.id.action_to_searchVideoFragment,

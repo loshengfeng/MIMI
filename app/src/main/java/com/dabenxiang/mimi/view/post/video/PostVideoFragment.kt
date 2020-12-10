@@ -97,6 +97,10 @@ class PostVideoFragment : BasePostFragment() {
                 return@setOnClickListener
             }
 
+            if (!checkTagCountIsValid()) {
+                return@setOnClickListener
+            }
+
             navigation()
         }
     }

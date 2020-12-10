@@ -82,6 +82,10 @@ class PostPicFragment : BasePostFragment() {
                 return@setOnClickListener
             }
 
+            if (!checkTagCountIsValid()) {
+                return@setOnClickListener
+            }
+
             navigation()
         }
     }

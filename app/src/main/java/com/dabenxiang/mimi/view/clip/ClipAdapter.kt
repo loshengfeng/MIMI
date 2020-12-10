@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiRepository.Companion.ERROR_CODE_ACCOUNT_OVERDUE
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -42,7 +43,6 @@ class ClipAdapter(
         const val PAYLOAD_UPDATE_UI = 0
         const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
         const val PAYLOAD_UPDATE_SCROLL_AWAY = 2
-        const val ERROR_CODE_ACCOUNT_OVERDUE = 402
     }
 
     private var currentViewHolder: ClipViewHolder? = null

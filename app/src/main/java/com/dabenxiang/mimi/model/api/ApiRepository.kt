@@ -21,6 +21,7 @@ class ApiRepository(private val apiService: ApiService) {
         const val MEDIA_TYPE_IMAGE = "image/*"
         const val X_REQUESTED_FROM = "X-Requested-From"
         const val NETWORK_PAGE_SIZE = 20
+        const val ERROR_CODE_ACCOUNT_OVERDUE = 402
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
@@ -423,8 +424,9 @@ class ApiRepository(private val apiService: ApiService) {
         isAdult: Boolean = true,
         offset: String,
         limit: String,
-        tag: String? = null
-    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag)
+        tag: String?= null,
+        type: VideoType? = null
+    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag, type?.value)
 
     /**
      * 取得小视频影片(需Client Credentials|需登入帳號)
