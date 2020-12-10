@@ -176,6 +176,9 @@ open class BasePostFragment : BaseFragment() {
             ).show()
         } else {
             val tag = edt_hashtag.text.toString()
+            if (tag.isBlank()) {
+                return 
+            }
             if (isTagExist(tag)) {
                 Toast.makeText(
                         requireContext(),

@@ -36,6 +36,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()
 
+        tvTitle.isSelected = true
+
         clipFuncItem.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
             ?.let { decryptSettingItem ->
                 clipFuncItem.decryptCover(item.cover?:"", decryptSettingItem) {
