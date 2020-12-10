@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
-import java.io.File
 import java.io.FileOutputStream
 
 class ClipPlayerViewModel : BaseViewModel() {
@@ -77,11 +76,9 @@ class ClipPlayerViewModel : BaseViewModel() {
 
                 fileName = "tmp_clip.$extension"
 
-                val path = "${FileUtil.getVideoFolderPath(context)}$fileName"
-                File(path).delete()
-                if (!File(path).exists()) {
-                    convertByteToVideo(context, byteArray, fileName)
-                }
+                val path = "${FileUtil.getAppPath(context)}/$fileName"
+                saveTmpClip(byteArray, path)
+
                 Timber.d("getAttachment($id) filePath=$path")
                 emit(ApiResult.success(path))
             }
@@ -93,19 +90,14 @@ class ClipPlayerViewModel : BaseViewModel() {
         }
     }
 
-    private fun convertByteToVideo(
-        context: Context,
+    private fun saveTmpClip(
         streamArray: ByteArray,
-        fileName: String
+        path: String
     ): String {
-        val path = getVideoPath(context, fileName)
+        FileUtil.deleteFile(path)
         val out = FileOutputStream(path)
         out.write(streamArray)
         out.close()
         return path
-    }
-
-    fun getVideoPath(context: Context, fileName: String, ext: String = ""): String {
-        return "${FileUtil.getVideoFolderPath(context)}$fileName$ext"
     }
 }
