@@ -21,7 +21,6 @@ import com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_follow_list.*
-import timber.log.Timber
 
 class MyFollowListFragment(val type: Int) : BaseFragment() {
 
@@ -183,9 +182,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.postCount.value ?: -1 <= 0) {
-            getData()
-        }
+        getData()
     }
 
     fun getData() {
