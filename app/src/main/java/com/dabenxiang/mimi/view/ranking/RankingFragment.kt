@@ -3,7 +3,6 @@ package com.dabenxiang.mimi.view.ranking
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -14,7 +13,6 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PlayerItem
@@ -98,26 +96,7 @@ class RankingFragment : BaseFragment() {
         RankingAdapter(requireActivity(),
             RankingFuncItem(
                 onItemClick = { items, position ->
-                    val memberPostItems = items.mapNotNull { it.detail }
-                        .let {
-                            arrayListOf<MemberPostItem>().also { arrayList ->
-                                arrayList.addAll(it)
-                            }
-                        }
-
-                    when (viewModel.postTypeSelected) {
-                        PostType.IMAGE -> {
-                            val bundle = ClubPicFragment.createBundle(memberPostItems[position])
-                            navigateTo(
-                                NavigateItem.Destination(
-                                    R.id.action_to_clubPicFragment,
-                                    bundle
-                                )
-                            )
-                        }
-                        else -> {}
-                    }
-
+                    viewModel.getPostDetail(items[position].id)
                 },
                 getBitmap = { id, view ->
                     viewModel.loadImage(
@@ -178,12 +157,21 @@ class RankingFragment : BaseFragment() {
         })
 
         viewModel.rankingClipList.observe(viewLifecycleOwner, {
-            when (it) {
+            clipAdapter.submitList(it)
+        })
+
+        viewModel.postDetail.observe(viewLifecycleOwner, {
+            when(it) {
                 is ApiResult.Loading -> layout_refresh.isRefreshing = true
-                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
-                is ApiResult.Success -> clipAdapter.updateData(it.result as ArrayList<VideoItem>)
-                is ApiResult.Error -> onApiError(it.throwable)
-                else -> {
+                is ApiResult.Loaded ->  layout_refresh.isRefreshing = false
+                is ApiResult.Success -> {
+                    val bundle = ClubPicFragment.createBundle(it.result)
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_to_clubPicFragment,
+                            bundle
+                        )
+                    )
                 }
             }
         })
