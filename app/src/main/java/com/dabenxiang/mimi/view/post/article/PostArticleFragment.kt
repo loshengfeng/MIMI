@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment.Companion.KEY_DATA
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.hideKeyboard
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -55,6 +56,9 @@ class PostArticleFragment : BasePostFragment() {
         })
 
         tv_clean.setOnClickListener {
+
+            hideKeyboard(requireActivity())
+            
             val title = edt_title.text.toString()
             val content = edt_content.text.toString()
 

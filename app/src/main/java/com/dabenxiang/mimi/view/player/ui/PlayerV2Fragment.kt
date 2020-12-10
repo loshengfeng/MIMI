@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.api.vo.VideoM3u8Source
 import com.dabenxiang.mimi.model.enums.HttpErrorMsgType
+import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BasePlayerFragment
 import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
@@ -69,7 +70,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
                 }
                 is ApiResult.Error -> {
                     when (it.throwable) {
-                        is PlayerV2ViewModel.NotDeductedException -> {
+                        is NotDeductedException -> {
                             showRechargeReminder(true)
                             if (progressHUD.isShowing)
                                 progressHUD.dismiss()

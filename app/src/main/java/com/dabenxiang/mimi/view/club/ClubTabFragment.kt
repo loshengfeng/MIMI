@@ -172,6 +172,7 @@ class ClubTabFragment : BaseFragment() {
                     getString(R.string.text_search_classification),
                     tabs[tab?.position?:0]
                 )
+                Timber.d("tabs[${tab?.position}]=${tabs[tab?.position?:0]}")
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -194,7 +195,11 @@ class ClubTabFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         Timber.i("ClubTabFragment onResume")
-
+        val tabs = resources.getStringArray(R.array.club_tabs)
+        search_bar.text = String.format(
+            getString(R.string.text_search_classification),
+            tabs[club_tabs.selectedTabPosition]
+        )
     }
 
     override fun onDestroy() {

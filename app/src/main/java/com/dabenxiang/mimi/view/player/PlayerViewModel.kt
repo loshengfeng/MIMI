@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.CheckStatusItem
+import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.google.android.exoplayer2.C
@@ -319,8 +320,6 @@ class PlayerViewModel : BaseViewModel() {
             getStreamUrl()
         }
     }
-
-    inner class NotDeductedException : Exception()
 
     fun getAdultStreamUrl() {
         viewModelScope.launch {

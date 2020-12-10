@@ -38,10 +38,10 @@ class SearchPostFollowDataSource constructor(
             val list = arrayListOf<MemberPostItem>()
             val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
             memberPostItems?.forEachIndexed { index, item ->
-                if (index == 5) list.add(memberPostAdItem)
                 list.add(item)
+                if (index % 5 == 4) list.add(memberPostAdItem)
             }
-            list.add(memberPostAdItem)
+            if ((memberPostItems?.size ?: 0) % 5 != 0) list.add(memberPostAdItem)
 
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
@@ -51,7 +51,7 @@ class SearchPostFollowDataSource constructor(
             val nextKey = if (hasNext) offset + PER_LIMIT_LONG else null
             if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
             pagingCallback.onTotalCount(body?.paging?.count ?: 0)
-            LoadResult.Page(memberPostItems ?: listOf(), null, nextKey)
+            LoadResult.Page(list ?: listOf(), null, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)
         }
