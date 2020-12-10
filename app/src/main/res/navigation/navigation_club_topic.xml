@@ -27,10 +27,10 @@
             android:id="@+id/action_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
         <action
-            android:id="@+id/action_topicDetailFragment_to_searchPostFragment"
+            android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
         <action
-            android:id="@+id/action_topicDetailFragment_to_myPostFragment"
+            android:id="@+id/action_to_myPostFragment"
             app:destination="@id/myPostFragment" />
         <action
             android:id="@+id/action_to_settingFragment"
@@ -83,6 +83,9 @@
         <action
             android:id="@+id/action_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
