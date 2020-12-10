@@ -154,6 +154,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun clearDeletePostResult() {
+        _deletePostResult.value = null
+    }
+
     fun cleanRemovedPosList() {
         _cleanRemovedPosList.value = null
     }
