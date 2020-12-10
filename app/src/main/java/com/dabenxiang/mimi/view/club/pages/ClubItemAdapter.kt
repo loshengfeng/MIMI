@@ -53,11 +53,11 @@ class ClubItemAdapter(
         }
     }
 
-    var removedPosList = ArrayList<Int>()
+    var removedPosList = ArrayList<Long>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(position)) {
+        return if (removedPosList.contains(item?.id)) {
             VIEW_TYPE_DELETED
         }else when (item?.type) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
