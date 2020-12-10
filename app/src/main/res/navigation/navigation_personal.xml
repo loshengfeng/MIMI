@@ -265,6 +265,9 @@
         <action
             android:id="@+id/action_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
