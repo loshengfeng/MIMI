@@ -14,7 +14,6 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.CombinedLoadStates
@@ -25,14 +24,17 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.SearchingVideoItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
@@ -47,6 +49,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
+import kotlin.collections.HashMap
 
 class SearchVideoFragment : BaseFragment() {
 
@@ -56,11 +59,13 @@ class SearchVideoFragment : BaseFragment() {
 
         fun createBundle(
             tag: String = "",
-            category: String = ""
+            category: String = "",
+            videoType: VideoType? = null
         ): Bundle {
             val data = SearchingVideoItem()
             data.tag = tag
             data.category = category
+            data.videoType = videoType
 
             return Bundle().also {
                 it.putSerializable(KEY_DATA, data)
@@ -120,10 +125,11 @@ class SearchVideoFragment : BaseFragment() {
 
             viewModel.searchingTag = data.tag
             viewModel.category = data.category
+            viewModel.videoType = data.videoType
             if (data.tag.isNotBlank()) {
                 layout_search_history.visibility = View.GONE
                 search_bar.setText(data.tag)
-                searchVideo(tag = data.tag)
+                searchVideo(tag = data.tag, videoType = data.videoType)
                 search_bar.post {
                     search_bar.clearFocus()
                 }
@@ -225,6 +231,14 @@ class SearchVideoFragment : BaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            videoListAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            videoListAdapter.notifyDataSetChanged()
+        }
+    }
+
     private fun searchText() {
         if (search_bar.text.isNotBlank()) {
             layout_search_text.visibility = View.GONE
@@ -246,14 +260,24 @@ class SearchVideoFragment : BaseFragment() {
 
     private val adapterListener = object : SearchVideoAdapter.EventListener {
         override fun onVideoClick(item: VideoItem) {
-            val playerData = PlayerItem(item.id ?: 0)
-            val bundle = PlayerFragment.createBundle(playerData)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_searchVideoFragment_to_navigation_player,
-                    bundle
-                )
-            )
+            when(viewModel.videoType) {
+                VideoType.SHORT_VIDEO -> {
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_searchVideoFragment_to_clipSingleFragment,
+                            ClipSingleFragment.createBundle(item)
+                        )
+                    )
+                }
+                else -> {
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_searchVideoFragment_to_navigation_player,
+                            PlayerFragment.createBundle(PlayerItem(item.id))
+                        )
+                    )
+                }
+            }
         }
 
         override fun onFunctionClick(
@@ -351,6 +375,18 @@ class SearchVideoFragment : BaseFragment() {
 
         override fun onAvatarDownload(view: ImageView, id: String) {
         }
+
+        override fun getDecryptSetting(source: String): DecryptSettingItem? {
+            return viewModel.getDecryptSetting(source)
+        }
+
+        override fun decryptCover(
+            source: String,
+            item: DecryptSettingItem,
+            block: (ByteArray?) -> Unit
+        ) {
+            viewModel.decryptCover(source, item, block)
+        }
     }
 
     /**
@@ -424,11 +460,12 @@ class SearchVideoFragment : BaseFragment() {
 
     private fun searchVideo(
         keyword: String? = null,
-        tag: String? = null
+        tag: String? = null,
+        videoType: VideoType? = viewModel.videoType
     ) {
         lifecycleScope.launch {
             videoListAdapter.submitData(PagingData.empty())
-            viewModel.getSearchVideoResult(keyword, tag)
+            viewModel.getSearchVideoResult(keyword, tag, videoType)
                 .collectLatest { videoListAdapter.submitData(it) }
         }
     }

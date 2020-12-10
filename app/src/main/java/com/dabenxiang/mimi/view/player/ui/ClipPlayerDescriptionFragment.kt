@@ -1,10 +1,8 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -13,7 +11,6 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
@@ -21,7 +18,6 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
@@ -55,6 +51,26 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     override fun setupObservers() {
         super.setupObservers()
+
+        clipViewModel.postChangedResult.observe(viewLifecycleOwner){
+            when (it) {
+                is ApiResult.Success<*> -> {
+                    it.result as MemberPostItem
+                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is ApiResult.Error<*> -> onApiError(it.throwable)
+            }
+        }
+
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner){
+            when (it) {
+                is ApiResult.Success -> {
+                    navigateTo(NavigateItem.Up)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.memberPostContentSource.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Success -> {
@@ -105,6 +121,11 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         }
+    }
+
+    override fun onDetach() {
+        mainViewModel?.clearDeletePostResult()
+        super.onDetach()
     }
 
     private fun setInteractiveListener() {

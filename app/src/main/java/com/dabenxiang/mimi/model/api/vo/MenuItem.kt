@@ -46,7 +46,6 @@ data class SecondMenuItem(
 
     @SerializedName("orderByType")
     val orderByType: Int = 0
-
 )
 
 data class ThirdMenuItem(

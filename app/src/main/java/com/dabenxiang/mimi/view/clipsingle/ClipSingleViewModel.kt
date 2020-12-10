@@ -7,7 +7,9 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoType
+import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.player.ui.PlayerV2ViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -98,6 +100,7 @@ class ClipSingleViewModel: BaseViewModel() {
                 val videoInfoResp = apiRepository.getVideoInfo(playItem.videoId?:0)
                 if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
                 videoItem = videoInfoResp.body()?.content
+                takeUnless { videoItem?.deducted == true }?.run { throw NotDeductedException() }
                 val videoEpisode = videoItem?.sources?.get(0)?.videoEpisodes?.get(0)
 
                 val episodeResp = apiRepository.getVideoEpisode(playItem.videoId?:0, videoEpisode?.id?:0)

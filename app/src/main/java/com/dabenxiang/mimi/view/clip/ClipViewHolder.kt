@@ -21,7 +21,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var tvComment: TextView = view.tv_comment
     var tvMore: TextView = view.tv_more
     var progress: ProgressBar = view.progress_video
-    var ibRetry: ImageButton = view.ib_retry
+    var tvRetry: TextView = view.tv_retry
     var reminder: View = view.recharge_reminder
     private var btnVip: View = view.btn_vip
     private var btnPromote: View = view.btn_promote
@@ -31,10 +31,12 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         ibReplay.visibility = View.GONE
         ibPlay.visibility = View.GONE
         progress.visibility = View.GONE
-        ibRetry.visibility = View.GONE
+        tvRetry.visibility = View.GONE
         tvTitle.text = item.title
         tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()
+
+        tvTitle.isSelected = true
 
         clipFuncItem.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
             ?.let { decryptSettingItem ->

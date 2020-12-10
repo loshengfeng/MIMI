@@ -117,16 +117,17 @@ class ClubTextDetailViewModel: BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 item.isFavorite = isFavorite
                 if (isFavorite) item.favoriteCount++ else item.favoriteCount--
-                emit(ApiResult.success(item.favoriteCount))
+                emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
+                    _postChangedResult.value = it
                     when (it) {
                         is ApiResult.Success -> {
-                            update(isFavorite, it.result)
+                            update(isFavorite, it.result.favoriteCount)
                         }
                     }
                 }
@@ -189,6 +190,7 @@ class ClubTextDetailViewModel: BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
+                    _postChangedResult.value = it
                     when (it) {
                         is ApiResult.Success -> {
                             update(like, it.result)
@@ -254,13 +256,15 @@ class ClubTextDetailViewModel: BaseViewModel() {
                         it.isFollow = isFollow
                     }
                 }
-                emit(ApiResult.success(null))
+                emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _followResult.value = it }
+                .collect {
+                    _postChangedResult.value = it
+                    _followResult.value = ApiResult.success(null) }
         }
     }
 

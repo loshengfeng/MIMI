@@ -11,15 +11,14 @@ import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -74,7 +73,7 @@ class SearchPostFragment : BaseFragment() {
         SearchPostAdapter(
             requireActivity(),
             postListener,
-            memberPostFuncItem,
+            viewModel.viewModelScope,
             { searchText ?: "" },
             { searchTag ?: "" })
     }
@@ -375,6 +374,14 @@ class SearchPostFragment : BaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
+        }
+    }
+
     private fun search(text: String? = null, tag: String? = null) {
         if (TextUtils.isEmpty(text) && TextUtils.isEmpty(tag)) {
             GeneralUtils.showToast(
@@ -456,16 +463,6 @@ class SearchPostFragment : BaseFragment() {
 
         tv_search_text.text = word
         layout_search_text.visibility = View.VISIBLE
-    }
-
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, view, type -> viewModel.loadImage(id, view, type)},
-            { item, items, isFollow, func -> },
-            { item, isLike, func -> },
-            { item, isFavorite, func -> }
-        )
     }
 
     private fun getSearchHistory() {

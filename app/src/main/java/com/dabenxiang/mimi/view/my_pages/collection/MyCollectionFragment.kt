@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.view.my_pages.base.BaseMyPagesTabFragment
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.my_pages.pages.favorites.MyFavoritesFragment
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoFragment
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_my.*
 import kotlinx.android.synthetic.main.fragment_my.view.*
 
@@ -39,5 +40,20 @@ class MyCollectionFragment: BaseMyPagesTabFragment() {
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
+
+    override val onTabSelectedListener: TabLayout.OnTabSelectedListener
+        get() = object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.position?.let { changeCleanBtnIsEnable(it) }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+        }
 
 }

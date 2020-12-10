@@ -62,7 +62,7 @@ object FileUtil {
         if (file.exists()) file.delete()
     }
 
-    private fun getAppPath(context: Context): String {
+    fun getAppPath(context: Context): String {
 //        return when (Environment.MEDIA_MOUNTED) {
 //            Environment.getExternalStorageState() -> {
 //                Environment.getExternalStorageDirectory().toString()

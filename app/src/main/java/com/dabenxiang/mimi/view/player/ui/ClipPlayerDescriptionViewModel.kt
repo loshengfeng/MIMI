@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 
-class ClipPlayerDescriptionViewModel: BaseViewModel() {
+class ClipPlayerDescriptionViewModel : BaseViewModel() {
 
     private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
     val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
@@ -36,7 +36,7 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val rep = domainManager.getApiRepository()
-                val result = when(isDelete) {
+                val result = when (isDelete) {
                     false -> rep.followPost(postId)
                     true -> rep.cancelFollowPost(postId)
                 }
@@ -71,6 +71,7 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val originFavorite = item.isFavorite
+                val originFavoriteCnt = item.favoriteCount
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
                     !originFavorite -> apiRepository.addFavorite(item.id)
@@ -78,13 +79,18 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
                 }
                 if (!result.isSuccessful) throw HttpException(result)
                 item.isFavorite = !originFavorite
+                item.favoriteCount = if (originFavorite) originFavoriteCnt - 1
+                else originFavoriteCnt + 1
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
+                .collect {
+                    _postChangedResult.value = it
+                    _favoriteResult.value = it
+                }
         }
     }
 
@@ -118,7 +124,10 @@ class ClipPlayerDescriptionViewModel: BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likeResult.value = it }
+                .collect {
+                    _postChangedResult.value = it
+                    _likeResult.value = it
+                }
         }
     }
 

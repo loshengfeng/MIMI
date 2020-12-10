@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -43,6 +45,8 @@ class SearchVideoAdapter(
             ): Boolean = oldItem == newItem
         }
     }
+
+    var changedPosList = HashMap<Long, VideoItem>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
@@ -78,7 +82,11 @@ class SearchVideoAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        val item = getItem(position)
+        var item = getItem(position)
+        val changedItem = changedPosList[item?.id]
+        if (changedItem != null) {
+            item = changedItem
+        }
         when (holder) {
             is AdHolder -> {
                 Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
@@ -107,5 +115,7 @@ class SearchVideoAdapter(
         fun onFunctionClick(type: FunctionType, view: View, item: VideoItem, position: Int)
         fun onChipClick(text: String)
         fun onAvatarDownload(view: ImageView, id: String)
+        fun getDecryptSetting(source: String): DecryptSettingItem?
+        fun decryptCover(source: String, item: DecryptSettingItem, block: (ByteArray?) -> Unit)
     }
 }

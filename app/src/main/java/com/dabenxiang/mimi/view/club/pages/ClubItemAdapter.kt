@@ -16,12 +16,13 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 class ClubItemAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
-        private val memberPostFuncItem: MemberPostFuncItem
+        private val viewModelScope: CoroutineScope
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -52,11 +53,12 @@ class ClubItemAdapter(
         }
     }
 
-    var removedPosList = ArrayList<Int>()
+    var changedPosList = HashMap<Long,MemberPostItem>()
+    var removedPosList = ArrayList<Long>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(position)) {
+        return if (removedPosList.contains(item?.id)) {
             VIEW_TYPE_DELETED
         }else when (item?.type) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
@@ -102,7 +104,12 @@ class ClubItemAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
+
+        var item = getItem(position)
+        val changedItem = changedPosList[item?.id]
+        if (changedItem != null) {
+            item = changedItem
+        }
         item?.also {
             when (holder) {
                 is AdHolder -> {
@@ -118,19 +125,23 @@ class ClubItemAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                     )
 
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(it, position, myPostListener, memberPostFuncItem)
+                    holder.onBind(it,
+                            position,
+                            myPostListener,
+                            viewModelScope
+                    )
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                     )
                 }
             }

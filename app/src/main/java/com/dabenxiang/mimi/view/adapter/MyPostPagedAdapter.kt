@@ -12,12 +12,14 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import kotlinx.coroutines.CoroutineScope
 
 class MyPostPagedAdapter(
     val context: Context,
     private val isAdultTheme: Boolean,
     private val myPostListener: MyPostListener,
-    private val memberPostFuncItem: MemberPostFuncItem
+    private val memberPostFuncItem: MemberPostFuncItem,
+    private val viewModelScope: CoroutineScope
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
@@ -113,7 +115,7 @@ class MyPostPagedAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                         )
                     }
                 }
@@ -130,7 +132,7 @@ class MyPostPagedAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                         )
                     }
                 }
@@ -142,7 +144,7 @@ class MyPostPagedAdapter(
                             PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item)
                         }
                     } ?: run {
-                        holder.onBind(it, position, myPostListener, memberPostFuncItem)
+                        holder.onBind(it, position, myPostListener, viewModelScope)
                     }
                 }
             }
@@ -152,11 +154,4 @@ class MyPostPagedAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
     }
 
-    fun updateInternalItem(holder: BaseViewHolder) {
-        when (holder) {
-            is PicturePostHolder -> {
-                holder.pictureRecycler.adapter?.notifyDataSetChanged()
-            }
-        }
-    }
 }

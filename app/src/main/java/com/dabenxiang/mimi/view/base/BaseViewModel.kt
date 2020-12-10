@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.api.vo.DownloadResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
@@ -135,6 +136,16 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     var deletePostIdList = MutableLiveData<ArrayList<Long>>().also { it.value = arrayListOf() }
 
+    protected var _postChangedResult = MutableLiveData<ApiResult<MemberPostItem>>()
+    val postChangedResult: LiveData<ApiResult<MemberPostItem>> = _postChangedResult
+
+    var postItemChangedList = MutableLiveData<HashMap<Long, MemberPostItem>>().also { it.value = HashMap() }
+
+    protected var _videoChangedResult = MutableLiveData<ApiResult<VideoItem>>()
+    val videoChangedResult: LiveData<ApiResult<VideoItem>> = _videoChangedResult
+
+    var videoItemChangedList = MutableLiveData<HashMap<Long, VideoItem>>().also { it.value = HashMap() }
+
     fun deletePost(
         item: MemberPostItem,
         position: Int
@@ -152,6 +163,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                     deletePostIdList.value?.add(item.id)
                     _deletePostResult.value = it }
         }
+    }
+
+    fun clearDeletePostResult() {
+        _deletePostResult.value = null
     }
 
     fun cleanRemovedPosList() {

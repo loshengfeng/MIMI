@@ -3,7 +3,9 @@ package com.dabenxiang.mimi.view.post.article
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Toast
+import androidx.core.view.size
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ArticleItem
@@ -16,6 +18,7 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment.Companion.KEY_DATA
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.hideKeyboard
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -25,6 +28,11 @@ class PostArticleFragment : BasePostFragment() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_post_article
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        txt_contentCount.text = String.format(getString(R.string.typing_count, edt_content.text.count(), CONTENT_LIMIT))
     }
 
     override fun setUI(item: MediaItem) {
@@ -37,12 +45,6 @@ class PostArticleFragment : BasePostFragment() {
         btn_tag_confirm.setOnClickListener { hashTagConfirm() }
         edt_content.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > CONTENT_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_title.setText(content)
-                    }
-                }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -54,6 +56,9 @@ class PostArticleFragment : BasePostFragment() {
         })
 
         tv_clean.setOnClickListener {
+
+            hideKeyboard(requireActivity())
+            
             val title = edt_title.text.toString()
             val content = edt_content.text.toString()
 
@@ -63,6 +68,10 @@ class PostArticleFragment : BasePostFragment() {
 
             if (content.isBlank()) {
                 Toast.makeText(requireContext(), R.string.post_warning_content, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!checkTagCountIsValid()) {
                 return@setOnClickListener
             }
 
@@ -119,6 +128,10 @@ class PostArticleFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(PictureDetailFragment.KEY_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
+        } else if (isEdit && page == FAVORITE) {
+            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postArticleFragment_to_myCollectionFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         }

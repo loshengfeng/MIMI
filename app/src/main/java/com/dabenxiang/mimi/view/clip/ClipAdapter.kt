@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiRepository.Companion.ERROR_CODE_ACCOUNT_OVERDUE
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -42,7 +43,6 @@ class ClipAdapter(
         const val PAYLOAD_UPDATE_UI = 0
         const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
         const val PAYLOAD_UPDATE_SCROLL_AWAY = 2
-        const val ERROR_CODE_ACCOUNT_OVERDUE = 402
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -110,11 +110,11 @@ class ClipAdapter(
     }
 
     fun pausePlayer() {
-        exoPlayer?.takeIf { it.isPlaying }?.run {
-            currentViewHolder?.takeUnless { it.ibRetry.visibility == View.VISIBLE }
+        exoPlayer?.takeUnless { currentViewHolder?.tvRetry?.visibility == View.VISIBLE }?.run {
+            this.playWhenReady = false
+            currentViewHolder?.takeUnless { it.tvRetry.visibility == View.VISIBLE }
                 ?.run { this.ibPlay.visibility = View.VISIBLE }
         }
-        exoPlayer?.playWhenReady = false
     }
 
     override fun onBindViewHolder(
@@ -181,8 +181,8 @@ class ClipAdapter(
                 holder.ibPlay.visibility = View.GONE
             }
         }
-        holder.ibRetry.setOnClickListener {
-            holder.ibRetry.visibility = View.GONE
+        holder.tvRetry.setOnClickListener {
+            holder.tvRetry.visibility = View.GONE
             holder.progress.visibility = View.VISIBLE
             getM3U8()
         }
@@ -287,8 +287,10 @@ class ClipAdapter(
                 }
             }
 
+            currentViewHolder?.ibPlay?.visibility = View.GONE
             currentViewHolder?.progress?.visibility = View.GONE
-            currentViewHolder?.ibRetry?.visibility = View.VISIBLE
+            currentViewHolder?.tvRetry?.visibility = View.VISIBLE
+//            currentViewHolder?.tvRetry?.text = error.localizedMessage
             getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
                 clipFuncItem.onVideoReport(id, true)
             }

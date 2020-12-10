@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
@@ -27,6 +28,8 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.item_clip.*
+import kotlinx.android.synthetic.main.recharge_reminder.*
+import kotlinx.android.synthetic.main.recharge_reminder.view.*
 import timber.log.Timber
 
 class ClipSingleFragment : BaseFragment() {
@@ -110,7 +113,7 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     private fun pausePlayer() {
-        exoPlayer?.takeIf { it.isPlaying }?.takeUnless { ib_retry.visibility == View.VISIBLE }
+        exoPlayer?.takeIf { it.isPlaying }?.takeUnless { tv_retry.visibility == View.VISIBLE }
             ?.run {
                 ib_play.visibility = View.VISIBLE
             }
@@ -167,11 +170,19 @@ class ClipSingleFragment : BaseFragment() {
 
         ib_back.setOnClickListener { findNavController().navigateUp() }
 
-        ib_retry.setOnClickListener {
+        tv_retry.setOnClickListener {
             playItem?.run {
-                ib_retry.visibility = View.GONE
+                tv_retry.visibility = View.GONE
                 viewModel.getM3U8(this)
             }
+        }
+
+        btn_vip.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        }
+
+        btn_promote.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
         }
     }
 
@@ -189,7 +200,12 @@ class ClipSingleFragment : BaseFragment() {
                         setupPlayer(player_view, it.result)
                     }
                 }
-                is ApiResult.Error -> onApiError(it.throwable)
+                is ApiResult.Error -> {
+                    when (it.throwable) {
+                        is NotDeductedException -> recharge_reminder.visibility = View.VISIBLE
+                        else -> onApiError(it.throwable)
+                    }
+                }
                 else -> {
                 }
             }
@@ -311,7 +327,8 @@ class ClipSingleFragment : BaseFragment() {
                 }
             }
             progress_video?.visibility = View.GONE
-            ib_retry.visibility = View.VISIBLE
+            tv_retry.visibility = View.VISIBLE
+//            tv_retry.text = error.localizedMessage
             viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
                 viewModel.sendVideoReport(this, true)
             }

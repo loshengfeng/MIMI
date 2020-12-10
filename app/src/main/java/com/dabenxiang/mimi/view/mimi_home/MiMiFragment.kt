@@ -1,7 +1,5 @@
 package com.dabenxiang.mimi.view.mimi_home
 
-import android.graphics.Typeface
-import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.TextView
@@ -13,8 +11,6 @@ import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.pxToDp
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_mimi_home.*
 
@@ -56,6 +52,8 @@ class MiMiFragment : BaseFragment() {
                     onApiError(it.throwable)
                     layout_server_error.visibility = View.VISIBLE
                 }
+                else -> {
+                }
             }
         })
 
@@ -72,7 +70,7 @@ class MiMiFragment : BaseFragment() {
         viewpager.adapter = MiMiViewPagerAdapter(this, menusItems)
 
         TabLayoutMediator(layout_tab, viewpager) { tab, position ->
-            val view = LayoutInflater.from(requireContext()).inflate(R.layout.custom_tab, null)
+            val view = View.inflate(requireContext(), R.layout.custom_tab, null)
             val textView = view?.findViewById<TextView>(R.id.tv_title)
             textView?.text = menusItems[position].name
             tab.customView = view
@@ -92,16 +90,6 @@ class MiMiFragment : BaseFragment() {
 
         iv_invitevip_close.setOnClickListener {
             layout_invitevip.visibility = View.GONE
-        }
-    }
-
-    private fun setupTextViewSelected(isSelected: Boolean, textView: TextView) {
-        if (isSelected) {
-            textView.setTypeface(null, Typeface.BOLD)
-            textView.setTextColor(requireContext().getColor(R.color.color_black_1))
-        } else {
-            textView.setTypeface(null, Typeface.NORMAL)
-            textView.setTextColor(requireContext().getColor(R.color.color_black_1_50))
         }
     }
 }

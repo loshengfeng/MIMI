@@ -43,12 +43,6 @@ class RankingDataSource constructor(
                     )
                 if (!result.isSuccessful) throw HttpException(result)
                 val items = result.body()?.content
-                items?.forEach {
-                    val resultPost = domainManager.getApiRepository().getMemberPostDetail(it.id)
-                    if (!resultPost.isSuccessful) throw HttpException(resultPost)
-                    val itemPost = resultPost.body()?.content?: throw HttpException(resultPost)
-                    it.detail = itemPost
-                }
                 emit(InitResult(items ?: arrayListOf(), null))
             }
                 .flowOn(Dispatchers.IO)

@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
-import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
@@ -20,26 +19,12 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
-import com.dabenxiang.mimi.view.adapter.PictureAdapter
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
-import kotlinx.android.synthetic.main.item_picture_post.view.chip_group_tag
-import kotlinx.android.synthetic.main.item_picture_post.view.img_avatar
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_comment
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_favorite
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_like
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_more
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_comment_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_favorite_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_follow
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_like_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_name
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_time
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_title
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
@@ -117,16 +102,16 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
             pictureRecycler.context, LinearLayoutManager.HORIZONTAL, false
         )
 
-        pictureRecycler.adapter = PictureAdapter(
-            pictureRecycler.context,
-            contentItem.images ?: arrayListOf(),
-            object : OnItemClickListener {
-                override fun onItemClick() {
-                    item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
-                }
-            },
-            memberPostFuncItem
-        )
+//        pictureRecycler.adapter = PictureAdapter(
+//            pictureRecycler.context,
+//            contentItem.images ?: arrayListOf(),
+//            object : OnItemClickListener {
+//                override fun onItemClick() {
+//                    item.also { adultListener.onItemClick(item, AdultTabType.PICTURE) }
+//                }
+//            },
+//            memberPostFuncItem
+//        )
         pictureRecycler.onFlingListener = null
         PagerSnapHelper().attachToRecyclerView(pictureRecycler)
 

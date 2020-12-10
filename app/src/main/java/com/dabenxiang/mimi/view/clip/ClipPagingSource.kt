@@ -20,7 +20,7 @@ class ClipPagingSource(
             val result = domainManager.getApiRepository().searchShortVideo(
                 orderByType = orderByType,
                 offset = offset.toString(),
-                limit = params.loadSize.toString()
+                limit = PER_LIMIT.toString()
             )
             if (!result.isSuccessful) throw HttpException(result)
             val item = result.body()
@@ -31,7 +31,7 @@ class ClipPagingSource(
                     item?.paging?.count ?: 0,
                     item?.paging?.offset ?: 0,
                     videos?.size ?: 0,
-                    params.loadSize
+                    PER_LIMIT
                 ) -> offset + PER_LIMIT
                 else -> null
             }

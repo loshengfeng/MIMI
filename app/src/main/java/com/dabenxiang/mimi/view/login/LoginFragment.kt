@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.login
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputFilter
@@ -9,6 +10,7 @@ import android.text.InputFilter.LengthFilter
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -49,6 +51,8 @@ class LoginFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         initSettings()
     }
 
@@ -59,6 +63,12 @@ class LoginFragment : BaseFragment() {
         }
 
         setCopyText()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN or WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
     }
 
     override fun getLayoutId(): Int {
@@ -257,12 +267,7 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose -> navigateTo(NavigateItem.Up)
-
-                R.id.btn_register_cancel, R.id.btn_login_cancel -> {
-                    navigateTo(NavigateItem.Up)
-                    mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
-                }
+                R.id.btn_register_cancel, R.id.btn_login_cancel, R.id.btnClose -> navigateTo(NavigateItem.Up)
 
                 R.id.btn_register -> {
                     viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())
