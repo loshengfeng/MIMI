@@ -116,6 +116,11 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         }
     }
 
+    override fun onDetach() {
+        mainViewModel?.clearDeletePostResult()
+        super.onDetach()
+    }
+
     private fun setInteractiveListener() {
         imgLike.setOnClickListener {
             checkStatus { clipViewModel.likePost(detailItem, LikeType.LIKE)}

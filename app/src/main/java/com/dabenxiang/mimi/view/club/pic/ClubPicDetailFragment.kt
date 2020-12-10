@@ -60,6 +60,16 @@ class ClubPicDetailFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_club_pic_detail
 
     override fun setupObservers() {
+
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer{
+            when (it) {
+                is ApiResult.Success -> {
+                    navigateTo(NavigateItem.Up)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.postDetailResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
@@ -89,14 +99,6 @@ class ClubPicDetailFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer{
-            when (it) {
-                is ApiResult.Success -> {
-                    navigateTo(NavigateItem.Up)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -210,6 +212,11 @@ class ClubPicDetailFragment : BaseFragment() {
             )
             navigateTo(NavigateItem.Destination(R.id.action_clubPicFragment_to_myPostFragment, bundle))
         }
+    }
+
+    override fun onDetach() {
+        mainViewModel?.clearDeletePostResult()
+        super.onDetach()
     }
 
     private val onPhotoGridItemClickListener = object : ClubPhotoGridAdapter.OnItemClickListener {

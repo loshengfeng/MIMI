@@ -173,6 +173,11 @@ class ClubTextDetailFragment : BaseFragment() {
         }
     }
 
+    override fun onDetach() {
+        mainViewModel?.clearDeletePostResult()
+        super.onDetach()
+    }
+
     private fun followMember(
         memberPostItem: MemberPostItem,
         items: List<MemberPostItem>,
