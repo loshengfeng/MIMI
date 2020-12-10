@@ -47,6 +47,7 @@ class SearchPostAdapter(
         }
     }
 
+    var changedPosList = HashMap<Long,MemberPostItem>()
     var removedPosList = ArrayList<Int>()
 
     override fun getItemViewType(position: Int): Int {
@@ -103,7 +104,11 @@ class SearchPostAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        val item = getItem(position)
+        var item = getItem(position)
+        val changedItem = changedPosList[item?.id]
+        if (changedItem != null) {
+            item = changedItem
+        }
         item?.also {
             when (holder) {
                 is AdHolder -> {

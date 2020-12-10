@@ -16,10 +16,11 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.coroutines.CoroutineScope
 
 class MyCollectionMimiVideoAdapter(
         val context: Context,
-        val funcItem: CollectionFuncItem,
+        val viewModelScope: CoroutineScope,
         val listener: MyCollectionVideoListener,
         val itemType: MyCollectionTabItemType
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {
@@ -121,7 +122,7 @@ class MyCollectionMimiVideoAdapter(
                             it,
                             position,
                             listener,
-                            funcItem
+                            viewModelScope
                         )
                     }
                 }
@@ -130,7 +131,7 @@ class MyCollectionMimiVideoAdapter(
                         it,
                         position,
                         listener,
-                        funcItem
+                        viewModelScope
                     )
                 }
             }

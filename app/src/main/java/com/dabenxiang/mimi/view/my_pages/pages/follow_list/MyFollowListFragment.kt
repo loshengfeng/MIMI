@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.BaseItemListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -27,15 +28,11 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
 
     private val memberAdapter by lazy {
-        MemberFollowPeopleAdapter(requireContext(), listener) { id, view, type ->
-            viewModel.loadImage(id, view, type)
-        }
+        MemberFollowPeopleAdapter(requireContext(), listener, viewModel.viewModelScope)
     }
 
     private val clubAdapter: ClubFollowPeopleAdapter by lazy {
-        ClubFollowPeopleAdapter(requireContext(), listener) { id, view, type ->
-            viewModel.loadImage(id, view, type)
-        }
+        ClubFollowPeopleAdapter(requireContext(), listener, viewModel.viewModelScope)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_follow_list
@@ -79,11 +76,10 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                 // 關注的圈子
                 MyFollowFragment.TAB_FOLLOW_CLUB -> {
                     (item as ClubFollowItem)
-
                     when (type) {
                         ClickType.TYPE_ITEM -> {
                             val clubItem = MemberClubItem(
-                                id = item.id,
+                                id = item.clubId,
                                 avatarAttachmentId = item.avatarAttachmentId,
                                 tag = item.tag,
                                 title = item.name,
@@ -186,9 +182,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.postCount.value ?: -1 <= 0) {
-            getData()
-        }
+        getData()
     }
 
     fun getData() {

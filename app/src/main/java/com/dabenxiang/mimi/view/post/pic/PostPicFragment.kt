@@ -140,6 +140,7 @@ class PostPicFragment : BasePostFragment() {
         } else if (isEdit && page == PIC) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(PictureDetailFragment.KEY_DATA, item)
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item) //TODO fix key
             findNavController().navigate(R.id.action_postPicFragment_to_clubPicFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)

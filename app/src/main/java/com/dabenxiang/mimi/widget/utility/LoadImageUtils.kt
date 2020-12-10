@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.widget.utility
 
 import android.text.TextUtils
 import android.widget.ImageView
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.MultiTransformation
@@ -13,15 +14,24 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.extension.decryptSource
 import com.dabenxiang.mimi.model.api.ApiRepository
+import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
+import com.dabenxiang.mimi.model.api.vo.DownloadResult
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.pref.Pref
+import io.ktor.client.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
-object LoadImageUtils: KoinComponent{
+object LoadImageUtils : KoinComponent {
 
     val domainManager: DomainManager by inject()
     val accountManager: AccountManager by inject()
@@ -87,5 +97,51 @@ object LoadImageUtils: KoinComponent{
                     .apply(options)
                     .into(view)
         }
+    }
+
+    fun setNormalOrDecryptImage(
+            viewModelScope: CoroutineScope,
+            source: String,
+            encryptCover: String,
+            imageView: ImageView) {
+        getDecryptSetting(source)?.takeIf { it.isImageDecrypt }?.let { decryptItem ->
+            viewModelScope.launch {
+                HttpClient().decryptSource(encryptCover, decryptItem.key?: "".toByteArray())
+                        .collect {
+                            when (it) {
+                                is DownloadResult.Success -> {
+                                    Timber.i("setNormalOrDecryptImage Success")
+                                    Glide.with(imageView.context)
+                                            .load((it.data as ByteArray))
+                                            .placeholder(R.drawable.img_nopic_03)
+                                            .into(imageView)
+                                }
+                                else -> {
+                                    Glide.with(imageView.context)
+                                            .load(R.drawable.img_nopic_03)
+                                            .placeholder(R.drawable.img_nopic_03)
+                                            .into(imageView)
+                                }
+                            }
+                        }
+            }
+        } ?: run {
+            Glide.with(imageView.context)
+                    .load(encryptCover)
+                    .placeholder(R.drawable.img_nopic_03)
+                    .into(imageView)
+        }
+    }
+
+
+    fun getDecryptSetting(source: String): DecryptSettingItem? {
+        var result: DecryptSettingItem? = null
+        pref.decryptSettingArray.forEach {
+            if (TextUtils.equals(source, it.source)) {
+                result = it
+                return@forEach
+            }
+        }
+        return result
     }
 }
