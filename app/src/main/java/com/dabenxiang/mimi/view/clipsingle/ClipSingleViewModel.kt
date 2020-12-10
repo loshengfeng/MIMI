@@ -16,10 +16,10 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 
-class ClipSingleViewModel: BaseViewModel() {
+class ClipSingleViewModel : BaseViewModel() {
 
-    private var _favoriteResult = MutableLiveData<ApiResult<Nothing>>()
-    val favoriteResult: LiveData<ApiResult<Nothing>> = _favoriteResult
+    private var _favoriteResult = MutableLiveData<ApiResult<VideoItem>>()
+    val favoriteResult: LiveData<ApiResult<VideoItem>> = _favoriteResult
 
     private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
     val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
@@ -42,11 +42,22 @@ class ClipSingleViewModel: BaseViewModel() {
                 if (!resp.isSuccessful) throw HttpException(resp)
                 item.favorite = isFavorite
                 item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
-                emit(ApiResult.success(null))
+                emit(
+                    ApiResult.success(
+                        VideoItem(
+                            id = item.videoId ?: 0,
+                            favorite = item.favorite ?: false,
+                            favoriteCount = item.favoriteCount?.toLong()
+                        )
+                    )
+                )
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
+                .collect {
+                    _videoChangedResult.value = it
+                    _favoriteResult.value = it
+                }
         }
     }
 
@@ -64,7 +75,7 @@ class ClipSingleViewModel: BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect ()
+                .collect()
         }
     }
 
@@ -76,11 +87,11 @@ class ClipSingleViewModel: BaseViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val resp = apiRepository.sendVideoReport(ReportRequest(content, id))
-                if(!resp.isSuccessful) throw HttpException(resp)
+                if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
-                .catch { e-> emit(ApiResult.error(e)) }
+                .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _videoReport.value = it }
         }
     }
@@ -97,26 +108,27 @@ class ClipSingleViewModel: BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val videoInfoResp = apiRepository.getVideoInfo(playItem.videoId?:0)
+                val videoInfoResp = apiRepository.getVideoInfo(playItem.videoId ?: 0)
                 if (!videoInfoResp.isSuccessful) throw HttpException(videoInfoResp)
                 videoItem = videoInfoResp.body()?.content
                 takeUnless { videoItem?.deducted == true }?.run { throw NotDeductedException() }
                 val videoEpisode = videoItem?.sources?.get(0)?.videoEpisodes?.get(0)
 
-                val episodeResp = apiRepository.getVideoEpisode(playItem.videoId?:0, videoEpisode?.id?:0)
+                val episodeResp =
+                    apiRepository.getVideoEpisode(playItem.videoId ?: 0, videoEpisode?.id ?: 0)
                 if (!episodeResp.isSuccessful) throw HttpException(episodeResp)
                 videoEpisodeItem = episodeResp.body()?.content
 
                 val videoStream = videoEpisodeItem?.videoStreams?.get(0)
                 val streamResp = domainManager.getApiRepository().getVideoM3u8Source(
-                    videoStream?.id?:0,
+                    videoStream?.id ?: 0,
                     accountManager.getProfile().userId,
-                    videoStream?.utcTime?:0,
-                    videoStream?.sign?:""
+                    videoStream?.utcTime ?: 0,
+                    videoStream?.sign ?: ""
                 )
                 if (!streamResp.isSuccessful) throw HttpException(streamResp)
                 videoM3u8Source = streamResp.body()?.content
-                emit(ApiResult.success(videoM3u8Source?.streamUrl?:""))
+                emit(ApiResult.success(videoM3u8Source?.streamUrl ?: ""))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e ->
@@ -124,7 +136,7 @@ class ClipSingleViewModel: BaseViewModel() {
                 }
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
-                .collect{
+                .collect {
                     _getM3U8Result.value = it
                 }
         }
