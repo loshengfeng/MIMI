@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.ApiResult.*
+import com.dabenxiang.mimi.model.api.ApiResult.Error
+import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -164,6 +165,7 @@ class MyPostFragment : BaseFragment() {
 
         viewModel.isNoData.observe(viewLifecycleOwner, {
             v_no_data.visibility = if (it) View.VISIBLE else View.GONE
+            recyclerView.visibility = if (it) View.GONE else View.VISIBLE
         })
     }
 

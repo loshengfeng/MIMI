@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/settingFragment"
         android:name="com.dabenxiang.mimi.view.setting.SettingFragment"
-        tools:layout="@layout/fragment_setting">
+        tools:layout="@layout/fragment_setting_v2">
 
         <action
             android:id="@+id/action_settingFragment_to_updateProfileFragment"

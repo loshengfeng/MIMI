@@ -448,7 +448,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun searchShortVideo(
         q: String? = null,
         startTime: String? = null,
-        endTime: String?= null,
+        endTime: String? = null,
         orderByType: StatisticsOrderType = StatisticsOrderType.LATEST,
         offset: String,
         limit: String
@@ -485,7 +485,8 @@ class ApiRepository(private val apiService: ApiService) {
         offset: Int,
         limit: Int,
         lastId: Long = 0L,
-        excludeId: String = ""
+        excludeId: String = "",
+        type: PostType = PostType.VIDEO_ON_DEMAND
     ) = apiService.statisticsHomeVideos(
         startTime = startTime,
         endTime = endTime,
@@ -497,7 +498,8 @@ class ApiRepository(private val apiService: ApiService) {
         offset = offset,
         limit = limit,
         lastId = lastId,
-        excludeId = excludeId
+        excludeId = excludeId,
+        type = type.value
     )
 
     /**

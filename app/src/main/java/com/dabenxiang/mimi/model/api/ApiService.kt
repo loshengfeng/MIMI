@@ -365,7 +365,8 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("lastId") lastId: Long,
-        @Query("excludeId") excludeId: String?
+        @Query("excludeId") excludeId: String?,
+        @Query("type") type: Int?
     ): Response<ApiBasePagingItem<ArrayList<StatisticsItem>>>
 
     @GET("/v1/Members/Home/Videos/PostStatistics")
