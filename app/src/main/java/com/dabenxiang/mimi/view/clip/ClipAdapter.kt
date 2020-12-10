@@ -110,11 +110,11 @@ class ClipAdapter(
     }
 
     fun pausePlayer() {
-        exoPlayer?.takeIf { it.isPlaying }?.run {
-            currentViewHolder?.takeUnless { it.ibRetry.visibility == View.VISIBLE }
+        exoPlayer?.takeUnless { currentViewHolder?.tvRetry?.visibility == View.VISIBLE }?.run {
+            this.playWhenReady = false
+            currentViewHolder?.takeUnless { it.tvRetry.visibility == View.VISIBLE }
                 ?.run { this.ibPlay.visibility = View.VISIBLE }
         }
-        exoPlayer?.playWhenReady = false
     }
 
     override fun onBindViewHolder(
@@ -181,8 +181,8 @@ class ClipAdapter(
                 holder.ibPlay.visibility = View.GONE
             }
         }
-        holder.ibRetry.setOnClickListener {
-            holder.ibRetry.visibility = View.GONE
+        holder.tvRetry.setOnClickListener {
+            holder.tvRetry.visibility = View.GONE
             holder.progress.visibility = View.VISIBLE
             getM3U8()
         }
@@ -287,8 +287,10 @@ class ClipAdapter(
                 }
             }
 
+            currentViewHolder?.ibPlay?.visibility = View.GONE
             currentViewHolder?.progress?.visibility = View.GONE
-            currentViewHolder?.ibRetry?.visibility = View.VISIBLE
+            currentViewHolder?.tvRetry?.visibility = View.VISIBLE
+            currentViewHolder?.tvRetry?.text = error.localizedMessage
             getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
                 clipFuncItem.onVideoReport(id, true)
             }

@@ -199,14 +199,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/ib_retry"
+    <TextView
+        android:id="@+id/tv_retry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/baseline_sync_problem_black_48"
-        android:backgroundTint="@color/color_red_1"
         android:text="@string/btn_retry"
-        android:visibility="gone"
+        android:textColor="@color/color_white_1"
+        android:background="@color/color_black_1_05"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:visibility="visible"
+        app:drawableTopCompat="@drawable/baseline_sync_problem_black_48"
+        app:drawableTint="@color/color_red_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
