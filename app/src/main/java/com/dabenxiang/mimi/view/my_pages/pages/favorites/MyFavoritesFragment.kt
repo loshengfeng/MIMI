@@ -235,7 +235,7 @@ class MyFavoritesFragment(
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putString(BasePostFragment.PAGE, BasePostFragment.TAB)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.FAVORITE)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
                 when (it.type) {

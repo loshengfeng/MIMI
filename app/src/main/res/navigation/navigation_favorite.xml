@@ -165,6 +165,11 @@
             app:destination="@id/searchPostFragment"
             app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postArticleFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment"
+            app:popUpTo="@+id/myCollectionFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
