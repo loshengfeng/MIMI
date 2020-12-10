@@ -328,7 +328,7 @@ class ClipSingleFragment : BaseFragment() {
             }
             progress_video?.visibility = View.GONE
             tv_retry.visibility = View.VISIBLE
-            tv_retry.text = error.localizedMessage
+//            tv_retry.text = error.localizedMessage
             viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
                 viewModel.sendVideoReport(this, true)
             }

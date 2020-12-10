@@ -118,11 +118,13 @@ class TopicTabFragment : BaseFragment() {
         }
 
         tv_follow.setOnClickListener {
-            checkStatus {
-                viewModel.followClub(
-                        memberClubItem,
-                        !memberClubItem.isFollow
-                )
+            if (this::memberClubItem.isInitialized) {
+                checkStatus {
+                    viewModel.followClub(
+                            memberClubItem,
+                            !memberClubItem.isFollow
+                    )
+                }
             }
         }
 
