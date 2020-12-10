@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
+import android.view.WindowManager
 import android.widget.ImageView
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
@@ -143,6 +144,7 @@ class ChatContentFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         toolbar.setBackgroundColor(requireContext().getColor(R.color.color_gray_2))
         text_toolbar_title.setTextColor(requireContext().getColor(R.color.color_black_1))
