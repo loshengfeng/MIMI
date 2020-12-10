@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearSnapHelper
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
@@ -112,9 +111,7 @@ class RecommendFragment(
         )
     }
 
-    private fun navToCategory(
-        category: String = ""
-    ) {
+    private fun navToCategory(category: String = "") {
         val bundle = CategoriesFragment.createBundle(category = category)
         navigateTo(
             NavigateItem.Destination(
