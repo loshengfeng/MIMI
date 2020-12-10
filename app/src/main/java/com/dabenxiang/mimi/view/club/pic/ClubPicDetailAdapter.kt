@@ -213,7 +213,7 @@ class ClubPicDetailAdapter(
 
     fun updateContent(item: MemberPostItem) {
         memberPostItem = item
-        notifyItemChanged(VIEW_TYPE_PICTURE_DETAIL)
+        notifyItemChanged(1)
     }
 
 
