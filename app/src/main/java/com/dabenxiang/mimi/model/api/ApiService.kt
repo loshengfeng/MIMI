@@ -331,7 +331,8 @@ interface ApiService {
         @Query("isAdult") isAdult: Boolean?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,
-        @Query("tag") tag: String?
+        @Query("tag") tag: String?,
+        @Query("type") type: Int?
     ): Response<ApiBasePagingItem<VideoSearchItem>>
 
     @GET("/v1/Members/Home/Videos/SearchShortVideo")

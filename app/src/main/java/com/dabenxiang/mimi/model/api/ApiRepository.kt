@@ -423,8 +423,9 @@ class ApiRepository(private val apiService: ApiService) {
         isAdult: Boolean = true,
         offset: String,
         limit: String,
-        tag: String?= null
-    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag)
+        tag: String?= null,
+        type: VideoType? = null
+    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag, type?.value)
 
     /**
      * 取得小视频影片(需Client Credentials|需登入帳號)

@@ -79,9 +79,16 @@ class SearchVideoViewHolder(
 //            setTextColor(ContextCompat.getColor(itemView.context, descTextColor))
         }
 
-        Glide.with(ivPhoto.context)
-            .load(data?.cover)
-            .into(ivPhoto)
+        listener.getDecryptSetting(data?.source?:"")?.takeIf { it.isImageDecrypt }
+            ?.let { decryptSettingItem ->
+                listener.decryptCover(data?.cover?:"", decryptSettingItem) {
+                    Glide.with(ivPhoto.context)
+                        .load(it).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+                }
+            } ?: run {
+            Glide.with(ivPhoto.context)
+                .load(data?.cover).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+        }
 
         // todo: no length data...
         tvLength.visibility = View.INVISIBLE

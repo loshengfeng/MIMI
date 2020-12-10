@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.search.post.paging.SearchPostFollowDataSource
@@ -28,6 +29,7 @@ class SearchVideoViewModel : BaseViewModel() {
     var category = ""
     var searchingTag = ""
     var searchingStr = ""
+    var videoType: VideoType? = null
 
     var currentItem: VideoItem? = null
 
@@ -59,7 +61,8 @@ class SearchVideoViewModel : BaseViewModel() {
 
     fun getSearchVideoResult(
         keyword: String? = null,
-        tag: String? = null
+        tag: String? = null,
+        videoType: VideoType? =null
     ): Flow<PagingData<VideoItem>> {
         return Pager(
             config = PagingConfig(pageSize = SearchVideoListDataSource.PER_LIMIT.toInt()),
@@ -71,7 +74,8 @@ class SearchVideoViewModel : BaseViewModel() {
                     tag,
                     keyword,
                     adWidth,
-                    adHeight
+                    adHeight,
+                    videoType
                 )
             }
         )
