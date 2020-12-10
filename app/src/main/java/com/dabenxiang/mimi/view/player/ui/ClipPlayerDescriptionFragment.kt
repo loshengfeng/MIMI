@@ -55,6 +55,15 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
 
     override fun setupObservers() {
         super.setupObservers()
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner){
+            when (it) {
+                is ApiResult.Success -> {
+                    navigateTo(NavigateItem.Up)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.memberPostContentSource.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Success -> {

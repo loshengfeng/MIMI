@@ -89,7 +89,14 @@ class ClubPicDetailFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer{
+            when (it) {
+                is ApiResult.Success -> {
+                    navigateTo(NavigateItem.Up)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

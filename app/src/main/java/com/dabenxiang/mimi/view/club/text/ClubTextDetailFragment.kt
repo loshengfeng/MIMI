@@ -57,6 +57,15 @@ class ClubTextDetailFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_club_text_detail
 
     override fun setupObservers() {
+        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    navigateTo(NavigateItem.Up)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.postDetailResult.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
