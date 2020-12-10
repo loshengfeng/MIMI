@@ -14,10 +14,7 @@ import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -77,9 +74,9 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
         }
 
-        override fun onChipClick(type: PostType, tag: String) {
+        override fun onChipClick(type: VideoType, tag: String) {
             Timber.d("onChipClick")
-            val bundle = SearchVideoFragment.createBundle(tag)
+            val bundle = SearchVideoFragment.createBundle(tag = tag, videoType = type)
             navigateTo(
                     NavigateItem.Destination(
                             R.id.action_to_searchVideoFragment,

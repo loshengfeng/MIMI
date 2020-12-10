@@ -257,12 +257,7 @@ class LoginFragment : BaseFragment() {
 
         View.OnClickListener { buttonView ->
             when (buttonView.id) {
-                R.id.btnClose -> navigateTo(NavigateItem.Up)
-
-                R.id.btn_register_cancel, R.id.btn_login_cancel -> {
-                    navigateTo(NavigateItem.Up)
-                    mainViewModel?.changeNavigationPosition?.value = R.id.navigation_mimi
-                }
+                R.id.btn_register_cancel, R.id.btn_login_cancel, R.id.btnClose -> navigateTo(NavigateItem.Up)
 
                 R.id.btn_register -> {
                     viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())

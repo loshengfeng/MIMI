@@ -14,7 +14,7 @@ class ProfileItem : Serializable{
      * emailConfirmed : false
      */
     @SerializedName("username")
-    var username: String? = null
+    var username: String? = ""
 
     @SerializedName("friendlyName")
     var friendlyName: String? = null
