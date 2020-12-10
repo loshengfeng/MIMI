@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.model.api.vo.DownloadResult
 import com.dabenxiang.mimi.model.api.vo.VideoEpisodeItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.api.vo.VideoM3u8Source
+import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
@@ -55,8 +56,6 @@ PlayerV2ViewModel: BaseViewModel() {
     var videoContentId : Long = -1
     var m3u8SourceUrl: String = ""
     var isResetPlayer: Boolean = true
-
-    inner class NotDeductedException : Exception()
 
     /**
      * get video content info
