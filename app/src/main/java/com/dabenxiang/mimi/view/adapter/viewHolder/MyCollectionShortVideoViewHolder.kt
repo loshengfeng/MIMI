@@ -50,7 +50,6 @@ class MyCollectionShortVideoViewHolder(
             funcItem: CollectionFuncItem,
             searchTag: String = ""
     ) {
-        Timber.d("neo, item = ${item}")
         clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvTitle.setTextColor(App.self.getColor(R.color.color_black_1))
 //        tvLikeCount.setTextColor(App.self.getColor(R.color.color_black_1))

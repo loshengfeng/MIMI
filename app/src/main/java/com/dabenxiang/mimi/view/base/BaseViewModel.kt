@@ -135,6 +135,11 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     var deletePostIdList = MutableLiveData<ArrayList<Long>>().also { it.value = arrayListOf() }
 
+    protected var _postChangedResult = MutableLiveData<ApiResult<MemberPostItem>>()
+    val postChangedResult: LiveData<ApiResult<MemberPostItem>> = _postChangedResult
+
+    var itemChangedList = MutableLiveData<HashMap<Long, MemberPostItem>>().also { it.value = HashMap() }
+
     fun deletePost(
         item: MemberPostItem,
         position: Int
