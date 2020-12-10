@@ -16,11 +16,12 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.coroutines.CoroutineScope
 
 class FavoritesAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
-        private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem()
+        private val viewModelScope: CoroutineScope
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
@@ -120,10 +121,10 @@ class FavoritesAdapter(
                         }
                     } else {
                         holder.onBind(
-                            it,
-                            position,
-                            myPostListener,
-                            memberPostFuncItem
+                                it,
+                                position,
+                                myPostListener,
+                                viewModelScope
                         )
                     }
                 }
@@ -139,7 +140,7 @@ class FavoritesAdapter(
                             it,
                             position,
                             myPostListener,
-                            memberPostFuncItem
+                            viewModelScope
                         )
                     }
                 }
@@ -150,7 +151,10 @@ class FavoritesAdapter(
                             PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
                         }
                     } else {
-                        holder.onBind(it, position, myPostListener, memberPostFuncItem)
+                        holder.onBind(it,
+                                position,
+                                myPostListener,
+                                viewModelScope)
                     }
                 }
             }

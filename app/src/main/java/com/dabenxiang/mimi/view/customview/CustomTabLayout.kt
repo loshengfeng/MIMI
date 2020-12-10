@@ -8,13 +8,17 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import androidx.viewpager2.widget.ViewPager2
 import com.dabenxiang.mimi.R
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.fragment_mimi_home.*
 
 /**
- * TODO: document your custom view class.
+ * Custom TabLayout with bold text style
  */
 class CustomTabLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -39,6 +43,9 @@ class CustomTabLayout @JvmOverloads constructor(
             }
 
             override fun onTabReselected(tab: Tab?) {
+                tab?.customView?.findViewById<TextView>(R.id.tv_title)?.run {
+                    setupTextViewSelected(true, this)
+                }
             }
         })
     }
@@ -50,12 +57,6 @@ class CustomTabLayout @JvmOverloads constructor(
         } else {
             textView.setTypeface(null, Typeface.NORMAL)
             textView.setTextColor(context.getColor(R.color.color_black_1_50))
-        }
-    }
-
-    fun setTitle(title: String, position: Int) {
-        this.getTabAt(position)?.customView?.findViewById<TextView>(R.id.tv_title)?.let {
-            it.text = title
         }
     }
 }

@@ -3,10 +3,12 @@ package com.dabenxiang.mimi.view.ranking
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
@@ -35,8 +37,7 @@ class RankingFragment : BaseFragment() {
         private const val REQUEST_LOGIN = 1000
 
         fun createBundle(): Bundle {
-            return Bundle().also {
-            }
+            return Bundle()
         }
     }
 
@@ -114,6 +115,7 @@ class RankingFragment : BaseFragment() {
                                 )
                             )
                         }
+                        else -> {}
                     }
 
                 },
@@ -136,12 +138,26 @@ class RankingFragment : BaseFragment() {
 
         text_toolbar_title.text = getString(R.string.text_ranking)
         toolbarContainer.toolbar.navigationIcon =
-            requireContext().getDrawable(R.drawable.btn_back_black_n)
+            ContextCompat.getDrawable(requireContext(), R.drawable.btn_back_black_n)
         toolbarContainer.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
         layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
         setupAdapter()
+    }
+
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+
+        val tabs = resources.getStringArray(R.array.ranking_tabs)
+        for (i in 0 until tab_temporal_filter.tabCount) {
+            val tab = tab_temporal_filter.getTabAt(i)
+            val tabView = View.inflate(requireContext(), R.layout.custom_tab, null)
+            val textView = tabView?.findViewById<TextView>(R.id.tv_title)
+            textView?.text = tabs[i]
+            tab?.customView = tabView
+        }
+        tab_temporal_filter.getTabAt(0)?.select()
     }
 
     override fun getLayoutId(): Int {
@@ -245,6 +261,7 @@ class RankingFragment : BaseFragment() {
             PostType.VIDEO_ON_DEMAND -> viewModel.getVideosRanking()
             PostType.VIDEO -> viewModel.getRankingClipList()
             PostType.IMAGE -> viewModel.getRankingPostList()
+            else -> {}
         }
     }
 }

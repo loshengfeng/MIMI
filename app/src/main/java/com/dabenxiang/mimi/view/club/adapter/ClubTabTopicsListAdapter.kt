@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import kotlinx.android.synthetic.main.item_topic_tab.view.*
 
+
 class TopicListAdapter(
     private val listener: TopicItemListener
 ) : PagingDataAdapter<MemberClubItem, TopicListAdapter.TopicViewHolder>(diffCallback) {
@@ -55,6 +56,8 @@ class TopicListAdapter(
             )
         }
     }
+
+
 }
 
 interface TopicItemListener {

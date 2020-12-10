@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="@id/tab_temporal_filter"
         app:layout_constraintTop_toTopOf="@id/tab_temporal_filter" />
 
-    <com.google.android.material.tabs.TabLayout
+    <com.dabenxiang.mimi.view.customview.CustomTabLayout
         android:id="@+id/tab_temporal_filter"
         android:layout_width="318dp"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:clickable="false"
             android:text="@string/ranking_moon" />
 
-    </com.google.android.material.tabs.TabLayout>
+    </com.dabenxiang.mimi.view.customview.CustomTabLayout>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_type_filter"

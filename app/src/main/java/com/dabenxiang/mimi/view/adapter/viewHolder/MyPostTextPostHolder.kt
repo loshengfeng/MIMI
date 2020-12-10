@@ -15,10 +15,13 @@ import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_text_post.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import java.util.*
@@ -49,7 +52,7 @@ class MyPostTextPostHolder(
             item: MemberPostItem,
             position: Int,
             myPostListener: MyPostListener,
-            memberPostFuncItem: MemberPostFuncItem,
+            viewModelScope: CoroutineScope,
             searchStr: String = "",
             searchTag: String = ""
     ) {
@@ -58,7 +61,6 @@ class MyPostTextPostHolder(
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = if (searchStr.isNotBlank()) getSpanString(tvTitle.context, item.title, searchStr) else item.title
 
-        // FIXME: item.content json 資料格式有問題
         try {
             val contentItem = Gson().fromJson(item.content, TextContentItem::class.java)
             tvTextDesc.text = contentItem.text
@@ -66,7 +68,10 @@ class MyPostTextPostHolder(
             Timber.e(e)
         }
 
-        memberPostFuncItem.getBitmap(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        viewModelScope.launch {
+            LoadImageUtils.loadImage(item.avatarAttachmentId, imgAvatar, LoadImageType.AVATAR)
+        }
+
         imgAvatar.setOnClickListener {
             myPostListener.onAvatarClick(item.creatorId, item.postFriendlyName)
         }
