@@ -758,6 +758,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     private fun showSnackBar() {
+        mainViewModel?.setIsShowSnackBar(true)
         snackBar = PostManager().showSnackBar(
             snackBarLayout,
             this,
@@ -793,6 +794,8 @@ abstract class BaseFragment : Fragment() {
         uploadCurrentPicPosition = 0
         uploadPicUri.clear()
         Timber.e(t)
+
+        mainViewModel?.setIsShowSnackBar(false)
 
         if (msg.isNotBlank()) {
             Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
@@ -843,6 +846,8 @@ abstract class BaseFragment : Fragment() {
         if (snackBar == null) {
             return
         }
+
+        mainViewModel?.setIsShowSnackBar(false)
 
         PostManager().dismissSnackBar(
             snackBar!!,
