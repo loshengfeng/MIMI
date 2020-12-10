@@ -53,6 +53,7 @@ class ClubItemAdapter(
         }
     }
 
+    var changedPosList = HashMap<Long,MemberPostItem>()
     var removedPosList = ArrayList<Long>()
 
     override fun getItemViewType(position: Int): Int {
@@ -103,7 +104,12 @@ class ClubItemAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
+
+        var item = getItem(position)
+        val changedItem = changedPosList[item?.id]
+        if (changedItem != null) {
+            item = changedItem
+        }
         item?.also {
             when (holder) {
                 is AdHolder -> {

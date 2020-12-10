@@ -192,6 +192,9 @@
             app:destination="@id/searchPostFragment"
             app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postPicFragment_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
     </fragment>
 
     <fragment
