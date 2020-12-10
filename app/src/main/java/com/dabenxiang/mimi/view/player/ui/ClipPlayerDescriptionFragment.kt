@@ -1,11 +1,8 @@
 package com.dabenxiang.mimi.view.player.ui
 
-import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -14,7 +11,6 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
@@ -22,19 +18,15 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.club.text.ClubTextDetailViewModel
-import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_clip_info.*
 import kotlinx.android.synthetic.main.item_comment_interactive.*
 import kotlinx.android.synthetic.main.item_video_tag.*
-import timber.log.Timber
 import java.util.*
 
 class ClipPlayerDescriptionFragment : BaseFragment() {

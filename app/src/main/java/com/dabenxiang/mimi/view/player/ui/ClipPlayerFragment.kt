@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.fragment_v2_player.*
 class ClipPlayerFragment : BasePlayerFragment() {
 
     companion object {
-        private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
+        const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val KEY_POSITION = "position"
 
         fun createBundle(id: Long, position: Int = 0): Bundle {

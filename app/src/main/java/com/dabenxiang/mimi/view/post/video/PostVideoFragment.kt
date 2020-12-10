@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
@@ -158,6 +159,7 @@ class PostVideoFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
+            bundle.putLong(ClipPlayerFragment.KEY_PLAYER_SRC, item.id)
             findNavController().navigate(
                 R.id.action_postVideoFragment_to_clipPlayerFragment,
                 bundle
