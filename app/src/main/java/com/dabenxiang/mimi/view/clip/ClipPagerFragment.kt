@@ -236,11 +236,15 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private fun onPromoteClick() {
-        navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+        checkStatus {
+            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+        }
     }
 
     private fun onVipClick() {
-        navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        checkStatus {
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        }
     }
 
     private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {

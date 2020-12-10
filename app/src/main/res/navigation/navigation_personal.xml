@@ -76,6 +76,9 @@
         <action
             android:id="@+id/action_orderFragment_to_paymentInfoFragment"
             app:destination="@id/paymentInfoFragment" />
+        <action
+            android:id="@+id/action_orderFragment_to_topupFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -138,7 +141,30 @@
     <fragment
         android:id="@+id/topUpFragment"
         android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
-        android:label="TopUpFragment" />
+        android:label="TopUpFragment" >
+        <action
+            android:id="@+id/action_topupFragment_to_orderFragment"
+            app:destination="@id/orderFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
+        <action
+            android:id="@+id/action_topupFragment_to_chatContentFragment"
+            app:destination="@id/chatContentFragment" />
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderInfoFragment"
+        android:name="com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment"
+        android:label="OrderInfoFragment">
+        <action
+            android:id="@+id/action_orderInfoFragment_to_orderResultFragment"
+            app:destination="@id/orderResultFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/myFollowFragment"
@@ -265,6 +291,9 @@
         <action
             android:id="@+id/action_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment

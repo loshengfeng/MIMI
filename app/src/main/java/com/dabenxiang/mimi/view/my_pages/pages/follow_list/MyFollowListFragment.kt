@@ -76,11 +76,10 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                 // 關注的圈子
                 MyFollowFragment.TAB_FOLLOW_CLUB -> {
                     (item as ClubFollowItem)
-
                     when (type) {
                         ClickType.TYPE_ITEM -> {
                             val clubItem = MemberClubItem(
-                                id = item.id,
+                                id = item.clubId,
                                 avatarAttachmentId = item.avatarAttachmentId,
                                 tag = item.tag,
                                 title = item.name,
@@ -183,9 +182,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.postCount.value ?: -1 <= 0) {
-            getData()
-        }
+        getData()
     }
 
     fun getData() {
