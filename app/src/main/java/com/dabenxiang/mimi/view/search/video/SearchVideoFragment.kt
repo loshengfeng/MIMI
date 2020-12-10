@@ -14,7 +14,6 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.CombinedLoadStates
@@ -50,6 +49,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
+import kotlin.collections.HashMap
 
 class SearchVideoFragment : BaseFragment() {
 
@@ -228,6 +228,14 @@ class SearchVideoFragment : BaseFragment() {
                 }
                 else -> false
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            videoListAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            videoListAdapter.notifyDataSetChanged()
         }
     }
 
