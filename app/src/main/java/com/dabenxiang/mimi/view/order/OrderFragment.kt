@@ -22,6 +22,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment
+import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
@@ -85,7 +86,14 @@ class OrderFragment : BaseFragment() {
                     )
                 },
                 getProxyUnread = { update -> getProxyUnread(update) },
-                onTopUpClick = { onTopUpClick() },
+                onTopUpClick = {
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_orderFragment_to_topupFragment,
+                                    TopUpFragment.createBundle(this::class.java.simpleName)
+                            )
+                    )
+                },
                 onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) },
                 updateTab = { updateTab() }
             ))

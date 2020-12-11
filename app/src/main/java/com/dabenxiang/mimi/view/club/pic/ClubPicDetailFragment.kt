@@ -66,7 +66,7 @@ class ClubPicDetailFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success<*> -> {
                     it.result as MemberPostItem
-                    mainViewModel?.itemChangedList?.value?.set(it.result.id, it.result)
+                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
                 }
                 is ApiResult.Error<*> -> onApiError(it.throwable)
             }

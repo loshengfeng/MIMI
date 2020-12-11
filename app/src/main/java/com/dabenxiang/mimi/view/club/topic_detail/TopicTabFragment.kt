@@ -82,6 +82,7 @@ class TopicTabFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     updateFollow()
+                    viewModel.getMembersClub(topicItem.id)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -117,11 +118,13 @@ class TopicTabFragment : BaseFragment() {
         }
 
         tv_follow.setOnClickListener {
-            checkStatus {
-                viewModel.followClub(
-                        memberClubItem,
-                        !memberClubItem.isFollow
-                )
+            if (this::memberClubItem.isInitialized) {
+                checkStatus {
+                    viewModel.followClub(
+                            memberClubItem,
+                            !memberClubItem.isFollow
+                    )
+                }
             }
         }
 
@@ -167,6 +170,7 @@ class TopicTabFragment : BaseFragment() {
         get() = View.GONE
 
     private fun updateFollow() {
+        tv_follow.visibility = View.VISIBLE
         val isFollow = memberClubItem.isFollow
         if (isFollow) {
             tv_follow.text = requireContext().getString(R.string.followed)

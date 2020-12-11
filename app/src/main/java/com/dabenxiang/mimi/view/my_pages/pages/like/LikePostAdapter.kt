@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.search.post
+package com.dabenxiang.mimi.view.my_pages.pages.like
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -8,25 +8,23 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.CoroutineScope
 
-class SearchPostAdapter(
+class LikePostAdapter(
     val context: Context,
     private val myPostListener: MyPostListener,
-    private val viewModelScope: CoroutineScope,
-    private val getSearchText: () -> String,
-    private val getSearchTag: () -> String
+    private val viewModelScope: CoroutineScope
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
-        const val UPDATE_LIKE = 0
-        const val UPDATE_FAVORITE = 1
+        const val PAYLOAD_UPDATE_LIKE = 0
+        const val PAYLOAD_UPDATE_FAVORITE = 1
 
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
@@ -47,12 +45,14 @@ class SearchPostAdapter(
         }
     }
 
-    var changedPosList = HashMap<Long,MemberPostItem>()
     var removedPosList = ArrayList<Int>()
+    var changedPosList = HashMap<Long, MemberPostItem>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(position)) {
+        val changedItem = changedPosList[item?.id]
+        return if ((changedItem != null && changedItem.likeType != LikeType.LIKE) || removedPosList.contains(position)
+        ) {
             VIEW_TYPE_DELETED
         } else {
             when (item?.type) {
@@ -99,6 +99,9 @@ class SearchPostAdapter(
         }
     }
 
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    }
+
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
@@ -120,25 +123,23 @@ class SearchPostAdapter(
                 is MyPostClipPostHolder -> {
                     if (payloads.size == 1) {
                         when (payloads[0]) {
-                            UPDATE_LIKE -> holder.updateLike(item)
-                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(it)
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
                         }
                     } else {
                         holder.onBind(
                             it,
                             position,
                             myPostListener,
-                            viewModelScope,
-                            getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            viewModelScope
                         )
                     }
                 }
                 is MyPostPicturePostHolder -> {
                     if (payloads.size == 1) {
                         when (payloads[0]) {
-                            UPDATE_LIKE -> holder.updateLike(item)
-                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(it)
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
                         }
                     } else {
                         holder.pictureRecycler.tag = position
@@ -146,35 +147,27 @@ class SearchPostAdapter(
                             it,
                             position,
                             myPostListener,
-                            viewModelScope,
-                            getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            viewModelScope
                         )
                     }
                 }
                 is MyPostTextPostHolder -> {
                     if (payloads.size == 1) {
                         when (payloads[0]) {
-                            UPDATE_LIKE -> holder.updateLike(item)
-                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(it)
+                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
                         }
                     } else {
                         holder.onBind(
                             it,
                             position,
                             myPostListener,
-                            viewModelScope,
-                            getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            viewModelScope
                         )
                     }
                 }
             }
         }
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
     }
 
 }

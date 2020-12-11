@@ -7,6 +7,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +21,11 @@ abstract class ClubViewModel : BaseViewModel(){
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
-    private var _likePostResult = MutableLiveData<ApiResult<MemberPostItem>>()
-    val likePostResult: LiveData<ApiResult<MemberPostItem>> = _likePostResult
+    private var _likePostResult = MutableLiveData<ApiResult<Int>>()
+    val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
+
+    private var _videoLikeResult = MutableLiveData<ApiResult<VideoItem>>()
+    val videoLikeResult: LiveData<ApiResult<VideoItem>> = _videoLikeResult
 
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
@@ -116,7 +120,7 @@ abstract class ClubViewModel : BaseViewModel(){
                     else -> apiRepository.deleteLike(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(item))
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -125,27 +129,20 @@ abstract class ClubViewModel : BaseViewModel(){
         }
     }
 
-    fun likeVideoPost(item: MemberPostItem, position: Int, isLike: Boolean) {
+    fun videoLike(item: VideoItem, type: LikeType) {
         viewModelScope.launch {
-            Timber.i("likePost item=$item")
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val likeType = when {
-                    isLike -> LikeType.LIKE
-                    else -> LikeType.DISLIKE
-                }
-                val request =  LikeRequest(likeType)
-                val result = when {
-                    isLike -> apiRepository.like(item.id, request)
-                    else -> apiRepository.deleteLike(item.id)
-                }
+                val request = LikeRequest(type)
+                val result = apiRepository.like(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(item))
             }
                     .flowOn(Dispatchers.IO)
+                    .onStart { emit(ApiResult.loading()) }
+                    .onCompletion { emit(ApiResult.loaded()) }
                     .catch { e -> emit(ApiResult.error(e)) }
-                    .collect {
-                        _likePostResult.value = it }
+                    .collect { _videoLikeResult.value = it }
         }
     }
 

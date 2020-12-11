@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -59,7 +60,13 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             { item, pos, update -> getM3U8(item, pos, update) },
             { pos -> scrollToNext(pos) },
             { source -> viewModel.getDecryptSetting(source) },
-            { videoItem, decryptSettingItem, function -> viewModel.decryptCover(videoItem, decryptSettingItem, function) }
+            { videoItem, decryptSettingItem, function ->
+                viewModel.decryptCover(
+                    videoItem,
+                    decryptSettingItem,
+                    function
+                )
+            }
         )
     }
 
@@ -128,6 +135,14 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            clipAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            clipAdapter.notifyDataSetChanged()
+        }
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.item_clip_pager
     }
@@ -160,6 +175,15 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     override fun setupObservers() {
+        viewModel.videoChangedResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is Success -> {
+                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.favoriteResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> progressHUD.show()
@@ -169,7 +193,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                     ClipAdapter.PAYLOAD_UPDATE_UI
                 )
                 is Error -> onApiError(it.throwable)
-                else -> {}
+                else -> {
+                }
             }
         })
 
@@ -184,7 +209,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                     )
                 }
                 is Error -> onApiError(it.throwable)
-                else -> {}
+                else -> {
+                }
             }
         })
 
@@ -217,11 +243,15 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private fun onPromoteClick() {
-        navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+        checkStatus {
+            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+        }
     }
 
     private fun onVipClick() {
-        navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        checkStatus {
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        }
     }
 
     private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {
@@ -251,7 +281,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             Timber.d("onMoreClick, item:$item")
             cachedItem = item
             item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
-                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false)
+                val reported = !viewModel.isVIP()
+                showMoreDialog(this.id ?: 0, PostType.VIDEO, reported)
             }
         }
     }
@@ -327,6 +358,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     ) {
         Timber.i("id=$id")
         Timber.i("isReported=$isReported")
+
         moreDialog = MoreDialogFragment.newInstance(
             MemberPostItem(id = id, type = type, reported = isReported),
             onMoreDialogListener,
@@ -376,7 +408,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             } else {
                 when (item) {
                     is MemberPostItem -> {
-                            viewModel.sendVideoReport(item.id, content)
+                        viewModel.sendVideoReport(item.id, content)
                     }
                 }
             }

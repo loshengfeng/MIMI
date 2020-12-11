@@ -59,6 +59,8 @@
 
                     <TextView
                         android:id="@+id/tv_follow"
+                        android:visibility="invisible"
+                        tools:visibility="visible"
                         android:layout_width="54dp"
                         android:layout_height="24dp"
                         android:background="@drawable/bg_red_1_stroke_radius_16"

@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.PlayerItem
@@ -58,8 +59,15 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
             checkStatus {
-                viewModel.likePost(MemberPostItem(id = item.videoId
-                        ?: 0, likeType = LikeType.LIKE), position, isLike)
+                viewModel.videoLike(VideoItem(
+                        id = item.videoId?:0,
+                        favorite = item.favorite ?: false,
+                        favoriteCount = item.favoriteCount?.toLong(),
+                        like = item.like,
+                        likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
+                        likeCount = item.likeCount?.toLong()?:0
+
+                ), LikeType.LIKE)
             }
         }
 
@@ -186,6 +194,17 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
                 else viewModel.deleteVideos(adapter.snapshot().items)
             }
         })
+
+        viewModel.videoLikeResult.observe(this){
+            when (it) {
+                is ApiResult.Success -> {
+                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
+                    checkChangedItems()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -212,7 +231,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.postCount.value ?: -1 <= 0) {
+        if (adapter.snapshot().items.isEmpty()) {
             viewModel.getData(adapter, type, isLike)
         } else if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
             checkChangedItems()
@@ -241,7 +260,6 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
         }
     }
-
 
     private val attachmentListener = object : AttachmentListener {
         override fun onGetAttachment(id: Long?, view: ImageView, type: LoadImageType) {

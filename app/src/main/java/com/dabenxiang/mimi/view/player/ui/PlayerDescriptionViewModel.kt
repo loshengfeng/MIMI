@@ -53,7 +53,12 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         }
     }
 
-    fun setupGuessLikeList(tags: String?, performers: String?, isAdult: Boolean, videoContentId: Long) {
+    fun setupGuessLikeList(
+        tags: String?,
+        performers: String?,
+        isAdult: Boolean,
+        videoContentId: Long
+    ) {
         viewModelScope.launch {
             val dataSrc = GuessLikeDataSource(
                 isAdult,
@@ -79,20 +84,26 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val originFavorite = item.favorite
+                val originFavoriteCnt = item.favoriteCount ?: 0
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    !originFavorite -> apiRepository.postMePlaylist(PlayListRequest(item.id,1))
+                    !originFavorite -> apiRepository.postMePlaylist(PlayListRequest(item.id, 1))
                     else -> apiRepository.deleteMePlaylist(item.id.toString())
                 }
                 if (!result.isSuccessful) throw HttpException(result)
                 item.favorite = !originFavorite
+                item.favoriteCount = if (originFavorite) originFavoriteCnt - 1
+                else originFavoriteCnt + 1
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
+                .collect {
+                    _videoChangedResult.value = it
+                    _favoriteResult.value = it
+                }
         }
     }
 
@@ -120,13 +131,18 @@ class PlayerDescriptionViewModel : BaseViewModel() {
                     if (type == LikeType.LIKE) item.likeCount -= 1
                     else item.dislikeCount -= 1
                 }
+                item.like = if (item.likeType == null) null
+                else item.likeType == LikeType.LIKE
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likeResult.value = it }
+                .collect {
+                    _videoChangedResult.value = it
+                    _likeResult.value = it
+                }
         }
     }
 
