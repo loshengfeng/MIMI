@@ -20,8 +20,8 @@ abstract class ClubViewModel : BaseViewModel(){
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
 
-    private var _likePostResult = MutableLiveData<ApiResult<Int>>()
-    val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
+    private var _likePostResult = MutableLiveData<ApiResult<MemberPostItem>>()
+    val likePostResult: LiveData<ApiResult<MemberPostItem>> = _likePostResult
 
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
@@ -116,11 +116,36 @@ abstract class ClubViewModel : BaseViewModel(){
                     else -> apiRepository.deleteLike(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
+                emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likePostResult.value = it }
+                .collect {
+                    _likePostResult.value = it }
+        }
+    }
+
+    fun likeVideoPost(item: MemberPostItem, position: Int, isLike: Boolean) {
+        viewModelScope.launch {
+            Timber.i("likePost item=$item")
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val likeType = when {
+                    isLike -> LikeType.LIKE
+                    else -> LikeType.DISLIKE
+                }
+                val request =  LikeRequest(likeType)
+                val result = when {
+                    isLike -> apiRepository.like(item.id, request)
+                    else -> apiRepository.deleteLike(item.id)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(item))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect {
+                        _likePostResult.value = it }
         }
     }
 

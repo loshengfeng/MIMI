@@ -131,7 +131,8 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         viewModel.deleteFavoriteResult.observe(this) {
-            viewModel.getData(adapter, type, isLike)
+//            viewModel.getData(adapter, type, isLike)
+            checkChangedItems()
         }
 
         viewModel.showProgress.observe(this) {
@@ -140,14 +141,9 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
         viewModel.postCount.observe(this) {
             Timber.i("postCount= $it")
-            if (it == 0) {
-                text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
-                id_empty_group.visibility = View.VISIBLE
-                list_short.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                list_short.visibility = View.VISIBLE
-            }
+
+            emptyPageToggle(it==0)
+
             myPagesViewModel.changeDataCount(tab, it)
             layout_refresh.isRefreshing = false
         }
@@ -155,10 +151,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.likePostResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
-                        MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_LIKE
-                    )
+                    checkChangedItems()
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
@@ -221,6 +214,31 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter, type, isLike)
+        } else if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            checkChangedItems()
+        }
+    }
+
+    private fun checkChangedItems(){
+        adapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+        adapter.notifyDataSetChanged()
+        val deleteCount = adapter.snapshot().items.filter {
+            !it.favorite!!
+        }.size
+        Timber.i("adapterCount = ${adapter.snapshot().items.size}")
+        Timber.i("deleteCount = $deleteCount")
+        if(deleteCount >= adapter.snapshot().items.size -1)  emptyPageToggle(true)
+    }
+
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+            text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
+            id_empty_group.visibility = View.VISIBLE
+            list_short.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            list_short.visibility = View.VISIBLE
+
         }
     }
 
