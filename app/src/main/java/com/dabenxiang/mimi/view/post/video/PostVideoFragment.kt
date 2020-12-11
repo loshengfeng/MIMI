@@ -186,7 +186,7 @@ class PostVideoFragment : BasePostFragment() {
         videoAttachmentList.add(postVideoAttachment)
     }
 
-    override fun setUI(item: MediaItem) {
+    override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
         val trimmerUri = arguments?.getString(BUNDLE_TRIMMER_URI, "")
         val picUri = arguments?.getString(BUNDLE_COVER_URI, "")
 

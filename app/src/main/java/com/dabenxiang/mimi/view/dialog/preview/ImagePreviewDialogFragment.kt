@@ -1,24 +1,31 @@
 package com.dabenxiang.mimi.view.dialog.preview
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.ChatContentItem
+import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.chatcontent.ChatContentViewModel
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import kotlinx.android.synthetic.main.fragment_dialog_image_preview.*
 
 class ImagePreviewDialogFragment : BaseDialogFragment() {
 
     private var onCleanDialogListener: OnCleanDialogListener? = null
-    private var imageArray: ByteArray? = null
+    private var imageArray: ChatContentItem? = null
+    private val viewModel: ImagePreviewViewModel by viewModels()
 
     companion object {
 
         fun newInstance(
-                imageArray: ByteArray?,
+                imageArray: ChatContentItem?,
                 listener: OnCleanDialogListener? = null
         ): ImagePreviewDialogFragment {
             val fragment = ImagePreviewDialogFragment()
@@ -48,10 +55,12 @@ class ImagePreviewDialogFragment : BaseDialogFragment() {
         if (imageArray != null) {
             txt_file_invalid.visibility = View.INVISIBLE
             img_logo.visibility = View.INVISIBLE
-            Glide.with(App.self)
-                    .asBitmap()
-                    .load(imageArray)
-                    .into(ima_bg)
+            if (!TextUtils.isEmpty(imageArray?.cacheImagePath)) {
+                imageArray?.cacheImagePath?.let { viewModel.loadImage(0, ima_bg, LoadImageType.PICTURE_FULL, filePath = it) }
+            } else {
+                viewModel.loadImage(
+                        imageArray?.payload?.content?.toLongOrNull(), ima_bg, LoadImageType.PICTURE_FULL)
+            }
         } else {
             txt_file_invalid.visibility = View.VISIBLE
             img_logo.visibility = View.VISIBLE

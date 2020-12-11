@@ -7,11 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.EditVideoListener
 import com.dabenxiang.mimi.callback.PostVideoItemListener
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import kotlinx.android.synthetic.main.item_pic.view.*
+import kotlinx.android.synthetic.main.item_pic.view.img_pic
+import kotlinx.android.synthetic.main.item_pic.view.iv_close
+
 
 class ScrollVideoAdapter(private val listener: PostVideoItemListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -86,13 +89,13 @@ class ScrollVideoAdapter(private val listener: PostVideoItemListener) : Recycler
 
         fun bind(postVideoAttachment: PostVideoAttachment, position: Int) {
             val viewItem = ViewerItem()
-
+            viewItem.isVideo = true
             if (postVideoAttachment.picAttachmentId.isEmpty()) {
                 val uriP = Uri.parse(postVideoAttachment.picUrl)
                 imgPic.setImageURI(uriP)
-                viewItem.url = postVideoAttachment.picUrl
+                viewItem.url = postVideoAttachment.videoUrl
             } else {
-                listener.getBitmap(postVideoAttachment.picAttachmentId.toLongOrNull(),imgPic)
+                listener.getBitmap(postVideoAttachment.picAttachmentId.toLongOrNull(), imgPic)
                 viewItem.attachmentId = postVideoAttachment.picAttachmentId
             }
 

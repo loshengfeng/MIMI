@@ -6,12 +6,11 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.size
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ArticleItem
-import com.dabenxiang.mimi.model.api.vo.MediaItem
-import com.dabenxiang.mimi.model.api.vo.MemberClubItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
@@ -33,11 +32,25 @@ class PostArticleFragment : BasePostFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         txt_contentCount.text = String.format(getString(R.string.typing_count, edt_content.text.count(), CONTENT_LIMIT))
+
+        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    val item = it.result.content
+                    val contentItem =
+                        Gson().fromJson(item?.content, TextContentItem::class.java)
+                    edt_content.setText(contentItem.text)
+
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
-    override fun setUI(item: MediaItem) {
-        edt_content.setText(item.textContent)
+    override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
+//        edt_content.setText(item.textContent)
         txt_contentCount.text = String.format(getString(R.string.typing_count, item.textContent.length, CONTENT_LIMIT))
+        viewModel.getPostDetail(memberPostItem)
     }
 
     override fun setupListeners() {
