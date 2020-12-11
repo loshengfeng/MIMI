@@ -265,7 +265,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
+                    val bundle = ClubPicFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_to_clubPicFragment,
@@ -274,7 +274,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
                     )
                 }
                 AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    val bundle = ClubTextFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_to_clubTextFragment,

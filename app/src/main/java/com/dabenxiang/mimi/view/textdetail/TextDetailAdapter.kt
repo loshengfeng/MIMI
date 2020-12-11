@@ -24,7 +24,7 @@ import com.dabenxiang.mimi.view.picturedetail.viewholder.CommentTitleViewHolder
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
 import com.dabenxiang.mimi.view.player.RootCommentNode
-import com.dabenxiang.mimi.view.textdetail.viewholder.TextDetailViewHolder
+import com.dabenxiang.mimi.view.club.text.TextDetailViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
