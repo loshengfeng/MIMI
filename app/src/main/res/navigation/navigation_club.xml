@@ -127,7 +127,7 @@
             android:id="@+id/action_searchPostFragment_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
         <action
-            android:id="@+id/action_searchPostFragment_to_myPostFragment"
+            android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
     </fragment>
 

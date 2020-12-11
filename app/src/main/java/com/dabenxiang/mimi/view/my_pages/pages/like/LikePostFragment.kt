@@ -19,6 +19,8 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
@@ -167,7 +169,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
             checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 1)
+                        val bundle = ClubPicFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_to_clubPicFragment,
@@ -176,7 +178,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
                         )
                     }
                     AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 1)
+                        val bundle = ClubTextFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_to_clubTextFragment,
