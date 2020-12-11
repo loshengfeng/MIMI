@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import timber.log.Timber
 import java.util.*
 
 class ClubTextDetailViewModel: BaseViewModel() {
@@ -49,6 +50,7 @@ class ClubTextDetailViewModel: BaseViewModel() {
     val postCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _postCommentResult
 
     fun getPostDetail(item: MemberPostItem) {
+        Timber.i("getPostDetail: item:$item")
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
