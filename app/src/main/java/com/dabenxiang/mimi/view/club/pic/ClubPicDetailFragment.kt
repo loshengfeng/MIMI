@@ -85,7 +85,7 @@ class ClubPicDetailFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     val item = it.result.content
-                    pictureDetailAdapter?.notifyDataSetChanged()
+                    pictureDetailAdapter?.updateContent(item!!)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }

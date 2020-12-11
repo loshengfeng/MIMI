@@ -81,7 +81,6 @@ class ClubTextDetailFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Success -> {
                     val item = it.result.content
-                    Timber.i("getPostDetail postDetailResult:$item")
                     textDetailAdapter?.updateContent(item!!)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -129,7 +128,6 @@ class ClubTextDetailFragment : BaseFragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
-        Timber.i("getPostDetail: org item:$memberPostItem")
         viewModel.getPostDetail(memberPostItem!!)
         mainViewModel?.getAd(adWidth, adHeight)
     }
@@ -140,7 +138,6 @@ class ClubTextDetailFragment : BaseFragment() {
         }
 
         override fun onFollowClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            Timber.i("getPostDetail: onFollowClick:$item")
             checkStatus { viewModel.followPost(item, position, isFollow) }
         }
 
