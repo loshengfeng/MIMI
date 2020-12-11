@@ -130,6 +130,15 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
+        viewModel.videoChangedResult.observe(this){
+            when (it) {
+                is ApiResult.Success -> {
+                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.deleteFavoriteResult.observe(this) {
             viewModel.getData(adapter)
         }
