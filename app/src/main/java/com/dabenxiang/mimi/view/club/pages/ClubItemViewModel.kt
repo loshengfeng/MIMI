@@ -7,19 +7,46 @@ import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
+import com.dabenxiang.mimi.model.db.MiMiDB
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 import timber.log.Timber
 
 class ClubItemViewModel : ClubViewModel() {
+
+    val mimiDB: MiMiDB by inject()
 
     private val _postCount = MutableLiveData<Int>()
     val postCount: LiveData<Int> = _postCount
 
     var totalCount: Int = 0
+
+    fun postItems(type: ClubTabItemType, postType:PostType = getPostType(type)) = Pager(
+            config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
+            remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth,
+                    adHeight,
+                    type, postType)
+    ) {
+
+
+        mimiDB.memberPostDao().pagingSourceAll(postType)
+    }.flow
+
+    private fun getPostType(type: ClubTabItemType) = when (type) {
+        ClubTabItemType.FOLLOW -> PostType.FOLLOWED
+        ClubTabItemType.RECOMMEND -> PostType.TEXT_IMAGE_VIDEO
+        ClubTabItemType.LATEST -> PostType.TEXT_IMAGE_VIDEO
+        ClubTabItemType.SHORT_VIDEO -> PostType.VIDEO
+        ClubTabItemType.PICTURE -> PostType.IMAGE
+        ClubTabItemType.NOVEL -> PostType.TEXT
+    }
+
+
 
     fun getData(adapter: ClubItemAdapter, type: ClubTabItemType) {
         Timber.i("getData")

@@ -1,13 +1,17 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
+@Entity(tableName = "MemberPostItems")
 data class MemberPostItem(
-
+     @PrimaryKey
     @SerializedName("id")
     var id: Long = 0,
 
@@ -20,6 +24,7 @@ data class MemberPostItem(
     @SerializedName("content")
     var content: String = "",
 
+    @ColumnInfo(name = "type")
     @SerializedName("type")
     val type: PostType = PostType.TEXT,
 
