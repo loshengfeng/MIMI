@@ -29,7 +29,6 @@ class LikePostViewModel : ClubViewModel() {
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
 
     fun getData(adapter: LikePostAdapter) {
-
         Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())

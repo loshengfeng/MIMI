@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
@@ -32,6 +33,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
@@ -88,6 +90,9 @@ class PostVideoFragment : BasePostFragment() {
         )
 
         tv_clean.setOnClickListener {
+
+            GeneralUtils.hideKeyboard(requireActivity())
+
             if (checkFieldIsEmpty()) {
                 return@setOnClickListener
             }
@@ -104,6 +109,11 @@ class PostVideoFragment : BasePostFragment() {
 
             navigation()
         }
+
+        tv_back.setOnClickListener {
+            discardDialog()
+        }
+
     }
 
     private fun navigation() {
@@ -180,7 +190,7 @@ class PostVideoFragment : BasePostFragment() {
         videoAttachmentList.add(postVideoAttachment)
     }
 
-    override fun setUI(item: MediaItem) {
+    override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
         val trimmerUri = arguments?.getString(BUNDLE_TRIMMER_URI, "")
         val picUri = arguments?.getString(BUNDLE_COVER_URI, "")
 
@@ -330,7 +340,7 @@ class PostVideoFragment : BasePostFragment() {
         } else if (isEdit && page == CLUB) {
             Navigation.findNavController(requireView()).popBackStack(R.id.topicDetailFragment, false)
         } else {
-            Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
+            navigateTo(NavigateItem.PopBackStack(R.id.clubTabFragment, true))
         }
     }
 

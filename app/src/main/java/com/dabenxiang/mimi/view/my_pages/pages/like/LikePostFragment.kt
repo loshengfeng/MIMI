@@ -52,7 +52,21 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Timber.i("MyFollowInterestFragment onAttach")
+
+        viewModel.postChangedResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    val changeItem = mainViewModel?.postItemChangedList?.value?.get(it.result.id)
+                    if(changeItem != null) {
+                        if (it.result.isFavorite) changeItem.favoriteCount++
+                        else changeItem.favoriteCount--
+                    }
+                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })
@@ -71,7 +85,9 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
         viewModel.likePostResult.observe(this, {
             when (it) {
-                is ApiResult.Success -> viewModel.getData(adapter)
+                is ApiResult.Success -> it.result.let { position ->
+                    adapter.notifyItemChanged(position)
+                }
                 else -> {
                     onApiError(Exception("Unknown Error!"))
                 }
@@ -142,7 +158,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter)
-        } else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+        }  else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
             adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
             adapter.notifyDataSetChanged()
         }
@@ -249,7 +265,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
+                    val bundle = ClubPicFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_to_clubPicFragment,
@@ -258,7 +274,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
                     )
                 }
                 AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    val bundle = ClubTextFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_to_clubTextFragment,

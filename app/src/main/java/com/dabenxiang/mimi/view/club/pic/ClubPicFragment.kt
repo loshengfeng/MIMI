@@ -8,6 +8,7 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.post.ClubPostPagerAdapter
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_text.*
@@ -24,10 +25,11 @@ class ClubPicFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
         const val KEY_POSITION = "position"
-        fun createBundle(item: MemberPostItem, position: Int = 0): Bundle {
+        fun createBundle(item: MemberPostItem, position: Int = 0, isNeedRefresh: Boolean = false): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, item)
                 it.putSerializable(KEY_POSITION, position)
+                it.putBoolean(MyPostFragment.IS_NEED_REFRESH, isNeedRefresh)
             }
         }
     }
@@ -40,7 +42,12 @@ class ClubPicFragment : BaseFragment() {
 
     override fun setupListeners() {
         tv_back.setOnClickListener {
-            navigateTo(NavigateItem.Up)
+            val isNeedRefresh = arguments?.getBoolean(MyPostFragment.IS_NEED_REFRESH, false)
+            if (isNeedRefresh!!) {
+                navigateTo(NavigateItem.Destination(R.id.action_to_clubTabFragment))
+            } else {
+                navigateTo(NavigateItem.Up)
+            }
         }
     }
 

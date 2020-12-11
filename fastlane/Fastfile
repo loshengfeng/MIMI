@@ -29,9 +29,9 @@ platform :android do
 
   desc "Build APK & Send To Slack"
   lane :build_release_apk do
-    build(flavor: "mimi", build_type: "Dev_Release")
-    #build(flavor: "mimi", build_type: "Sit_Release")
-    #build(flavor: "mimi", build_type: "Prod_Release")
+    #build(flavor: "mimi", build_type: "Dev_Release")
+    build(flavor: "mimi", build_type: "Sit_Release")
+    build(flavor: "mimi", build_type: "Prod_Release")
   end
 
   desc "Building APK"
