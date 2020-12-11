@@ -162,7 +162,7 @@ class PostPicFragment : BasePostFragment() {
         )
     }
 
-    override fun setUI(item: MediaItem) {
+    override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
         for (pic in item.picParameter) {
             val postAttachmentItem = PostAttachmentItem()
             postAttachmentItem.attachmentId = pic.id

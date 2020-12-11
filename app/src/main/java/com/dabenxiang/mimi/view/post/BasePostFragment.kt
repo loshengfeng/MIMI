@@ -246,10 +246,10 @@ open class BasePostFragment : BaseFragment() {
 
         haveMainTag = true
 
-        setUI(contentItem)
+        setUI(contentItem, item)
     }
 
-    open fun setUI(item: MediaItem) {
+    open fun setUI(item: MediaItem, memberPostItem: MemberPostItem ) {
 
     }
 
