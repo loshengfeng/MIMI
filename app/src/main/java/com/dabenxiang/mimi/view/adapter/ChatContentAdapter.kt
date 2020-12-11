@@ -31,6 +31,7 @@ class ChatContentAdapter(
         fun onImageClick(imageArray: ByteArray?)
         fun onVideoClick(item: ChatContentItem?, position: Int)
         fun getSenderAvatar(): String
+        fun onImageClick(data: ChatContentItem?)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
