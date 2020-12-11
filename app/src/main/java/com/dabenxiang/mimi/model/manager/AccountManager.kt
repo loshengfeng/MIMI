@@ -56,7 +56,7 @@ class AccountManager(
     }
 
     fun isLogin(): Boolean {
-        return when(getMemberTokenResult()){
+        return when (getMemberTokenResult()) {
             TokenResult.PASS -> true
             TokenResult.EXPIRED -> getProfile().userId != 0L
             else -> false

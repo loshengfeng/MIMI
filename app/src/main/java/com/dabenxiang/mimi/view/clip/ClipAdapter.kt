@@ -117,6 +117,8 @@ class ClipAdapter(
         }
     }
 
+    var changedPosList = HashMap<Long, VideoItem>()
+
     override fun onBindViewHolder(
         holder: ClipViewHolder,
         position: Int,
@@ -124,7 +126,11 @@ class ClipAdapter(
     ) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = getItem(position) ?: VideoItem()
-
+        val changedItem = changedPosList[item.id]
+        if (changedItem != null) {
+            item.favorite = changedItem.favorite
+            item.favoriteCount = changedItem.favoriteCount
+        }
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
