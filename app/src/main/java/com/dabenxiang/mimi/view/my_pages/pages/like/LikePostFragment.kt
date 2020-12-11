@@ -53,20 +53,19 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-//        viewModel.postChangedResult.observe(this, {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    val changeItem = mainViewModel?.postItemChangedList?.value?.get(it.result.id)
-//                    if(changeItem != null) {
-//                        if (it.result.isFavorite) changeItem.favoriteCount++
-//                        else changeItem.favoriteCount--
-//                    }
-//                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
-//                    viewModel.getData(adapter)
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
+        viewModel.postChangedResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    val changeItem = mainViewModel?.postItemChangedList?.value?.get(it.result.id)
+                    if(changeItem != null) {
+                        if (it.result.isFavorite) changeItem.favoriteCount++
+                        else changeItem.favoriteCount--
+                    }
+                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
 
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
