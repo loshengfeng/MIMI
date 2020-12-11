@@ -170,6 +170,7 @@ class TopicTabFragment : BaseFragment() {
         get() = View.GONE
 
     private fun updateFollow() {
+        tv_follow.visibility = View.VISIBLE
         val isFollow = memberClubItem.isFollow
         if (isFollow) {
             tv_follow.text = requireContext().getString(R.string.followed)
