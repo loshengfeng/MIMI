@@ -152,7 +152,7 @@ class PersonalFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
-//
+
         viewModel.apiSignOut.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> layout_refresh.isRefreshing = true
