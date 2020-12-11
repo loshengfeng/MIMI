@@ -28,6 +28,7 @@ import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
@@ -220,7 +221,13 @@ class PostPicFragment : BasePostFragment() {
         val uri = PostManager().getPicUri(data, requireContext(), file)
 
         if (uri.path!!.isNotBlank()) {
-            postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
+            try {
+                postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
+            } catch(e: Exception) {
+                GeneralUtils.showToast(requireContext(), "仅支援本地图片上传")
+                onApiError(e)
+                return
+            }
         }
 
         val uriDataList = adapter.getData()
