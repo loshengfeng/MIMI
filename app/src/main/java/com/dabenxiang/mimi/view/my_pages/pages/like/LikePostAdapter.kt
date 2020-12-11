@@ -107,10 +107,13 @@ class LikePostAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        var item = getItem(position)
+        val item = getItem(position)
         val changedItem = changedPosList[item?.id]
         if (changedItem != null) {
-            item = changedItem
+            item?.isFavorite = changedItem.isFavorite
+            item?.favoriteCount = changedItem.favoriteCount
+            item?.likeType = changedItem.likeType
+            item?.likeCount = changedItem.likeCount
         }
         item?.also {
             when (holder) {
