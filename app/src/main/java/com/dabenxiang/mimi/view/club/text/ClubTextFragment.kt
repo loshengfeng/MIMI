@@ -40,7 +40,7 @@ class ClubTextFragment : BaseFragment() {
 
     override fun setupListeners() {
         tv_back.setOnClickListener {
-            navigateTo(NavigateItem.Up)
+            navigateTo(NavigateItem.Destination(R.id.action_to_clubTabFragment))
         }
     }
 
