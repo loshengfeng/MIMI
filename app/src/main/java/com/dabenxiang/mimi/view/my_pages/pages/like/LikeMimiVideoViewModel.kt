@@ -107,6 +107,18 @@ class LikeMimiVideoViewModel : BaseViewModel() {
                 item.favoriteCount =
                     if (originFavorite) originFavoriteCnt - 1
                     else originFavoriteCnt + 1
+                _videoChangedResult.postValue(
+                    ApiResult.success(
+                        VideoItem(
+                            id = item.videoId?:0,
+                            favorite = item.favorite ?: false,
+                            favoriteCount = item.favoriteCount?.toLong(),
+                            like = item.like,
+                            likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
+                            likeCount = item.likeCount?.toLong()?:0
+                        )
+                    )
+                )
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)

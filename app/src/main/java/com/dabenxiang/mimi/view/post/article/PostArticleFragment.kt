@@ -127,6 +127,7 @@ class PostArticleFragment : BasePostFragment() {
         } else if (isEdit && page == TEXT) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(PictureDetailFragment.KEY_DATA, item)
+            bundle.putSerializable(MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
         } else if (isEdit && page == FAVORITE) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
