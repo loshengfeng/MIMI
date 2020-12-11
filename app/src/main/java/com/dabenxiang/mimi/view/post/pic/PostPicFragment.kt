@@ -223,10 +223,10 @@ class PostPicFragment : BasePostFragment() {
         if (uri.path!!.isNotBlank()) {
             try {
                 postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
-            }
-            catch(e: Exception) {
+            } catch(e: Exception) {
                 GeneralUtils.showToast(requireContext(), "仅支援本地图片上传")
                 onApiError(e)
+                return
             }
         }
 
