@@ -331,10 +331,13 @@ class ChatContentFragment : BaseFragment() {
         }
 
         override fun onImageClick(imageArray: ByteArray?) {
-            imagePreviewDialog = ImagePreviewDialogFragment.newInstance(imageArray, null).also {
+        }
+
+        override fun onImageClick(data: ChatContentItem?) {
+            imagePreviewDialog = ImagePreviewDialogFragment.newInstance(data, null).also {
                 it.show(
-                    requireActivity().supportFragmentManager,
-                    MoreDialogFragment::class.java.simpleName
+                        requireActivity().supportFragmentManager,
+                        MoreDialogFragment::class.java.simpleName
                 )
             }
         }

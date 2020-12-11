@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
+import timber.log.Timber
 
 class ClubTextDetailFragment : BaseFragment() {
 
@@ -127,7 +128,6 @@ class ClubTextDetailFragment : BaseFragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
-
         viewModel.getPostDetail(memberPostItem!!)
         mainViewModel?.getAd(adWidth, adHeight)
     }
