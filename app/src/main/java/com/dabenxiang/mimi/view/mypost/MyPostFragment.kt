@@ -51,6 +51,7 @@ class MyPostFragment : BaseFragment() {
         const val EDIT = "edit"
         const val MEMBER_DATA = "member_data"
         const val TYPE_PIC = "type_pic"
+        const val IS_NEED_REFRESH = "is_need_refresh"
 
         private const val KEY_USER_ID = "KEY_USER_ID"
         private const val KEY_USER_NAME = "KEY_USER_NAME"
@@ -197,7 +198,6 @@ class MyPostFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-
         View.OnClickListener { btnView ->
             when (btnView.id) {
                 R.id.tv_back -> {

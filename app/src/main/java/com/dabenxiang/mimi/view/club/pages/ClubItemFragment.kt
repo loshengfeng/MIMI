@@ -331,7 +331,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             Timber.d("onItemClick =${adultTabType}, ${item.likeType}")
             when (adultTabType) {
                 AdultTabType.TEXT -> {
-                    val bundle = ClubTextFragment.createBundle(item)
+                    val bundle = ClubTextFragment.createBundle(item, isNeedRefresh = true)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_to_clubTextFragment,
@@ -340,7 +340,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                     )
                 }
                 AdultTabType.PICTURE -> {
-                    val bundle = ClubPicFragment.createBundle(item)
+                    val bundle = ClubPicFragment.createBundle(item, isNeedRefresh = true)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_to_clubPicFragment,
