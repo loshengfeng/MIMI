@@ -229,6 +229,9 @@
             app:destination="@id/searchPostFragment"
             app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
     </fragment>
 
     <fragment
