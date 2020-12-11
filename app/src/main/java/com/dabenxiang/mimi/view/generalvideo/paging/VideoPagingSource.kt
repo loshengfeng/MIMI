@@ -43,7 +43,7 @@ class VideoPagingSource(
                 null
             }
 
-            if (needAd) {
+            if (needAd && lastId == 0L) {
                 val adItem = domainManager.getAdRepository()
                     .getAD(adWidth, adHeight).body()?.content ?: AdItem()
                 items?.add(0, StatisticsItem(adItem = adItem))

@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -46,10 +47,12 @@ class FavoritesAdapter(
         }
     }
     var removedPosList = ArrayList<Int>()
+    var changedPosList = HashMap<Long,MemberPostItem>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(position)) {
+        val changedItem = changedPosList[item?.id]
+        return if ((changedItem != null && !changedItem.isFavorite) || removedPosList.contains(position)) {
             VIEW_TYPE_DELETED
         } else {
             when (item?.type) {
@@ -104,7 +107,11 @@ class FavoritesAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        val item = getItem(position)
+        var item = getItem(position)
+        val changedItem = changedPosList[item?.id]
+        if (changedItem != null) {
+            item = changedItem
+        }
         item?.also {
             when (holder) {
                 is AdHolder->{

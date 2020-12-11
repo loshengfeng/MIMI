@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -15,7 +16,6 @@ import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -24,8 +24,6 @@ import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
-import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
-import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoAdapter
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -38,21 +36,8 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
     private val viewModel: LikeMimiVideoViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
 
-    private val clipFuncItem by lazy {
-        CollectionFuncItem(
-            { source -> viewModel.getDecryptSetting(source) },
-            { videoItem, decryptSettingItem, function ->
-                viewModel.decryptCover(
-                    videoItem,
-                    decryptSettingItem,
-                    function
-                )
-            }
-        )
-    }
-
-    private val adapter: MyCollectionMimiVideoAdapter by lazy {
-        MyCollectionMimiVideoAdapter(requireContext(), clipFuncItem, listener, type)
+    private val adapter: LikeMimiVideoAdapter by lazy {
+        LikeMimiVideoAdapter(requireContext(), viewModel.viewModelScope, listener, type)
     }
 
     override fun getLayoutId() = R.layout.fragment_my_collection_videos
@@ -179,7 +164,7 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
                 is ApiResult.Success -> {
                     adapter.notifyItemChanged(
                         it.result,
-                        MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
+                        LikeMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -225,6 +210,9 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
 
         if (viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter)
+        }else if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
         }
     }
 }

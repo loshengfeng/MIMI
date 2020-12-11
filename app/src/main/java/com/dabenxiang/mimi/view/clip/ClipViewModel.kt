@@ -131,11 +131,14 @@ class ClipViewModel : BaseViewModel() {
                 if (!resp.isSuccessful) throw HttpException(resp)
                 item.favorite = isFavorite
                 item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
+                _videoChangedResult.postValue(ApiResult.success(item))
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
+                .collect {
+                    _favoriteResult.value = it
+                }
         }
     }
 

@@ -9,7 +9,6 @@ import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -114,7 +113,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -185,10 +183,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             checkRemovedItems()
         }
 
-        if (adapter.snapshot().items.isEmpty()) {
-            viewModel.getData(adapter, type)
-        } else if (mainViewModel?.itemChangedList?.value?.isNotEmpty() == true) {
-            adapter.changedPosList = mainViewModel?.itemChangedList?.value ?: HashMap()
+        if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
             adapter.notifyDataSetChanged()
         }
 

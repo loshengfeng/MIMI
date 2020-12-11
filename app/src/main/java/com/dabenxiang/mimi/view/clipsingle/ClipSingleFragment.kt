@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
@@ -28,6 +29,8 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.item_clip.*
+import kotlinx.android.synthetic.main.recharge_reminder.*
+import kotlinx.android.synthetic.main.recharge_reminder.view.*
 import timber.log.Timber
 
 class ClipSingleFragment : BaseFragment() {
@@ -174,9 +177,26 @@ class ClipSingleFragment : BaseFragment() {
                 viewModel.getM3U8(this)
             }
         }
+
+        btn_vip.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        }
+
+        btn_promote.setOnClickListener {
+            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+        }
     }
 
     override fun setupObservers() {
+        viewModel.videoChangedResult.observe(viewLifecycleOwner){
+            when (it) {
+                is ApiResult.Success -> {
+                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.getM3U8Result.observe(this, {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
@@ -205,7 +225,7 @@ class ClipSingleFragment : BaseFragment() {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Empty -> modifyFavorite()
+                is ApiResult.Success -> modifyFavorite()
                 is ApiResult.Error -> onApiError(it.throwable)
                 else -> {
                 }
@@ -318,7 +338,7 @@ class ClipSingleFragment : BaseFragment() {
             }
             progress_video?.visibility = View.GONE
             tv_retry.visibility = View.VISIBLE
-            tv_retry.text = error.localizedMessage
+//            tv_retry.text = error.localizedMessage
             viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
                 viewModel.sendVideoReport(this, true)
             }

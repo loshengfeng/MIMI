@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -128,6 +130,14 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            clipAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            clipAdapter.notifyDataSetChanged()
+        }
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.item_clip_pager
     }
@@ -160,6 +170,15 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     override fun setupObservers() {
+        viewModel.videoChangedResult.observe(viewLifecycleOwner){
+            when (it) {
+                is Success -> {
+                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.favoriteResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loading -> progressHUD.show()
@@ -217,11 +236,15 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private fun onPromoteClick() {
-        navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+        checkStatus {
+            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+        }
     }
 
     private fun onVipClick() {
-        navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        checkStatus {
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        }
     }
 
     private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {
