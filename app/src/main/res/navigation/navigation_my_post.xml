@@ -175,6 +175,11 @@
             app:destination="@id/searchPostFragment"
             app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postArticleFragment_to_clubTextFragment"
+            app:destination="@id/clubTextFragment"
+            app:popUpTo="@+id/clubTextFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
