@@ -73,6 +73,8 @@ class PostPicFragment : BasePostFragment() {
 
         tv_clean.setOnClickListener {
 
+            GeneralUtils.hideKeyboard(requireActivity())
+
             if (checkFieldIsEmpty()) {
                 return@setOnClickListener
             }
