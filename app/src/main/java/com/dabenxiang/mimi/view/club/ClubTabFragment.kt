@@ -37,6 +37,7 @@ import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -49,6 +50,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
+import java.lang.Exception
 
 
 class ClubTabFragment : BaseFragment() {
@@ -278,7 +280,12 @@ class ClubTabFragment : BaseFragment() {
             val uri = PostManager().getPicUri(data, requireContext(), file)
 
             if (uri.path!!.isNotBlank()) {
-                pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
+                try{
+                    pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
+                } catch(e: Exception) {
+                    GeneralUtils.showToast(requireContext(), "仅支援本地图片上传")
+                    onApiError(e)
+                }
             } else {
                 pciUri.add(file.absolutePath)
             }
