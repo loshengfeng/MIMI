@@ -5,6 +5,7 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
@@ -12,8 +13,8 @@ import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.db.MiMiDB
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.db.RemoteKey
-import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -25,8 +26,9 @@ class ClubItemMediator(
         private val adWidth: Int,
         private val adHeight: Int,
         private val type: ClubTabItemType,
-        private var postType: PostType
-) : RemoteMediator<Int, MemberPostItem>() {
+        private var postType: PostType,
+        private val pagingCallback: PagingCallback,
+) : RemoteMediator<Int, PostDBItem>() {
 
     companion object {
         const val PER_LIMIT = 10
@@ -35,39 +37,40 @@ class ClubItemMediator(
 
     override suspend fun load(
             loadType: LoadType,
-            state: PagingState<Int, MemberPostItem>
+            state: PagingState<Int, PostDBItem>
     ): MediatorResult {
         try {
+            Timber.i("ClubItemMediator loadType =$loadType  type =$type")
             val offset = when (loadType) {
-                LoadType.REFRESH -> null
+                LoadType.REFRESH -> {
+                    database.remoteKeyDao().insertOrReplace(RemoteKey(type, 0))
+                    null
+                }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
-                        database.remoteKeys().remoteKeyByType(postType)
+                        database.remoteKeyDao().remoteKeyByType(type)
                     }
 
-                    Timber.i("remoteKey =$remoteKey")
                     remoteKey?.offset?.let {
                         remoteKey.offset
                     } ?: run{
-                        Timber.i("remoteKey endOfPaginationReached")
                         return MediatorResult.Success(endOfPaginationReached = true)
                     }
 
                 }
             }.takeIf { it == null }.run { 0 }
-            Timber.i("offset =$offset")
 
             val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
                     ?: AdItem()
-
 
             val result =
                     when (type) {
                         ClubTabItemType.FOLLOW -> {
                             domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
                         }
-                        ClubTabItemType.RECOMMEND -> {
+                        ClubTabItemType.HOTTEST -> {
+                            Timber.i("ClubItemMediator RECOMMEND ")
                             domainManager.getApiRepository().getMembersPost(
                                     PostType.TEXT_IMAGE_VIDEO,
                                     OrderBy.HOTTEST,
@@ -103,21 +106,52 @@ class ClubItemMediator(
             val body = result.body()
             val memberPostItems = body?.content
             val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
-            val list = arrayListOf<MemberPostItem>()
-
-            memberPostItems?.forEachWithIndex { index, item ->
-                if (index == 5) list.add(memberPostAdItem)
-                list.add(item)
-            }
+//            val list = arrayListOf<MemberPostItem>()
+//
+//            memberPostItems?.forEachWithIndex { index, item ->
+//                if (index == 5) list.add(memberPostAdItem)
+//                list.add(item)
+//            }
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
-                    database.memberPostDao().deleteItemByType(postType)
-                    database.remoteKeys().deleteByType(postType)
+                    when(type){
+                        ClubTabItemType.FOLLOW ->  database.postDBItemDao().deleteItemByFollow()
+                        ClubTabItemType.HOTTEST -> database.postDBItemDao().deleteItemByHottest()
+                        ClubTabItemType.LATEST -> database.postDBItemDao().deleteItemByLatest()
+                        else-> database.postDBItemDao().deleteItemByPostType(postType)
+                    }
+                    database.remoteKeyDao().deleteByType(type)
                 }
+
+                database.remoteKeyDao().insertOrReplace(RemoteKey(type, result.body()?.paging?.offset ?: 0))
                 memberPostItems?.let {
-                    database.remoteKeys().insertOrReplace(RemoteKey(postType, result.body()?.paging?.offset ?: 0))
-                    database.memberPostDao().insertAll(it)
+                    val postDBItems = it.map {item->
+                        Timber.i("ClubItemMediator postDBItems type=$type")
+                        val oldItem = database.postDBItemDao().getItemById(item.id)
+                        if(oldItem == null) {
+                            PostDBItem(
+                                    id = item.id,
+                                    isFollow = type == ClubTabItemType.FOLLOW,
+                                    isHottest = type == ClubTabItemType.HOTTEST,
+                                    isLatest = type == ClubTabItemType.LATEST,
+                                    postType =  item.type,
+                                    memberPostItem = item
+                            )
+                        }else{
+                            PostDBItem(
+                                    id = oldItem.id,
+                                    isFollow = if(type == ClubTabItemType.FOLLOW) true else oldItem.isFollow,
+                                    isHottest = if(type == ClubTabItemType.HOTTEST) true else oldItem.isHottest,
+                                    isLatest = if(type == ClubTabItemType.LATEST) true else oldItem.isLatest,
+                                    postType =  item.type,
+                                    memberPostItem = item
+                            )
+                        }
+
+                    }
+
+                    database.postDBItemDao().insertAll(postDBItems)
                 }
 
             }
@@ -127,7 +161,7 @@ class ClubItemMediator(
                     result.body()?.paging?.offset ?: 0,
                     memberPostItems?.size ?: 0
             )
-
+            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
             return MediatorResult.Success(endOfPaginationReached = hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)

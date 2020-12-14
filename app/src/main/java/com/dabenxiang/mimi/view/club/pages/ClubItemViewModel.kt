@@ -2,11 +2,8 @@ package com.dabenxiang.mimi.view.club.pages
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
@@ -21,8 +18,8 @@ class ClubItemViewModel : ClubViewModel() {
 
     val mimiDB: MiMiDB by inject()
 
-//    private val _postCount = MutableLiveData<Int>()
-//    val postCount: LiveData<Int> = _postCount
+    private val _postCount = MutableLiveData<Int>()
+    val postCount: LiveData<Int> = _postCount
 
     var totalCount: Int = 0
 
@@ -30,7 +27,8 @@ class ClubItemViewModel : ClubViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun posts(type: ClubTabItemType) = flowOf(
-//            clearListCh.receiveAsFlow().map { PagingData.empty() },
+            clearListCh.receiveAsFlow().map { PagingData.empty() },
+
             postItems(type)
 
     ).flattenMerge(2)
@@ -38,17 +36,31 @@ class ClubItemViewModel : ClubViewModel() {
     private fun postItems(type: ClubTabItemType, postType:PostType = getPostType(type)) = Pager(
             config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
             remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight,
-                    type, postType)
+                    type, postType, pagingCallback)
     ) {
-        mimiDB.memberPostDao().pagingSourceAll(postType)
+        Timber.i("ClubTabItemType =$type  postType=$postType")
+        when (type) {
+            ClubTabItemType.FOLLOW ->  mimiDB.postDBItemDao().pagingSourceByFollow()
+            ClubTabItemType.HOTTEST -> mimiDB.postDBItemDao().pagingSourceByHottest()
+            ClubTabItemType.LATEST -> mimiDB.postDBItemDao().pagingSourceByLatest()
+            else -> mimiDB.postDBItemDao().pagingSourceByPostType(postType)
+        }
     }.flow
 
     private fun getPostType(type: ClubTabItemType) = when (type) {
         ClubTabItemType.FOLLOW -> PostType.FOLLOWED
-        ClubTabItemType.RECOMMEND -> PostType.TEXT_IMAGE_VIDEO
+        ClubTabItemType.HOTTEST -> PostType.TEXT_IMAGE_VIDEO
         ClubTabItemType.LATEST -> PostType.TEXT_IMAGE_VIDEO
         ClubTabItemType.SHORT_VIDEO -> PostType.VIDEO
         ClubTabItemType.PICTURE -> PostType.IMAGE
         ClubTabItemType.NOVEL -> PostType.TEXT
+    }
+
+    private val pagingCallback = object : PagingCallback {
+
+        override fun onTotalCount(count: Long) {
+            _postCount.postValue(count.toInt())
+        }
+
     }
 }

@@ -17,5 +17,5 @@ fun provideAppDatabase(context: Context): MiMiDB {
             .fallbackToDestructiveMigration()
             .build()
 }
-fun provideUserDao(db: MiMiDB)= db.memberPostDao()
+fun provideUserDao(db: MiMiDB)= db.postDBItemDao()
 

@@ -4,12 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
-import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -28,19 +24,14 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.flurry.sdk.it
 import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_club_item.id_empty_group
 import kotlinx.android.synthetic.main.fragment_club_item.layout_refresh
 import kotlinx.android.synthetic.main.fragment_club_item.list_short
 import kotlinx.android.synthetic.main.fragment_club_item.text_page_empty
-import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -63,34 +54,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     }
 
     private fun initAdapter(){
-
         adapter = ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
-
-//        lifecycleScope.launchWhenResumed {
-//            @OptIn(ExperimentalCoroutinesApi::class)
-//            adapter.loadStateFlow.collectLatest { loadStates ->
-////                layout_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
-//            }
-//        }
-//
-//        lifecycleScope.launchWhenResumed {
-//            @OptIn(ExperimentalCoroutinesApi::class)
-//            viewModel.posts(type).collectLatest {
-//                adapter.submitData(it)
-////                emptyPageToggle(adapter.snapshot().items.isEmpty())
-//            }
-//        }
-//
-//        lifecycleScope.launchWhenResumed {
-//            @OptIn(FlowPreview::class)
-//            adapter.loadStateFlow
-//                    .distinctUntilChangedBy { it.refresh }
-//                    .filter { it.refresh is LoadState.NotLoading }
-//                    .collect {
-////                        list_short.scrollToPosition(0)
-//                        emptyPageToggle(false)
-//                    }
-//        }
     }
 
     private fun emptyPageToggle(isHide:Boolean){
@@ -106,6 +70,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             list_short.visibility = View.VISIBLE
 
         }
+        layout_refresh.isRefreshing = false
+
     }
 
     override fun onAttach(context: Context) {
@@ -155,9 +121,13 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             }
         })
 
-        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.postCount.observe(this) {
+            Timber.i("type=$type postCount= $it")
+            emptyPageToggle(it <=0)
+        }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
             viewModel.posts(type).collectLatest {
                 adapter.submitData(it)
 
@@ -208,10 +178,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     }
 
-    override fun initSettings() {
-
-    }
-
     private fun loginPageToggle(isLogin: Boolean) {
         Timber.i("loginPageToggle= $isLogin")
         if (isLogin) {
@@ -231,6 +197,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         )
 
         if (adapter.snapshot().items.isEmpty()) {
+            layout_refresh.isRefreshing =true
             adapter.refresh()
         }
 //            viewModel.getData(adapter, type)
@@ -426,7 +393,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         override fun onChipClick(postType: PostType, tag: String) {
             Timber.d("onChipClick")
             val item = SearchPostItem(
-                if (type == ClubTabItemType.RECOMMEND || type == ClubTabItemType.LATEST) PostType.TEXT_IMAGE_VIDEO
+                if (type == ClubTabItemType.HOTTEST || type == ClubTabItemType.LATEST) PostType.TEXT_IMAGE_VIDEO
                 else if (type == ClubTabItemType.FOLLOW) PostType.FOLLOWED
                 else postType, tag = tag
             )

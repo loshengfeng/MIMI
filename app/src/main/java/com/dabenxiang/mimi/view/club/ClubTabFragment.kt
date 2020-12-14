@@ -80,7 +80,7 @@ class ClubTabFragment : BaseFragment() {
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
         TAB_FOLLOW to { ClubItemFragment(ClubTabItemType.FOLLOW) },
-        TAB_RECOMMEND to { ClubItemFragment(ClubTabItemType.RECOMMEND) },
+        TAB_RECOMMEND to { ClubItemFragment(ClubTabItemType.HOTTEST) },
         TAB_LATEST to { ClubItemFragment(ClubTabItemType.LATEST) },
         TAB_CLIP to { ClubItemFragment(ClubTabItemType.SHORT_VIDEO) },
         TAB_PICTURE to { ClubItemFragment(ClubTabItemType.PICTURE) },
@@ -158,7 +158,7 @@ class ClubTabFragment : BaseFragment() {
     ): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
         view.club_view_pager.adapter = ClubTabAdapter(tabFragmentsCreators, childFragmentManager, lifecycle)
-        view.club_view_pager.offscreenPageLimit = 7
+        view.club_view_pager.offscreenPageLimit = 1
         val tabs = resources.getStringArray(R.array.club_tabs)
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
             val tabView = View.inflate(requireContext(), R.layout.custom_tab, null)

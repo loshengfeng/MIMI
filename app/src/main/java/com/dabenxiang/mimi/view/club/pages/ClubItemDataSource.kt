@@ -36,7 +36,7 @@ class ClubItemDataSource(
                     ClubTabItemType.FOLLOW -> {
                         domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
                     }
-                    ClubTabItemType.RECOMMEND -> {
+                    ClubTabItemType.HOTTEST -> {
                         domainManager.getApiRepository().getMembersPost(
                             PostType.TEXT_IMAGE_VIDEO,
                             OrderBy.HOTTEST,

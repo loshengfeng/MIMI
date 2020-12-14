@@ -3,13 +3,15 @@ package com.dabenxiang.mimi.model.api.vo
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
-@Entity(tableName = "MemberPostItems")
+@Entity
 data class MemberPostItem(
     @PrimaryKey
     @SerializedName("id")
@@ -110,3 +112,12 @@ data class MemberPostItem(
     var postId: Long = 0
 
 ) : BaseMemberPostItem()
+
+class MemberPostItemConverters {
+
+    @TypeConverter
+    fun adItemToJson(item: MemberPostItem): String = Gson().toJson(item)
+
+    @TypeConverter
+    fun jsonToAdItem(value: String):MemberPostItem = Gson().fromJson(value, MemberPostItem::class.java)
+}
