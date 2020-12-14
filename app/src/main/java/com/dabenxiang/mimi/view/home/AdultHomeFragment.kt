@@ -47,8 +47,6 @@ import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.OnLoginRequestDialogListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.ADULT
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
@@ -56,7 +54,6 @@ import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
-import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
@@ -372,30 +369,30 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     override fun navigationToText(bundle: Bundle) {
-        navigateTo(
-            NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_textDetailFragment,
-                bundle
-            )
-        )
+//        navigateTo(
+//            NavigateItem.Destination(
+//                R.id.action_adultHomeFragment_to_textDetailFragment,
+//                bundle
+//            )
+//        )
     }
 
     override fun navigationToPicture(bundle: Bundle) {
-        navigateTo(
-            NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                bundle
-            )
-        )
+//        navigateTo(
+//            NavigateItem.Destination(
+//                R.id.action_adultHomeFragment_to_pictureDetailFragment,
+//                bundle
+//            )
+//        )
     }
 
     override fun navigationToClip(bundle: Bundle) {
-        navigateTo(
-            NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_clipFragment,
-                bundle
-            )
-        )
+//        navigateTo(
+//            NavigateItem.Destination(
+//                R.id.action_adultHomeFragment_to_clipFragment,
+//                bundle
+//            )
+//        )
     }
 
     override fun setupListeners() {
@@ -403,7 +400,7 @@ class AdultHomeFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
-                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
+//                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
             }
         )
 
@@ -424,12 +421,12 @@ class AdultHomeFragment : BaseFragment() {
                 else -> SearchPostItem()
             }
             val bundle = SearchPostFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_homeFragment_to_searchPostFragment,
-                    bundle
-                )
-            )
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_homeFragment_to_searchPostFragment,
+//                    bundle
+//                )
+//            )
         }
 
         iv_post.setOnClickListener {
@@ -465,12 +462,12 @@ class AdultHomeFragment : BaseFragment() {
 
         btn_ranking.setOnClickListener {
             val bundle = RankingFragment.createBundle()
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_rankingFragment,
-                    bundle
-                )
-            )
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_rankingFragment,
+//                    bundle
+//                )
+//            )
         }
 
         btn_filter.setOnClickListener {
@@ -754,14 +751,14 @@ class AdultHomeFragment : BaseFragment() {
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
             checkStatus {
                 when (adultTabType) {
-                    AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 2)
-                        navigationToPicture(bundle)
-                    }
-                    AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 2)
-                        navigationToText(bundle)
-                    }
+//                    AdultTabType.PICTURE -> {
+//                        val bundle = PictureDetailFragment.createBundle(item, 2)
+//                        navigationToPicture(bundle)
+//                    }
+//                    AdultTabType.TEXT -> {
+//                        val bundle = TextDetailFragment.createBundle(item, 2)
+//                        navigationToText(bundle)
+//                    }
                     AdultTabType.CLIP -> {
                         val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
                         navigationToClip(bundle)
@@ -779,39 +776,39 @@ class AdultHomeFragment : BaseFragment() {
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
                 it as MemberPostItem
-                when (item.type) {
-                    PostType.TEXT -> {
-                        findNavController().navigate(
-                                R.id.action_adultHomeFragment_to_postArticleFragment,
-                                bundle
-                        )
-                    }
-                    PostType.IMAGE -> {
-                        findNavController().navigate(
-                                R.id.action_adultHomeFragment_to_postPicFragment,
-                                bundle
-                        )
-                    }
-                    PostType.VIDEO -> {
-                        findNavController().navigate(
-                                R.id.action_adultHomeFragment_to_postVideoFragment,
-                                bundle
-                        )
-                    }
-                }
+//                when (item.type) {
+//                    PostType.TEXT -> {
+//                        findNavController().navigate(
+//                                R.id.action_adultHomeFragment_to_postArticleFragment,
+//                                bundle
+//                        )
+//                    }
+//                    PostType.IMAGE -> {
+//                        findNavController().navigate(
+//                                R.id.action_adultHomeFragment_to_postPicFragment,
+//                                bundle
+//                        )
+//                    }
+//                    PostType.VIDEO -> {
+//                        findNavController().navigate(
+//                                R.id.action_adultHomeFragment_to_postVideoFragment,
+//                                bundle
+//                        )
+//                    }
+//                }
             }
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
-                    navigationToPicture(bundle)
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
-                    navigationToText(bundle)
-                }
+//                AdultTabType.PICTURE -> {
+//                    val bundle = PictureDetailFragment.createBundle(item, 0)
+//                    navigationToPicture(bundle)
+//                }
+//                AdultTabType.TEXT -> {
+//                    val bundle = TextDetailFragment.createBundle(item, 0)
+//                    navigationToText(bundle)
+//                }
                 AdultTabType.CLIP -> {
                     val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
                     navigationToClip(bundle)
@@ -824,23 +821,23 @@ class AdultHomeFragment : BaseFragment() {
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
             val bundle =
                 ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position - 1)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_clipFragment,
-                    bundle
-                )
-            )
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_clipFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
             checkStatus {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position, true)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_adultHomeFragment_to_clipFragment,
-                        bundle
-                    )
-                )
+//                navigateTo(
+//                    NavigateItem.Destination(
+//                        R.id.action_adultHomeFragment_to_clipFragment,
+//                        bundle
+//                    )
+//                )
             }
         }
 
@@ -901,33 +898,33 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onVideoClick(view: View, item: PlayerItem) {
-            val bundle = PlayerFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_navigation_player,
-                    bundle
-                )
-            )
+//            val bundle = PlayerFragment.createBundle(item)
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_navigation_player,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_clipFragment,
-                    bundle
-                )
-            )
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_clipFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-            val bundle = PictureDetailFragment.createBundle(item, 0)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                    bundle
-                )
-            )
+//            val bundle = PictureDetailFragment.createBundle(item, 0)
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
@@ -1008,7 +1005,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onUploadArticle() {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_postArticleFragment)
+//            findNavController().navigate(R.id.action_adultHomeFragment_to_postArticleFragment)
         }
     }
 
@@ -1029,10 +1026,10 @@ class AdultHomeFragment : BaseFragment() {
                     if (PostManager().isVideoTimeValid(myUri, requireContext())) {
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
-                        findNavController().navigate(
-                            R.id.action_adultHomeFragment_to_editVideoFragment,
-                            bundle
-                        )
+//                        findNavController().navigate(
+//                            R.id.action_adultHomeFragment_to_editVideoFragment,
+//                            bundle
+//                        )
                     } else {
                         Toast.makeText(
                             requireContext(),
@@ -1068,15 +1065,15 @@ class AdultHomeFragment : BaseFragment() {
         val bundle = Bundle()
         bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
 
-        findNavController().navigate(
-            R.id.action_adultHomeFragment_to_postPicFragment,
-            bundle
-        )
+//        findNavController().navigate(
+//            R.id.action_adultHomeFragment_to_postPicFragment,
+//            bundle
+//        )
     }
 
     private fun onItemClick(item: MemberClubItem) {
         val bundle = TopicTabFragment.createBundle(item)
-        findNavController().navigate(R.id.action_adultHomeFragment_to_topicDetailFragment, bundle)
+//        findNavController().navigate(R.id.action_adultHomeFragment_to_topicDetailFragment, bundle)
     }
 
     private fun followMember(

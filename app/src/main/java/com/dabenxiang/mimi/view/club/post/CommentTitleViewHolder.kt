@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.picturedetail.viewholder
+package com.dabenxiang.mimi.view.club.post
 
 import android.view.View
 import android.widget.TextView
