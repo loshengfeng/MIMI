@@ -3,11 +3,14 @@ package com.dabenxiang.mimi.widget.utility
 import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import com.dabenxiang.mimi.App
 
 object UriUtils {
     fun getPath(context: Context, uri: Uri): String? {
@@ -51,6 +54,24 @@ object UriUtils {
                     split[1]
                 )
                 return getDataColumn(context, contentUri, selection, selectionArgs)
+            } else { //from cloud
+                var bitmap: Bitmap? =
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        val source =
+                            ImageDecoder.createSource(context.contentResolver, uri)
+                        ImageDecoder.decodeBitmap(source)
+                    } else {
+                        MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                    }
+                bitmap?.also {
+                    val re = Regex("[^A-Za-z0-9 ]")
+                    var fileName = uri.toString().substringAfterLast("/")
+                    fileName = re.replace(fileName, "") + ".jpeg"
+                    val tempImagePath = App.self.getExternalFilesDir(null)?.path
+                        .plus(StringBuffer("/").append(fileName))
+                    FileUtil.saveBitmapToJpegFile(it, it.width, it.height, destPath = tempImagePath)
+                    return tempImagePath
+                }
             }
         } else if ("content".equals(uri.scheme, ignoreCase = true)) {
             return getDataColumn(context, uri, null, null)

@@ -7,7 +7,6 @@
 
     <include app:graph="@navigation/navigation_login" />
     <include app:graph="@navigation/navigation_my_post" />
-    <include app:graph="@navigation/navigation_setting" />
     <include app:graph="@navigation/navigation_topup" />
 
     <fragment
@@ -26,10 +25,6 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
-
-        <action
-            android:id="@+id/action_playerFragment_to_settingFragment"
-            app:destination="@id/navigation_setting" />
 
         <action
             android:id="@+id/action_to_topup"

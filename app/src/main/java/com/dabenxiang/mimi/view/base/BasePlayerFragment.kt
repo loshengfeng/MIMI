@@ -7,12 +7,12 @@ import android.os.Bundle
 import android.view.*
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.topup.TopUpFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.OrientationDetector
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
@@ -35,6 +35,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     private val SWIPE_DISTANCE_UNIT = 25
     private val SWIPE_SOUND_LEAST = 100
     private var volume: Float = 1f
+    private var reportedVideoId = 0L
     open var streamId = 0L
 
     private var player: SimpleExoPlayer? = null
@@ -167,7 +168,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
             }
 
         exo_play_pause.setOnClickListener {
-            playerPause()
+            playerPlayOrPause()
         }
 
         iv_player.setOnClickListener {
@@ -225,6 +226,9 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         playerViewModel.getMediaSource(url, sourceFactory)?.also {
             Timber.d("player ready confirmed")
             player?.prepare(it, isReset, isReset)
+            if(player?.playWhenReady == false) {
+                playerPlayOrPause()
+            }
         }
     }
 
@@ -236,9 +240,12 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     fun sendVideoReport(unhealthy: Boolean) {
         if(streamId != 0L)
             playerViewModel.sendVideoReport(streamId, unhealthy)
+        if(unhealthy) {
+            GeneralUtils.showToast(requireContext(), resources.getString(R.string.source_not_found))
+        }
     }
 
-    private fun playerPause() {
+    private fun playerPlayOrPause() {
         Timber.d("exo_play_pause confirmed")
         player?.also {
             it.playWhenReady.also { playing ->
@@ -456,7 +463,10 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
             ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
             ExoPlayer.STATE_READY -> {
 //                viewModel.activateLoading(false)
-                sendVideoReport(false)
+                if(reportedVideoId != contentId) {
+                    sendVideoReport(false)
+                    reportedVideoId = contentId
+                }
                 player_view.visibility = View.VISIBLE
                 "ExoPlayer.STATE_READY"
             }
@@ -469,7 +479,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
 //            viewModel.setStreamPosition(viewModel.episodePosition.value!! + 1)
 //        }
         if(playbackState == ExoPlayer.STATE_ENDED && playWhenReady) {
-            playerPause()
+            playerPlayOrPause()
             player?.seekTo(0)
         }
     }
@@ -504,6 +514,7 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
                 Timber.d("error: TYPE_SOURCE")
 //                viewModel.activateLoading(true)
                 //showErrorDialog("SOURCE")
+                sendVideoReport(true)
             }
             ExoPlaybackException.TYPE_RENDERER -> {
                 Timber.d("error: TYPE_RENDERER")
@@ -526,7 +537,6 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
                 //showErrorDialog("UNKNOWN")
             }
         }
-        sendVideoReport(true)
     }
 
     /**

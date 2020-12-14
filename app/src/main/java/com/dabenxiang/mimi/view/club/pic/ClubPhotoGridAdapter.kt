@@ -10,7 +10,6 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.ImageItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.view.picturedetail.viewholder.PictureGridViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class ClubPhotoGridAdapter(

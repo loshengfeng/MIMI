@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -53,6 +52,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Success -> {
+                    contentId = it.result.id
                     parsingVideoContent(it.result)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -109,7 +109,9 @@ class PlayerV2Fragment : BasePlayerFragment() {
         }
 
         viewModel.sourceNotFound.observe(viewLifecycleOwner) {
-            sendVideoReport(true)
+            if(!it.isNullOrEmpty()) {
+                sendVideoReport(true)
+            }
         }
     }
 

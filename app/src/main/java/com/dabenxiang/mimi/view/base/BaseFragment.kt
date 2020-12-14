@@ -979,7 +979,9 @@ abstract class BaseFragment : Fragment() {
                 moreDialog?.dismiss()
             }
         }
-        moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener).also {
+
+        val isLogin = mainViewModel?.checkIsLogin()
+        moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, isLogin = isLogin!!).also {
             it.show(
                 requireActivity().supportFragmentManager,
                 MoreDialogFragment::class.java.simpleName

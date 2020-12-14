@@ -5,7 +5,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
-import androidx.core.view.size
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
@@ -14,7 +13,6 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment.Companion.KEY_DATA
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.hideKeyboard
@@ -139,7 +137,7 @@ class PostArticleFragment : BasePostFragment() {
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         } else if (isEdit && page == TEXT) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(PictureDetailFragment.KEY_DATA, item)
+            bundle.putSerializable(KEY_DATA, item)
             bundle.putSerializable(MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
         } else if (isEdit && page == FAVORITE) {

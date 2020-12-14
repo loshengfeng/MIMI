@@ -172,6 +172,11 @@ class ClubCommentFragment : BaseFragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
+        recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
+            if (bottom < oBottom) {
+                recyclerView.scrollBy(0, oBottom - bottom)
+            }
+        }
 
         mainViewModel?.getAd(adWidth, adHeight)
     }
@@ -240,7 +245,7 @@ class ClubCommentFragment : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_textDetailFragment_to_searchPostFragment,
+                    R.id.action_to_searchPostFragment,
                     bundle
                 )
             )

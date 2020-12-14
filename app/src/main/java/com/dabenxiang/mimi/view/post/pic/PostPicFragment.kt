@@ -21,8 +21,8 @@ import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
@@ -142,7 +142,7 @@ class PostPicFragment : BasePostFragment() {
             findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         } else if (isEdit && page == PIC) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(PictureDetailFragment.KEY_DATA, item)
+            bundle.putSerializable(ClubPicFragment.KEY_DATA, item)
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item) //TODO fix key
             findNavController().navigate(R.id.action_postPicFragment_to_clubPicFragment, bundle)
         } else {
@@ -226,7 +226,7 @@ class PostPicFragment : BasePostFragment() {
             try {
                 postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
             } catch(e: Exception) {
-                GeneralUtils.showToast(requireContext(), "仅支援本地图片上传")
+                GeneralUtils.showToast(requireContext(), "不支援此图片上传")
                 onApiError(e)
                 return
             }
