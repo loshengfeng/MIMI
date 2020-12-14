@@ -109,11 +109,7 @@ class ClubTabFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_tab_club
     override fun setupObservers() {
         mainViewModel?.isShowSnackBar?.observe(viewLifecycleOwner, {
-            if (it) {
-                iv_post.isEnabled = false
-            } else {
-                iv_post.isEnabled = true
-            }
+            iv_post.isEnabled = !it
         })
     }
     override fun setupListeners() {
@@ -158,7 +154,7 @@ class ClubTabFragment : BaseFragment() {
     ): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
         view.club_view_pager.adapter = ClubTabAdapter(tabFragmentsCreators, childFragmentManager, lifecycle)
-        view.club_view_pager.offscreenPageLimit = 1
+        view.club_view_pager.offscreenPageLimit = 5
         val tabs = resources.getStringArray(R.array.club_tabs)
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
             val tabView = View.inflate(requireContext(), R.layout.custom_tab, null)

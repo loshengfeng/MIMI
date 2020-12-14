@@ -197,7 +197,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         )
 
         if (adapter.snapshot().items.isEmpty()) {
-            layout_refresh.isRefreshing =true
+            layout_refresh.isRefreshing = true
             adapter.refresh()
         }
 //            viewModel.getData(adapter, type)
