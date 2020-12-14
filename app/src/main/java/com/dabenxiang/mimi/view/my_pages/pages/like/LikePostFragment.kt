@@ -8,19 +8,22 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.*
+import com.dabenxiang.mimi.model.enums.AdultTabType
+import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
-import com.dabenxiang.mimi.view.my_pages.pages.favorites.FavoritesAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -29,11 +32,6 @@ import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
-import kotlinx.android.synthetic.main.item_ad.view.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -43,8 +41,8 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
-    private val adapter: FavoritesAdapter by lazy {
-        FavoritesAdapter(requireActivity(), postListener, viewModel.viewModelScope)
+    private val adapter: LikePostAdapter by lazy {
+        LikePostAdapter(requireActivity(), postListener, viewModel.viewModelScope)
     }
 
     override val bottomNavigationVisibility: Int
@@ -54,7 +52,21 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Timber.i("MyFollowInterestFragment onAttach")
+
+        viewModel.postChangedResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    val changeItem = mainViewModel?.postItemChangedList?.value?.get(it.result.id)
+                    if(changeItem != null) {
+                        if (it.result.isFavorite) changeItem.favoriteCount++
+                        else changeItem.favoriteCount--
+                    }
+                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })
@@ -73,7 +85,9 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
         viewModel.likePostResult.observe(this, {
             when (it) {
-                is ApiResult.Success -> viewModel.getData(adapter)
+                is ApiResult.Success -> it.result.let { position ->
+                    adapter.notifyItemChanged(position)
+                }
                 else -> {
                     onApiError(Exception("Unknown Error!"))
                 }
@@ -84,7 +98,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
             when (it) {
                 is ApiResult.Success -> {
                     it.result.let { position ->
-                        adapter.notifyItemChanged(position, FavoritesAdapter.PAYLOAD_UPDATE_FAVORITE)
+                        adapter.notifyItemChanged(position, LikePostAdapter.PAYLOAD_UPDATE_FAVORITE)
                     }
                 }
                 else -> {
@@ -144,6 +158,9 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
         Timber.i("onResume isLogin:${accountManager.isLogin()}")
         if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
             viewModel.getData(adapter)
+        }  else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
         }
     }
 
@@ -168,7 +185,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
             checkStatus {
                 when (adultTabType) {
                     AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 1)
+                        val bundle = ClubPicFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_to_clubPicFragment,
@@ -177,7 +194,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
                         )
                     }
                     AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 1)
+                        val bundle = ClubTextFragment.createBundle(item, 1)
                         navigateTo(
                             NavigateItem.Destination(
                                 R.id.action_to_clubTextFragment,
@@ -248,7 +265,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
             when (adultTabType) {
                 AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
+                    val bundle = ClubPicFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_to_clubPicFragment,
@@ -257,7 +274,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
                     )
                 }
                 AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
+                    val bundle = ClubTextFragment.createBundle(item, 0)
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_to_clubTextFragment,

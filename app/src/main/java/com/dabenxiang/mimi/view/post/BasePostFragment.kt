@@ -16,9 +16,7 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
@@ -35,7 +33,6 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
@@ -249,10 +246,10 @@ open class BasePostFragment : BaseFragment() {
 
         haveMainTag = true
 
-        setUI(contentItem)
+        setUI(contentItem, item)
     }
 
-    open fun setUI(item: MediaItem) {
+    open fun setUI(item: MediaItem, memberPostItem: MemberPostItem ) {
 
     }
 
@@ -378,11 +375,7 @@ open class BasePostFragment : BaseFragment() {
             txt_clubName.text = item.title
             txt_hashtagName.text = item.tag
 
-            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-            Glide.with(requireContext())
-                .load(bitmap)
-                .circleCrop()
-                .into(iv_avatar)
+            viewModel.loadImage(item.avatarAttachmentId, iv_avatar, LoadImageType.CLUB)
 
             addTag(item.tag, true)
             txt_placeholder.visibility = View.GONE

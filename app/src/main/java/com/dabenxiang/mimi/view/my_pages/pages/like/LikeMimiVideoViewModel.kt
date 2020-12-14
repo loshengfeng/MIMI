@@ -15,7 +15,6 @@ import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoAdapter
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +41,7 @@ class LikeMimiVideoViewModel : BaseViewModel() {
 
     var totalCount: Int = 0
 
-    fun getData(adapter: MyCollectionMimiVideoAdapter) {
+    fun getData(adapter: LikeMimiVideoAdapter) {
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())
             getLikeItemList()
@@ -108,6 +107,18 @@ class LikeMimiVideoViewModel : BaseViewModel() {
                 item.favoriteCount =
                     if (originFavorite) originFavoriteCnt - 1
                     else originFavoriteCnt + 1
+                _videoChangedResult.postValue(
+                    ApiResult.success(
+                        VideoItem(
+                            id = item.videoId?:0,
+                            favorite = item.favorite ?: false,
+                            favoriteCount = item.favoriteCount?.toLong(),
+                            like = item.like,
+                            likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
+                            likeCount = item.likeCount?.toLong()?:0
+                        )
+                    )
+                )
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)

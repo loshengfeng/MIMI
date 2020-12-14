@@ -11,7 +11,6 @@ import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -37,8 +36,14 @@ class ClipViewModel : BaseViewModel() {
     fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
         viewModelScope.launch {
             flow {
-                val videoStreamItem = item.videoEpisodes?.get(0)?.videoStreams?.get(0)?: VideoStream()
-                val result = domainManager.getApiRepository().getVideoM3u8Source(videoStreamItem.id?:0, accountManager.getProfile().userId, videoStreamItem.utcTime, videoStreamItem.sign)
+                val videoStreamItem =
+                    item.videoEpisodes?.get(0)?.videoStreams?.get(0) ?: VideoStream()
+                val result = domainManager.getApiRepository().getVideoM3u8Source(
+                    videoStreamItem.id ?: 0,
+                    accountManager.getProfile().userId,
+                    videoStreamItem.utcTime,
+                    videoStreamItem.sign
+                )
                 if (!result.isSuccessful) throw HttpException(result)
                 val url = result.body()?.content?.streamUrl ?: ""
                 emit(url)
@@ -50,9 +55,10 @@ class ClipViewModel : BaseViewModel() {
                     update(position, "", errorCode)
                 }
                 .collect {
-                    getDecryptSetting(item.source?:"")?.takeIf { it.isVideoDecrypt }?.also { decryptItem ->
-                        decryptM3U8(it, decryptItem) { update(position, it, -1) }
-                    } ?: run {
+                    getDecryptSetting(item.source ?: "")?.takeIf { it.isVideoDecrypt }
+                        ?.also { decryptItem ->
+                            decryptM3U8(it, decryptItem) { update(position, it, -1) }
+                        } ?: run {
                         update(position, it, -1)
                     }
                 }
@@ -108,11 +114,11 @@ class ClipViewModel : BaseViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val resp = apiRepository.sendVideoReport(ReportRequest(content, id))
-                if(!resp.isSuccessful) throw HttpException(resp)
+                if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
-                .catch { e-> emit(ApiResult.error(e)) }
+                .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _videoReport.value = it }
         }
     }
@@ -131,11 +137,14 @@ class ClipViewModel : BaseViewModel() {
                 if (!resp.isSuccessful) throw HttpException(resp)
                 item.favorite = isFavorite
                 item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
+                _videoChangedResult.postValue(ApiResult.success(item))
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
+                .collect {
+                    _favoriteResult.value = it
+                }
         }
     }
 
