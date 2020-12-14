@@ -14,8 +14,8 @@ import com.dabenxiang.mimi.model.api.vo.VideoM3u8Source
 import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.google.gson.Gson
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
+import io.ktor.client.*
+import io.ktor.client.engine.android.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -51,7 +51,8 @@ PlayerV2ViewModel: BaseViewModel() {
 
     val stopVideoPlayer = MutableLiveData(false)
 
-    val sourceNotFound = MutableLiveData("")
+    private val _sourceNotFound = MutableLiveData<String>()
+    val sourceNotFound: LiveData<String> = _sourceNotFound
 
     var videoContentId : Long = -1
     var m3u8SourceUrl: String = ""
@@ -174,13 +175,13 @@ PlayerV2ViewModel: BaseViewModel() {
                         is DownloadResult.Success -> {
                             if (Uri.parse((it.data as String)).isHierarchical) {
                                 Timber.d("download success file path ${it.data}")
-                                if(it.data.isEmpty()) sourceNotFound.postValue("")
+                                if(it.data.isEmpty()) _sourceNotFound.postValue("data is empty")
                                 else _videoStreamingUrl.postValue(it.data)
                             }
                         }
                         is DownloadResult.Error -> {
-                            Timber.d("error ${it.cause}")
-                            sourceNotFound.postValue("")
+                            _sourceNotFound.postValue(it.message)
+                            Timber.d("error ${it.cause}, message ${it.message}")
                         }
                         is DownloadResult.Progress -> {
                             Timber.d("progress ${it.progress}")
