@@ -43,7 +43,16 @@ enum class PostType(val value: Int) {
 class PostTypeConverter {
     @TypeConverter
     fun fromPostType(type: PostType): Int {
-        return type.ordinal
+        return when (type) {
+            PostType.FOLLOWED ->0
+            PostType.TEXT ->1
+            PostType.IMAGE ->2
+            PostType.VIDEO -> 4
+            PostType.TEXT_IMAGE_VIDEO -> 7
+            PostType.VIDEO_ON_DEMAND ->8
+           PostType.SMALL_CLIP -> 16
+            else -> 1024
+        }
     }
 
     @TypeConverter

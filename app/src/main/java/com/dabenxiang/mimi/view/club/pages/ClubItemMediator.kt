@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.RemoteKey
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
@@ -41,20 +42,21 @@ class ClubItemMediator(
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
-//                    val offset = state.key ?: 0
                     val remoteKey = database.withTransaction {
                         database.remoteKeys().remoteKeyByType(postType)
                     }
 
-
-                    if (remoteKey.offset ==0L) {
+                    Timber.i("remoteKey =$remoteKey")
+                    remoteKey?.offset?.let {
+                        remoteKey.offset
+                    } ?: run{
+                        Timber.i("remoteKey endOfPaginationReached")
                         return MediatorResult.Success(endOfPaginationReached = true)
                     }
 
-                    remoteKey.offset
                 }
             }.takeIf { it == null }.run { 0 }
-
+            Timber.i("offset =$offset")
 
             val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
                     ?: AdItem()

@@ -19,8 +19,12 @@ enum class LikeType(val value: Int) {
 
 class LikeTypeConverter {
     @TypeConverter
-    fun fromLikeType(type: LikeType): Int {
-        return type.ordinal
+    fun fromLikeType(type: LikeType?): Int {
+        return when(type){
+            LikeType.LIKE ->0
+            LikeType.DISLIKE ->1
+            null -> -1
+        }
     }
 
     @TypeConverter

@@ -14,7 +14,10 @@ enum class PostStatus(val value: Int) {
 class PostStatusConverter {
     @TypeConverter
     fun fromPostStatus(type: PostStatus): Int {
-        return type.ordinal
+        return when(type){
+            PostStatus.OFFLINE ->0
+            else -> 1
+        }
     }
 
     @TypeConverter

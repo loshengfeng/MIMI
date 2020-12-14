@@ -20,5 +20,5 @@ data class RemoteKey(
         @PrimaryKey
         @ColumnInfo(name = "type")
         val type: PostType,
-        val offset: Long
+        val offset: Long?
 )

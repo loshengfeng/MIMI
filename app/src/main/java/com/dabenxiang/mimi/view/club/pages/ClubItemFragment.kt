@@ -36,8 +36,7 @@ import kotlinx.android.synthetic.main.fragment_club_item.list_short
 import kotlinx.android.synthetic.main.fragment_club_item.text_page_empty
 import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -67,31 +66,31 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         adapter = ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
 
-        lifecycleScope.launchWhenResumed {
-            @OptIn(ExperimentalCoroutinesApi::class)
-            adapter.loadStateFlow.collectLatest { loadStates ->
-//                layout_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
-            }
-        }
-
-        lifecycleScope.launchWhenResumed {
-            @OptIn(ExperimentalCoroutinesApi::class)
-            viewModel.posts(type).collectLatest {
-                adapter.submitData(it)
-//                emptyPageToggle(adapter.snapshot().items.isEmpty())
-            }
-        }
-
-        lifecycleScope.launchWhenResumed {
-            @OptIn(FlowPreview::class)
-            adapter.loadStateFlow
-                    .distinctUntilChangedBy { it.refresh }
-                    .filter { it.refresh is LoadState.NotLoading }
-                    .collect {
-//                        list_short.scrollToPosition(0)
-                        emptyPageToggle(adapter.snapshot().items.isEmpty())
-                    }
-        }
+//        lifecycleScope.launchWhenResumed {
+//            @OptIn(ExperimentalCoroutinesApi::class)
+//            adapter.loadStateFlow.collectLatest { loadStates ->
+////                layout_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
+//            }
+//        }
+//
+//        lifecycleScope.launchWhenResumed {
+//            @OptIn(ExperimentalCoroutinesApi::class)
+//            viewModel.posts(type).collectLatest {
+//                adapter.submitData(it)
+////                emptyPageToggle(adapter.snapshot().items.isEmpty())
+//            }
+//        }
+//
+//        lifecycleScope.launchWhenResumed {
+//            @OptIn(FlowPreview::class)
+//            adapter.loadStateFlow
+//                    .distinctUntilChangedBy { it.refresh }
+//                    .filter { it.refresh is LoadState.NotLoading }
+//                    .collect {
+////                        list_short.scrollToPosition(0)
+//                        emptyPageToggle(false)
+//                    }
+//        }
     }
 
     private fun emptyPageToggle(isHide:Boolean){
@@ -155,6 +154,16 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            viewModel.posts(type).collectLatest {
+                adapter.submitData(it)
+
+            }
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -41,7 +41,7 @@ class ClubItemAdapter(
                     oldItem: MemberPostItem,
                     newItem: MemberPostItem
             ): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem == newItem
             }
 
             override fun areContentsTheSame(

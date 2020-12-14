@@ -6,8 +6,9 @@ import com.dabenxiang.mimi.model.api.vo.AdItemConverters
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Database(
         entities = [MemberPostItem::class, RemoteKey::class],
@@ -38,13 +39,18 @@ abstract class MiMiDB : RoomDatabase() {
 }
 
 class StringArrayListConverters {
+    @TypeConverter
+    fun fromString(value: String?): ArrayList<String> {
+        val listType: Type = object : TypeToken<ArrayList<String?>?>() {}.type
+        return Gson().fromJson(value, listType)
+    }
 
     @TypeConverter
-    fun listToJson(value: List<String>?) = Gson().toJson(value)
-
-    @TypeConverter
-    fun jsonToList(value: String) = Gson().fromJson(value, Array<String>::class.java).toList() as ArrayList
+    fun fromArrayList(list: ArrayList<String?>?): String {
+        return Gson().toJson(list)
+    }
 }
+
 
 object DateConverter {
     @TypeConverter

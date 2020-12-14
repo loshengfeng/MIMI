@@ -1,10 +1,7 @@
 package com.dabenxiang.mimi.model.db
 
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 
@@ -29,3 +26,4 @@ interface MemberPostDao {
     suspend fun deleteItemByType(type: PostType)
 
 }
+

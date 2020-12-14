@@ -18,8 +18,14 @@ data class AdItem(
 class AdItemConverters {
 
     @TypeConverter
-    fun adItemToJson(value: AdItem) = Gson().toJson(value)
+    fun adItemToJson(item: AdItem?): String = item?.let{
+        Gson().toJson(it)
+    } ?: Gson().toJson("")
 
     @TypeConverter
-    fun jsonToAdItem(value: String) = Gson().fromJson(value, AdItem::class.java)
+    fun jsonToAdItem(value: String):AdItem? = value.takeIf { it.isEmpty() }?.let{
+        Gson().fromJson(value, AdItem::class.java)
+    } ?: run {
+        null
+    }
 }
