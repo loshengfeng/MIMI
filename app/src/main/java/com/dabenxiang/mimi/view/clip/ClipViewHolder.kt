@@ -1,7 +1,10 @@
 package com.dabenxiang.mimi.view.clip
 
 import android.view.View
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -40,7 +43,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         clipFuncItem.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
             ?.let { decryptSettingItem ->
-                clipFuncItem.decryptCover(item.cover?:"", decryptSettingItem) {
+                clipFuncItem.decryptCover(item.cover ?: "", decryptSettingItem) {
                     Glide.with(ivCover.context)
                         .load(it).placeholder(R.drawable.img_nopic_03).into(ivCover)
                 }
@@ -56,17 +59,19 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     fun updateAfterM3U8(item: VideoItem, clipFuncItem: ClipFuncItem, pos: Int, isOverdue: Boolean) {
         if (isOverdue) {
-            btnVip.setOnClickListener {
-                clipFuncItem.onVipClick()
-            }
-            btnPromote.setOnClickListener {
-                clipFuncItem.onPromoteClick()
-            }
+            btnVip.setOnClickListener { clipFuncItem.onVipClick() }
+            btnPromote.setOnClickListener { clipFuncItem.onPromoteClick() }
+
+            tvFavorite.isClickable = false
+            tvComment.isClickable = false
+            tvMore.isClickable = false
+
             reminder.visibility = View.VISIBLE
             progress.visibility = View.GONE
+
         } else {
             tvFavorite.setOnClickListener {
-                clipFuncItem.onFavoriteClick(item, pos, item.favorite != true)
+                clipFuncItem.onFavoriteClick(item, pos, !item.favorite)
             }
             tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
             tvMore.setOnClickListener { clipFuncItem.onMoreClick(item) }
