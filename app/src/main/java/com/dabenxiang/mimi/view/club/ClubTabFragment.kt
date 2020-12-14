@@ -283,7 +283,7 @@ class ClubTabFragment : BaseFragment() {
                 try{
                     pciUri.add(UriUtils.getPath(requireContext(), uri)!!)
                 } catch(e: Exception) {
-                    GeneralUtils.showToast(requireContext(), "仅支援本地图片上传")
+                    GeneralUtils.showToast(requireContext(), "不支援此图片上传")
                     onApiError(e)
                 }
             } else {
