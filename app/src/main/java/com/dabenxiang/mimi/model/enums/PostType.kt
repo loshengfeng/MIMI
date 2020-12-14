@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.model.enums
 
+import androidx.room.TypeConverter
 import com.google.gson.annotations.SerializedName
 
 enum class PostType(val value: Int) {
@@ -35,6 +36,27 @@ enum class PostType(val value: Int) {
             }
 
             return result
+        }
+    }
+}
+
+class PostTypeConverter {
+    @TypeConverter
+    fun fromPostType(type: PostType): Int {
+        return type.ordinal
+    }
+
+    @TypeConverter
+    fun toPostType(value: Int): PostType {
+        return when (value) {
+            0 -> PostType.FOLLOWED
+            1 -> PostType.TEXT
+            2 -> PostType.IMAGE
+            4 -> PostType.VIDEO
+            7 -> PostType.TEXT_IMAGE_VIDEO
+            8 -> PostType.VIDEO_ON_DEMAND
+            16 -> PostType.SMALL_CLIP
+            else -> PostType.AD
         }
     }
 }

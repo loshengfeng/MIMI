@@ -14,7 +14,7 @@ interface MemberPostDao {
     suspend fun insertAll(posts: List<MemberPostItem>)
 
     @Query("SELECT * FROM MemberPostItems WHERE type = :type")
-    fun pagingSourceAll(type: PostType): PagingSource<Long, MemberPostItem>
+    fun pagingSourceAll(type: PostType): PagingSource<Int, MemberPostItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertItem(item: MemberPostItem) : Long

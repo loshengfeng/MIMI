@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.db.MiMiDB
+import com.dabenxiang.mimi.model.db.RemoteKey
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import java.io.IOException
@@ -24,7 +25,7 @@ class ClubItemMediator(
         private val adHeight: Int,
         private val type: ClubTabItemType,
         private var postType: PostType
-) : RemoteMediator<Long, MemberPostItem>() {
+) : RemoteMediator<Int, MemberPostItem>() {
 
     companion object {
         const val PER_LIMIT = 10
@@ -33,21 +34,26 @@ class ClubItemMediator(
 
     override suspend fun load(
             loadType: LoadType,
-            state: PagingState<Long, MemberPostItem>
+            state: PagingState<Int, MemberPostItem>
     ): MediatorResult {
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
-                    val lastItem = state.lastItemOrNull()
-                            ?: return MediatorResult.Success(
-                                    endOfPaginationReached = true
-                            )
+//                    val offset = state.key ?: 0
+                    val remoteKey = database.withTransaction {
+                        database.remoteKeys().remoteKeyByType(postType)
+                    }
 
-                    lastItem.id
+
+                    if (remoteKey.offset ==0L) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
+                    }
+
+                    remoteKey.offset
                 }
-            }.takeIf { it == null }.run { 0L }
+            }.takeIf { it == null }.run { 0 }
 
 
             val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
@@ -57,37 +63,37 @@ class ClubItemMediator(
             val result =
                     when (type) {
                         ClubTabItemType.FOLLOW -> {
-                            domainManager.getApiRepository().getPostFollow(offset.toInt(), ClubItemDataSource.PER_LIMIT)
+                            domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
                         }
                         ClubTabItemType.RECOMMEND -> {
                             domainManager.getApiRepository().getMembersPost(
                                     PostType.TEXT_IMAGE_VIDEO,
                                     OrderBy.HOTTEST,
-                                    offset.toInt(),
-                                    ClubItemDataSource.PER_LIMIT
+                                    offset,
+                                    PER_LIMIT
                             )
                         }
                         ClubTabItemType.LATEST -> {
                             domainManager.getApiRepository().getMembersPost(
                                     PostType.TEXT_IMAGE_VIDEO,
                                     OrderBy.NEWEST,
-                                    offset.toInt(),
-                                    ClubItemDataSource.PER_LIMIT
+                                    offset,
+                                    PER_LIMIT
                             )
                         }
                         ClubTabItemType.SHORT_VIDEO -> {
                             domainManager.getApiRepository()
-                                    .getMembersPost(PostType.VIDEO, OrderBy.NEWEST, offset.toInt(), ClubItemDataSource.PER_LIMIT)
+                                    .getMembersPost(PostType.VIDEO, OrderBy.NEWEST, offset, PER_LIMIT)
                         }
                         ClubTabItemType.PICTURE -> {
                             domainManager.getApiRepository().getMembersPost(
                                     PostType.IMAGE, OrderBy.NEWEST,
-                                    offset.toInt(), ClubItemDataSource.PER_LIMIT
+                                    offset, PER_LIMIT
                             )
                         }
                         ClubTabItemType.NOVEL -> {
                             domainManager.getApiRepository()
-                                    .getMembersPost(PostType.TEXT, OrderBy.NEWEST, offset.toInt(), ClubItemDataSource.PER_LIMIT)
+                                    .getMembersPost(PostType.TEXT, OrderBy.NEWEST, offset, PER_LIMIT)
                         }
                     }
             if (!result.isSuccessful) throw HttpException(result)
@@ -103,14 +109,15 @@ class ClubItemMediator(
             }
 
             database.withTransaction {
-                when (loadType) {
-                    LoadType.REFRESH -> database.memberPostDao().deleteItemByType(postType)
-                    else -> {
-                        memberPostItems?.let {
-                            database.memberPostDao().insertAll(it)
-                        }
-                    }
+                if(loadType == LoadType.REFRESH){
+                    database.memberPostDao().deleteItemByType(postType)
+                    database.remoteKeys().deleteByType(postType)
                 }
+                memberPostItems?.let {
+                    database.remoteKeys().insertOrReplace(RemoteKey(postType, result.body()?.paging?.offset ?: 0))
+                    database.memberPostDao().insertAll(it)
+                }
+
             }
 
             val hasNext = hasNextPage(
@@ -118,10 +125,8 @@ class ClubItemMediator(
                     result.body()?.paging?.offset ?: 0,
                     memberPostItems?.size ?: 0
             )
-//        val nextKey = if (hasNext) offset + ClubItemDataSource.PER_LIMIT else null
 
-            return MediatorResult.Success(endOfPaginationReached = hasNext
-            )
+            return MediatorResult.Success(endOfPaginationReached = hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {
@@ -131,7 +136,7 @@ class ClubItemMediator(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
-            currentSize < ClubItemDataSource.PER_LIMIT -> false
+            currentSize < PER_LIMIT -> false
             offset >= total -> false
             else -> true
         }

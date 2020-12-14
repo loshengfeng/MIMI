@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -26,8 +28,20 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.flurry.sdk.it
 import kotlinx.android.synthetic.main.fragment_club_item.*
+import kotlinx.android.synthetic.main.fragment_club_item.id_empty_group
+import kotlinx.android.synthetic.main.fragment_club_item.layout_refresh
+import kotlinx.android.synthetic.main.fragment_club_item.list_short
+import kotlinx.android.synthetic.main.fragment_club_item.text_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -37,10 +51,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val clubTabViewModel: ClubTabViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
-    private val adapter: ClubItemAdapter by lazy {
-        ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
-    }
-
+    private lateinit var adapter: ClubItemAdapter
     override fun getLayoutId() = R.layout.fragment_club_item
 
     companion object {
@@ -52,29 +63,60 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
     }
 
+    private fun initAdapter(){
+
+        adapter = ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
+
+        lifecycleScope.launchWhenResumed {
+            @OptIn(ExperimentalCoroutinesApi::class)
+            adapter.loadStateFlow.collectLatest { loadStates ->
+//                layout_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
+            }
+        }
+
+        lifecycleScope.launchWhenResumed {
+            @OptIn(ExperimentalCoroutinesApi::class)
+            viewModel.posts(type).collectLatest {
+                adapter.submitData(it)
+//                emptyPageToggle(adapter.snapshot().items.isEmpty())
+            }
+        }
+
+        lifecycleScope.launchWhenResumed {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                    .distinctUntilChangedBy { it.refresh }
+                    .filter { it.refresh is LoadState.NotLoading }
+                    .collect {
+//                        list_short.scrollToPosition(0)
+                        emptyPageToggle(adapter.snapshot().items.isEmpty())
+                    }
+        }
+    }
+
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+             id_empty_group.visibility = View.VISIBLE
+                    text_page_empty.text = when (type) {
+                ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
+                else -> getText(R.string.empty_post)
+            }
+            list_short.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            list_short.visibility = View.VISIBLE
+
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        initAdapter()
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it
-        }
-
-        viewModel.postCount.observe(this) {
-            Timber.i("postCount= $it")
-            if (it == 0) {
-                id_empty_group.visibility = View.VISIBLE
-                text_page_empty.text = when (type) {
-                    ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
-                    else -> getText(R.string.empty_post)
-                }
-                list_short.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                list_short.visibility = View.VISIBLE
-            }
-            layout_refresh.isRefreshing = false
         }
 
         viewModel.followResult.observe(this, Observer {
@@ -117,12 +159,14 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         list_short.adapter = adapter
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
             clubTabViewModel.doTask(ClubTabViewModel.REFRESH_TASK)
-            viewModel.getData(adapter, type)
+//            viewModel.getData(adapter, type)
+            adapter.refresh()
         }
 
         tv_register.setOnClickListener {
@@ -178,15 +222,17 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         )
 
         if (adapter.snapshot().items.isEmpty()) {
-            viewModel.getData(adapter, type)
-        } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
-            checkRemovedItems()
+            adapter.refresh()
         }
-
-        if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
-            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
-            adapter.notifyDataSetChanged()
-        }
+//            viewModel.getData(adapter, type)
+//        } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
+//            checkRemovedItems()
+//        }
+//
+//        if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+//            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
+//            adapter.notifyDataSetChanged()
+//        }
 
         viewModel.getAd()
     }

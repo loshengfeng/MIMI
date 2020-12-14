@@ -1,5 +1,7 @@
 package com.dabenxiang.mimi.model.enums
 
+import androidx.room.TypeConverter
+
 enum class LikeType(val value: Int) {
     LIKE(0),
     DISLIKE(1);
@@ -11,6 +13,22 @@ enum class LikeType(val value: Int) {
                 1->DISLIKE
                 else-> null
             }
+        }
+    }
+}
+
+class LikeTypeConverter {
+    @TypeConverter
+    fun fromLikeType(type: LikeType): Int {
+        return type.ordinal
+    }
+
+    @TypeConverter
+    fun toLikeType(value: Int): LikeType? {
+        return when (value) {
+            0 -> LikeType.LIKE
+            1 -> LikeType.DISLIKE
+            else -> null
         }
     }
 }
