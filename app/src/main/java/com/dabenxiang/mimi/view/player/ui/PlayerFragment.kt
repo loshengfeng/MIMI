@@ -1564,13 +1564,13 @@ class PlayerFragment : BaseFragment() {
                 secondBtn = getString(R.string.verify_immediately),
                 secondBlock = {
                     val bundle = Bundle().also { it.putBoolean(KEY_IS_FROM_PLAYER, true) }
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_playerFragment_to_settingFragment,
-                            bundle
-                        )
-
-                    )
+//                    navigateTo(
+//                        NavigateItem.Destination(
+//                            R.id.action_playerFragment_to_settingFragment,
+//                            bundle
+//                        )
+//
+//                    )
                 }
             )
         ).show(requireActivity().supportFragmentManager)

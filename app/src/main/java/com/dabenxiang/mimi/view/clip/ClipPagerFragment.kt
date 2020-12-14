@@ -281,8 +281,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             Timber.d("onMoreClick, item:$item")
             cachedItem = item
             item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
-                val reported = !viewModel.isVIP()
-                showMoreDialog(this.id ?: 0, PostType.VIDEO, reported)
+                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported == true)
             }
         }
     }

@@ -16,12 +16,14 @@ class MoreDialogFragment : BaseDialogFragment() {
         fun newInstance(
             item: BaseMemberPostItem,
             listener: OnMoreDialogListener,
-            isComment: Boolean? = false
+            isComment: Boolean? = false,
+            isLogin: Boolean = false
         ): MoreDialogFragment {
             val fragment = MoreDialogFragment()
             fragment.item = item
             fragment.listener = listener
             fragment.isComment = isComment
+            fragment.isLogin = isLogin
             return fragment
         }
     }
@@ -29,6 +31,7 @@ class MoreDialogFragment : BaseDialogFragment() {
     var item: BaseMemberPostItem? = null
     var isComment: Boolean? = false
     var listener: OnMoreDialogListener? = null
+    var isLogin: Boolean = false
 
     override fun isFullLayout(): Boolean {
         return true
@@ -62,6 +65,13 @@ class MoreDialogFragment : BaseDialogFragment() {
 
         background.setOnClickListener {
             listener?.onCancel()
+        }
+
+        tv_problem_report.isEnabled = isLogin
+
+        if (!isLogin) {
+            tv_problem_report.isEnabled = false
+            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
         }
     }
 

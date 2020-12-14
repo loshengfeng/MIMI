@@ -31,8 +31,6 @@ import timber.log.Timber
 class RankingFragment : BaseFragment() {
 
     companion object {
-        private const val REQUEST_LOGIN = 1000
-
         fun createBundle(): Bundle {
             return Bundle()
         }
@@ -233,21 +231,6 @@ class RankingFragment : BaseFragment() {
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = true
             getRankingList()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_LOGIN -> {
-                    findNavController().navigate(
-                        R.id.action_rankingFragment_to_loginFragment,
-                        data?.extras
-                    )
-                }
-            }
         }
     }
 

@@ -286,7 +286,7 @@
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_clubTextDetailFragment_to_searchPostFragment"
+            android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
         <action
             android:id="@+id/action_to_postArticleFragment"
@@ -304,7 +304,7 @@
             android:id="@+id/action_clubPicFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_clubPicFragment_to_searchPostFragment"
+            android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
         <action
             android:id="@+id/action_to_pictureFragment"
