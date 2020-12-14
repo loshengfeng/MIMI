@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
@@ -89,6 +90,9 @@ class PostVideoFragment : BasePostFragment() {
         )
 
         tv_clean.setOnClickListener {
+
+            GeneralUtils.hideKeyboard(requireActivity())
+
             if (checkFieldIsEmpty()) {
                 return@setOnClickListener
             }
