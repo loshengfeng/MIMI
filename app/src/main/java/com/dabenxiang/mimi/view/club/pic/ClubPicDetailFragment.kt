@@ -205,7 +205,7 @@ class ClubPicDetailFragment : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubPicFragment_to_searchPostFragment,
+                    R.id.action_to_searchPostFragment,
                     bundle
                 )
             )

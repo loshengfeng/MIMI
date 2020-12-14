@@ -9,7 +9,6 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.post.ClubPostPagerAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_text.*
 import kotlinx.android.synthetic.main.fragment_order.viewPager
@@ -54,7 +53,7 @@ class ClubPicFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        memberPostItem = arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
+        memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
 
         tv_title.text = getString(R.string.home_tab_picture)
 
