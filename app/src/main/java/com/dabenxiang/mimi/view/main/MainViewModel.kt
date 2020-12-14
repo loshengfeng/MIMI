@@ -594,6 +594,8 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun checkIsLogin() = accountManager.isLogin()
+
     fun clearOrderItem() {
         _orderItem.postValue(null)
     }
