@@ -41,12 +41,12 @@ class ClubPicFragment : BaseFragment() {
 
     override fun setupListeners() {
         tv_back.setOnClickListener {
-            val isNeedRefresh = arguments?.getBoolean(MyPostFragment.IS_NEED_REFRESH, false)
-            if (isNeedRefresh!!) {
-                navigateTo(NavigateItem.Destination(R.id.action_to_clubTabFragment))
-            } else {
+//            val isNeedRefresh = arguments?.getBoolean(MyPostFragment.IS_NEED_REFRESH, false)
+//            if (isNeedRefresh!!) {
+//                navigateTo(NavigateItem.Destination(R.id.action_to_clubTabFragment))
+//            } else {
                 navigateTo(NavigateItem.Up)
-            }
+//            }
         }
     }
 
