@@ -58,14 +58,12 @@ class ClubItemAdapter(
         }
     }
 
-    var changedPosList = HashMap<Long,MemberPostItem>()
-    var removedPosList = ArrayList<Long>()
+//    var changedPosList = HashMap<Long,MemberPostItem>()
+//    var removedPosList = ArrayList<Long>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(item?.id)) {
-            VIEW_TYPE_DELETED
-        }else when (item?.memberPostItem?.type) {
+        return when (item?.memberPostItem?.type) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
             PostType.IMAGE -> VIEW_TYPE_PICTURE
             PostType.AD -> VIEW_TYPE_AD
@@ -111,10 +109,10 @@ class ClubItemAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
         var item = getItem(position)
-        val changedItem = changedPosList[item?.id]
-        if (changedItem != null) {
-            item?.memberPostItem = changedItem
-        }
+//        val changedItem = changedPosList[item?.id]
+//        if (changedItem != null) {
+//            item?.memberPostItem = changedItem
+//        }
         item?.also {
             when (holder) {
                 is AdHolder -> {

@@ -8,15 +8,19 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 import retrofit2.HttpException
 import timber.log.Timber
 
 abstract class ClubViewModel : BaseViewModel(){
+
+    val mimiDB: MiMiDB by inject()
 
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
@@ -103,20 +107,37 @@ abstract class ClubViewModel : BaseViewModel(){
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion {
+                        mimiDB.postDBItemDao().getItemById(item.id)?.let { dbItem->
+                            val item = dbItem.memberPostItem.apply {
+                                this.isFavorite = isFavorite
+                                this.favoriteCount = when(isFavorite) {
+                                    true -> this.favoriteCount+1
+                                    else -> this.favoriteCount-1
+                                }
+                            }
+                            dbItem.memberPostItem = item
+                            mimiDB.postDBItemDao().insertItem(dbItem)
+                        }
+                 }
                 .collect { _favoriteResult.value = it }
         }
     }
 
-    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
+    fun likePost(
+            item: MemberPostItem,
+            position: Int,
+            isLike: Boolean) {
         viewModelScope.launch {
             Timber.i("likePost item=$item")
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val likeType = when {
-                    isLike -> LikeType.LIKE
-                    else -> LikeType.DISLIKE
-                }
-                val request =  LikeRequest(likeType)
+
+                val likeType: LikeType = when {
+                isLike -> LikeType.LIKE
+                else -> LikeType.DISLIKE
+            }
+                val request = LikeRequest(likeType)
                 val result = when {
                     isLike -> apiRepository.like(item.id, request)
                     else -> apiRepository.deleteLike(item.id)
@@ -126,6 +147,24 @@ abstract class ClubViewModel : BaseViewModel(){
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion {
+                    mimiDB.postDBItemDao().getItemById(item.id)?.let { dbItem->
+                        val item = dbItem.memberPostItem.apply {
+                            when {
+                                isLike -> {
+                                    this.likeType = LikeType.LIKE
+                                    this.likeCount += 1
+                                }
+                                else-> {
+                                    this.likeType = LikeType.DISLIKE
+                                    this.likeCount -= 1
+                                }
+                            }
+                        }
+                        dbItem.memberPostItem = item
+                        mimiDB.postDBItemDao().insertItem(dbItem)
+                    }
+                }
                 .collect {
                     _likePostResult.value = it }
         }

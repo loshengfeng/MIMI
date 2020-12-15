@@ -41,7 +41,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val clubTabViewModel: ClubTabViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
-    private lateinit var adapter: ClubItemAdapter
+    private val adapter: ClubItemAdapter by lazy {
+       ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
+    }
     override fun getLayoutId() = R.layout.fragment_club_item
 
     companion object {
@@ -51,10 +53,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 it.putSerializable(KEY_DATA, item)
             }
         }
-    }
-
-    private fun initAdapter(){
-        adapter = ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
 
     private fun emptyPageToggle(isHide:Boolean){
@@ -76,7 +74,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        initAdapter()
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
@@ -100,10 +97,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         viewModel.likePostResult.observe(this, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    adapter?.notifyItemChanged(
-                        it.result,
-                        ClubItemAdapter.PAYLOAD_UPDATE_LIKE
-                    )
+                    Timber.i("likePostResult = $it")
+                    adapter.notifyDataSetChanged()
                 }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
@@ -189,8 +184,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         )
 
         if (adapter.snapshot().items.isEmpty()) {
-            layout_refresh.isRefreshing = true
-            adapter.refresh()
+//            layout_refresh.isRefreshing = true
+//            adapter.refresh()
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -200,16 +195,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
             }
         }
-
-//            viewModel.getData(adapter, type)
-//        } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
-//            checkRemovedItems()
-//        }
-//
-//        if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
-//            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
-//            adapter.notifyDataSetChanged()
-//        }
 
         viewModel.getAd()
     }
@@ -223,7 +208,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
                 val pos = idList.indexOf(id)
                 Timber.i("id =$id pos =$pos")
-                adapter.removedPosList.add(id)
                 adapter.notifyItemChanged(pos)
             }
         }
