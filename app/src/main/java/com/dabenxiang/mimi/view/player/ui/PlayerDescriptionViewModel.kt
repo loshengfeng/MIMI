@@ -38,6 +38,8 @@ class PlayerDescriptionViewModel : BaseViewModel() {
     private val _reportResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val reportResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _reportResult
 
+    var videoContentId = 0L
+
     fun getAd(width: Int, height: Int) {
         viewModelScope.launch {
             flow {

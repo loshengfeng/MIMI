@@ -11,14 +11,11 @@ import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
@@ -51,11 +48,12 @@ class SplashViewModel : BaseViewModel() {
         if (accountManager.hasMemberToken()) {
             viewModelScope.launch {
                 val profile = accountManager.getProfile()
-                if (TextUtils.isEmpty(profile.account) || TextUtils.isEmpty(profile.password)) {
+                if (TextUtils.isEmpty(profile.account) || TextUtils.isEmpty(pref.memberToken.refreshToken)) {
                     accountManager.logoutLocal()
                     _autoLoginResult.value = ApiResult.success(null)
                 } else {
-                    signIn(profile.account, profile.password)
+                    doRefreshToken()
+//                    signIn(profile.account, profile.password)
                 }
             }
         } else {
@@ -63,9 +61,14 @@ class SplashViewModel : BaseViewModel() {
         }
     }
 
-    private suspend fun signIn(account: String, password: String) {
-        accountManager.signIn(account, password)
-            .collect { _autoLoginResult.value = it }
+//    private suspend fun signIn(account: String, password: String) {
+//        accountManager.signIn(account, password)
+//            .collect { _autoLoginResult.value = it }
+//    }
+
+    private suspend fun doRefreshToken() {
+        accountManager.refreshToken()
+                .collect { _autoLoginResult.value = it }
     }
 
     fun checkVersion() {

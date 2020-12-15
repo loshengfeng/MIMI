@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
@@ -67,7 +66,7 @@ class ClubTextDetailAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
-            0 -> PictureDetailAdapter.VIEW_TYPE_AD
+            0 -> VIEW_TYPE_AD
             1 -> VIEW_TYPE_TEXT_DETAIL
             else -> VIEW_TYPE_TEXT_DETAIL
         }

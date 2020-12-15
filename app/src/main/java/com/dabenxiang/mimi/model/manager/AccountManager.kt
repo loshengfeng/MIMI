@@ -128,9 +128,9 @@ class AccountManager(
             .catch { e -> emit(ApiResult.error(e)) }
             .onCompletion { emit(ApiResult.loaded()) }
 
-    fun signIn(userName: String, password: String) =
+    fun signIn(userName: String, password: String, code: String) =
         flow {
-            val request = SignInRequest(userName, password)
+            val request = SignInRequest(userName = userName, password = password, code = code)
             val result = domainManager.getApiRepository().signIn(request)
             if (!result.isSuccessful) throw HttpException(result)
 
@@ -153,7 +153,7 @@ class AccountManager(
                         userId = meItem?.id ?: 0,
                         deviceId = GeneralUtils.getAndroidID(),
                         account = userName,
-                        password = password,
+                        password = "",
                         friendlyName = meItem?.friendlyName ?: "",
                         avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
                         isEmailConfirmed = meItem?.isEmailConfirmed ?: false,

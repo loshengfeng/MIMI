@@ -314,6 +314,7 @@
     <string name="load_more_comment_fail">加载失败</string>
     <string name="reply">回复</string>
     <string name="n_reply">%d个回复</string>
+    <string name="source_not_found">加载失败，该片源可能遭移除</string>
 
     <string-array name="player_short_video_tabs">
         <item>@string/video_desc</item>

@@ -10,7 +10,6 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.post.ClubPostPagerAdapter
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.IS_NEED_REFRESH
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_club_text.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -42,19 +41,19 @@ class ClubTextFragment : BaseFragment() {
 
     override fun setupListeners() {
         tv_back.setOnClickListener {
-            val isNeedRefresh = arguments?.getBoolean(IS_NEED_REFRESH, false)
-            if (isNeedRefresh!!) {
-                navigateTo(NavigateItem.Destination(R.id.action_to_clubTabFragment))
-            } else {
+//            val isNeedRefresh = arguments?.getBoolean(IS_NEED_REFRESH, false)
+//            if (isNeedRefresh!!) {
+//                navigateTo(NavigateItem.Destination(R.id.action_to_clubTabFragment))
+//            } else {
                 navigateTo(NavigateItem.Up)
-            }
+//            }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        memberPostItem = arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as MemberPostItem
+        memberPostItem = arguments?.getSerializable(KEY_DATA) as MemberPostItem
 
         tv_title.text = getString(R.string.home_tab_text)
 

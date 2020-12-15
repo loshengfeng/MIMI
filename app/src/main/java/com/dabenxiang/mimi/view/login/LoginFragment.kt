@@ -5,13 +5,17 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.Editable
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
+import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.WindowManager
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -100,12 +104,23 @@ class LoginFragment : BaseFragment() {
 
         viewModel.validateCodeError.observe(viewLifecycleOwner, {
             if (it == "") {
-                layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle)
-                tv_validate_code_error.visibility = View.INVISIBLE
+                if (viewModel.clickType == TYPE_REGISTER) {
+                    layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle)
+                    tv_validate_code_error.visibility = View.INVISIBLE
+                } else {
+                    layout_login_verification_code.setBackgroundResource(R.drawable.layout_rectangle)
+                    tv_login_validate_code_error.visibility = View.INVISIBLE
+                }
             } else {
-                layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle_error)
-                tv_validate_code_error.text = it
-                tv_validate_code_error.visibility = View.VISIBLE
+                if (viewModel.clickType == TYPE_REGISTER) {
+                    layout_verification_code.setBackgroundResource(R.drawable.layout_rectangle_error)
+                    tv_validate_code_error.text = it
+                    tv_validate_code_error.visibility = View.VISIBLE
+                } else {
+                    layout_login_verification_code.setBackgroundResource(R.drawable.layout_rectangle_error)
+                    tv_login_validate_code_error.text = it
+                    tv_login_validate_code_error.visibility = View.VISIBLE
+                }
             }
         })
 
@@ -153,6 +168,17 @@ class LoginFragment : BaseFragment() {
             }
         })
 
+        viewModel.loginVerificationCodeError.observe(viewLifecycleOwner, {
+            if (it == "") {
+                layout_login_verification_code.setBackgroundResource(R.drawable.edit_text_rectangle)
+                tv_login_validate_code_error.visibility = View.INVISIBLE
+            } else {
+                layout_login_verification_code.setBackgroundResource(R.drawable.edit_text_error_rectangle)
+                tv_login_validate_code_error.text = it
+                tv_login_validate_code_error.visibility = View.VISIBLE
+            }
+        })
+
         viewModel.registerResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
@@ -184,13 +210,28 @@ class LoginFragment : BaseFragment() {
             it?.let {
                 val callPrefix = tv_call_prefix.text.toString()
                 if (callPrefix == getString(R.string.login_mobile_call_prefix_taiwan) && it.length == 9) {
-                    validateMobile(it)
+                    validateMobile(it, tv_get_code, tv_call_prefix)
                 } else if (callPrefix == getString(R.string.login_mobile_call_prefix_china) && it.length == 11) {
-                    validateMobile(it)
+                    validateMobile(it, tv_get_code, tv_call_prefix)
                 } else {
                     viewModel.onResetMobileError()
                     tv_get_code.isEnabled = false
                     tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
+                }
+            }
+        })
+
+        viewModel.loginAccount.observe(viewLifecycleOwner, {
+            it?.let {
+                val callPrefix = tv_login_call_prefix.text.toString()
+                if (callPrefix == getString(R.string.login_mobile_call_prefix_taiwan) && it.length == 9) {
+                    validateMobile(it, tv_get_login_code, tv_login_call_prefix)
+                } else if (callPrefix == getString(R.string.login_mobile_call_prefix_china) && it.length == 11) {
+                    validateMobile(it, tv_get_login_code, tv_login_call_prefix)
+                } else {
+                    viewModel.onResetMobileError()
+                    tv_get_login_code.isEnabled = false
+                    tv_get_login_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
                 }
             }
         })
@@ -201,6 +242,7 @@ class LoginFragment : BaseFragment() {
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
                     countDownTimer.start()
+                    loginCountDownTimer.start()
                     GeneralUtils.showToast(requireContext(), getString(R.string.send_msg))
                 }
                 is Error -> onApiError(it.throwable)
@@ -219,15 +261,15 @@ class LoginFragment : BaseFragment() {
         })
     }
 
-    private fun validateMobile(mobile: String) {
-        val errMsg = viewModel.isValidateMobile(mobile, tv_call_prefix.text.toString())
+    private fun validateMobile(mobile: String, getCodeView: TextView, prefixView: TextView) {
+        val errMsg = viewModel.isValidateMobile(mobile, prefixView.text.toString())
         if (errMsg.isNotBlank()) {
-            tv_get_code.isEnabled = false
-            tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
+            getCodeView.isEnabled = false
+            getCodeView.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1_30))
             viewModel.onMobileError(errMsg)
         } else {
-            tv_get_code.isEnabled = true
-            tv_get_code.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
+            getCodeView.isEnabled = true
+            getCodeView.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_black_1))
         }
     }
 
@@ -240,6 +282,18 @@ class LoginFragment : BaseFragment() {
         override fun onTick(p0: Long) {
             tv_get_code?.isEnabled = false
             tv_get_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
+        }
+    }
+
+    private val loginCountDownTimer = object : CountDownTimer(60000, 1000) {
+        override fun onFinish() {
+            tv_get_login_code?.isEnabled = true
+            tv_get_login_code?.text = getString(R.string.login_get_code)
+        }
+
+        override fun onTick(p0: Long) {
+            tv_get_login_code?.isEnabled = false
+            tv_get_login_code?.text = String.format(getString(R.string.send_code_count_down), p0 / 1000)
         }
     }
 
@@ -272,15 +326,15 @@ class LoginFragment : BaseFragment() {
                 R.id.btn_register -> {
                     viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())
                 }
-                R.id.btn_forget -> navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
-                R.id.btn_login -> viewModel.doLoginValidateAndSubmit(tv_login_call_prefix.text.toString())
+//                R.id.btn_forget -> navigateTo(NavigateItem.Destination(R.id.action_loginFragment_to_forgetPasswordFragment))
+                R.id.btn_login -> viewModel.doLoginValidateAndSubmit(tv_login_call_prefix.text.toString(), group_pwd.isVisible)
             }
         }.also {
             btnClose.setOnClickListener(it)
             btn_register_cancel.setOnClickListener(it)
             btn_login_cancel.setOnClickListener(it)
             btn_register.setOnClickListener(it)
-            btn_forget.setOnClickListener(it)
+//            btn_forget.setOnClickListener(it)
             btn_login.setOnClickListener(it)
         }
 
@@ -313,7 +367,21 @@ class LoginFragment : BaseFragment() {
         }
 
         tv_get_code.setOnClickListener {
-            viewModel.callValidateMessage(tv_call_prefix.text.toString())
+            viewModel.callValidateMessage(tv_call_prefix.text.toString(), viewModel.mobile.value?:"")
+        }
+
+        tv_get_login_code.setOnClickListener {
+            viewModel.callValidateMessage(tv_login_call_prefix.text.toString(), viewModel.loginAccount.value
+                    ?: "")
+        }
+
+        layout_login_verification_code.setOnClickListener {
+            viewModel.changePWDCount++
+            if (viewModel.changePWDCount == 10) {
+                viewModel.changePWDCount = 0
+                group_pwd.visibility = View.VISIBLE
+
+            }
         }
 
         tv_call_prefix.setOnClickListener {
@@ -373,6 +441,7 @@ class LoginFragment : BaseFragment() {
         viewModel.registerPw.bindingEditText = edit_register_pw
         viewModel.confirmPw.bindingEditText = edit_register_confirm_pw
         viewModel.loginAccount.bindingEditText = edit_login_account
+        viewModel.loginVerificationCode.bindingEditText = edit_login_verification_code
         viewModel.loginPw.bindingEditText = edit_login_pw
 
         tl_type.selectTab(
@@ -397,6 +466,7 @@ class LoginFragment : BaseFragment() {
         }
 
         tv_get_code.isEnabled = false
+        tv_get_login_code.isEnabled = false
     }
 
     override fun navigateTo(item: NavigateItem) {
@@ -449,11 +519,18 @@ class LoginFragment : BaseFragment() {
                 showErrorMessageDialog(getString(R.string.error_validation))
 //                viewModel.inviteCodeError()
             }
+            SERVER_ERROR -> {
+                showErrorMessageDialog(errorHandler.httpExceptionItem.errorItem.message
+                        ?: "Server error")
+            }
             LOGIN_409000 -> {
                 countDownTimer.cancel()
                 countDownTimer.onFinish()
+                loginCountDownTimer.cancel()
+                loginCountDownTimer.onFinish()
                 viewModel.onMobileError(getString(R.string.error_mobile_duplicate))
                 edit_verification_code.setText("")
+                tv_login_validate_code_error.setText("")
             }
         }
     }
@@ -476,6 +553,8 @@ class LoginFragment : BaseFragment() {
         val copyText = clipDataItem?.text.toString() ?: ""
 
         if (copyText.contains(MIMI_INVITE_CODE)) {
+            edit_invite_code.isFocusable = false
+            edit_invite_code.isClickable = false
             val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
             val inviteCode = copyText.substring(startIndex, copyText.length)
             viewModel.inviteCode.value = inviteCode

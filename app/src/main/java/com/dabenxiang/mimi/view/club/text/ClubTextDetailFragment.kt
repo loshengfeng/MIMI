@@ -163,7 +163,7 @@ class ClubTextDetailFragment : BaseFragment() {
             val bundle = SearchPostFragment.createBundle(item)
             navigateTo(
                 NavigateItem.Destination(
-                    R.id.action_clubTextDetailFragment_to_searchPostFragment,
+                    R.id.action_to_searchPostFragment,
                     bundle
                 )
             )

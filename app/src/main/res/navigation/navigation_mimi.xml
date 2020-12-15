@@ -9,7 +9,6 @@
     <include app:graph="@navigation/navigation_player" />
     <include app:graph="@navigation/navigation_clip_player" />
     <include app:graph="@navigation/navigation_clip" />
-    <include app:graph="@navigation/navigation_picture" />
     <include app:graph="@navigation/navigation_my_post" />
 
     <fragment
@@ -66,8 +65,8 @@
         <action
             android:id="@+id/action_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
-
     </fragment>
+
     <fragment
         android:id="@+id/clipSingleFragment"
         android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
@@ -102,7 +101,6 @@
             app:destination="@id/navigation_player" />
 
     </fragment>
-
 
     <fragment
         android:id="@+id/searchVideoFragment"
@@ -150,7 +148,7 @@
             android:id="@+id/action_clubPicFragment_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
         <action
-            android:id="@+id/action_clubPicFragment_to_searchPostFragment"
+            android:id="@+id/action_to_searchPostFragment"
             app:destination="@id/searchPostFragment" />
         <action
             android:id="@+id/action_to_pictureFragment"
