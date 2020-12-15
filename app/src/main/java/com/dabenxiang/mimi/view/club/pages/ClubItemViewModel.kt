@@ -30,7 +30,7 @@ class ClubItemViewModel : ClubViewModel() {
             clearListCh.receiveAsFlow().map { PagingData.empty() },
             postItems(type)
 
-    ).flattenMerge(2)
+    ).flattenMerge(2).buffer()
 
     private fun postItems(type: ClubTabItemType, postType:PostType = getPostType(type)) = Pager(
             config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),

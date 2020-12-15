@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.db.RemoteKey
+import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -65,7 +66,6 @@ class ClubItemMediator(
                             domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
                         }
                         ClubTabItemType.HOTTEST -> {
-                            Timber.i("ClubItemMediator RECOMMEND ")
                             domainManager.getApiRepository().getMembersPost(
                                     PostType.TEXT_IMAGE_VIDEO,
                                     OrderBy.HOTTEST,
@@ -97,24 +97,18 @@ class ClubItemMediator(
                         }
                     }
 
-            if(type == ClubTabItemType.HOTTEST){
-                Timber.i("ClubItemMediator HOTTEST result =$result ")
-            }
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result.body()
-            if(type == ClubTabItemType.HOTTEST){
-                Timber.i("ClubItemMediator HOTTEST body =$body ")
-            }
-
             val memberPostItems = body?.content
             val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
-//            val list = arrayListOf<MemberPostItem>()
-//
-//            memberPostItems?.forEachWithIndex { index, item ->
-//                if (index == 5) list.add(memberPostAdItem)
-//                list.add(item)
-//            }
+            val list = arrayListOf<MemberPostItem>()
+
+            memberPostItems?.forEachWithIndex { index, item ->
+                if (index == 5) list.add(memberPostAdItem)
+                list.add(item)
+            }
+            
             pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
