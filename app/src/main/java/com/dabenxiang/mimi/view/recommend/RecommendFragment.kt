@@ -73,8 +73,8 @@ class RecommendFragment(
     private fun setupBannerUi(categoryBanners: List<CategoryBanner>) {
         banner.also {
             val indicator = IndicatorView(requireContext())
-                .setIndicatorColor(Color.LTGRAY)
-                .setIndicatorSelectorColor(Color.DKGRAY)
+                .setIndicatorColor(Color.DKGRAY)
+                .setIndicatorSelectorColor(Color.LTGRAY)
             it.setIndicator(indicator)
             it.setPageTransformer(ScaleInTransformer())
             it.setPageMargin(
