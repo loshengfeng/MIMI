@@ -28,7 +28,6 @@ class ClubItemViewModel : ClubViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun posts(type: ClubTabItemType) = flowOf(
             clearListCh.receiveAsFlow().map { PagingData.empty() },
-
             postItems(type)
 
     ).flattenMerge(2)

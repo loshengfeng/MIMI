@@ -126,14 +126,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             emptyPageToggle(it <=0)
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            viewModel.posts(type).collectLatest {
-                adapter.submitData(it)
-
-            }
-        }
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -200,6 +192,15 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             layout_refresh.isRefreshing = true
             adapter.refresh()
         }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(type).collectLatest {
+                adapter.submitData(it)
+
+            }
+        }
+
 //            viewModel.getData(adapter, type)
 //        } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
 //            checkRemovedItems()

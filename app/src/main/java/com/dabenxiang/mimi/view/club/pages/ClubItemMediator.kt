@@ -51,12 +51,7 @@ class ClubItemMediator(
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByType(type)
                     }
-
-                    remoteKey?.offset?.let {
-                        remoteKey.offset
-                    } ?: run{
-                        return MediatorResult.Success(endOfPaginationReached = true)
-                    }
+                    remoteKey.offset
 
                 }
             }.takeIf { it == null }.run { 0 }
@@ -75,7 +70,7 @@ class ClubItemMediator(
                                     PostType.TEXT_IMAGE_VIDEO,
                                     OrderBy.HOTTEST,
                                     offset,
-                                    PER_LIMIT
+                                    ClubItemDataSource.PER_LIMIT
                             )
                         }
                         ClubTabItemType.LATEST -> {
@@ -101,9 +96,17 @@ class ClubItemMediator(
                                     .getMembersPost(PostType.TEXT, OrderBy.NEWEST, offset, PER_LIMIT)
                         }
                     }
+
+            if(type == ClubTabItemType.HOTTEST){
+                Timber.i("ClubItemMediator HOTTEST result =$result ")
+            }
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result.body()
+            if(type == ClubTabItemType.HOTTEST){
+                Timber.i("ClubItemMediator HOTTEST body =$body ")
+            }
+
             val memberPostItems = body?.content
             val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
 //            val list = arrayListOf<MemberPostItem>()
@@ -112,7 +115,7 @@ class ClubItemMediator(
 //                if (index == 5) list.add(memberPostAdItem)
 //                list.add(item)
 //            }
-
+            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
                     when(type){
@@ -161,7 +164,6 @@ class ClubItemMediator(
                     result.body()?.paging?.offset ?: 0,
                     memberPostItems?.size ?: 0
             )
-            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
             return MediatorResult.Success(endOfPaginationReached = hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
