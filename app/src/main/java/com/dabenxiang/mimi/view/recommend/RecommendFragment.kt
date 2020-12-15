@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
+import com.to.aboomy.pager2banner.ScaleInTransformer
 import kotlinx.android.synthetic.main.fragment_recommend.*
 
 class RecommendFragment(
@@ -70,12 +71,16 @@ class RecommendFragment(
     }
 
     private fun setupBannerUi(categoryBanners: List<CategoryBanner>) {
-        val indicator = IndicatorView(requireContext())
-            .setIndicatorColor(Color.LTGRAY)
-            .setIndicatorSelectorColor(Color.DKGRAY)
-
         banner.also {
+            val indicator = IndicatorView(requireContext())
+                .setIndicatorColor(Color.DKGRAY)
+                .setIndicatorSelectorColor(Color.LTGRAY)
             it.setIndicator(indicator)
+            it.setPageTransformer(ScaleInTransformer())
+            it.setPageMargin(
+                GeneralUtils.dpToPx(it.context, 20),
+                GeneralUtils.dpToPx(it.context, 10)
+            )
             it.adapter = BannerAdapter(categoryBanners, bannerFuncItem)
         }
     }

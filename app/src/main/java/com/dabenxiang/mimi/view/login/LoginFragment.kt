@@ -553,8 +553,8 @@ class LoginFragment : BaseFragment() {
         val copyText = clipDataItem?.text.toString() ?: ""
 
         if (copyText.contains(MIMI_INVITE_CODE)) {
-            edit_invite_code.visibility = View.GONE
-            tv_invite_code_error.visibility = View.GONE
+            edit_invite_code.isFocusable = false
+            edit_invite_code.isClickable = false
             val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
             val inviteCode = copyText.substring(startIndex, copyText.length)
             viewModel.inviteCode.value = inviteCode
