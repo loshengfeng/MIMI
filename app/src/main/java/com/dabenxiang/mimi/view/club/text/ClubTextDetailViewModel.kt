@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,8 +79,9 @@ class ClubTextDetailViewModel : BaseViewModel() {
                         }
                         adapter.setList(finalList)
                     }
+                    if(load.isEnd) delay(500)
+                    setupLoadMoreResult(adapter, load.isEnd)
                 }
-                setupLoadMoreResult(adapter, load.isEnd)
             }
 
             adapter.loadMoreModule.setOnLoadMoreListener {
