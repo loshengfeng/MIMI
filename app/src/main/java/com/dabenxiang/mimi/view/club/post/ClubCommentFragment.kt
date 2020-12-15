@@ -34,6 +34,7 @@ import kotlinx.android.synthetic.main.fragment_club_comment.et_message
 import kotlinx.android.synthetic.main.fragment_club_comment.layout_edit_bar
 import kotlinx.android.synthetic.main.fragment_club_comment.tv_replay_name
 import kotlinx.android.synthetic.main.fragment_club_text_detail.recyclerView
+import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -176,7 +177,8 @@ class ClubCommentFragment : BaseFragment() {
                         Pair(id, comment)
                     }?.also { (id, comment) ->
                         val replyId = et_message.tag?.let { rid -> rid as Long }
-                        viewModel.postComment(id, replyId, comment)
+                        val replyName = tv_replay_name.text.toString()
+                        viewModel.postComment(id, replyId, "$replyName $comment")
                     }
                 }
             }
