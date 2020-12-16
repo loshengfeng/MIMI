@@ -199,12 +199,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private fun onMoreClick(item: VideoItem) {
-        checkStatus {
-            Timber.d("onMoreClick, item:$item")
-            cachedItem = item
-            item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
-                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false)
-            }
+        Timber.d("onMoreClick, item:$item")
+        cachedItem = item
+        item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
+            showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false)
         }
     }
 
@@ -292,27 +290,25 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
-            checkStatus {
-                if ((item as MemberPostItem).reported) {
-                    GeneralUtils.showToast(
-                        App.applicationContext(),
-                        getString(R.string.already_reported)
-                    )
-                } else {
-                    reportDialog =
-                        ReportDialogFragment.newInstance(
-                            item = item,
-                            listener = onReportDialogListener,
-                            isComment = isComment
-                        ).also {
-                            it.show(
-                                requireActivity().supportFragmentManager,
-                                ReportDialogFragment::class.java.simpleName
-                            )
-                        }
-                }
-                moreDialog?.dismiss()
+            if ((item as MemberPostItem).reported) {
+                GeneralUtils.showToast(
+                    App.applicationContext(),
+                    getString(R.string.already_reported)
+                )
+            } else {
+                reportDialog =
+                    ReportDialogFragment.newInstance(
+                        item = item,
+                        listener = onReportDialogListener,
+                        isComment = isComment
+                    ).also {
+                        it.show(
+                            requireActivity().supportFragmentManager,
+                            ReportDialogFragment::class.java.simpleName
+                        )
+                    }
             }
+            moreDialog?.dismiss()
         }
 
         override fun onCancel() {
