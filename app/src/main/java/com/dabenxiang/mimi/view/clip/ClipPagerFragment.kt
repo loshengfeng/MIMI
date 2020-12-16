@@ -202,7 +202,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         Timber.d("onMoreClick, item:$item")
         cachedItem = item
         item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
-            showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false)
+            showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false, item.deducted)
         }
     }
 
@@ -270,13 +270,15 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         id: Long,
         type: PostType,
         isReported: Boolean,
+        deducted: Boolean?,
         isComment: Boolean = false
     ) {
         Timber.i("id: $id")
         Timber.i("isReported: $isReported")
+        Timber.i("deducted: $deducted")
 
         moreDialog = MoreDialogFragment.newInstance(
-            MemberPostItem(id = id, type = type, reported = isReported),
+            MemberPostItem(id = id, type = type, reported = isReported, deducted = deducted?:false),
             onMoreDialogListener,
             isComment,
             mainViewModel?.checkIsLogin() ?: false
