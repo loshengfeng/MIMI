@@ -229,6 +229,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 }
             }
         })
+
+        viewModel.isVipCheck.observe(viewLifecycleOwner, {
+            Timber.d("@@Dave: $it")
+        })
     }
 
     override fun resetObservers() {
@@ -250,6 +254,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     private fun onVipClick() {
         checkStatus {
+            // TODO: @@Dave 發送檢查VIP通知
+            viewModel.setupVipCheck(true)
             navigateTo(NavigateItem.Destination(R.id.action_to_topup))
         }
     }
@@ -281,7 +287,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             Timber.d("onMoreClick, item:$item")
             cachedItem = item
             item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
-                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported == true)
+                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false)
             }
         }
     }
@@ -355,13 +361,14 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         isReported: Boolean,
         isComment: Boolean = false
     ) {
-        Timber.i("id=$id")
-        Timber.i("isReported=$isReported")
+        Timber.i("id: $id")
+        Timber.i("isReported: $isReported")
 
         moreDialog = MoreDialogFragment.newInstance(
             MemberPostItem(id = id, type = type, reported = isReported),
             onMoreDialogListener,
-            isComment
+            isComment,
+            mainViewModel?.checkIsLogin() ?: false
         ).also {
             it.show(
                 requireActivity().supportFragmentManager,

@@ -33,6 +33,13 @@ class ClipViewModel : BaseViewModel() {
     private val _videoReport = MutableLiveData<ApiResult<Nothing>>()
     val videoReport: LiveData<ApiResult<Nothing>> = _videoReport
 
+    private val _isVipCheck = MutableLiveData<Boolean>()
+    val isVipCheck: LiveData<Boolean> = _isVipCheck
+
+    fun setupVipCheck(isCheckVip: Boolean) {
+        _isVipCheck.value = isCheckVip
+    }
+
     fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
         viewModelScope.launch {
             flow {
