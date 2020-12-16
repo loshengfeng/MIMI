@@ -398,7 +398,7 @@
     <string name="post_hint_tag">请输入标签, 字数限 10 字</string>
     <string name="post_warning_title">请输入标题</string>
     <string name="post_warning_content">请输入内容</string>
-    <string name="post_warning_tag">请选择圈子</string>
+    <string name="post_warning_tag">请选择社区</string>
     <string name="post_warning_pic">请选择照片</string>
     <string name="post_warning_video">请选择影片</string>
     <string name="post_warning_tag_limit">已超过标签上限20个，请确认</string>
