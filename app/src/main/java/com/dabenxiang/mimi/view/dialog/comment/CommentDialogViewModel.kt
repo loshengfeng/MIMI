@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.api.vo.PostCommentRequest
 import com.dabenxiang.mimi.model.api.vo.PostLikeRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
@@ -19,14 +20,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
+import java.util.*
 
 class CommentDialogViewModel: BaseViewModel() {
 
     private val _apiLoadReplyCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val apiLoadReplyCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiLoadReplyCommentResult
 
-    private val _apiPostCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
-    val apiPostCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiPostCommentResult
+    private val _apiPostCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>>()
+    val apiPostCommentResult: LiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>> = _apiPostCommentResult
 
     private val _apiCommentLikeResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
     val apiCommentLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _apiCommentLikeResult
@@ -184,8 +186,20 @@ class CommentDialogViewModel: BaseViewModel() {
             flow {
                 val resp = domainManager.getApiRepository().postMembersPostComment(videoId, body)
                 if (!resp.isSuccessful) throw HttpException(resp)
-
-                emit(ApiResult.success(null))
+                val comment = MembersPostCommentItem(
+                    content = body.content,
+                    creationDate = Date(),
+                    creatorId = accountManager.getProfile().userId,
+                    postAvatarAttachmentId = accountManager.getProfile().avatarAttachmentId,
+                    postName = accountManager.getProfile().friendlyName,
+                    commentCount = 0,
+                    dislikeCount = 0,
+                    id = resp.body()?.content,
+                    likeCount = 0,
+                    likeType = null,
+                    reported = false
+                )
+                emit(ApiResult.success(comment))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e ->

@@ -188,6 +188,7 @@
             tools:visibility="visible" />
 
         <EditText
+            android:visibility="gone"
             android:id="@+id/edit_register_pw"
             style="@style/login_edit_text"
             android:layout_height="wrap_content"
@@ -209,7 +210,7 @@
             android:background="@drawable/ico_eye_selector"
             android:button="@null"
             android:checked="false"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/edit_register_pw"
             app:layout_constraintEnd_toEndOf="@id/edit_register_pw"
             app:layout_constraintTop_toTopOf="@id/edit_register_pw" />
@@ -223,10 +224,10 @@
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_register_pw"
-            tools:text="错误讯息"
-            tools:visibility="visible" />
+            tools:text="错误讯息" />
 
         <EditText
+            android:visibility="gone"
             android:id="@+id/edit_register_confirm_pw"
             style="@style/login_edit_text"
             android:layout_height="wrap_content"
@@ -247,7 +248,7 @@
             android:layout_marginEnd="12dp"
             android:background="@drawable/ico_eye_selector"
             android:button="@null"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/edit_register_confirm_pw"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/edit_register_confirm_pw" />
@@ -261,8 +262,7 @@
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_register_confirm_pw"
-            tools:text="错误讯息"
-            tools:visibility="visible" />
+            tools:text="错误讯息" />
 
         <TextView
             android:id="@+id/tv_desc"
