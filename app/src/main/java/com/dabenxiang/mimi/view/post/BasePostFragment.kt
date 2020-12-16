@@ -438,6 +438,13 @@ open class BasePostFragment : BaseFragment() {
                 Toast.LENGTH_SHORT
             ).show()
             false
+        } else if (!haveMainTag) {
+            Toast.makeText(
+                requireContext(),
+                R.string.post_warning_tag,
+                Toast.LENGTH_SHORT
+            ).show()
+            false
         } else {
             true
         }

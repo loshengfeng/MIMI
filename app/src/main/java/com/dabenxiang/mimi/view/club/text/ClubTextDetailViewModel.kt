@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,7 +22,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.util.*
 
-class ClubTextDetailViewModel: BaseViewModel() {
+class ClubTextDetailViewModel : BaseViewModel() {
 
     private var _postDetailResult = MutableLiveData<ApiResult<ApiBaseItem<MemberPostItem>>>()
     val postDetailResult: LiveData<ApiResult<ApiBaseItem<MemberPostItem>>> = _postDetailResult
@@ -46,8 +47,8 @@ class ClubTextDetailViewModel: BaseViewModel() {
     val commentDeleteLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
         _commentDeleteLikeResult
 
-    private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<Nothing>>>()
-    val postCommentResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> = _postCommentResult
+    private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>>()
+    val postCommentResult: LiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>> = _postCommentResult
 
     fun getPostDetail(item: MemberPostItem) {
         Timber.i("getPostDetail: item:$item")
@@ -78,8 +79,9 @@ class ClubTextDetailViewModel: BaseViewModel() {
                         }
                         adapter.setList(finalList)
                     }
+                    if(load.isEnd) delay(500)
+                    setupLoadMoreResult(adapter, load.isEnd)
                 }
-                setupLoadMoreResult(adapter, load.isEnd)
             }
 
             adapter.loadMoreModule.setOnLoadMoreListener {
@@ -136,7 +138,13 @@ class ClubTextDetailViewModel: BaseViewModel() {
         }
     }
 
-    fun likePost(item: MemberPostItem, isLike: Boolean, type: LikeType, originType: LikeType?, update: (Boolean, MemberPostItem) -> Unit) {
+    fun likePost(
+        item: MemberPostItem,
+        isLike: Boolean,
+        type: LikeType,
+        originType: LikeType?,
+        update: (Boolean, MemberPostItem) -> Unit
+    ) {
         viewModelScope.launch {
             var like = isLike
             flow {
@@ -182,7 +190,7 @@ class ClubTextDetailViewModel: BaseViewModel() {
                         like = true
                         item.likeType = LikeType.LIKE
                         item.likeCount += 1
-                        item.dislikeCount -=1
+                        item.dislikeCount -= 1
                     }
                     emit(ApiResult.success(item))
                 }
@@ -266,7 +274,8 @@ class ClubTextDetailViewModel: BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
                     _postChangedResult.value = it
-                    _followResult.value = ApiResult.success(null) }
+                    _followResult.value = ApiResult.success(null)
+                }
         }
     }
 
@@ -373,7 +382,20 @@ class ClubTextDetailViewModel: BaseViewModel() {
                 val request = PostCommentRequest(replyId, comment)
                 val resp = domainManager.getApiRepository().postMembersPostComment(postId, request)
                 if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(null))
+                val comment = MembersPostCommentItem(
+                    content = comment,
+                    creationDate = Date(),
+                    creatorId = accountManager.getProfile().userId,
+                    postAvatarAttachmentId = accountManager.getProfile().avatarAttachmentId,
+                    postName = accountManager.getProfile().friendlyName,
+                    commentCount = 0,
+                    dislikeCount = 0,
+                    id = resp.body()?.content,
+                    likeCount = 0,
+                    likeType = null,
+                    reported = false
+                )
+                emit(ApiResult.success(comment))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }

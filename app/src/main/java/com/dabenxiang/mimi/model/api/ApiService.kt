@@ -227,7 +227,7 @@ interface ApiService {
     suspend fun postMembersPostComment(
         @Path("postId") postId: Long,
         @Body request: PostCommentRequest
-    ): Response<Void>
+    ): Response<ApiBaseItem<Long>>
 
     @POST("/v1/Members/Post/{postId}/Comment/{commentId}/Like")
     suspend fun postMembersPostCommentLike(
