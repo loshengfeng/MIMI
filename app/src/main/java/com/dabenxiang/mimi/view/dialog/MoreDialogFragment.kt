@@ -48,7 +48,7 @@ class MoreDialogFragment : BaseDialogFragment() {
             else -> (item as MembersPostCommentItem).reported
         } ?: false
 
-        if (isReport) {
+        if (isReport || (item as MemberPostItem).deducted == false) {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
         } else {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
