@@ -569,8 +569,9 @@ class PlayerViewModel : BaseViewModel() {
                         }
                         adapter.setList(finalList)
                     }
+                    if(load.isEnd) delay(500)
+                    setupLoadMoreResult(adapter, load.isEnd)
                 }
-                setupLoadMoreResult(adapter, load.isEnd)
             }
 
             adapter.loadMoreModule.setOnLoadMoreListener {
