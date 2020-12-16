@@ -116,7 +116,7 @@ abstract class ClubViewModel : BaseViewModel(){
                                     else -> this.favoriteCount-1
                                 }
                             }
-                            mimiDB.postDBItemDao().insertItem(item)
+                            mimiDB.postDBItemDao().insertMemberPostItem(item)
                         }
                  }
                 .collect { _favoriteResult.value = it }
@@ -160,7 +160,7 @@ abstract class ClubViewModel : BaseViewModel(){
                                 }
                             }
                         }
-                        mimiDB.postDBItemDao().insertItem(item)
+                        mimiDB.postDBItemDao().insertMemberPostItem(item)
                     }
                 }
                 .collect {

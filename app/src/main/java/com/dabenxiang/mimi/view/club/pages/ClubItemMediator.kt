@@ -135,20 +135,21 @@ class ClubItemMediator(
                 finalItems?.let {
                     val postDBItems = it.mapIndexed { index, item ->
 
-                        val queryId = (CLUB_INDEX + type.value.toString() + item.id.toString())
+                        val queryId = (CLUB_INDEX + type.value.toString() + item.id.toString().substring(3)).toLong()
                         val oldItem = database.postDBItemDao().getItemById(queryId)
                         if(oldItem == null) {
                             PostDBItem(
-                                    postDBId = queryId,
+                                    id = queryId,
+                                    postDBId = item.id,
                                     postType =  item.type,
-                                    clubTabItemType= type,
-                                    memberPostItem = item
+                                    clubTabItemType= type
                             )
                         }else{
-                            oldItem.memberPostItem = item
+                            oldItem.postDBId = item.id
                             oldItem
                         }
                     }
+                    database.postDBItemDao().insertMemberPostItemAll(it)
                     database.postDBItemDao().insertAll(postDBItems)
                 }
 
