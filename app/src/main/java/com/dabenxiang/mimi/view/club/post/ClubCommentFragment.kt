@@ -1,11 +1,14 @@
 package com.dabenxiang.mimi.view.club.post
 
+import android.graphics.Point
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -29,12 +32,8 @@ import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_comment.btn_send
-import kotlinx.android.synthetic.main.fragment_club_comment.et_message
-import kotlinx.android.synthetic.main.fragment_club_comment.layout_edit_bar
-import kotlinx.android.synthetic.main.fragment_club_comment.tv_replay_name
-import kotlinx.android.synthetic.main.fragment_club_text_detail.recyclerView
-import kotlinx.android.synthetic.main.fragment_dialog_comment.*
+import kotlinx.android.synthetic.main.fragment_club_comment.*
+import timber.log.Timber
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -54,6 +53,8 @@ class ClubCommentFragment : BaseFragment() {
     private var commentLikeBlock: (() -> Unit)? = null
 
     var replyRootNode: RootCommentNode? = null
+
+    var lastClickY = 0
 
     companion object {
         const val KEY_DATA = "data"
@@ -160,8 +161,6 @@ class ClubCommentFragment : BaseFragment() {
                                 }
                             }
                         }
-
-                        textDetailAdapter?.notifyItemChanged(3)
                     }
                     is ApiResult.Error -> onApiError(it.throwable)
                 }
@@ -206,9 +205,28 @@ class ClubCommentFragment : BaseFragment() {
         recyclerView.adapter = textDetailAdapter
         recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
             if (bottom < oBottom) {
-                recyclerView.scrollBy(0, oBottom - bottom)
+                if(bottom - 30 < lastClickY) recyclerView.scrollBy(0, lastClickY - bottom + 30)
             }
         }
+
+        recyclerView.addOnItemTouchListener(object :RecyclerView.OnItemTouchListener{
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                when(e.action){
+                    MotionEvent.ACTION_UP -> {
+                        Timber.d("onTouchEvent: $e")
+                        lastClickY = e.getY(0).toInt()
+                    }
+                }
+                return false
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+            }
+
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+            }
+
+        })
 
         mainViewModel?.getAd(adWidth, adHeight)
     }
