@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.main
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.lifecycle.LiveData
@@ -23,6 +24,7 @@ import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
@@ -422,9 +424,10 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun postAttachment(pic: String, context: Context, type: String) {
+        Timber.d("arvin pic ??? " + pic)
         viewModelScope.launch(context = job) {
             flow {
-                val realPath = when (type) {
+                var realPath = when (type) {
                     HomeViewModel.TYPE_VIDEO -> pic
                     HomeViewModel.TYPE_PIC -> pic
                     else -> UriUtils.getPath(context, Uri.parse(pic))
@@ -450,6 +453,17 @@ class MainViewModel : BaseViewModel() {
                         mmr.setDataSource(realPath)
                         mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
                     }
+                }
+
+                val file = File(realPath)
+
+                if (type == HomeViewModel.TYPE_PIC && file.length() >= 5242880) {
+                    val tempFile = FileUtil.getTakePhoto( "temp.jpg")
+                    file.copyTo(tempFile, true)
+                    val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
+                    FileUtil.saveBitmapToJpegFile(bitmap, bitmap.width, bitmap.height, destPath = tempFile.absolutePath)
+
+                    realPath = tempFile.absolutePath
                 }
 
                 Timber.d("Upload photo path : $realPath")
