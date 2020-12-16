@@ -55,12 +55,14 @@ class ClubCommentFragment : BaseFragment() {
     var replyRootNode: RootCommentNode? = null
 
     var lastClickY = 0
-    var lastTimestamp = System.currentTimeMillis()
 
     companion object {
         const val KEY_DATA = "data"
         const val KEY_IS_DARK_MODE = "is_dark_mode"
-        fun createBundle(item: MemberPostItem, isDarkMode: Boolean = false): ClubCommentFragment {
+        fun createBundle(
+            item: MemberPostItem,
+            isDarkMode: Boolean = false
+        ): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
                 it.putBoolean(KEY_IS_DARK_MODE, isDarkMode)
@@ -205,11 +207,11 @@ class ClubCommentFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
         recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
-            if (System.currentTimeMillis() - lastTimestamp > 1000) {
-                lastTimestamp = System.currentTimeMillis()
-                if (bottom < oBottom) {
-                    if (bottom - 20 < lastClickY) recyclerView.scrollBy(0, lastClickY - bottom + 20)
-                }
+            if (bottom < oBottom && bottom < lastClickY) {
+                if(lastClickY - bottom < 30)
+                    recyclerView.scrollBy(0, 30)
+                else
+                    recyclerView.scrollBy(0, lastClickY - bottom)
             }
         }
 
@@ -227,6 +229,7 @@ class ClubCommentFragment : BaseFragment() {
 
         })
 
+        recyclerView.scrollBy(0, 1)
         mainViewModel?.getAd(adWidth, adHeight)
     }
 
