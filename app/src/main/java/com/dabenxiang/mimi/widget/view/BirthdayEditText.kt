@@ -23,7 +23,7 @@ class BirthdayEditText : TextInputEditText {
     private var dividerCharacter = DividerCharacter.Minus
     private var dateFormat = DateFormat.YYYYMMDD
 
-    private var maxDate: Date? = null
+    var maxDate: Date? = null
         set(value) {
             validateMinMaxDate(minDate, value)
             field = value
@@ -223,6 +223,18 @@ class BirthdayEditText : TextInputEditText {
     private fun validatedDateFormat(value: String): String {
         var mValue = value
 
+        if (mValue.length >= 4) {
+            val maxCalendar = Calendar.getInstance()
+            maxCalendar.time = maxDate!!
+            val maxYear = maxCalendar.get(Calendar.YEAR)
+            val year = mValue.substring(0, 4).toInt()
+            if (year > maxYear) {
+                if (autoCorrect) {
+                    mValue = mValue.replace(year.toString(), maxYear.toString(), false)
+                }
+            }
+        }
+
         if (mValue.length >= 8) {
             val month = mValue.substring(5, 7).toInt()
             if (month > 12 || month == 0) {
@@ -298,6 +310,8 @@ class BirthdayEditText : TextInputEditText {
                     }
                 }
             }
+
+
         }
 
         return mValue
