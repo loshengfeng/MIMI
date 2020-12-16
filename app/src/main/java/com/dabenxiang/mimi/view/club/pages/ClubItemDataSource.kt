@@ -21,7 +21,6 @@ class ClubItemDataSource(
 
     companion object {
         const val PER_LIMIT = 10
-        private const val AD_GAP: Int = 5
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MemberPostItem> {

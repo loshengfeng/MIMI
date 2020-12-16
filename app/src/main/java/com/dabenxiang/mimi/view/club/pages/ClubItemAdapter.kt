@@ -1,22 +1,24 @@
 package com.dabenxiang.mimi.view.club.pages
 
 import android.content.Context
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
-
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
@@ -57,9 +59,6 @@ class ClubItemAdapter(
             }
         }
     }
-
-//    var changedPosList = HashMap<Long,MemberPostItem>()
-//    var removedPosList = ArrayList<Long>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
@@ -108,11 +107,19 @@ class ClubItemAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-        var item = getItem(position)
-//        val changedItem = changedPosList[item?.id]
-//        if (changedItem != null) {
-//            item?.memberPostItem = changedItem
+//        fun checkADView(adView:View, adItem: AdItem){
+//            position.takeIf { position % AD_GAP == 0}?.let {
+//                Timber.i("position =$position position % AD_GAP =${position % AD_GAP}")
+//                adView.visibility = View.VISIBLE
+//                Glide.with(context).load(adItem.href).into(adView.iv_ad)
+//                adView.setOnClickListener {
+//                    GeneralUtils.openWebView(context, adItem.target ?: "")
+//                }
+//
+//            } ?: run { adView.visibility = View.GONE}
 //        }
+
+        val item = getItem(position)
         item?.also {
             when (holder) {
                 is AdHolder -> {
@@ -123,6 +130,7 @@ class ClubItemAdapter(
                 }
 
                 is MyPostPicturePostHolder -> {
+
                     holder.pictureRecycler.tag = position
                     holder.onBind(
                             it.memberPostItem,
@@ -130,6 +138,9 @@ class ClubItemAdapter(
                             myPostListener,
                             viewModelScope
                     )
+//                    item.memberPostItem.adItem?.let {
+//                        checkADView(holder.adView, it)
+//                    }
 
                 }
                 is MyPostTextPostHolder -> {
@@ -139,6 +150,10 @@ class ClubItemAdapter(
                             myPostListener,
                             viewModelScope
                     )
+
+//                    item.memberPostItem.adItem?.let {
+//                        checkADView(holder.adView, it)
+//                    }
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
@@ -147,6 +162,10 @@ class ClubItemAdapter(
                             myPostListener,
                             viewModelScope
                     )
+//
+//                    item.memberPostItem.adItem?.let {
+//                        checkADView(holder.adView, it)
+//                    }
                 }
             }
         }

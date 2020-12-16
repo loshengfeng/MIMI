@@ -1,6 +1,8 @@
 package com.dabenxiang.mimi.model.enums
 
 import androidx.room.TypeConverter
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
 enum class PostType(val value: Int) {
@@ -69,3 +71,4 @@ class PostTypeConverter {
         }
     }
 }
+

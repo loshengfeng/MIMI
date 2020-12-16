@@ -37,11 +37,10 @@ class ClubItemViewModel : ClubViewModel() {
             remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight,
                     type, postType, pagingCallback)
     ) {
-        Timber.i("ClubTabItemType =$type  postType=$postType")
         when (type) {
-            ClubTabItemType.FOLLOW ->  mimiDB.postDBItemDao().pagingSourceByFollow()
-            ClubTabItemType.HOTTEST -> mimiDB.postDBItemDao().pagingSourceByHottest()
-            ClubTabItemType.LATEST -> mimiDB.postDBItemDao().pagingSourceByLatest()
+            ClubTabItemType.FOLLOW,
+            ClubTabItemType.HOTTEST,
+            ClubTabItemType.LATEST -> mimiDB.postDBItemDao().pagingSourceByClubTab(type)
             else -> mimiDB.postDBItemDao().pagingSourceByPostType(postType)
         }
     }.flow

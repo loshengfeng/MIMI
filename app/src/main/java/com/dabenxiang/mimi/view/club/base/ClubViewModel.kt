@@ -108,16 +108,15 @@ abstract class ClubViewModel : BaseViewModel(){
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
-                        mimiDB.postDBItemDao().getItemById(item.id)?.let { dbItem->
-                            val item = dbItem.memberPostItem.apply {
+                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
+                            val item = memberPostItem.apply {
                                 this.isFavorite = isFavorite
                                 this.favoriteCount = when(isFavorite) {
                                     true -> this.favoriteCount+1
                                     else -> this.favoriteCount-1
                                 }
                             }
-                            dbItem.memberPostItem = item
-                            mimiDB.postDBItemDao().insertItem(dbItem)
+                            mimiDB.postDBItemDao().insertItem(item)
                         }
                  }
                 .collect { _favoriteResult.value = it }
@@ -148,8 +147,8 @@ abstract class ClubViewModel : BaseViewModel(){
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
-                    mimiDB.postDBItemDao().getItemById(item.id)?.let { dbItem->
-                        val item = dbItem.memberPostItem.apply {
+                    mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
+                        val item = memberPostItem.apply {
                             when {
                                 isLike -> {
                                     this.likeType = LikeType.LIKE
@@ -161,8 +160,7 @@ abstract class ClubViewModel : BaseViewModel(){
                                 }
                             }
                         }
-                        dbItem.memberPostItem = item
-                        mimiDB.postDBItemDao().insertItem(dbItem)
+                        mimiDB.postDBItemDao().insertItem(item)
                     }
                 }
                 .collect {

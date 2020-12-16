@@ -12,7 +12,7 @@ import java.lang.reflect.Type
 import java.util.*
 
 @Database(
-        entities = [PostDBItem::class, RemoteKey::class],
+        entities = [PostDBItem::class, MemberPostItem::class, RemoteKey::class],
         version = 1,
         exportSchema = false
 )

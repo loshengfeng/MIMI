@@ -1,9 +1,6 @@
 package com.dabenxiang.mimi.model.api.vo
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
+import androidx.room.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
@@ -11,9 +8,10 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
-@Entity
+@Entity(tableName = "MemberPostItems")
 data class MemberPostItem(
     @PrimaryKey
+    @ColumnInfo(name = "id")
     @SerializedName("id")
     var id: Long = 0,
 
@@ -97,7 +95,7 @@ data class MemberPostItem(
     val category: String? = "",
 
     @ColumnInfo(name = "adItem")
-    val adItem: AdItem? = null,
+    var adItem: AdItem? = null,
 
     @ColumnInfo(name = "isFullContent")
     @SerializedName("isFullContent")

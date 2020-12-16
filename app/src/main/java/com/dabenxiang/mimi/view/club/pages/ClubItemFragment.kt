@@ -94,27 +94,27 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             }
         })
 
-        viewModel.likePostResult.observe(this, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    Timber.i("likePostResult = $it")
-                    adapter.notifyDataSetChanged()
-                }
-                is ApiResult.Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.favoriteResult.observe(this, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    adapter?.notifyItemChanged(
-                        it.result,
-                        ClubItemAdapter.PAYLOAD_UPDATE_FAVORITE
-                    )
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
+//        viewModel.likePostResult.observe(this, Observer {
+//            when (it) {
+//                is ApiResult.Success -> {
+//                    Timber.i("likePostResult = $it")
+//                    adapter.notifyDataSetChanged()
+//                }
+//                is ApiResult.Error -> Timber.e(it.throwable)
+//            }
+//        })
+//
+//        viewModel.favoriteResult.observe(this, Observer {
+//            when (it) {
+//                is ApiResult.Success -> {
+//                    adapter?.notifyItemChanged(
+//                        it.result,
+//                        ClubItemAdapter.PAYLOAD_UPDATE_FAVORITE
+//                    )
+//                }
+//                is ApiResult.Error -> onApiError(it.throwable)
+//            }
+//        })
 
         viewModel.postCount.observe(this) {
             Timber.i("type=$type postCount= $it")
@@ -192,7 +192,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         viewModel.viewModelScope.launch {
             viewModel.posts(type).collectLatest {
                 adapter.submitData(it)
-
             }
         }
 
@@ -200,17 +199,17 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     }
 
     private fun checkRemovedItems(){
-        val idList = adapter.snapshot().items.map { item ->
-            item.id
-        }
-        Timber.i("idList =$idList")
-        idList.forEach { id ->
-            if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
-                val pos = idList.indexOf(id)
-                Timber.i("id =$id pos =$pos")
-                adapter.notifyItemChanged(pos)
-            }
-        }
+//        val idList = adapter.snapshot().items.map { item ->
+//            item.id
+//        }
+//        Timber.i("idList =$idList")
+//        idList.forEach { id ->
+//            if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
+//                val pos = idList.indexOf(id)
+//                Timber.i("id =$id pos =$pos")
+//                adapter.notifyItemChanged(pos)
+//            }
+//        }
     }
 
     private val postListener = object : MyPostListener {

@@ -32,8 +32,9 @@ class ClubItemMediator(
 ) : RemoteMediator<Int, PostDBItem>() {
 
     companion object {
+        const val CLUB_INDEX = "990"
         const val PER_LIMIT = 10
-        private const val AD_GAP: Int = 5
+        const val AD_GAP: Int = 5
     }
 
     override suspend fun load(
@@ -101,53 +102,53 @@ class ClubItemMediator(
 
             val body = result.body()
             val memberPostItems = body?.content
-            val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
-            val list = arrayListOf<MemberPostItem>()
 
+            val finalItems = arrayListOf<MemberPostItem>()
+            Timber.i("memberPostItems paging =${result.body()?.paging}")
             memberPostItems?.forEachWithIndex { index, item ->
-                if (index == 5) list.add(memberPostAdItem)
-                list.add(item)
+                Timber.i("memberPostItems index =$index")
+                if (index==0 || index % AD_GAP == 0) {
+                    val id = (CLUB_INDEX
+                            + type.value.toString()
+                            + result.body()?.paging?.pageIndex.toString()
+                            + index.toString()).toLong()
+                    Timber.i("memberPostItems ad index =$index  id=$id")
+                    finalItems.add( MemberPostItem(id=id , type = PostType.AD, adItem = adItem))
+                }
+                finalItems.add(item)
             }
-            
             pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
                     when(type){
-                        ClubTabItemType.FOLLOW ->  database.postDBItemDao().deleteItemByFollow()
-                        ClubTabItemType.HOTTEST -> database.postDBItemDao().deleteItemByHottest()
-                        ClubTabItemType.LATEST -> database.postDBItemDao().deleteItemByLatest()
-                        else-> database.postDBItemDao().deleteItemByPostType(postType)
+                        ClubTabItemType.FOLLOW,
+                        ClubTabItemType.HOTTEST,
+                        ClubTabItemType.LATEST,
+                        ClubTabItemType.SHORT_VIDEO,
+                        ClubTabItemType.PICTURE,
+                        ClubTabItemType.NOVEL -> database.postDBItemDao().deleteItemByClubTab(type)
                     }
                     database.remoteKeyDao().deleteByType(type)
                 }
 
                 database.remoteKeyDao().insertOrReplace(RemoteKey(type, result.body()?.paging?.offset ?: 0))
-                memberPostItems?.let {
-                    val postDBItems = it.map {item->
-                        Timber.i("ClubItemMediator postDBItems type=$type")
-                        val oldItem = database.postDBItemDao().getItemById(item.id)
+                finalItems?.let {
+                    val postDBItems = it.mapIndexed { index, item ->
+
+                        val queryId = (CLUB_INDEX + type.value.toString() + item.id.toString())
+                        val oldItem = database.postDBItemDao().getItemById(queryId)
                         if(oldItem == null) {
                             PostDBItem(
-                                    id = item.id,
-                                    isFollow = type == ClubTabItemType.FOLLOW,
-                                    isHottest = type == ClubTabItemType.HOTTEST,
-                                    isLatest = type == ClubTabItemType.LATEST,
+                                    postDBId = queryId,
                                     postType =  item.type,
+                                    clubTabItemType= type,
                                     memberPostItem = item
                             )
                         }else{
-                            PostDBItem(
-                                    id = oldItem.id,
-                                    isFollow = if(type == ClubTabItemType.FOLLOW) true else oldItem.isFollow,
-                                    isHottest = if(type == ClubTabItemType.HOTTEST) true else oldItem.isHottest,
-                                    isLatest = if(type == ClubTabItemType.LATEST) true else oldItem.isLatest,
-                                    postType =  item.type,
-                                    memberPostItem = item
-                            )
+                            oldItem.memberPostItem = item
+                            oldItem
                         }
-
                     }
-
                     database.postDBItemDao().insertAll(postDBItems)
                 }
 
