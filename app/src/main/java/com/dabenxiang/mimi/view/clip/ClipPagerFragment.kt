@@ -37,7 +37,6 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     companion object {
         const val KEY_DATA = "data"
-
         fun createBundle(items: ArrayList<VideoItem>): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, items)
@@ -46,6 +45,281 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private val viewModel: ClipViewModel by viewModels()
+
+    private var moreDialog: MoreDialogFragment? = null
+    private var reportDialog: ReportDialogFragment? = null
+    private var cachedItem: VideoItem? = null
+
+    override fun getLayoutId(): Int {
+        return R.layout.item_clip_pager
+    }
+
+    override val isNavTransparent: Boolean = true
+    override val isStatusBarDark: Boolean = true
+
+    override fun setupFirstTime() {
+        if (rv_clip.adapter == null) {
+            clipAdapter.setClipFuncItem(clipFuncItem)
+            rv_clip.adapter = clipAdapter
+            (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            PagerSnapHelper().attachToRecyclerView(rv_clip)
+            rv_clip.addOnScrollListener(onScrollListener)
+
+            (arguments?.getSerializable(KEY_DATA) as? ArrayList<*>)?.run {
+                getLimitClips(ArrayList(this.filterIsInstance<VideoItem>()))
+            } ?: run { getClips() }
+        }
+    }
+
+    override fun setupObservers() {
+        viewModel.videoChangedResult.observe(viewLifecycleOwner) {
+            when (it) {
+                is Success -> {
+                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
+                }
+                is Error -> onApiError(it.throwable)
+            }
+        }
+
+        viewModel.favoriteResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Success -> rv_clip.adapter?.notifyItemChanged(
+                    it.result,
+                    ClipAdapter.PAYLOAD_UPDATE_UI
+                )
+                is Error -> onApiError(it.throwable)
+                else -> {
+                }
+            }
+        })
+
+        viewModel.likePostResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Success -> {
+                    rv_clip.adapter?.notifyItemChanged(
+                        it.result,
+                        ClipAdapter.PAYLOAD_UPDATE_UI
+                    )
+                }
+                is Error -> onApiError(it.throwable)
+                else -> {
+                }
+            }
+        })
+
+        viewModel.videoReport.observe(viewLifecycleOwner, {
+            when (it) {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Empty -> {
+                    cachedItem?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.also { item ->
+                        item.reported = true
+                    }
+                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
+                }
+                is Error -> onApiError(it.throwable)
+                else -> {
+                }
+            }
+        })
+
+        viewModel.rechargeVipResult.observe(viewLifecycleOwner, {
+            if (viewModel.isVip()) {
+                clipAdapter.getM3U8()
+            }
+        })
+    }
+
+    override fun resetObservers() {
+        viewModel.resetLiveData()
+    }
+
+    override fun setupListeners() {
+        btn_retry.setOnClickListener {
+            progressHUD.show()
+            getClips()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
+            clipAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            clipAdapter.notifyDataSetChanged()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        clipAdapter.pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        clipAdapter.releasePlayer()
+    }
+
+    private fun onPromoteClick() {
+        viewModel.rechargeVip()
+        checkStatus {
+            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+        }
+    }
+
+    private fun onVipClick() {
+        viewModel.rechargeVip()
+        checkStatus {
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+        }
+    }
+
+    private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {
+        checkStatus {
+            Timber.d("onFavoriteClick,  item:$item, pos:$pos, isFavorite:$isFavorite")
+            viewModel.modifyFavorite(item, pos, isFavorite)
+        }
+    }
+
+    private fun onLikeClick(item: VideoItem, pos: Int, isLike: Boolean) {
+        checkStatus {
+            Timber.d("onLikeClick, item:$item, pos:$pos, isLike:$isLike")
+            viewModel.likePost(item, pos, isLike)
+        }
+    }
+
+    private fun onCommentClick(item: VideoItem) {
+        checkStatus {
+            Timber.d("onCommentClick, item:$item")
+            showCommentDialog(item)
+        }
+    }
+
+    private fun onMoreClick(item: VideoItem) {
+        checkStatus {
+            Timber.d("onMoreClick, item:$item")
+            cachedItem = item
+            item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
+                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false)
+            }
+        }
+    }
+
+    private fun getClips() {
+        lifecycleScope.launch {
+            viewModel.getClips(orderByType).collectLatest {
+                (rv_clip.adapter as ClipAdapter).submitData(it)
+            }
+        }
+    }
+
+    /**
+     * 提供固定數量小視頻列表
+     */
+    private fun getLimitClips(items: ArrayList<VideoItem>) {
+        lifecycleScope.launch {
+            viewModel.getLimitClips(items).collectLatest {
+                (rv_clip.adapter as ClipAdapter).submitData(it)
+            }
+        }
+    }
+
+    private fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
+        viewModel.getM3U8(item, position, update)
+    }
+
+    private fun scrollToNext(nextPosition: Int) {
+        rv_clip?.smoothScrollToPosition(nextPosition)
+    }
+
+    private fun showCommentDialog(item: VideoItem) {
+        val listener = object : CommentDialogFragment.CommentListener {
+            override fun onAvatarClick(userId: Long, name: String) {
+                val bundle = MyPostFragment.createBundle(
+                    userId, name,
+                    isAdult = true,
+                    isAdultTheme = true
+                )
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_myPostFragment,
+                        bundle
+                    )
+                )
+            }
+
+            override fun onUpdateCommentCount(count: Int) {
+                val currentPos = clipAdapter.getCurrentPos()
+                if (currentPos >= 0) {
+                    clipAdapter.getVideoItem(currentPos)?.commentCount = count.toLong()
+                    rv_clip.adapter?.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_UI)
+                }
+            }
+        }
+        CommentDialogFragment.newInstance(item, listener).also {
+            it.isCancelable = true
+            it.show(
+                requireActivity().supportFragmentManager,
+                CommentDialogFragment::class.java.simpleName
+            )
+        }
+    }
+
+    private fun showMoreDialog(
+        id: Long,
+        type: PostType,
+        isReported: Boolean,
+        isComment: Boolean = false
+    ) {
+        Timber.i("id: $id")
+        Timber.i("isReported: $isReported")
+
+        moreDialog = MoreDialogFragment.newInstance(
+            MemberPostItem(id = id, type = type, reported = isReported),
+            onMoreDialogListener,
+            isComment,
+            mainViewModel?.checkIsLogin() ?: false
+        ).also {
+            it.show(
+                requireActivity().supportFragmentManager,
+                MoreDialogFragment::class.java.simpleName
+            )
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
+            checkStatus {
+                if ((item as MemberPostItem).reported) {
+                    GeneralUtils.showToast(
+                        App.applicationContext(),
+                        getString(R.string.already_reported)
+                    )
+                } else {
+                    reportDialog =
+                        ReportDialogFragment.newInstance(
+                            item = item,
+                            listener = onReportDialogListener,
+                            isComment = isComment
+                        ).also {
+                            it.show(
+                                requireActivity().supportFragmentManager,
+                                ReportDialogFragment::class.java.simpleName
+                            )
+                        }
+                }
+                moreDialog?.dismiss()
+            }
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
+        }
+    }
+
 
     private val clipFuncItem by lazy {
         ClipFuncItem(
@@ -135,278 +409,6 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
-            clipAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
-            clipAdapter.notifyDataSetChanged()
-        }
-    }
-
-    override fun getLayoutId(): Int {
-        return R.layout.item_clip_pager
-    }
-
-    override val isNavTransparent: Boolean = true
-    override val isStatusBarDark: Boolean = true
-
-    override fun onPause() {
-        super.onPause()
-        clipAdapter.pausePlayer()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        clipAdapter.releasePlayer()
-    }
-
-    override fun setupFirstTime() {
-        if (rv_clip.adapter == null) {
-            clipAdapter.setClipFuncItem(clipFuncItem)
-            rv_clip.adapter = clipAdapter
-            (rv_clip.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-            PagerSnapHelper().attachToRecyclerView(rv_clip)
-            rv_clip.addOnScrollListener(onScrollListener)
-
-            (arguments?.getSerializable(KEY_DATA) as? ArrayList<*>)?.run {
-                getLimitClips(ArrayList(this.filterIsInstance<VideoItem>()))
-            } ?: run { getClips() }
-        }
-    }
-
-    override fun setupObservers() {
-        viewModel.videoChangedResult.observe(viewLifecycleOwner) {
-            when (it) {
-                is Success -> {
-                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        }
-
-        viewModel.favoriteResult.observe(viewLifecycleOwner, {
-            when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(
-                    it.result,
-                    ClipAdapter.PAYLOAD_UPDATE_UI
-                )
-                is Error -> onApiError(it.throwable)
-                else -> {
-                }
-            }
-        })
-
-        viewModel.likePostResult.observe(viewLifecycleOwner, {
-            when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
-                is Success -> {
-                    rv_clip.adapter?.notifyItemChanged(
-                        it.result,
-                        ClipAdapter.PAYLOAD_UPDATE_UI
-                    )
-                }
-                is Error -> onApiError(it.throwable)
-                else -> {
-                }
-            }
-        })
-
-        viewModel.videoReport.observe(viewLifecycleOwner, {
-            when (it) {
-                is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
-                is Empty -> {
-                    cachedItem?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.also { item ->
-                        item.reported = true
-                    }
-                    GeneralUtils.showToast(requireContext(), getString(R.string.report_success))
-                }
-                is Error -> onApiError(it.throwable)
-                else -> {
-                }
-            }
-        })
-
-        viewModel.isVipCheck.observe(viewLifecycleOwner, {
-            Timber.d("@@Dave: $it")
-        })
-    }
-
-    override fun resetObservers() {
-        viewModel.resetLiveData()
-    }
-
-    override fun setupListeners() {
-        btn_retry.setOnClickListener {
-            progressHUD.show()
-            getClips()
-        }
-    }
-
-    private fun onPromoteClick() {
-        checkStatus {
-            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
-        }
-    }
-
-    private fun onVipClick() {
-        checkStatus {
-            // TODO: @@Dave 發送檢查VIP通知
-            viewModel.setupVipCheck(true)
-            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
-        }
-    }
-
-    private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {
-        checkStatus {
-            Timber.d("onFavoriteClick,  item:$item, pos:$pos, isFavorite:$isFavorite")
-            viewModel.modifyFavorite(item, pos, isFavorite)
-        }
-    }
-
-    private fun onLikeClick(item: VideoItem, pos: Int, isLike: Boolean) {
-        checkStatus {
-            Timber.d("onLikeClick, item:$item, pos:$pos, isLike:$isLike")
-            viewModel.likePost(item, pos, isLike)
-        }
-    }
-
-    private fun onCommentClick(item: VideoItem) {
-        checkStatus {
-            Timber.d("onCommentClick, item:$item")
-            showCommentDialog(item)
-        }
-    }
-
-    private var cachedItem: VideoItem? = null
-    private fun onMoreClick(item: VideoItem) {
-        checkStatus {
-            Timber.d("onMoreClick, item:$item")
-            cachedItem = item
-            item.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
-                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false)
-            }
-        }
-    }
-
-    private fun getClips() {
-        lifecycleScope.launch {
-            viewModel.getClips(orderByType).collectLatest {
-                (rv_clip.adapter as ClipAdapter).submitData(it)
-            }
-        }
-    }
-
-    /**
-     * 提供固定數量小視頻列表
-     */
-    private fun getLimitClips(items: ArrayList<VideoItem>) {
-        lifecycleScope.launch {
-            viewModel.getLimitClips(items).collectLatest {
-                (rv_clip.adapter as ClipAdapter).submitData(it)
-            }
-        }
-    }
-
-    private fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
-        viewModel.getM3U8(item, position, update)
-    }
-
-    private fun scrollToNext(nextPosition: Int) {
-        rv_clip?.smoothScrollToPosition(nextPosition)
-    }
-
-    private fun showCommentDialog(item: VideoItem) {
-        val listener = object : CommentDialogFragment.CommentListener {
-            override fun onAvatarClick(userId: Long, name: String) {
-                val bundle = MyPostFragment.createBundle(
-                    userId, name,
-                    isAdult = true,
-                    isAdultTheme = true
-                )
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_to_myPostFragment,
-                        bundle
-                    )
-                )
-            }
-
-            override fun onUpdateCommentCount(count: Int) {
-                val currentPos = clipAdapter.getCurrentPos()
-                if (currentPos >= 0) {
-                    clipAdapter.getVideoItem(currentPos)?.commentCount = count.toLong()
-                    rv_clip.adapter?.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_UI)
-                }
-            }
-        }
-        CommentDialogFragment.newInstance(item, listener).also {
-            it.isCancelable = true
-            it.show(
-                requireActivity().supportFragmentManager,
-                CommentDialogFragment::class.java.simpleName
-            )
-        }
-    }
-
-    private var moreDialog: MoreDialogFragment? = null
-    private var reportDialog: ReportDialogFragment? = null
-
-    private fun showMoreDialog(
-        id: Long,
-        type: PostType,
-        isReported: Boolean,
-        isComment: Boolean = false
-    ) {
-        Timber.i("id: $id")
-        Timber.i("isReported: $isReported")
-
-        moreDialog = MoreDialogFragment.newInstance(
-            MemberPostItem(id = id, type = type, reported = isReported),
-            onMoreDialogListener,
-            isComment,
-            mainViewModel?.checkIsLogin() ?: false
-        ).also {
-            it.show(
-                requireActivity().supportFragmentManager,
-                MoreDialogFragment::class.java.simpleName
-            )
-        }
-    }
-
-    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
-            checkStatus {
-                if ((item as MemberPostItem).reported) {
-                    GeneralUtils.showToast(
-                        App.applicationContext(),
-                        getString(R.string.already_reported)
-                    )
-                } else {
-                    reportDialog =
-                        ReportDialogFragment.newInstance(
-                            item = item,
-                            listener = onReportDialogListener,
-                            isComment = isComment
-                        ).also {
-                            it.show(
-                                requireActivity().supportFragmentManager,
-                                ReportDialogFragment::class.java.simpleName
-                            )
-                        }
-                }
-                moreDialog?.dismiss()
-            }
-        }
-
-        override fun onCancel() {
-            moreDialog?.dismiss()
-        }
-    }
-
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
         override fun onSend(item: BaseMemberPostItem, content: String, postItem: MemberPostItem?) {
             if (TextUtils.isEmpty(content)) {
@@ -422,7 +424,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         }
 
         override fun onCancel() {
-            Timber.i("reportDialog onCancel reportDialog=$reportDialog ")
+            Timber.i("reportDialog onCancel reportDialog: $reportDialog ")
             reportDialog?.dismiss()
         }
     }
