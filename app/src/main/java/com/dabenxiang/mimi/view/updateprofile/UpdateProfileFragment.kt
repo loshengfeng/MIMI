@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.view.dialog.FilterDialogFragment
 import com.dabenxiang.mimi.view.listener.OnDialogListener
 import kotlinx.android.synthetic.main.fragment_update_profile.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import java.util.*
 
 class UpdateProfileFragment : BaseFragment() {
 
@@ -76,7 +77,6 @@ class UpdateProfileFragment : BaseFragment() {
                 R.id.tv_back -> navigateTo(NavigateItem.Up)
                 R.id.btn_confirm -> {
                     if (viewModel.type == TYPE_BIRTHDAY) {
-                        //FIXME user TIMEFORMAT !!!!
                         viewModel.content.value = edit_birthday.text.toString()
                         viewModel.birthday.value = edit_birthday.text.toString()
                     }else if (viewModel.type == TYPE_GEN) {
@@ -136,6 +136,7 @@ class UpdateProfileFragment : BaseFragment() {
                         tv_text.text = getString(R.string.setting_birthday)
                         edit_content.visibility = View.INVISIBLE
                         edit_birthday.visibility = View.VISIBLE
+                        edit_birthday.maxDate = Date()
                         edit_birthday.listen()
                     }
                 }
@@ -161,6 +162,7 @@ class UpdateProfileFragment : BaseFragment() {
                         edit_birthday.setText(viewModel.profileItem.birthday?.let {
                             it.split("T")[0]
                         })
+                        edit_birthday.maxDate = Date()
                         edit_birthday.listen()
                     }
                 }

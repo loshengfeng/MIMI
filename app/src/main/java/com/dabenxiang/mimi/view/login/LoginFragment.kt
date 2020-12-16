@@ -182,10 +182,11 @@ class LoginFragment : BaseFragment() {
         viewModel.registerResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
-                    viewModel.mobile.value?.let { it1 ->
-                        viewModel.registerPw.value?.let { it2 ->
-                            viewModel.doLogin((tv_call_prefix.text.toString() + it1), it2)
+                    viewModel.mobile.value?.let { mobile ->
+                        viewModel.verificationCode.value?.let { code ->
+                            viewModel.doLogin((tv_call_prefix.text.toString() + mobile), code = code)
                         }
+
                     }
                 }
                 is Error -> onApiError(it.throwable)

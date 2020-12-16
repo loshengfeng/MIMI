@@ -2,10 +2,12 @@ package com.dabenxiang.mimi.view.club.post
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -29,12 +31,9 @@ import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_comment.btn_send
-import kotlinx.android.synthetic.main.fragment_club_comment.et_message
-import kotlinx.android.synthetic.main.fragment_club_comment.layout_edit_bar
-import kotlinx.android.synthetic.main.fragment_club_comment.tv_replay_name
-import kotlinx.android.synthetic.main.fragment_club_text_detail.recyclerView
-import kotlinx.android.synthetic.main.fragment_dialog_comment.*
+import kotlinx.android.synthetic.main.fragment_club_comment.*
+import timber.log.Timber
+import java.util.*
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -55,10 +54,15 @@ class ClubCommentFragment : BaseFragment() {
 
     var replyRootNode: RootCommentNode? = null
 
+    var lastClickY = 0
+
     companion object {
         const val KEY_DATA = "data"
         const val KEY_IS_DARK_MODE = "is_dark_mode"
-        fun createBundle(item: MemberPostItem, isDarkMode: Boolean = false): ClubCommentFragment {
+        fun createBundle(
+            item: MemberPostItem,
+            isDarkMode: Boolean = false
+        ): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
                 it.putBoolean(KEY_IS_DARK_MODE, isDarkMode)
@@ -160,8 +164,6 @@ class ClubCommentFragment : BaseFragment() {
                                 }
                             }
                         }
-
-                        textDetailAdapter?.notifyItemChanged(3)
                     }
                     is ApiResult.Error -> onApiError(it.throwable)
                 }
@@ -205,11 +207,29 @@ class ClubCommentFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
         recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
-            if (bottom < oBottom) {
-                recyclerView.scrollBy(0, oBottom - bottom)
+            if (bottom < oBottom && bottom < lastClickY) {
+                if(lastClickY - bottom < 30)
+                    recyclerView.scrollBy(0, 30)
+                else
+                    recyclerView.scrollBy(0, lastClickY - bottom)
             }
         }
 
+        recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                if (e.action == MotionEvent.ACTION_UP) lastClickY = e.getY(0).toInt()
+                return false
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+            }
+
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+            }
+
+        })
+
+        recyclerView.scrollBy(0, 1)
         mainViewModel?.getAd(adWidth, adHeight)
     }
 

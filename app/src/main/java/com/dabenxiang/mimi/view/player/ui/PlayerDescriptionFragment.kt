@@ -301,13 +301,13 @@ class PlayerDescriptionFragment : BaseFragment() {
 
         val performers = videoItem.performers
 
-        val tags = ""
+        var tags = ""
         (videoItem.tags as List<String>).indices.mapNotNull {
             (videoItem.tags as List<String>)[it]
         }.forEach {
-            tags.plus(it).plus(",")
+            tags = tags.plus(it).plus(",")
         }
-        Timber.d("@@@ ${videoItem.tags}, tag $tags")
+        Timber.d("videoItem.tags ${videoItem.tags}, tag $tags")
         if(viewModel.videoContentId != descriptionViewModel.videoContentId) {
             descriptionViewModel.setupGuessLikeList(
                 tags,
