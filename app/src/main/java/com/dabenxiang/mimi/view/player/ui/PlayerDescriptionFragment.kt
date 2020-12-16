@@ -260,7 +260,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         imgMore.setOnClickListener {
             Timber.d("onMoreClick, item:$videoItem")
             videoItem.sources?.get(0)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
-                showMoreDialog(this.id ?: 0, PostType.VIDEO, this.reported ?: false, videoItem.deducted)
+                showMoreDialog(this.id ?: 0, PostType.VIDEO, isReported, videoItem.deducted)
             }
         }
     }
