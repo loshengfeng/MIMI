@@ -375,14 +375,14 @@ class LoginFragment : BaseFragment() {
                     ?: "")
         }
 
-        layout_login_verification_code.setOnClickListener {
-            viewModel.changePWDCount++
-            if (viewModel.changePWDCount == 10) {
-                viewModel.changePWDCount = 0
-                group_pwd.visibility = View.VISIBLE
-
-            }
-        }
+//        layout_login_verification_code.setOnClickListener {
+//            viewModel.changePWDCount++
+//            if (viewModel.changePWDCount == 10) {
+//                viewModel.changePWDCount = 0
+//                group_pwd.visibility = View.VISIBLE
+//
+//            }
+//        }
 
         tv_call_prefix.setOnClickListener {
             viewModel.changePrefixCount++
