@@ -86,7 +86,7 @@
         <EditText
             android:id="@+id/edit_login_verification_code"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="10dp"
             android:autofillHints=""
             android:background="@null"
@@ -95,7 +95,7 @@
             android:maxLength="6"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_get_code"
+            app:layout_constraintEnd_toStartOf="@id/tv_get_login_code"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="LabelFor" />
