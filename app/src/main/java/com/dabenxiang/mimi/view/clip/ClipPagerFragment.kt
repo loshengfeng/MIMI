@@ -164,6 +164,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private fun onPromoteClick() {
+        viewModel.rechargeVip()
         checkStatus {
             navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
         }
