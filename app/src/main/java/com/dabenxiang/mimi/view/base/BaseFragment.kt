@@ -967,12 +967,10 @@ abstract class BaseFragment : Fragment() {
         val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
             override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
                 moreDialog?.dismiss()
-                checkStatus {
-                    (requireActivity() as MainActivity).showReportDialog(
+                (requireActivity() as MainActivity).showReportDialog(
                         item,
                         isComment = isComment
-                    )
-                }
+                )
             }
 
             override fun onCancel() {
