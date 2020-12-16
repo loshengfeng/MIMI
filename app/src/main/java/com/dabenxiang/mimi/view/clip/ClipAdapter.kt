@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
@@ -198,8 +199,12 @@ class ClipAdapter(
     private fun processClip(playerView: PlayerView, url: String?, position: Int) {
         Timber.d("processClip position:$position, url:$url")
         url?.takeIf { currentPosition == position }?.run {
-            releasePlayer()
-            setupPlayer(playerView, this)
+            if(url.isNullOrEmpty()) {
+                GeneralUtils.showToast(context, context.resources.getString(R.string.source_not_found))
+            } else {
+                releasePlayer()
+                setupPlayer(playerView, this)
+            }
         }
     }
 
@@ -270,6 +275,7 @@ class ClipAdapter(
                 ExoPlaybackException.TYPE_SOURCE -> {
                     Timber.d("error: TYPE_SOURCE")
                     //showErrorDialog("SOURCE")
+                    GeneralUtils.showToast(context, context.resources.getString(R.string.source_not_found))
                 }
                 ExoPlaybackException.TYPE_RENDERER -> {
                     Timber.d("error: TYPE_RENDERER")
