@@ -47,7 +47,7 @@ class GuessLikeDataSource(
                     "",
                     StatisticsOrderType.HOTTEST.value,
                     category,
-                    "",
+                    if(category.isNullOrEmpty()) tags else "",
                     true,
                     true,
                     0,
