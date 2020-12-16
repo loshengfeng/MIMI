@@ -32,8 +32,7 @@ import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_comment.*
-import timber.log.Timber
-import java.util.*
+import kotlin.math.abs
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -207,9 +206,10 @@ class ClubCommentFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
         recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
-            if (bottom < oBottom && bottom < lastClickY) {
-                if(lastClickY - bottom < 30)
-                    recyclerView.scrollBy(0, 30)
+            val h = GeneralUtils.getScreenSize(requireActivity()).second
+            if (oBottom - bottom > h/4 && (bottom < lastClickY || bottom - lastClickY < 20)) {
+                if(abs(lastClickY - bottom) < 30)
+                    recyclerView.scrollBy(0, 30 - abs(lastClickY - bottom))
                 else
                     recyclerView.scrollBy(0, lastClickY - bottom)
             }
@@ -229,7 +229,6 @@ class ClubCommentFragment : BaseFragment() {
 
         })
 
-        recyclerView.scrollBy(0, 1)
         mainViewModel?.getAd(adWidth, adHeight)
     }
 
