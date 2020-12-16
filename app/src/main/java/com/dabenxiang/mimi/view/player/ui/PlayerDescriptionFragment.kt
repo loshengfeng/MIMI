@@ -307,7 +307,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         }.forEach {
             tags.plus(it).plus(",")
         }
-        Timber.d("@@@ ${videoItem.tags}, tag $tags")
+        Timber.d("videoItem.tags ${videoItem.tags}, tag $tags")
         if(viewModel.videoContentId != descriptionViewModel.videoContentId) {
             descriptionViewModel.setupGuessLikeList(
                 tags,

@@ -58,9 +58,9 @@ class GuessLikeDataSource(
 
                 val item = result.body()
                 val videos = item?.content
-                Timber.d("@@@ video size ${videos?.size}")
+                Timber.d("video size ${videos?.size}")
                 if(videos?.size != 10) {
-                    Timber.d("@@@ 3 video size ${videos?.size}")
+                    Timber.d("video size ${videos?.size}")
                     val res = apiRepository.statisticsHomeVideos(
                         "",
                         "",
