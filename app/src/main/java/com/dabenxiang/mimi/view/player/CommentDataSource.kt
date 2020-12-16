@@ -53,7 +53,7 @@ class CommentDataSource(
         return when {
             currentSize < PER_LIMIT_LONG -> false
             offset >= total -> false
-            offset == 0L && total == PER_LIMIT_LONG -> false
+            offset + currentSize.toLong() == total -> false
             else -> true
         }
     }
