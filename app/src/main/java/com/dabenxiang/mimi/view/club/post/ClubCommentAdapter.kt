@@ -136,16 +136,16 @@ class ClubCommentAdapter(
     }
 
     private val playerInfoListener = object : CommentAdapter.PlayerInfoListener {
-        override fun sendComment(replyId: Long?, replyName: String?) {
-            onTextDetailListener.onReplyComment(replyId, replyName)
+        override fun sendComment(replyId: Long?, replyName: String?, parentNode: RootCommentNode) { // click root item reply
+            onTextDetailListener.onReplyComment(replyId, replyName, parentNode)
         }
 
         override fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit) {
             onTextDetailListener.onGetReplyCommand(parentNode, succeededBlock)
         }
 
-        override fun replyComment(replyId: Long?, replyName: String?) {
-            onTextDetailListener.onReplyComment(replyId, replyName)
+        override fun replyComment(replyId: Long?, replyName: String?, parentNode: RootCommentNode) { // click nested item reply
+            onTextDetailListener.onReplyComment(replyId, replyName, parentNode)
         }
 
         override fun setCommentLikeType(
@@ -179,7 +179,7 @@ class ClubCommentAdapter(
         fun onGetReplyCommand(parentNode: RootCommentNode, succeededBlock: () -> Unit)
         fun onCommandLike(commentId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun onCommandDislike(commentId: Long?, succeededBlock: () -> Unit)
-        fun onReplyComment(replyId: Long?, replyName: String?)
+        fun onReplyComment(replyId: Long?, replyName: String?, parentNode: RootCommentNode)
         fun onMoreClick(item: MembersPostCommentItem)
         fun onChipClick(type: PostType, tag: String)
         fun onOpenWebView(url: String)

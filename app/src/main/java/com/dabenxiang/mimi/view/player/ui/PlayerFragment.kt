@@ -19,6 +19,7 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
+import com.chad.library.adapter.base.entity.node.BaseNode
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
@@ -137,7 +138,7 @@ class PlayerFragment : BaseFragment() {
     private val playerInfoAdapter by lazy {
         Timber.i("playerInfoAdapter")
         CommentAdapter(object : CommentAdapter.PlayerInfoListener {
-            override fun sendComment(replyId: Long?, replyName: String?) {
+            override fun sendComment(replyId: Long?, replyName: String?, parentNode: RootCommentNode) {
                 viewModel.checkStatus {
                     Timber.i("playerInfoAdapter sendComment")
                     currentReplyId = null
@@ -158,7 +159,7 @@ class PlayerFragment : BaseFragment() {
                 }
             }
 
-            override fun replyComment(replyId: Long?, replyName: String?) {
+            override fun replyComment(replyId: Long?, replyName: String?, parentNode: RootCommentNode) {
                 Timber.i("playerInfoAdapter replyComment")
                 currentReplyId = null
                 currentreplyName = null

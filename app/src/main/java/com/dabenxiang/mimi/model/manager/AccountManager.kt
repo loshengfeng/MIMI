@@ -55,6 +55,10 @@ class AccountManager(
         return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
     }
 
+    fun isVip(): Boolean {
+        return getProfile().isSubscribed
+    }
+
     fun isLogin(): Boolean {
         return when (getMemberTokenResult()) {
             TokenResult.PASS -> true
