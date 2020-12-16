@@ -54,7 +54,6 @@ class MoreDialogFragment : BaseDialogFragment() {
         } else {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
             tv_problem_report.setOnClickListener {
-                Timber.i(" isReport=$isReport")
                 listener?.onProblemReport(item!!, isComment!!)
             }
         }
