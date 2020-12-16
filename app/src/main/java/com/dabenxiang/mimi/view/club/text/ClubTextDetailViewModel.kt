@@ -79,7 +79,7 @@ class ClubTextDetailViewModel : BaseViewModel() {
                         }
                         adapter.setList(finalList)
                     }
-                    if(load.isEnd) delay(500)
+                    if(load.isEnd) delay(1000)
                     setupLoadMoreResult(adapter, load.isEnd)
                 }
             }
