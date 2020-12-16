@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.club.post
 
-import android.graphics.Point
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.MotionEvent
@@ -33,7 +32,7 @@ import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_comment.*
-import timber.log.Timber
+import kotlin.math.abs
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -59,7 +58,10 @@ class ClubCommentFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
         const val KEY_IS_DARK_MODE = "is_dark_mode"
-        fun createBundle(item: MemberPostItem, isDarkMode: Boolean = false): ClubCommentFragment {
+        fun createBundle(
+            item: MemberPostItem,
+            isDarkMode: Boolean = false
+        ): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
                 it.putBoolean(KEY_IS_DARK_MODE, isDarkMode)
@@ -204,19 +206,18 @@ class ClubCommentFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
         recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
-            if (bottom < oBottom) {
-                if(bottom - 30 < lastClickY) recyclerView.scrollBy(0, lastClickY - bottom + 30)
+            val h = GeneralUtils.getScreenSize(requireActivity()).second
+            if (oBottom - bottom > h/4 && (bottom < lastClickY || bottom - lastClickY < 20)) {
+                if(abs(lastClickY - bottom) < 30)
+                    recyclerView.scrollBy(0, 30 - abs(lastClickY - bottom))
+                else
+                    recyclerView.scrollBy(0, lastClickY - bottom)
             }
         }
 
-        recyclerView.addOnItemTouchListener(object :RecyclerView.OnItemTouchListener{
+        recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                when(e.action){
-                    MotionEvent.ACTION_UP -> {
-                        Timber.d("onTouchEvent: $e")
-                        lastClickY = e.getY(0).toInt()
-                    }
-                }
+                if (e.action == MotionEvent.ACTION_UP) lastClickY = e.getY(0).toInt()
                 return false
             }
 
