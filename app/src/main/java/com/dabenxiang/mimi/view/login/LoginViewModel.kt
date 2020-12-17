@@ -28,6 +28,8 @@ class LoginViewModel : BaseViewModel() {
     var type = TYPE_REGISTER
     var clickType = TYPE_REGISTER
 
+    var clickTime: Long = 0
+
     var changePrefixCount = 0
     var changePWDCount = 0 // 登入使用 password
     var mobileValidCount = 0
