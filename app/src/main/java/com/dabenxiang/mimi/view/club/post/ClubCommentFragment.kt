@@ -32,7 +32,6 @@ import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_comment.*
-import kotlin.math.abs
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -202,22 +201,18 @@ class ClubCommentFragment : BaseFragment() {
             onTextDetailListener,
             onItemClickListener
         )
-
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
         recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
-            val h = GeneralUtils.getScreenSize(requireActivity()).second
-            if (oBottom - bottom > h/4 && (bottom < lastClickY || bottom - lastClickY < 20)) {
-                if(abs(lastClickY - bottom) < 30)
-                    recyclerView.scrollBy(0, 30 - abs(lastClickY - bottom))
-                else
-                    recyclerView.scrollBy(0, lastClickY - bottom)
+            if (oBottom > bottom && bottom < lastClickY) {
+                recyclerView.scrollBy(0, lastClickY - bottom)
+                lastClickY = bottom + 1
             }
         }
 
         recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                if (e.action == MotionEvent.ACTION_UP) lastClickY = e.getY(0).toInt()
+                if(e.action == MotionEvent.ACTION_UP) lastClickY = e.getY(0).toInt()
                 return false
             }
 
