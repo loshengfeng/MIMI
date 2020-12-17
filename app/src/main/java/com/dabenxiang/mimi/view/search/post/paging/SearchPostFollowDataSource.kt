@@ -25,7 +25,7 @@ class SearchPostFollowDataSource constructor(
     }
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MemberPostItem> {
-        val offset = params.key ?: 0
+        val offset = params.key ?: 0L
         return try {
             val result =
                 domainManager.getApiRepository().searchPostFollow(
@@ -45,7 +45,7 @@ class SearchPostFollowDataSource constructor(
                 domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
                     .body()?.content?.get(0)?.ad ?: arrayListOf()
             val list = arrayListOf<MemberPostItem>()
-            list.add(MemberPostItem(type = PostType.AD, adItem = topAdItem))
+            if(offset == 0L) list.add(MemberPostItem(type = PostType.AD, adItem = topAdItem))
             memberPostItems?.forEachIndexed { index, item ->
                 list.add(item)
                 if (index % 5 == 4) list.add(getAdItem(adItems))
