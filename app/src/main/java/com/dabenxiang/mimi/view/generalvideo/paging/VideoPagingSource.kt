@@ -15,7 +15,8 @@ class VideoPagingSource(
     private val orderByType: Int = StatisticsOrderType.LATEST.value,
     private val adWidth: Int,
     private val adHeight: Int,
-    private val needAd: Boolean
+    private val needAd: Boolean,
+    private val isCategoryPage: Boolean = false
 ) : PagingSource<Long, StatisticsItem>() {
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, StatisticsItem> {
@@ -44,8 +45,10 @@ class VideoPagingSource(
             }
 
             if (needAd && lastId == 0L) {
-                val adItem = domainManager.getAdRepository()
-                    .getAD(adWidth, adHeight).body()?.content ?: AdItem()
+                val adItems =
+                    domainManager.getAdRepository().getAD(getAdCode(), adWidth, adHeight, 1)
+                        .body()?.content?.get(0)?.ad ?: arrayListOf()
+                val adItem = if (adItems.isEmpty()) AdItem() else adItems.first()
                 items?.add(0, StatisticsItem(adItem = adItem))
             }
 
@@ -69,6 +72,17 @@ class VideoPagingSource(
         } catch (exception: Exception) {
             Timber.e(exception)
             LoadResult.Error(exception)
+        }
+    }
+
+    private fun getAdCode(): String {
+        return if (isCategoryPage) "categorie_top"
+        else when (category) {
+            "国产" -> "categorie1_top"
+            "日韩" -> "categorie2_top"
+            "动漫" -> "categorie3_top"
+            "无码" -> "categorie4_top"
+            else -> "categorie_top"
         }
     }
 }
