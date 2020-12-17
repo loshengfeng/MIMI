@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.club.pages
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
@@ -28,7 +29,7 @@ class ClubItemViewModel : ClubViewModel() {
             clearListCh.receiveAsFlow().map { PagingData.empty() },
             postItems(type)
 
-    ).flattenMerge(2).buffer()
+    ).flattenMerge(2).buffer().cachedIn(viewModelScope)
 
     private fun postItems(type: ClubTabItemType, postType:PostType = getPostType(type)) = Pager(
             config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),

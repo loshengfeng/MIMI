@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.db
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.room.ForeignKey.CASCADE
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -19,6 +20,12 @@ interface PostDBItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMemberPostItem(item: MemberPostItem) : Long
+
+    @Update
+    fun updatePostDBItem(item: PostDBItem)
+
+    @Update
+    fun updateMemberPostItem(item: MemberPostItem)
 
     @Query("SELECT * FROM PostDBItems WHERE id= :id")
     fun getItemById(id:Long): PostDBItem?
@@ -51,7 +58,14 @@ interface PostDBItemDao {
 
 }
 
-@Entity(tableName = "PostDBItems")
+@Entity(tableName = "PostDBItems",
+        foreignKeys = [
+            ForeignKey(
+                    entity = MemberPostItem::class,
+                    parentColumns = ["id"],
+                    childColumns =["postDBId"],
+                    onUpdate =CASCADE)
+        ])
 data class PostDBItem(
         @PrimaryKey
         @ColumnInfo(name = "id")

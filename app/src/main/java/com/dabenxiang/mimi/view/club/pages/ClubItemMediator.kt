@@ -8,6 +8,7 @@ import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
@@ -44,7 +45,6 @@ class ClubItemMediator(
             state: PagingState<Int, PostDBItem>
     ): MediatorResult {
         try {
-            Timber.i("ClubItemMediator loadType =$loadType  type =$type")
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
                     adItem = null
@@ -61,12 +61,10 @@ class ClubItemMediator(
                 }
             }.takeIf { it == null }.run { 0 }
 
-            if(adItem ==null|| adItem?.href.isNullOrEmpty()){
+            adItem?.takeIf { adItem?.href?.isNotEmpty() ==true }?.let { adItem } ?: run {
                 adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
                         ?: AdItem()
             }
-
-            Timber.i("ClubItemMediator AdItem= $adItem")
 
             val result =
                     when (type) {
@@ -140,29 +138,37 @@ class ClubItemMediator(
 
                 database.remoteKeyDao().insertOrReplace(RemoteKey(type, result.body()?.paging?.offset ?: 0))
                 finalItems?.let {
-                    val postDBItems = it.mapIndexed { index, item ->
+                    it.forEachIndexed { index, item ->
+
+                        database.postDBItemDao().getMemberPostItemById(item.id)?.let {
+                            database.postDBItemDao().updateMemberPostItem(item)
+                        } ?: run {
+                            database.postDBItemDao().insertMemberPostItem(item)
+                        }
 
                         val queryId = if(item.type != PostType.AD)
                                         (CLUB_INDEX + type.value.toString() + item.id.toString().substring(5)).toLong()
                                       else item.id
                         val oldItem = database.postDBItemDao().getItemById(queryId)
                         if(oldItem == null) {
-                            PostDBItem(
+                            database.postDBItemDao().insertItem(PostDBItem(
                                     id = queryId,
                                     postDBId = item.id,
                                     postType =  item.type,
                                     clubTabItemType= type,
                                     timestamp = System.nanoTime()
 
-                            )
+                            ))
                         }else{
                             oldItem.postDBId = item.id
                             oldItem.timestamp = System.nanoTime()
-                            oldItem
+                            database.postDBItemDao().updatePostDBItem(oldItem)
                         }
+
+
                     }
-                    database.postDBItemDao().insertMemberPostItemAll(it)
-                    database.postDBItemDao().insertAll(postDBItems)
+//                    database.postDBItemDao().insertMemberPostItemAll(it)
+//                    database.postDBItemDao().insertAll(postDBItems)
                 }
 
             }

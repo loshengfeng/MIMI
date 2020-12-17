@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.api.vo
 
 import androidx.room.*
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
