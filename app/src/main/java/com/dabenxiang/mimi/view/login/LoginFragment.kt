@@ -182,10 +182,11 @@ class LoginFragment : BaseFragment() {
         viewModel.registerResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
-                    viewModel.mobile.value?.let { it1 ->
-                        viewModel.registerPw.value?.let { it2 ->
-                            viewModel.doLogin((tv_call_prefix.text.toString() + it1), it2)
+                    viewModel.mobile.value?.let { mobile ->
+                        viewModel.verificationCode.value?.let { code ->
+                            viewModel.doLogin((tv_call_prefix.text.toString() + mobile), code = code)
                         }
+
                     }
                 }
                 is Error -> onApiError(it.throwable)
@@ -375,14 +376,14 @@ class LoginFragment : BaseFragment() {
                     ?: "")
         }
 
-        layout_login_verification_code.setOnClickListener {
-            viewModel.changePWDCount++
-            if (viewModel.changePWDCount == 10) {
-                viewModel.changePWDCount = 0
-                group_pwd.visibility = View.VISIBLE
-
-            }
-        }
+//        layout_login_verification_code.setOnClickListener {
+//            viewModel.changePWDCount++
+//            if (viewModel.changePWDCount == 10) {
+//                viewModel.changePWDCount = 0
+//                group_pwd.visibility = View.VISIBLE
+//
+//            }
+//        }
 
         tv_call_prefix.setOnClickListener {
             viewModel.changePrefixCount++

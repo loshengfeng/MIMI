@@ -2,11 +2,12 @@ package com.dabenxiang.mimi.view.club.post
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -26,14 +27,12 @@ import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.CommentAdapter
+import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_comment.btn_send
-import kotlinx.android.synthetic.main.fragment_club_comment.et_message
-import kotlinx.android.synthetic.main.fragment_club_comment.layout_edit_bar
-import kotlinx.android.synthetic.main.fragment_club_comment.tv_replay_name
-import kotlinx.android.synthetic.main.fragment_club_text_detail.recyclerView
+import kotlinx.android.synthetic.main.fragment_club_comment.*
+import kotlin.math.abs
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -52,10 +51,17 @@ class ClubCommentFragment : BaseFragment() {
     private var replyCommentBlock: (() -> Unit)? = null
     private var commentLikeBlock: (() -> Unit)? = null
 
+    var replyRootNode: RootCommentNode? = null
+
+    var lastClickY = 0
+
     companion object {
         const val KEY_DATA = "data"
         const val KEY_IS_DARK_MODE = "is_dark_mode"
-        fun createBundle(item: MemberPostItem, isDarkMode: Boolean = false): ClubCommentFragment {
+        fun createBundle(
+            item: MemberPostItem,
+            isDarkMode: Boolean = false
+        ): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
                 it.putBoolean(KEY_IS_DARK_MODE, isDarkMode)
@@ -113,7 +119,9 @@ class ClubCommentFragment : BaseFragment() {
         viewModel.postCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is ApiResult.Empty -> {
+                    is ApiResult.Success -> {
+                        val isParent = et_message.tag == null
+
                         GeneralUtils.hideKeyboard(requireActivity())
                         et_message.text = null
                         et_message.tag = null
@@ -123,14 +131,38 @@ class ClubCommentFragment : BaseFragment() {
                         memberPostItem?.commentCount =
                             memberPostItem?.commentCount?.let { count -> count + 1 } ?: run { 1 }
 
-                        memberPostItem?.also { memberPostItem ->
-                            viewModel.getCommentInfo(
-                                memberPostItem.id,
-                                viewModel.currentCommentType,
-                                commentAdapter!!
-                            )
+                        if (isParent) {
+                            memberPostItem?.also { memberPostItem ->
+                                viewModel.getCommentInfo(
+                                    memberPostItem.id,
+                                    viewModel.currentCommentType,
+                                    commentAdapter!!
+                                )
+                            }
+                        } else {
+                            replyRootNode?.also { parentNode ->
+                                val parentIndex = commentAdapter?.getItemPosition(parentNode)!!
+                                if (parentNode.isExpanded) {
+                                    commentAdapter?.addData(
+                                        parentIndex + 1,
+                                        NestedCommentNode(
+                                            parentNode as RootCommentNode,
+                                            it.result
+                                        )
+                                    )
+                                } else {
+                                    replyCommentBlock = {
+                                        commentAdapter?.expand(
+                                            position = parentIndex,
+                                            animate = false,
+                                            notify = true,
+                                            parentPayload = CommentAdapter.EXPAND_COLLAPSE_PAYLOAD
+                                        )
+                                    }
+                                    viewModel.getReplyComment(parentNode, memberPostItem!!)
+                                }
+                            }
                         }
-                        textDetailAdapter?.notifyItemChanged(3)
                     }
                     is ApiResult.Error -> onApiError(it.throwable)
                 }
@@ -146,7 +178,8 @@ class ClubCommentFragment : BaseFragment() {
                         Pair(id, comment)
                     }?.also { (id, comment) ->
                         val replyId = et_message.tag?.let { rid -> rid as Long }
-                        viewModel.postComment(id, replyId, comment)
+                        val replyName = tv_replay_name.text.toString()
+                        viewModel.postComment(id, replyId, "$replyName $comment")
                     }
                 }
             }
@@ -173,10 +206,28 @@ class ClubCommentFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
         recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
-            if (bottom < oBottom) {
-                recyclerView.scrollBy(0, oBottom - bottom)
+            val h = GeneralUtils.getScreenSize(requireActivity()).second
+            if (oBottom - bottom > h/4 && (bottom < lastClickY || bottom - lastClickY < 20)) {
+                if(abs(lastClickY - bottom) < 30)
+                    recyclerView.scrollBy(0, 30 - abs(lastClickY - bottom))
+                else
+                    recyclerView.scrollBy(0, lastClickY - bottom)
             }
         }
+
+        recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                if (e.action == MotionEvent.ACTION_UP) lastClickY = e.getY(0).toInt()
+                return false
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+            }
+
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+            }
+
+        })
 
         mainViewModel?.getAd(adWidth, adHeight)
     }
@@ -215,9 +266,14 @@ class ClubCommentFragment : BaseFragment() {
             }
         }
 
-        override fun onReplyComment(replyId: Long?, replyName: String?) {
+        override fun onReplyComment(
+            replyId: Long?,
+            replyName: String?,
+            parentNode: RootCommentNode
+        ) {
             checkStatus {
                 takeUnless { replyId == null }?.also {
+                    replyRootNode = parentNode
                     layout_edit_bar.visibility = View.VISIBLE
 
                     GeneralUtils.showKeyboard(requireContext())
@@ -273,7 +329,7 @@ class ClubCommentFragment : BaseFragment() {
     }
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
-        override fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean) {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
             moreDialog?.dismiss()
             checkStatus {
                 (requireActivity() as MainActivity).showReportDialog(

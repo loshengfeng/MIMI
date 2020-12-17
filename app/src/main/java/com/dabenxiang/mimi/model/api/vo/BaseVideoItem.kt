@@ -24,7 +24,7 @@ data class VideoItem(
     val cover: String? = "",
 
     @SerializedName("deducted")
-    val deducted: Boolean? = false,
+    var deducted: Boolean? = false,
 
     @SerializedName("description")
     val description: String? = "",

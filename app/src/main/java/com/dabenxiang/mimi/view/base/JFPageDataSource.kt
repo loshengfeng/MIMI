@@ -31,9 +31,10 @@ abstract class JFPageDataSource<Key : Any, Value : Any> :
         if (nextKey != null || isLoadInit) {
             when (val data = load(nextKey)) {
                 is JFLoadResult.Page<*, *> -> {
-                    if (data.nextKey != null) {
-                        nextKey = data.nextKey as? Key
-                    }
+                    nextKey = if (data.nextKey != null)
+                        data.nextKey as? Key
+                    else
+                        null
 
                     if (data.content != null) {
                         return JFLoadAfterResult(nextKey == null, data.content as? Value)

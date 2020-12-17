@@ -81,6 +81,7 @@ object GeneralUtils {
         val url = oriResponse?.raw()?.request?.url.toString()
 
         val errorBody = oriResponse?.errorBody()
+        val errorCode = oriResponse?.code()
         val jsonStr = errorBody?.string()
         val type = object : TypeToken<ErrorItem>() {}.type
 
@@ -88,7 +89,7 @@ object GeneralUtils {
             Gson().fromJson(jsonStr, type)
         } catch (e: Exception) {
             e.printStackTrace()
-            ErrorItem(null, null, null)
+            ErrorItem(errorCode.toString(), "伺服器错误", null)
         }
 
         val responseBody = Gson().toJson(
