@@ -37,6 +37,8 @@ class ClubItemMediator(
         const val AD_GAP: Int = 5
     }
 
+    var adItem :AdItem ? =null
+
     override suspend fun load(
             loadType: LoadType,
             state: PagingState<Int, PostDBItem>
@@ -45,6 +47,7 @@ class ClubItemMediator(
             Timber.i("ClubItemMediator loadType =$loadType  type =$type")
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
+                    adItem = null
                     database.remoteKeyDao().insertOrReplace(RemoteKey(type, 0))
                     null
                 }
@@ -58,8 +61,12 @@ class ClubItemMediator(
                 }
             }.takeIf { it == null }.run { 0 }
 
-            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
-                    ?: AdItem()
+            if(adItem ==null|| adItem?.href.isNullOrEmpty()){
+                adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
+                        ?: AdItem()
+            }
+
+            Timber.i("ClubItemMediator AdItem= $adItem")
 
             val result =
                     when (type) {
@@ -135,7 +142,9 @@ class ClubItemMediator(
                 finalItems?.let {
                     val postDBItems = it.mapIndexed { index, item ->
 
-                        val queryId = (CLUB_INDEX + type.value.toString() + item.id.toString().substring(5)).toLong()
+                        val queryId = if(item.type != PostType.AD)
+                                        (CLUB_INDEX + type.value.toString() + item.id.toString().substring(5)).toLong()
+                                      else item.id
                         val oldItem = database.postDBItemDao().getItemById(queryId)
                         if(oldItem == null) {
                             PostDBItem(
@@ -143,12 +152,12 @@ class ClubItemMediator(
                                     postDBId = item.id,
                                     postType =  item.type,
                                     clubTabItemType= type,
-                                    timestamp = System.currentTimeMillis()
+                                    timestamp = System.nanoTime()
 
                             )
                         }else{
                             oldItem.postDBId = item.id
-                            if(oldItem.postType !=PostType.AD) oldItem.timestamp = System.currentTimeMillis()
+                            oldItem.timestamp = System.nanoTime()
                             oldItem
                         }
                     }

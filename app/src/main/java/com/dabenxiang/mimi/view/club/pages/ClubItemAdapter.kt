@@ -10,6 +10,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
@@ -19,6 +21,7 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.google.zxing.client.android.Intents.Scan.RESULT
 import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.component.inject
@@ -130,7 +133,9 @@ class ClubItemAdapter(
             when (holder) {
                 is AdHolder -> {
                     Timber.i("memberPostItem $memberPostItem AdHolder=$holder")
-                    Glide.with(context).load(memberPostItem.adItem?.href).into(holder.adImg)
+                    Glide.with(context).load(memberPostItem.adItem?.href)
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .into(holder.adImg)
                     holder.adImg.setOnClickListener {
                         GeneralUtils.openWebView(context, memberPostItem.adItem?.target ?: "")
                     }
