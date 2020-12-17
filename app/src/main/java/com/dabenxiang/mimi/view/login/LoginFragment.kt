@@ -321,6 +321,12 @@ class LoginFragment : BaseFragment() {
         })
 
         View.OnClickListener { buttonView ->
+            if (System.currentTimeMillis() - viewModel.clickTime > 500L) {
+                viewModel.clickTime = System.currentTimeMillis()
+            } else {
+                return@OnClickListener
+            }
+
             when (buttonView.id) {
                 R.id.btn_register_cancel, R.id.btn_login_cancel, R.id.btnClose -> navigateTo(NavigateItem.Up)
 
