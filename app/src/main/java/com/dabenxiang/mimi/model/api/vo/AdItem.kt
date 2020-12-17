@@ -17,15 +17,22 @@ data class AdItem(
 
 class AdItemConverters {
 
-    @TypeConverter
-    fun adItemToJson(item: AdItem?): String = item?.let{
-        Gson().toJson(it)
-    } ?: Gson().toJson("")
+//    @TypeConverter
+//    fun adItemToJson(item: AdItem?): String = item?.let{
+//        Gson().toJson(it)
+//    } ?: Gson().toJson("")
+//
+//    @TypeConverter
+//    fun jsonToAdItem(value: String):AdItem? = value.takeIf { it.isEmpty() }?.let{
+//        Gson().fromJson(value, AdItem::class.java)
+//    } ?: run {
+//        null
+//    }
 
     @TypeConverter
-    fun jsonToAdItem(value: String):AdItem? = value.takeIf { it.isEmpty() }?.let{
-        Gson().fromJson(value, AdItem::class.java)
-    } ?: run {
-        null
-    }
+    fun adItemToJson(item: AdItem?): String = if(item ==null) "" else Gson().toJson(item)
+
+    @TypeConverter
+    fun jsonToAdItem(value: String):AdItem? = if(value.isEmpty()) null
+        else Gson().fromJson(value, AdItem::class.java)?: null
 }

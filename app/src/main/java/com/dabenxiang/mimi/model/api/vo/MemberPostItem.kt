@@ -114,8 +114,8 @@ data class MemberPostItem(
 class MemberPostItemConverters {
 
     @TypeConverter
-    fun adItemToJson(item: MemberPostItem): String = Gson().toJson(item)
+    fun itemToJson(item: MemberPostItem): String = Gson().toJson(item)
 
     @TypeConverter
-    fun jsonToAdItem(value: String):MemberPostItem = Gson().fromJson(value, MemberPostItem::class.java)
+    fun jsonToItem(value: String):MemberPostItem = Gson().fromJson(value, MemberPostItem::class.java)
 }

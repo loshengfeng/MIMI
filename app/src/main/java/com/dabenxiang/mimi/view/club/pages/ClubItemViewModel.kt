@@ -16,8 +16,6 @@ import timber.log.Timber
 
 class ClubItemViewModel : ClubViewModel() {
 
-
-
     private val _postCount = MutableLiveData<Int>()
     val postCount: LiveData<Int> = _postCount
 
@@ -37,12 +35,7 @@ class ClubItemViewModel : ClubViewModel() {
             remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight,
                     type, postType, pagingCallback)
     ) {
-        when (type) {
-            ClubTabItemType.FOLLOW,
-            ClubTabItemType.HOTTEST,
-            ClubTabItemType.LATEST -> mimiDB.postDBItemDao().pagingSourceByClubTab(type)
-            else -> mimiDB.postDBItemDao().pagingSourceByPostType(postType)
-        }
+        mimiDB.postDBItemDao().pagingSourceByClubTab(type)
     }.flow
 
     private fun getPostType(type: ClubTabItemType) = when (type) {

@@ -31,11 +31,11 @@ interface PostDBItemDao {
 
     @Transaction
     @Query("SELECT * FROM PostDBItems WHERE postType= :postType ")
-    fun pagingSourceByPostType(postType: PostType): PagingSource<Int, MemberPostWithPostDBItem>
+    fun pagingSourceByPostType(postType: PostType): PagingSource<Int, PostDBItem>
 
     @Transaction
-    @Query("SELECT * FROM PostDBItems WHERE clubTabItemType= :clubTabItemType ")
-    fun pagingSourceByClubTab(clubTabItemType: ClubTabItemType): PagingSource<Int, MemberPostWithPostDBItem>
+    @Query("SELECT * FROM PostDBItems WHERE clubTabItemType= :clubTabItemType ORDER BY timestamp")
+    fun pagingSourceByClubTab(clubTabItemType: ClubTabItemType): PagingSource<Int, PostDBItem>
 
     @Query("DELETE FROM PostDBItems WHERE postType= :postType")
     suspend fun deleteItemByPostType(postType: PostType)
@@ -64,13 +64,17 @@ data class PostDBItem(
         val postType: PostType,
 
         @ColumnInfo(name = "clubTabItemType")
-        val clubTabItemType: ClubTabItemType
+        val clubTabItemType: ClubTabItemType,
+
+        @ColumnInfo(name = "timestamp")
+        var timestamp:Long
 )
 
 data class MemberPostWithPostDBItem(
-       @Relation(parentColumn = "id", entityColumn = "postDBId")
+
+        @ColumnInfo(name = "postDBItem")
        val postDBItem:PostDBItem,
 
-       @Embedded
+       @Relation(parentColumn = "id", entityColumn = "postDBId")
        var memberPostItem: MemberPostItem
 )

@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
@@ -20,12 +21,14 @@ import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_ad.view.*
 import kotlinx.coroutines.CoroutineScope
+import org.koin.core.component.inject
 import timber.log.Timber
 
 class ClubItemAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
-        private val viewModelScope: CoroutineScope
+        private val viewModelScope: CoroutineScope,
+        val mimiDB: MiMiDB
 ) : PagingDataAdapter<PostDBItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -44,7 +47,7 @@ class ClubItemAdapter(
                     oldItem: PostDBItem,
                     newItem: PostDBItem
             ): Boolean {
-                return oldItem.memberPostItem.id == newItem.memberPostItem.id
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
@@ -55,14 +58,14 @@ class ClubItemAdapter(
             }
 
             override fun getChangePayload(oldItem: PostDBItem, newItem: PostDBItem): Any? {
-                return oldItem.copy(memberPostItem = newItem.memberPostItem) == newItem
+                return oldItem.copy(postDBId = newItem.postDBId) == newItem
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return when (item?.memberPostItem?.type) {
+        return when (item?.postType) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
             PostType.IMAGE -> VIEW_TYPE_PICTURE
             PostType.AD -> VIEW_TYPE_AD
@@ -119,13 +122,17 @@ class ClubItemAdapter(
 //            } ?: run { adView.visibility = View.GONE}
 //        }
 
-        val item = getItem(position)
-        item?.also {
+        val item = getItem(position)?.postDBId?.let {
+            mimiDB.postDBItemDao().getMemberPostItemById(it)
+        }
+        item?.also {memberPostItem->
+            Timber.i("memberPostItem $memberPostItem position=$position  holder=$holder")
             when (holder) {
                 is AdHolder -> {
-                    Glide.with(context).load(item.memberPostItem.adItem?.href).into(holder.adImg)
+                    Timber.i("memberPostItem $memberPostItem AdHolder=$holder")
+                    Glide.with(context).load(memberPostItem.adItem?.href).into(holder.adImg)
                     holder.adImg.setOnClickListener {
-                        GeneralUtils.openWebView(context, item.memberPostItem.adItem?.target ?: "")
+                        GeneralUtils.openWebView(context, memberPostItem.adItem?.target ?: "")
                     }
                 }
 
@@ -133,7 +140,7 @@ class ClubItemAdapter(
 
                     holder.pictureRecycler.tag = position
                     holder.onBind(
-                            it.memberPostItem,
+                            memberPostItem,
                             position,
                             myPostListener,
                             viewModelScope
@@ -145,7 +152,7 @@ class ClubItemAdapter(
                 }
                 is MyPostTextPostHolder -> {
                     holder.onBind(
-                            it.memberPostItem,
+                            memberPostItem,
                             position,
                             myPostListener,
                             viewModelScope
@@ -157,7 +164,7 @@ class ClubItemAdapter(
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
-                            it.memberPostItem,
+                            memberPostItem,
                             position,
                             myPostListener,
                             viewModelScope
