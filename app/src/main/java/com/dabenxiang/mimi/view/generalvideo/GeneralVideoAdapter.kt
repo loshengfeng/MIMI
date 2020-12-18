@@ -40,7 +40,6 @@ class GeneralVideoAdapter(
 
         const val VIEW_TYPE_AD = 0
         const val VIEW_TYPE_VIDEO = 1
-        const val AD_INTERVAL = 10
     }
 
     override fun getItemViewType(position: Int): Int {

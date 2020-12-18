@@ -7,6 +7,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -104,7 +106,11 @@ class TopicListAdapter(
         item?.also {
             when (holder) {
                 is AdHolder -> {
-                    Glide.with(context).load(item.adItem?.href).into(holder.adImg)
+                    val options = RequestOptions()
+                        .priority(Priority.NORMAL)
+                        .placeholder(R.drawable.img_nopic_03)
+                        .error(R.drawable.img_nopic_03)
+                    Glide.with(context).load(item.adItem?.href).apply(options).into(holder.adImg)
                     holder.adImg.setOnClickListener {
                         GeneralUtils.openWebView(context, item.adItem?.target ?: "")
                     }
