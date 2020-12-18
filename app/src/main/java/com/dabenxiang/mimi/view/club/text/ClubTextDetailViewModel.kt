@@ -49,6 +49,9 @@ class ClubTextDetailViewModel : BaseViewModel() {
     private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>>()
     val postCommentResult: LiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>> = _postCommentResult
 
+    private val _getAdResult = MutableLiveData<ApiResult<AdItem>>()
+    val getAdResult: LiveData<ApiResult<AdItem>> = _getAdResult
+
     fun getPostDetail(item: MemberPostItem) {
         Timber.i("getPostDetail: item:$item")
         viewModelScope.launch {
@@ -410,6 +413,21 @@ class ClubTextDetailViewModel : BaseViewModel() {
             currentSize < 50 -> false
             offset >= total -> false
             else -> true
+        }
+    }
+
+    fun getAd(code: String, width: Int, height: Int, count: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getAdRepository().getAD(code, width, height, count)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content?.get(0)?.ad?.first()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _getAdResult.value = it }
         }
     }
 }

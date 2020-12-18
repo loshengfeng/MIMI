@@ -32,6 +32,7 @@ import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_comment.*
+import timber.log.Timber
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -57,13 +58,16 @@ class ClubCommentFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
         const val KEY_IS_DARK_MODE = "is_dark_mode"
+        const val KEY_AD_CODE = "AD_CODE"
         fun createBundle(
             item: MemberPostItem,
-            isDarkMode: Boolean = false
+            isDarkMode: Boolean = false,
+            adCode: String = ""
         ): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
                 it.putBoolean(KEY_IS_DARK_MODE, isDarkMode)
+                it.putString(KEY_AD_CODE, adCode)
             }
 
             val fragment = ClubCommentFragment()
@@ -79,6 +83,16 @@ class ClubCommentFragment : BaseFragment() {
 
     override fun setupObservers() {
         mainViewModel?.getAdResult?.observe(viewLifecycleOwner, {
+            when (it) {
+                is ApiResult.Success -> {
+                    textDetailAdapter?.setupAdItem(it.result)
+                    textDetailAdapter?.notifyItemChanged(0)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel?.getAdResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     textDetailAdapter?.setupAdItem(it.result)
@@ -223,8 +237,9 @@ class ClubCommentFragment : BaseFragment() {
             }
 
         })
-
-        mainViewModel?.getAd(adWidth, adHeight)
+        val adCode = arguments?.getString(KEY_AD_CODE)?:""
+        Timber.d("get ad code: $adCode")
+        viewModel?.getAd(adCode, adWidth, adHeight, 1)
     }
 
     private val onTextDetailListener = object : ClubCommentAdapter.OnTextDetailListener {
