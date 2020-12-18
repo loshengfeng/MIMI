@@ -196,19 +196,19 @@ object GeneralUtils {
         val time = (endDate.time - startDate.time) / 1000
         return when {
             (time / (60 * 60 * 24 * 30)) > 0 -> {
-                (time / (60 * 60 * 24 * 30)).toString().plus("月個前")
+                (time / (60 * 60 * 24 * 30)).toString().plus("月个前")
             }
             (time / (60 * 60 * 24)) > 0 -> {
                 (time / (60 * 60 * 24)).toString().plus("天前")
             }
             (time / (60 * 60)) > 0 -> {
-                (time / (60 * 60)).toString().plus("小時前")
+                (time / (60 * 60)).toString().plus("小时前")
             }
             (time / 60) > 0 -> {
-                (time / 60).toString().plus("分鐘前")
+                (time / 60).toString().plus("分钟前")
             }
             else -> {
-                time.toString().plus("秒鐘前")
+                time.toString().plus("秒钟前")
             }
         }
     }
