@@ -24,9 +24,6 @@ import timber.log.Timber
 
 class MyCollectionMimiVideoViewModel : ClubViewModel() {
 
-    private val _postCount = MutableLiveData<Int>()
-    val postCount: LiveData<Int> = _postCount
-
     private var _videoFavoriteResult = MutableLiveData<ApiResult<Int>>()
     val videoFavoriteResult: LiveData<ApiResult<Int>> = _videoFavoriteResult
 
@@ -102,12 +99,6 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     .flowOn(Dispatchers.IO)
                     .catch { e -> emit(ApiResult.error(e)) }
                     .collect { _deleteFavoriteResult.value = it }
-        }
-    }
-
-    private val pagingCallback = object : PagingCallback {
-        override fun onTotalCount(count: Long) {
-            _postCount.postValue(count.toInt())
         }
     }
 

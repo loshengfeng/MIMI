@@ -4,10 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -16,7 +16,7 @@ import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.club.pages.ClubItemAdapter
+import com.dabenxiang.mimi.view.club.base.ClubItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -28,6 +28,9 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
@@ -36,8 +39,8 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
     private val viewModel: TopicListViewModel by viewModels()
     private val topicviewmodel: TopicViewModel by viewModels({requireParentFragment()})
 
-    private val adapter: TopicListAdapter by lazy {
-        TopicListAdapter(requireContext(), postListener, viewModel.viewModelScope)
+    private val adapter: ClubItemAdapter by lazy {
+        ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item
@@ -62,65 +65,38 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         }
 
         viewModel.postCount.observe(this) {
-
-            if (it == 0) {
-                id_empty_group.visibility = View.VISIBLE
-                text_page_empty.text = getText(R.string.empty_post)
-//                list_short.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                list_short.visibility = View.VISIBLE
-            }
-            layout_refresh.isRefreshing = false
+            emptyPageToggle(it <=0)
         }
+    }
 
-        viewModel.followResult.observe(this, Observer {
-            when (it) {
-                is ApiResult.Empty -> {
-                    adapter?.notifyItemRangeChanged(
-                            0,
-                            adapter.snapshot().items.size,
-                            ClubItemAdapter.PAYLOAD_UPDATE_FOLLOW
-                    )
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = getText(R.string.empty_post)
+        } else {
+            id_empty_group.visibility = View.GONE
+            posts_list.visibility = View.VISIBLE
 
-        viewModel.likePostResult.observe(this, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    adapter?.notifyItemChanged(
-                            it.result,
-                            ClubItemAdapter.PAYLOAD_UPDATE_LIKE
-                    )
-                }
-                is ApiResult.Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.favoriteResult.observe(this, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    adapter?.notifyItemChanged(
-                            it.result,
-                            ClubItemAdapter.PAYLOAD_UPDATE_FAVORITE
-                    )
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
+        }
+        layout_refresh.isRefreshing = false
 
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        list_short.adapter = adapter
+        posts_list.adapter = adapter
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                layout_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
+            }
+        }
+
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter, topicTag, orderBy)
+            adapter.refresh()
         }
 
         tv_register.setOnClickListener {
@@ -141,15 +117,14 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             )
         }
 
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
-            when (it) {
-                is ApiResult.Success -> {
-                    Timber.i("deletePostResult")
-                    checkRemovedItems()
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
+//        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
+//            when (it) {
+//                is ApiResult.Success -> {
+//                    Timber.i("deletePostResult")
+//                }
+//                is ApiResult.Error -> onApiError(it.throwable)
+//            }
+//        })
 
     }
 
@@ -170,28 +145,14 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
     override fun onResume() {
         super.onResume()
 
-        if (adapter.snapshot().items.isEmpty()) {
-            viewModel.getData(adapter, topicTag, orderBy)
-        } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
-            checkRemovedItems()
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(topicTag, orderBy).collectLatest {
+                adapter.submitData(it)
+            }
         }
 
         viewModel.getAd()
-    }
-
-    private fun checkRemovedItems(){
-        val idList = adapter.snapshot().items.map { item ->
-            item.id
-        }
-        Timber.i("idList =$idList")
-        idList.forEach { id ->
-            if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
-                val pos = idList.indexOf(id)
-                Timber.i("id =$id pos =$pos")
-                adapter.removedPosList.add(id)
-                adapter.notifyItemChanged(pos)
-            }
-        }
     }
 
     private val postListener = object : MyPostListener {

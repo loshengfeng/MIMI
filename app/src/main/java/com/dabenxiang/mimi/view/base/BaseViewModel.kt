@@ -25,6 +25,7 @@ import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
@@ -37,10 +38,7 @@ import com.google.gson.Gson
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -48,6 +46,8 @@ import retrofit2.HttpException
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
+
+    val mimiDB: MiMiDB by inject()
 
     companion object {
         const val POP_HINT_DURATION = 1000L
@@ -156,6 +156,11 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion {
+                        mimiDB.postDBItemDao().getPostDBItems(item.id)?.forEach { postItem ->
+                            mimiDB.postDBItemDao().deleteItem(postItem.id)
+                        }
+                    }
                 .collect {
                     deletePostIdList.value?.add(item.id)
                     _deletePostResult.value = it }

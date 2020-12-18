@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.club.base
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
@@ -20,7 +21,8 @@ import timber.log.Timber
 
 abstract class ClubViewModel : BaseViewModel(){
 
-    val mimiDB: MiMiDB by inject()
+    private val _postCount = MutableLiveData<Int>()
+    val postCount: LiveData<Int> = _postCount
 
     private val _followResult = MutableLiveData<ApiResult<Nothing>>()
     val followResult: LiveData<ApiResult<Nothing>> = _followResult
@@ -213,6 +215,12 @@ abstract class ClubViewModel : BaseViewModel(){
                 .collect { _adResult.value = it}
         }
 
+    }
+
+    open val pagingCallback = object : PagingCallback {
+        override fun onTotalCount(count: Long) {
+            _postCount.postValue(count.toInt())
+        }
     }
 
 }

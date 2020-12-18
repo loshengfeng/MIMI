@@ -209,7 +209,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        list_short.adapter = adapter
+        posts_list.adapter = adapter
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
@@ -253,10 +253,10 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         if (isHide) {
             text_page_empty.text = if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
             id_empty_group.visibility = View.VISIBLE
-            list_short.visibility = View.INVISIBLE
+            posts_list.visibility = View.INVISIBLE
         } else {
             id_empty_group.visibility = View.GONE
-            list_short.visibility = View.VISIBLE
+            posts_list.visibility = View.VISIBLE
 
         }
     }

@@ -1,62 +1,32 @@
-package com.dabenxiang.mimi.view.club.topic_detail
+package com.dabenxiang.mimi.view.club.base
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.club.base.PostDBDiffCallback.diffCallback
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
-class TopicListAdapter(
+class ClubItemAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
         private val viewModelScope: CoroutineScope
-) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
-
-    companion object {
-        const val PAYLOAD_UPDATE_LIKE = 0
-        const val PAYLOAD_UPDATE_FAVORITE = 1
-        const val PAYLOAD_UPDATE_FOLLOW = 2
-
-        const val VIEW_TYPE_CLIP = 0
-        const val VIEW_TYPE_PICTURE = 1
-        const val VIEW_TYPE_TEXT = 2
-        const val VIEW_TYPE_DELETED = 3
-        const val VIEW_TYPE_AD = 4
-
-        val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
-            override fun areItemsTheSame(
-                    oldItem: MemberPostItem,
-                    newItem: MemberPostItem
-            ): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-            override fun areContentsTheSame(
-                    oldItem: MemberPostItem,
-                    newItem: MemberPostItem
-            ): Boolean {
-                return oldItem == newItem
-            }
-        }
-    }
-
-    var removedPosList = ArrayList<Long>()
+) : PagingDataAdapter<MemberPostWithPostDBItem, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
-        return if (removedPosList.contains(item?.id)) {
-            VIEW_TYPE_DELETED
-        }else when (item?.type) {
+        val item = getItem(position)?.postDBItem
+        return when (item?.postType) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
             PostType.IMAGE -> VIEW_TYPE_PICTURE
             PostType.AD -> VIEW_TYPE_AD
@@ -100,42 +70,56 @@ class TopicListAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
-        item?.also {
+
+//        val item = getItem(position)?.postDBId?.let {
+//            mimiDB.postDBItemDao().getMemberPostItemById(it)
+//        }
+        val item = getItem(position)?.memberPostItem
+        item?.also {memberPostItem->
+            Timber.i("memberPostItem $memberPostItem position=$position  holder=$holder")
             when (holder) {
                 is AdHolder -> {
-                    Glide.with(context).load(item.adItem?.href).into(holder.adImg)
+                    Timber.i("memberPostItem $memberPostItem AdHolder=$holder")
+                    Glide.with(context).load(memberPostItem.adItem?.href)
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .into(holder.adImg)
                     holder.adImg.setOnClickListener {
-                        GeneralUtils.openWebView(context, item.adItem?.target ?: "")
+                        GeneralUtils.openWebView(context, memberPostItem.adItem?.target ?: "")
                     }
                 }
 
                 is MyPostPicturePostHolder -> {
+
                     holder.pictureRecycler.tag = position
                     holder.onBind(
-                            it,
+                            memberPostItem,
+                            position,
+                            myPostListener,
+                            viewModelScope
+                    )
+
+
+                }
+                is MyPostTextPostHolder -> {
+                    holder.onBind(
+                            memberPostItem,
                             position,
                             myPostListener,
                             viewModelScope
                     )
 
                 }
-                is MyPostTextPostHolder -> {
-                    holder.onBind(it,
-                            position,
-                            myPostListener,
-                            viewModelScope
-                    )
-                }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
-                            it,
+                            memberPostItem,
                             position,
                             myPostListener,
                             viewModelScope
                     )
+
                 }
             }
         }
     }
+
 }

@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -16,6 +17,7 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
+import com.dabenxiang.mimi.view.club.base.ClubItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -27,11 +29,13 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_club_item.id_empty_group
 import kotlinx.android.synthetic.main.fragment_club_item.layout_refresh
-import kotlinx.android.synthetic.main.fragment_club_item.list_short
+import kotlinx.android.synthetic.main.fragment_club_item.posts_list
 import kotlinx.android.synthetic.main.fragment_club_item.text_page_empty
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -42,7 +46,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val accountManager: AccountManager by inject()
 
     private val adapter: ClubItemAdapter by lazy {
-       ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope, viewModel.mimiDB)
+       ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
     override fun getLayoutId() = R.layout.fragment_club_item
 
@@ -62,10 +66,10 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
                 else -> getText(R.string.empty_post)
             }
-            list_short.visibility = View.INVISIBLE
+            posts_list.visibility = View.INVISIBLE
         } else {
             id_empty_group.visibility = View.GONE
-            list_short.visibility = View.VISIBLE
+            posts_list.visibility = View.VISIBLE
 
         }
         layout_refresh.isRefreshing = false
@@ -81,35 +85,13 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             layout_refresh.isRefreshing = it
         }
 
-        viewModel.followResult.observe(this, Observer {
-            when (it) {
-                is ApiResult.Empty -> {
-                    adapter.notifyItemRangeChanged(
-                        0,
-                        viewModel.totalCount,
-                        ClubItemAdapter.PAYLOAD_UPDATE_FOLLOW
-                    )
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
-//        viewModel.likePostResult.observe(this, Observer {
+//        viewModel.followResult.observe(this, Observer {
 //            when (it) {
-//                is ApiResult.Success -> {
-//                    Timber.i("likePostResult = $it")
-//                    adapter.notifyDataSetChanged()
-//                }
-//                is ApiResult.Error -> Timber.e(it.throwable)
-//            }
-//        })
-//
-//        viewModel.favoriteResult.observe(this, Observer {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    adapter?.notifyItemChanged(
-//                        it.result,
-//                        ClubItemAdapter.PAYLOAD_UPDATE_FAVORITE
+//                is ApiResult.Empty -> {
+//                    adapter.notifyItemRangeChanged(
+//                        0,
+//                        viewModel.totalCount,
+//                        PAYLOAD_UPDATE_FOLLOW
 //                    )
 //                }
 //                is ApiResult.Error -> onApiError(it.throwable)
@@ -126,12 +108,18 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        list_short.adapter = adapter
+        posts_list.adapter = adapter
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                layout_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
+            }
+        }
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
             clubTabViewModel.doTask(ClubTabViewModel.REFRESH_TASK)
-//            viewModel.getData(adapter, type)
             adapter.refresh()
         }
 

@@ -152,10 +152,10 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
             if (it == 0) {
                 text_page_empty.text = getString(R.string.like_empty_msg)
                 id_empty_group.visibility = View.VISIBLE
-                list_short.visibility = View.INVISIBLE
+                posts_list.visibility = View.INVISIBLE
             } else {
                 id_empty_group.visibility = View.GONE
-                list_short.visibility = View.VISIBLE
+                posts_list.visibility = View.VISIBLE
             }
             myPagesViewModel.changeDataCount(tab, it)
             layout_refresh.isRefreshing = false
@@ -196,7 +196,7 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        list_short.adapter = adapter
+        posts_list.adapter = adapter
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false

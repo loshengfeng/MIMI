@@ -17,9 +17,6 @@ import timber.log.Timber
 
 class ClubItemViewModel : ClubViewModel() {
 
-    private val _postCount = MutableLiveData<Int>()
-    val postCount: LiveData<Int> = _postCount
-
     var totalCount: Int = 0
 
     private val clearListCh = Channel<Unit>(Channel.CONFLATED)
@@ -31,28 +28,13 @@ class ClubItemViewModel : ClubViewModel() {
 
     ).flattenMerge(2).buffer().cachedIn(viewModelScope)
 
-    private fun postItems(type: ClubTabItemType, postType:PostType = getPostType(type)) = Pager(
+    private fun postItems(type: ClubTabItemType) = Pager(
             config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
             remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight,
-                    type, postType, pagingCallback)
+                    type, pagingCallback)
     ) {
-        mimiDB.postDBItemDao().pagingSourceByClubTab(type)
+        mimiDB.postDBItemDao().pagingSourceByClubTab( ClubItemMediator::class.simpleName+ type.toString())
     }.flow
 
-    private fun getPostType(type: ClubTabItemType) = when (type) {
-        ClubTabItemType.FOLLOW -> PostType.FOLLOWED
-        ClubTabItemType.HOTTEST -> PostType.TEXT_IMAGE_VIDEO
-        ClubTabItemType.LATEST -> PostType.TEXT_IMAGE_VIDEO
-        ClubTabItemType.SHORT_VIDEO -> PostType.VIDEO
-        ClubTabItemType.PICTURE -> PostType.IMAGE
-        ClubTabItemType.NOVEL -> PostType.TEXT
-    }
 
-    private val pagingCallback = object : PagingCallback {
-
-        override fun onTotalCount(count: Long) {
-            _postCount.postValue(count.toInt())
-        }
-
-    }
 }

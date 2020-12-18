@@ -22,9 +22,6 @@ import timber.log.Timber
 
 class LikePostViewModel : ClubViewModel() {
 
-    private val _postCount = MutableLiveData<Int>()
-    val postCount: LiveData<Int> = _postCount
-
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
 
@@ -56,15 +53,6 @@ class LikePostViewModel : ClubViewModel() {
                 .onStart {  setShowProgress(true) }
                 .onCompletion { setShowProgress(false) }
                 .cachedIn(viewModelScope)
-    }
-
-
-    private val pagingCallback = object : PagingCallback {
-
-        override fun onTotalCount(count: Long) {
-            _postCount.postValue(count.toInt())
-        }
-
     }
 
     fun deleteAllLike(items: List<MemberPostItem>) {

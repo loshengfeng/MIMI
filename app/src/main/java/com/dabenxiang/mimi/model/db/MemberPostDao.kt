@@ -28,7 +28,16 @@ interface PostDBItemDao {
     fun updateMemberPostItem(item: MemberPostItem)
 
     @Query("SELECT * FROM PostDBItems WHERE id= :id")
-    fun getItemById(id:Long): PostDBItem?
+    fun getPostDBItemsById(id:Long): PostDBItem?
+
+    @Query("SELECT * FROM PostDBItems WHERE pageName = :pageName and postDBId = :postDBId limit 1")
+    fun getPostDBItem(pageName:String, postDBId:Long): PostDBItem?
+
+    @Query("SELECT * FROM PostDBItems WHERE postDBId = :postDBId")
+    fun getPostDBItems(postDBId:Long): List<PostDBItem>?
+
+    @Query("SELECT * FROM PostDBItems WHERE pageName = :pageName and postType = :postType ")
+    fun getPostDBItem(pageName:String, postType:PostType): PostDBItem?
 
     @Query("SELECT * FROM MemberPostItems WHERE id= :id")
     fun getMemberPostItemById(id:Long): MemberPostItem?
@@ -37,58 +46,52 @@ interface PostDBItemDao {
     fun pagingSourceAll(): PagingSource<Int, PostDBItem>
 
     @Transaction
-    @Query("SELECT * FROM PostDBItems WHERE clubTabItemType= :clubTabItemType ORDER BY timestamp")
-    fun pagingSourceByPostType(clubTabItemType: ClubTabItemType): PagingSource<Int, MemberPostWithPostDBItem>
-
-    @Transaction
-    @Query("SELECT * FROM PostDBItems WHERE clubTabItemType= :clubTabItemType ORDER BY timestamp")
-    fun pagingSourceByClubTab(clubTabItemType: ClubTabItemType): PagingSource<Int, MemberPostWithPostDBItem>
-
-//    @Transaction
-//    @Query("SELECT * FROM PostDBItems WHERE clubTabItemType= :clubTabItemType ORDER BY timestamp")
-//    fun pagingSourceByClubTab(clubTabItemType: ClubTabItemType): PagingSource<Int, PostDBItem>
+    @Query("SELECT * FROM PostDBItems WHERE pageName= :pageName ORDER BY timestamp")
+    fun pagingSourceByClubTab(pageName: String): PagingSource<Int, MemberPostWithPostDBItem>
 
     @Query("DELETE FROM PostDBItems WHERE postType= :postType")
     suspend fun deleteItemByPostType(postType: PostType)
 
-    @Query("DELETE FROM PostDBItems WHERE clubTabItemType= :clubTabItemType")
-    suspend fun deleteItemByClubTab(clubTabItemType: ClubTabItemType)
-
-    @Query("DELETE FROM PostDBItems")
-    suspend fun deleteAll()
+    @Query("DELETE FROM PostDBItems WHERE pageName = :pageName")
+    suspend fun deleteItemByClubTab(pageName: String)
 
     @Query("DELETE FROM PostDBItems WHERE id = :id")
     suspend fun deleteItem(id: Long)
 
+    @Query("DELETE FROM PostDBItems")
+    suspend fun deleteAll()
 }
 
-@Entity(tableName = "PostDBItems",
-        indices = [
-            Index(value = ["postDBId"], unique = true)
-        ])
+
+@Entity(
+    tableName = "PostDBItems",
+    indices = [
+        Index(value = ["postDBId"], unique = true)
+    ]
+)
 data class PostDBItem(
-        @PrimaryKey
-        @ColumnInfo(name = "id")
-        val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val id: Long =0,
 
-        @ColumnInfo(name = "postDBId")
-        var postDBId: Long,
+    @ColumnInfo(name = "postDBId")
+    var postDBId: Long,
 
-        @ColumnInfo(name = "postType")
-        val postType: PostType,
+    @ColumnInfo(name = "postType")
+    val postType: PostType,
 
-        @ColumnInfo(name = "clubTabItemType")
-        val clubTabItemType: ClubTabItemType,
+    @ColumnInfo(name = "pageName")
+    val pageName: String,
 
-        @ColumnInfo(name = "timestamp")
-        var timestamp:Long,
+    @ColumnInfo(name = "timestamp")
+    var timestamp: Long,
 )
 
 data class MemberPostWithPostDBItem(
-
        @Embedded
        val postDBItem:PostDBItem,
 
        @Relation(parentColumn = "postDBId", entityColumn = "id")
        var memberPostItem: MemberPostItem
 )
+

@@ -12,7 +12,10 @@ import java.lang.reflect.Type
 import java.util.*
 
 @Database(
-        entities = [PostDBItem::class, MemberPostItem::class, RemoteKey::class],
+        entities = [
+            DBRemoteKey::class,
+            PostDBItem::class,
+            MemberPostItem::class],
         version = 1,
         exportSchema = false
 )
@@ -38,7 +41,7 @@ abstract class MiMiDB : RoomDatabase() {
     }
 
     abstract fun postDBItemDao(): PostDBItemDao
-    abstract fun remoteKeyDao(): RemoteKeyDao
+    abstract fun remoteKeyDao(): DBRemoteKeyDao
 }
 
 class StringArrayListConverters {
