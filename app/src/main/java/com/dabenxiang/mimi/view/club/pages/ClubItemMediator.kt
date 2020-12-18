@@ -30,7 +30,7 @@ class ClubItemMediator(
         private val type: ClubTabItemType,
         private var postType: PostType,
         private val pagingCallback: PagingCallback,
-) : RemoteMediator<Int, PostDBItem>() {
+) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
         const val CLUB_INDEX = "990"
@@ -42,7 +42,7 @@ class ClubItemMediator(
 
     override suspend fun load(
             loadType: LoadType,
-            state: PagingState<Int, PostDBItem>
+            state: PagingState<Int, MemberPostWithPostDBItem>
     ): MediatorResult {
         try {
             val offset = when (loadType) {
@@ -138,37 +138,31 @@ class ClubItemMediator(
 
                 database.remoteKeyDao().insertOrReplace(RemoteKey(type, result.body()?.paging?.offset ?: 0))
                 finalItems?.let {
-                    it.forEachIndexed { index, item ->
-
-                        database.postDBItemDao().getMemberPostItemById(item.id)?.let {
-                            database.postDBItemDao().updateMemberPostItem(item)
-                        } ?: run {
-                            database.postDBItemDao().insertMemberPostItem(item)
-                        }
+                    val postDBItems = it.mapIndexed() { index, item ->
 
                         val queryId = if(item.type != PostType.AD)
                                         (CLUB_INDEX + type.value.toString() + item.id.toString().substring(5)).toLong()
                                       else item.id
                         val oldItem = database.postDBItemDao().getItemById(queryId)
                         if(oldItem == null) {
-                            database.postDBItemDao().insertItem(PostDBItem(
-                                    id = queryId,
-                                    postDBId = item.id,
-                                    postType =  item.type,
-                                    clubTabItemType= type,
-                                    timestamp = System.nanoTime()
+                            PostDBItem(
+                                id = queryId,
+                                postDBId = item.id,
+                                postType =  item.type,
+                                clubTabItemType= type,
+                                timestamp = System.nanoTime()
 
-                            ))
+                            )
                         }else{
                             oldItem.postDBId = item.id
                             oldItem.timestamp = System.nanoTime()
-                            database.postDBItemDao().updatePostDBItem(oldItem)
+                            oldItem
                         }
 
 
                     }
-//                    database.postDBItemDao().insertMemberPostItemAll(it)
-//                    database.postDBItemDao().insertAll(postDBItems)
+                    database.postDBItemDao().insertMemberPostItemAll(it)
+                    database.postDBItemDao().insertAll(postDBItems)
                 }
 
             }
@@ -193,4 +187,5 @@ class ClubItemMediator(
             else -> true
         }
     }
+
 }

@@ -37,12 +37,16 @@ interface PostDBItemDao {
     fun pagingSourceAll(): PagingSource<Int, PostDBItem>
 
     @Transaction
-    @Query("SELECT * FROM PostDBItems WHERE postType= :postType ")
-    fun pagingSourceByPostType(postType: PostType): PagingSource<Int, PostDBItem>
+    @Query("SELECT * FROM PostDBItems WHERE clubTabItemType= :clubTabItemType ORDER BY timestamp")
+    fun pagingSourceByPostType(clubTabItemType: ClubTabItemType): PagingSource<Int, MemberPostWithPostDBItem>
 
     @Transaction
     @Query("SELECT * FROM PostDBItems WHERE clubTabItemType= :clubTabItemType ORDER BY timestamp")
-    fun pagingSourceByClubTab(clubTabItemType: ClubTabItemType): PagingSource<Int, PostDBItem>
+    fun pagingSourceByClubTab(clubTabItemType: ClubTabItemType): PagingSource<Int, MemberPostWithPostDBItem>
+
+//    @Transaction
+//    @Query("SELECT * FROM PostDBItems WHERE clubTabItemType= :clubTabItemType ORDER BY timestamp")
+//    fun pagingSourceByClubTab(clubTabItemType: ClubTabItemType): PagingSource<Int, PostDBItem>
 
     @Query("DELETE FROM PostDBItems WHERE postType= :postType")
     suspend fun deleteItemByPostType(postType: PostType)
@@ -59,12 +63,8 @@ interface PostDBItemDao {
 }
 
 @Entity(tableName = "PostDBItems",
-        foreignKeys = [
-            ForeignKey(
-                    entity = MemberPostItem::class,
-                    parentColumns = ["id"],
-                    childColumns =["postDBId"],
-                    onUpdate =CASCADE)
+        indices = [
+            Index(value = ["postDBId"], unique = true)
         ])
 data class PostDBItem(
         @PrimaryKey
@@ -81,14 +81,14 @@ data class PostDBItem(
         val clubTabItemType: ClubTabItemType,
 
         @ColumnInfo(name = "timestamp")
-        var timestamp:Long
+        var timestamp:Long,
 )
 
 data class MemberPostWithPostDBItem(
 
-        @ColumnInfo(name = "postDBItem")
+       @Embedded
        val postDBItem:PostDBItem,
 
-       @Relation(parentColumn = "id", entityColumn = "postDBId")
+       @Relation(parentColumn = "postDBId", entityColumn = "id")
        var memberPostItem: MemberPostItem
 )

@@ -15,6 +15,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.PostType
@@ -32,7 +33,7 @@ class ClubItemAdapter(
         private val myPostListener: MyPostListener,
         private val viewModelScope: CoroutineScope,
         val mimiDB: MiMiDB
-) : PagingDataAdapter<PostDBItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<MemberPostWithPostDBItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
@@ -45,29 +46,29 @@ class ClubItemAdapter(
         const val VIEW_TYPE_DELETED = 3
         const val VIEW_TYPE_AD = 4
 
-        val diffCallback = object : DiffUtil.ItemCallback<PostDBItem>() {
+        val diffCallback = object : DiffUtil.ItemCallback<MemberPostWithPostDBItem>() {
             override fun areItemsTheSame(
-                    oldItem: PostDBItem,
-                    newItem: PostDBItem
+                    oldItem: MemberPostWithPostDBItem,
+                    newItem: MemberPostWithPostDBItem
             ): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.postDBItem.id == newItem.postDBItem.id
             }
 
             override fun areContentsTheSame(
-                    oldItem: PostDBItem,
-                    newItem: PostDBItem
+                    oldItem: MemberPostWithPostDBItem,
+                    newItem: MemberPostWithPostDBItem
             ): Boolean {
                 return oldItem == newItem
             }
 
-            override fun getChangePayload(oldItem: PostDBItem, newItem: PostDBItem): Any? {
-                return oldItem.copy(postDBId = newItem.postDBId) == newItem
+            override fun getChangePayload(oldItem: MemberPostWithPostDBItem, newItem: MemberPostWithPostDBItem): Any? {
+                return oldItem.copy(memberPostItem = newItem.memberPostItem) == newItem
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
+        val item = getItem(position)?.postDBItem
         return when (item?.postType) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
             PostType.IMAGE -> VIEW_TYPE_PICTURE
@@ -113,21 +114,10 @@ class ClubItemAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-//        fun checkADView(adView:View, adItem: AdItem){
-//            position.takeIf { position % AD_GAP == 0}?.let {
-//                Timber.i("position =$position position % AD_GAP =${position % AD_GAP}")
-//                adView.visibility = View.VISIBLE
-//                Glide.with(context).load(adItem.href).into(adView.iv_ad)
-//                adView.setOnClickListener {
-//                    GeneralUtils.openWebView(context, adItem.target ?: "")
-//                }
-//
-//            } ?: run { adView.visibility = View.GONE}
+//        val item = getItem(position)?.postDBId?.let {
+//            mimiDB.postDBItemDao().getMemberPostItemById(it)
 //        }
-
-        val item = getItem(position)?.postDBId?.let {
-            mimiDB.postDBItemDao().getMemberPostItemById(it)
-        }
+        val item = getItem(position)?.memberPostItem
         item?.also {memberPostItem->
             Timber.i("memberPostItem $memberPostItem position=$position  holder=$holder")
             when (holder) {
@@ -150,9 +140,7 @@ class ClubItemAdapter(
                             myPostListener,
                             viewModelScope
                     )
-//                    item.memberPostItem.adItem?.let {
-//                        checkADView(holder.adView, it)
-//                    }
+
 
                 }
                 is MyPostTextPostHolder -> {
@@ -163,9 +151,6 @@ class ClubItemAdapter(
                             viewModelScope
                     )
 
-//                    item.memberPostItem.adItem?.let {
-//                        checkADView(holder.adView, it)
-//                    }
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
@@ -174,12 +159,10 @@ class ClubItemAdapter(
                             myPostListener,
                             viewModelScope
                     )
-//
-//                    item.memberPostItem.adItem?.let {
-//                        checkADView(holder.adView, it)
-//                    }
+
                 }
             }
         }
     }
+
 }

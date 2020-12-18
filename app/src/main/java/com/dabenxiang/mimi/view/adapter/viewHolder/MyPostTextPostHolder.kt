@@ -95,6 +95,7 @@ class MyPostTextPostHolder(
             item.isFavorite = !item.isFavorite
             item.favoriteCount =
                 if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
+            updateFavorite(item)
             myPostListener.onFavoriteClick(
                 item,
                 position,
@@ -114,6 +115,7 @@ class MyPostTextPostHolder(
             item.likeType = if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
             item.likeCount =
                 if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
+            updateLike(item)
             myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
         ivLike.setOnClickListener(onLikeClickListener)

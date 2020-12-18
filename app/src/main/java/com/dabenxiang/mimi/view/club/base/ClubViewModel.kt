@@ -116,7 +116,7 @@ abstract class ClubViewModel : BaseViewModel(){
                                     else -> this.favoriteCount-1
                                 }
                             }
-                            mimiDB.postDBItemDao().updateMemberPostItem(item)
+                            mimiDB.postDBItemDao().insertMemberPostItem(item)
                         }
                  }
                 .collect { _favoriteResult.value = it }
@@ -160,7 +160,7 @@ abstract class ClubViewModel : BaseViewModel(){
                                 }
                             }
                         }
-                        mimiDB.postDBItemDao().updateMemberPostItem(item)
+                        mimiDB.postDBItemDao().insertMemberPostItem(item)
                     }
                 }
                 .collect {
@@ -179,7 +179,23 @@ abstract class ClubViewModel : BaseViewModel(){
             }
                     .flowOn(Dispatchers.IO)
                     .onStart { emit(ApiResult.loading()) }
-                    .onCompletion { emit(ApiResult.loaded()) }
+                    .onCompletion {
+                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
+                            val item = memberPostItem.apply {
+                                this.likeType = type
+                                when(type) {
+                                    LikeType.LIKE -> {
+                                        this.likeCount += 1
+                                    }
+                                    else-> {
+                                        this.likeCount -= 1
+                                    }
+                                }
+                            }
+                            mimiDB.postDBItemDao().insertMemberPostItem(item)
+                        }
+                        emit(ApiResult.loaded())
+                    }
                     .catch { e -> emit(ApiResult.error(e)) }
                     .collect { _videoLikeResult.value = it }
         }
