@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextDetailViewModel
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.fullpicture.FullPictureFragment
@@ -46,9 +47,11 @@ class ClubPicDetailFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
-        fun createBundle(item: MemberPostItem): ClubPicDetailFragment {
+        const val KEY_AD_CODE = "AD_CODE"
+        fun createBundle(item: MemberPostItem, adCode: String = ""): ClubPicDetailFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
+                it.putString(ClubCommentFragment.KEY_AD_CODE, adCode)
             }
 
             val fragment =
@@ -134,7 +137,8 @@ class ClubPicDetailFragment : BaseFragment() {
         recyclerView.adapter = pictureDetailAdapter
 
         viewModel.getPostDetail(memberPostItem!!)
-        mainViewModel?.getAd(adWidth, adHeight)
+        val adCode = arguments?.getString(KEY_AD_CODE)?:""
+        mainViewModel?.getAd(adCode, adWidth, adHeight, 1)
     }
 
     private fun followMember(

@@ -17,13 +17,13 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
-import timber.log.Timber
 
 class ClubTextDetailFragment : BaseFragment() {
 
@@ -43,9 +43,11 @@ class ClubTextDetailFragment : BaseFragment() {
 
     companion object {
         const val KEY_DATA = "data"
-        fun createBundle(item: MemberPostItem): ClubTextDetailFragment {
+        const val KEY_AD_CODE = "AD_CODE"
+        fun createBundle(item: MemberPostItem, adCode: String = ""): ClubTextDetailFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
+                it.putString(ClubCommentFragment.KEY_AD_CODE, adCode)
             }
 
             val fragment =
@@ -129,7 +131,8 @@ class ClubTextDetailFragment : BaseFragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
         viewModel.getPostDetail(memberPostItem!!)
-        mainViewModel?.getAd(adWidth, adHeight)
+        val adCode = arguments?.getString(KEY_AD_CODE)?:""
+        mainViewModel?.getAd(adCode, adWidth, adHeight, 1)
     }
 
     private val onTextDetailListener = object : ClubTextDetailAdapter.OnTextDetailListener {

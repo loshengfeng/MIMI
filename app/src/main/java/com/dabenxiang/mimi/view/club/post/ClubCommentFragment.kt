@@ -32,7 +32,6 @@ import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_comment.*
-import timber.log.Timber
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -83,16 +82,6 @@ class ClubCommentFragment : BaseFragment() {
 
     override fun setupObservers() {
         mainViewModel?.getAdResult?.observe(viewLifecycleOwner, {
-            when (it) {
-                is ApiResult.Success -> {
-                    textDetailAdapter?.setupAdItem(it.result)
-                    textDetailAdapter?.notifyItemChanged(0)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel?.getAdResult?.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Success -> {
                     textDetailAdapter?.setupAdItem(it.result)
@@ -238,8 +227,7 @@ class ClubCommentFragment : BaseFragment() {
 
         })
         val adCode = arguments?.getString(KEY_AD_CODE)?:""
-        Timber.d("get ad code: $adCode")
-        viewModel?.getAd(adCode, adWidth, adHeight, 1)
+        mainViewModel?.getAd(adCode, adWidth, adHeight, 1)
     }
 
     private val onTextDetailListener = object : ClubCommentAdapter.OnTextDetailListener {
