@@ -47,6 +47,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
     companion object {
         const val KEY_DATA = "data"
+        const val AD_GAP: Int = 5
         fun createBundle(item: MemberPostItem): Bundle {
             return Bundle().also {
                 it.putSerializable(KEY_DATA, item)
@@ -85,11 +86,11 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         posts_list.adapter = adapter
-
+        viewModel.getAd()
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
         }
 
@@ -151,8 +152,6 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
                 adapter.submitData(it)
             }
         }
-
-        viewModel.getAd()
     }
 
     private val postListener = object : MyPostListener {

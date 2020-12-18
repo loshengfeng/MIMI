@@ -36,8 +36,8 @@ abstract class ClubViewModel : BaseViewModel(){
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
-    private val _adResult = MutableLiveData<ApiResult<AdItem>>()
-    val adResult: LiveData<ApiResult<AdItem>> = _adResult
+    private val _adResult = MutableLiveData<AdItem>()
+    val adResult: LiveData<AdItem> = _adResult
 
     fun followMember(
         item: MemberPostItem,
@@ -208,10 +208,9 @@ abstract class ClubViewModel : BaseViewModel(){
             flow {
                 val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
                 if (!adResult.isSuccessful) throw HttpException(adResult)
-                emit(ApiResult.success(adResult.body()?.content))
+                emit(adResult.body()?.content)
             }
                 .flowOn(Dispatchers.IO)
-                .catch { emit(ApiResult.error(it)) }
                 .collect { _adResult.value = it}
         }
 

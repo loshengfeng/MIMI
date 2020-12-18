@@ -65,17 +65,7 @@ class TopicPostMediator(
             if (!result.isSuccessful) throw HttpException(result)
             val body = result.body()
             val memberPostItems = body?.content
-            val finalItems = arrayListOf<MemberPostItem>()
-            memberPostItems?.forEachWithIndex { index, item ->
-                if (index==0 || index % ClubItemMediator.AD_GAP == 0) {
-                    val id = (TOPIC_INDEX
-                            + orderBy.value.toString()
-                            + result.body()?.paging?.pageIndex.toString()
-                            + index.toString()).toLong()
-                    finalItems.add( MemberPostItem(id=id , type = PostType.AD, adItem = adItem))
-                }
-                finalItems.add(item)
-            }
+
             pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
 
             database.withTransaction {
@@ -85,7 +75,7 @@ class TopicPostMediator(
                 }
 
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, result.body()?.paging?.offset ?: 0))
-                finalItems?.let {
+                memberPostItems?.let {
                     val postDBItems = it.mapIndexed() { index, item ->
                         val oldItem = database.postDBItemDao().getPostDBItem(pageName, item.id)
                         if(oldItem == null) {
@@ -93,12 +83,13 @@ class TopicPostMediator(
                                 postDBId = item.id,
                                 postType = item.type,
                                 pageName= pageName,
-                                timestamp = System.nanoTime()
-
+                                timestamp = System.nanoTime(),
+                                index =index
                             )
                         }else{
                             oldItem.postDBId = item.id
                             oldItem.timestamp = System.nanoTime()
+                            oldItem.index =index
                             oldItem
                         }
 

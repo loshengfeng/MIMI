@@ -113,7 +113,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh.isRefreshing = loadStates.refresh is LoadState.Loading
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
         }
 

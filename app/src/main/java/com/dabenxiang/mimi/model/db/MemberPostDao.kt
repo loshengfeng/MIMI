@@ -72,24 +72,27 @@ interface PostDBItemDao {
 data class PostDBItem(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Long =0,
+    var id: Long =0,
 
     @ColumnInfo(name = "postDBId")
     var postDBId: Long,
 
     @ColumnInfo(name = "postType")
-    val postType: PostType,
+    var postType: PostType,
 
     @ColumnInfo(name = "pageName")
-    val pageName: String,
+    var pageName: String,
 
     @ColumnInfo(name = "timestamp")
     var timestamp: Long,
+
+    @ColumnInfo(name = "index")
+    var index: Int,
 )
 
 data class MemberPostWithPostDBItem(
        @Embedded
-       val postDBItem:PostDBItem,
+       var postDBItem:PostDBItem,
 
        @Relation(parentColumn = "postDBId", entityColumn = "id")
        var memberPostItem: MemberPostItem

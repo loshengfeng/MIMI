@@ -1,18 +1,22 @@
 package com.dabenxiang.mimi.view.club.topic_detail
 
+import androidx.annotation.Nullable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.OrderBy
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
+import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_GAP
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 class TopicListViewModel : ClubViewModel() {
 
@@ -44,8 +48,23 @@ class TopicListViewModel : ClubViewModel() {
             )
     ) {
         mimiDB.postDBItemDao().pagingSourceByClubTab( TopicPostMediator::class.simpleName+tag+orderBy.toString())
-    }.flow
-
+    }.flow.map { pagingData->
+        pagingData.map {
+            it
+        }.insertSeparators{ before, after->
+                if(after!=null &&  after.postDBItem.index.rem(AD_GAP) == 0 ){
+                    val adItem = MemberPostWithPostDBItem(after.postDBItem, after.memberPostItem)
+                    adItem.apply {
+                        postDBItem.id = (1024..1024*10).random().toLong()
+                        postDBItem.postType = PostType.AD
+                        postDBItem.timestamp = after.postDBItem.timestamp+1
+                        memberPostItem = MemberPostItem(type = PostType.AD, adItem = adResult.value)
+                    }
+                }else {
+                    null
+                }
+            }
+    }
 
 
 //    fun getData(adapter:TopicListAdapter, tag: String, orderBy: OrderBy) {

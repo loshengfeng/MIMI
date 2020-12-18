@@ -9,7 +9,7 @@ object PostDBDiffCallback{
                 oldItem: MemberPostWithPostDBItem,
                 newItem: MemberPostWithPostDBItem
         ): Boolean {
-            return oldItem.postDBItem.id == newItem.postDBItem.id
+            return oldItem.postDBItem.id== newItem.postDBItem.id
         }
 
         override fun areContentsTheSame(
