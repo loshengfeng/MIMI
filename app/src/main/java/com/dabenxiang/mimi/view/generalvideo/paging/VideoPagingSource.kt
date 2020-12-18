@@ -51,20 +51,24 @@ class VideoPagingSource(
             if (needAd) {
                 if (lastId == 0L) {
                     val topAdItem =
-                        domainManager.getAdRepository().getAD(getTopAdCode(), adWidth, adHeight)
+                        domainManager.getAdRepository()
+                            .getAD("${getAdCode()}_top", adWidth, adHeight)
                             .body()?.content?.get(0)?.ad?.first() ?: AdItem()
                     itemsWithAd.add(StatisticsItem(adItem = topAdItem))
                 }
-                val adCount = ceil((items?.size ?: 0).toFloat() / 10).toInt()
-                val adItems =
-                    domainManager.getAdRepository().getAD(getAdCode(), adWidth, adHeight, adCount)
-                        .body()?.content?.get(0)?.ad ?: arrayListOf()
-                items?.forEachIndexed { index, item ->
-                    itemsWithAd.add(item)
-                    if (index % 10 == 9) itemsWithAd.add(getAdItem(adItems))
+                val adCount = (items?.size ?: 0) / 10
+                if (adCount > 0) {
+                    val adItems =
+                        domainManager.getAdRepository()
+                            .getAD(getAdCode(), adWidth, adHeight, adCount)
+                            .body()?.content?.get(0)?.ad ?: arrayListOf()
+                    items?.forEachIndexed { index, item ->
+                        itemsWithAd.add(item)
+                        if (index % 10 == 9) itemsWithAd.add(getAdItem(adItems))
+                    }
+                } else {
+                    items?.let { itemsWithAd.addAll(items) }
                 }
-            } else {
-                items?.let { itemsWithAd.addAll(items) }
             }
 
             val nextOffset = when {
@@ -73,7 +77,7 @@ class VideoPagingSource(
             }
 
             val data = if (nextOffset != null) {
-                itemsWithAd
+                if(needAd) itemsWithAd else items?: arrayListOf()
             } else {
                 emptyList()
             }
@@ -87,17 +91,6 @@ class VideoPagingSource(
         } catch (exception: Exception) {
             Timber.e(exception)
             LoadResult.Error(exception)
-        }
-    }
-
-    private fun getTopAdCode(): String {
-        return if (isCategoryPage) "categorie_top"
-        else when (category) {
-            "国产" -> "categorie1_top"
-            "日韩" -> "categorie2_top"
-            "动漫" -> "categorie3_top"
-            "无码" -> "categorie4_top"
-            else -> "categorie_top"
         }
     }
 
