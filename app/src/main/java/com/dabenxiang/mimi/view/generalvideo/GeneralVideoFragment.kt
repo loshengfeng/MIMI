@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.generalvideo
 
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.GeneratedAdapter
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
@@ -86,7 +87,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
                 2,
                 GeneralUtils.dpToPx(requireContext(), 10),
                 GeneralUtils.dpToPx(requireContext(), 10),
-                true
+                GeneralVideoAdapter.AD_INTERVAL
             )
             it.addItemDecoration(itemDecoration)
         }

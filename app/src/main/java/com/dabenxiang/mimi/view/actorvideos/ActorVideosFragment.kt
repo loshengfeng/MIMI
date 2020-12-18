@@ -89,7 +89,7 @@ class ActorVideosFragment : BaseFragment() {
                     2,
                     GeneralUtils.dpToPx(requireContext(), 10),
                     GeneralUtils.dpToPx(requireContext(), 20),
-                    false
+                    GeneralVideoAdapter.AD_INTERVAL
                 )
             )
         }

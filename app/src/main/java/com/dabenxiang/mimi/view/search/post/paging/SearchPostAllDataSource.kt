@@ -37,15 +37,17 @@ class SearchPostAllDataSource constructor(
             val body = result.body()
             val memberPostItems = body?.content
 
-            val topAdItem =
-                domainManager.getAdRepository().getAD("search_top", adWidth, adHeight)
-                    .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+            val list = arrayListOf<MemberPostItem>()
+            if (offset == 0L) {
+                val topAdItem =
+                    domainManager.getAdRepository().getAD("search_top", adWidth, adHeight)
+                        .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+                list.add(MemberPostItem(type = PostType.AD, adItem = topAdItem))
+            }
             val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / 5).toInt()
             val adItems =
                 domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
                     .body()?.content?.get(0)?.ad ?: arrayListOf()
-            val list = arrayListOf<MemberPostItem>()
-            if(offset == 0L) list.add(MemberPostItem(type = PostType.AD, adItem = topAdItem))
             memberPostItems?.forEachIndexed { index, item ->
                 list.add(item)
                 if (index % 5 == 4) list.add(getAdItem(adItems))

@@ -176,7 +176,7 @@ class CategoriesFragment : BaseFragment() {
                     2,
                     GeneralUtils.dpToPx(requireContext(), 10),
                     GeneralUtils.dpToPx(requireContext(), 20),
-                    true
+                    GeneralVideoAdapter.AD_INTERVAL
                 )
             )
         }

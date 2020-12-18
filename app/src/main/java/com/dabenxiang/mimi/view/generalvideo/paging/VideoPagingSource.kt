@@ -3,11 +3,14 @@ package com.dabenxiang.mimi.view.generalvideo.paging
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 import timber.log.Timber
+import kotlin.math.ceil
 
 class VideoPagingSource(
     private val domainManager: DomainManager,
@@ -44,12 +47,24 @@ class VideoPagingSource(
                 null
             }
 
-            if (needAd && lastId == 0L) {
+            val itemsWithAd = arrayListOf<StatisticsItem>()
+            if (needAd) {
+                if (lastId == 0L) {
+                    val topAdItem =
+                        domainManager.getAdRepository().getAD(getTopAdCode(), adWidth, adHeight)
+                            .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+                    itemsWithAd.add(StatisticsItem(adItem = topAdItem))
+                }
+                val adCount = ceil((items?.size ?: 0).toFloat() / 10).toInt()
                 val adItems =
-                    domainManager.getAdRepository().getAD(getAdCode(), adWidth, adHeight, 1)
+                    domainManager.getAdRepository().getAD(getAdCode(), adWidth, adHeight, adCount)
                         .body()?.content?.get(0)?.ad ?: arrayListOf()
-                val adItem = if (adItems.isEmpty()) AdItem() else adItems.first()
-                items?.add(0, StatisticsItem(adItem = adItem))
+                items?.forEachIndexed { index, item ->
+                    itemsWithAd.add(item)
+                    if (index % 10 == 9) itemsWithAd.add(getAdItem(adItems))
+                }
+            } else {
+                items?.let { itemsWithAd.addAll(items) }
             }
 
             val nextOffset = when {
@@ -58,7 +73,7 @@ class VideoPagingSource(
             }
 
             val data = if (nextOffset != null) {
-                items ?: arrayListOf()
+                itemsWithAd
             } else {
                 emptyList()
             }
@@ -75,7 +90,7 @@ class VideoPagingSource(
         }
     }
 
-    private fun getAdCode(): String {
+    private fun getTopAdCode(): String {
         return if (isCategoryPage) "categorie_top"
         else when (category) {
             "国产" -> "categorie1_top"
@@ -84,5 +99,23 @@ class VideoPagingSource(
             "无码" -> "categorie4_top"
             else -> "categorie_top"
         }
+    }
+
+    private fun getAdCode(): String {
+        return if (isCategoryPage) "categorie"
+        else when (category) {
+            "国产" -> "categorie1"
+            "日韩" -> "categorie2"
+            "动漫" -> "categorie3"
+            "无码" -> "categorie4"
+            else -> "categorie"
+        }
+    }
+
+    private fun getAdItem(adItems: ArrayList<AdItem>): StatisticsItem {
+        val adItem =
+            if (adItems.isEmpty()) AdItem()
+            else adItems.removeFirst()
+        return StatisticsItem(adItem = adItem)
     }
 }

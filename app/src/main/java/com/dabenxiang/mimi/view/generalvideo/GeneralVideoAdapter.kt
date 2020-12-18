@@ -41,11 +41,12 @@ class GeneralVideoAdapter(
 
         const val VIEW_TYPE_AD = 0
         const val VIEW_TYPE_VIDEO = 1
+        const val AD_INTERVAL = 10
     }
 
     override fun getItemViewType(position: Int): Int {
         return when {
-            position == 0 && isNeedAD -> VIEW_TYPE_AD
+            isNeedAD && position % (AD_INTERVAL + 1) == 0 -> VIEW_TYPE_AD
             else -> VIEW_TYPE_VIDEO
         }
     }
