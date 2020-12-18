@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.search.video.paging
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoType
@@ -42,12 +43,17 @@ class SearchVideoDataSource(
             if (!result.isSuccessful) throw HttpException(result)
             val memberPostItems = result.body()?.content?.videos
 
+            val list = arrayListOf<VideoItem>()
+            if (offset == 0L) {
+                val topAdItem =
+                    domainManager.getAdRepository().getAD("search_top", adWidth, adHeight)
+                        .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+                list.add(VideoItem(type = PostType.AD, adItem = topAdItem))
+            }
             val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / 5).toInt()
             val adItems =
                 domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
                     .body()?.content?.get(0)?.ad ?: arrayListOf()
-
-            val list = arrayListOf<VideoItem>()
             memberPostItems?.forEachIndexed { index, item ->
                 list.add(item)
                 if (index % 5 == 4) list.add(getAdItem(adItems))

@@ -4,12 +4,15 @@ import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
+import kotlin.math.ceil
+import kotlin.math.round
 
 class ClubItemDataSource(
     private val domainManager: DomainManager,
@@ -21,15 +24,14 @@ class ClubItemDataSource(
 
     companion object {
         const val PER_LIMIT = 10
-        private const val AD_GAP: Int = 5
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MemberPostItem> {
         val offset = params.key ?: 0
         return try {
 
-            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
-                ?: AdItem()
+//            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
+//                ?: AdItem()
 
             val result =
                 when (type) {
@@ -72,18 +74,27 @@ class ClubItemDataSource(
 
             val body = result.body()
             val memberPostItems = body?.content
-            val memberPostAdItem = MemberPostItem(type = PostType.AD, adItem = adItem)
+
             val list = arrayListOf<MemberPostItem>()
-            memberPostItems?.forEachWithIndex { index, item ->
-                if (index == 5) list.add(memberPostAdItem)
-                list.add(item)
+            if (offset == 0) {
+                val topAdItem =
+                    domainManager.getAdRepository().getAD("${getAdCode()}_top", adWidth, adHeight)
+                        .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+                list.add(MemberPostItem(type = PostType.AD, adItem = topAdItem))
             }
-            if(offset == 0) list.add(0, memberPostAdItem)
-            list.add(memberPostAdItem)
+            val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / 5).toInt()
+            val adItems =
+                domainManager.getAdRepository().getAD(getAdCode(), adWidth, adHeight, adCount)
+                    .body()?.content?.get(0)?.ad ?: arrayListOf()
+            memberPostItems?.forEachIndexed { index, item ->
+                list.add(item)
+                if (index % 5 == 4) list.add(getAdItem(adItems))
+            }
+            if ((memberPostItems?.size ?: 0) % 5 != 0) list.add(getAdItem(adItems))
 
             val hasNext = hasNextPage(
-                result.body()?.paging?.count ?: 0,
-                result.body()?.paging?.offset ?: 0,
+                body?.paging?.count ?: 0,
+                body?.paging?.offset ?: 0,
                 memberPostItems?.size ?: 0
             )
             val nextKey = if (hasNext) offset + PER_LIMIT else null
@@ -103,5 +114,23 @@ class ClubItemDataSource(
             offset >= total -> false
             else -> true
         }
+    }
+
+    private fun getAdCode(): String {
+        return when (type) {
+            ClubTabItemType.FOLLOW -> "subscribe"
+            ClubTabItemType.RECOMMEND -> "recommend"
+            ClubTabItemType.LATEST -> "news"
+            ClubTabItemType.SHORT_VIDEO -> "video"
+            ClubTabItemType.PICTURE -> "image"
+            ClubTabItemType.NOVEL -> "text"
+        }
+    }
+
+    private fun getAdItem(adItems: ArrayList<AdItem>): MemberPostItem {
+        val adItem =
+            if (adItems.isEmpty()) AdItem()
+            else adItems.removeFirst()
+        return MemberPostItem(type = PostType.AD, adItem = adItem)
     }
 }

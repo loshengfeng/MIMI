@@ -44,7 +44,7 @@ class ActorVideosFragment : BaseFragment() {
     }
 
     private val generalVideoAdapter by lazy {
-        GeneralVideoAdapter(false, onItemClick)
+        GeneralVideoAdapter(onItemClick)
     }
 
     private val onItemClick: (StatisticsItem) -> Unit = {
@@ -86,10 +86,9 @@ class ActorVideosFragment : BaseFragment() {
             it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.addItemDecoration(
                 GridSpaceItemDecoration(
-                    2,
                     GeneralUtils.dpToPx(requireContext(), 10),
                     GeneralUtils.dpToPx(requireContext(), 20),
-                    false
+                    generalVideoAdapter
                 )
             )
         }
