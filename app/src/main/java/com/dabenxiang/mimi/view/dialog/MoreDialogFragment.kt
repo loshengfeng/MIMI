@@ -47,8 +47,14 @@ class MoreDialogFragment : BaseDialogFragment() {
             is MemberPostItem -> (item as MemberPostItem).reported
             else -> (item as MembersPostCommentItem).reported
         } ?: false
+        
+        val deducted = if ((item is MemberPostItem)) {
+            (item as MemberPostItem).deducted
+        } else {
+            true
+        }
 
-        if (isReport || (item as MemberPostItem).deducted == false) {
+        if (isReport || !deducted) {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
         } else {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
