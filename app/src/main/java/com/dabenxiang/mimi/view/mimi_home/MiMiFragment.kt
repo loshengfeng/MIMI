@@ -50,13 +50,6 @@ class MiMiFragment : BaseFragment() {
             when (it) {
                 is Success -> {
                     setupUi(it.result)
-
-                    AnnounceDialogFragment.newInstance().also { fragment ->
-                        fragment.show(
-                            requireActivity().supportFragmentManager,
-                            AnnounceDialogFragment::class.java.simpleName
-                        )
-                    }
                 }
                 is Error -> {
                     onApiError(it.throwable)
@@ -67,8 +60,20 @@ class MiMiFragment : BaseFragment() {
             }
         })
 
+        viewModel.announceConfig.observe(this, {
+            if (it.status == 1) {
+                AnnounceDialogFragment.newInstance().also { fragment ->
+                    fragment.show(
+                        requireActivity().supportFragmentManager,
+                        AnnounceDialogFragment::class.java.simpleName
+                    )
+                }
+            }
+        })
+
         viewModel.getMenu()
         viewModel.startAnim(ANIMATE_INTERVAL)
+        viewModel.getAnnounceConfig()
     }
 
     override fun getLayoutId() = R.layout.fragment_mimi_home
