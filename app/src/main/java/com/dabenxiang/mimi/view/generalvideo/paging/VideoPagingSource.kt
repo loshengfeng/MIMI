@@ -56,19 +56,16 @@ class VideoPagingSource(
                             .body()?.content?.get(0)?.ad?.first() ?: AdItem()
                     itemsWithAd.add(StatisticsItem(adItem = topAdItem))
                 }
-                val adCount = (items?.size ?: 0) / 10
-                if (adCount > 0) {
-                    val adItems =
-                        domainManager.getAdRepository()
-                            .getAD(getAdCode(), adWidth, adHeight, adCount)
-                            .body()?.content?.get(0)?.ad ?: arrayListOf()
-                    items?.forEachIndexed { index, item ->
-                        itemsWithAd.add(item)
-                        if (index % 10 == 9) itemsWithAd.add(getAdItem(adItems))
-                    }
-                } else {
-                    items?.let { itemsWithAd.addAll(items) }
+                val adCount = ceil((items?.size ?: 0).toFloat() / 10).toInt()
+                val adItems =
+                    domainManager.getAdRepository()
+                        .getAD(getAdCode(), adWidth, adHeight, adCount)
+                        .body()?.content?.get(0)?.ad ?: arrayListOf()
+                items?.forEachIndexed { index, item ->
+                    itemsWithAd.add(item)
+                    if (index % 10 == 9) itemsWithAd.add(getAdItem(adItems))
                 }
+                if ((items?.size ?: 0) % 10 != 0) itemsWithAd.add(getAdItem(adItems))
             }
 
             val nextOffset = when {
@@ -77,7 +74,7 @@ class VideoPagingSource(
             }
 
             val data = if (nextOffset != null) {
-                if(needAd) itemsWithAd else items?: arrayListOf()
+                if (needAd) itemsWithAd else items ?: arrayListOf()
             } else {
                 emptyList()
             }

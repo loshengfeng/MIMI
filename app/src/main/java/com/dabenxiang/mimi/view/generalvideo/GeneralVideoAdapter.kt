@@ -19,7 +19,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_general_video.view.*
 
 class GeneralVideoAdapter(
-    private val isNeedAD: Boolean = true,
     val onItemClick: (StatisticsItem) -> Unit,
     private val videoFuncItem: GeneralVideoFuncItem? = null,
 ) : PagingDataAdapter<StatisticsItem, RecyclerView.ViewHolder>(COMPARATOR) {
@@ -45,8 +44,9 @@ class GeneralVideoAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
+        val item = getItem(position) ?: StatisticsItem()
         return when {
-            isNeedAD && position % (AD_INTERVAL + 1) == 0 -> VIEW_TYPE_AD
+            item.adItem != null -> VIEW_TYPE_AD
             else -> VIEW_TYPE_VIDEO
         }
     }
