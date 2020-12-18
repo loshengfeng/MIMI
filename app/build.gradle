@@ -366,12 +366,13 @@ dependencies {
     implementation("org.cks.utils:BaseManager:$cks_manager")
     implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
     implementation "org.cks.utils:logmanager:$cks_log_version"
+    implementation "org.cks.utils:updatemanager:$cks_update_version"
     implementation "org.cks.utils:utils_device:$cks_utils"
     implementation "org.cks.utils:utils_api_result:$cks_utils"
     implementation "org.cks.utils:utils_general:$cks_utils_general"
     implementation "org.cks.utils:utils_loglevel:$cks_utils_loglevel"
     implementation "org.cks.utils:utils_gson_factory:$cks_utils_gson_factory"
-    implementation "org.cks.utils:updatemanager:$cks_update_version"
+
 
     // Domain GoLib
     implementation project(path: ':domain_libs')

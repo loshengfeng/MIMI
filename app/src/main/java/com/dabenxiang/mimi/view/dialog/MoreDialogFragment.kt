@@ -8,7 +8,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_more.*
-import timber.log.Timber
 
 class MoreDialogFragment : BaseDialogFragment() {
 
@@ -48,8 +47,14 @@ class MoreDialogFragment : BaseDialogFragment() {
             is MemberPostItem -> (item as MemberPostItem).reported
             else -> (item as MembersPostCommentItem).reported
         } ?: false
+        
+        val deducted = if ((item is MemberPostItem)) {
+            (item as MemberPostItem).deducted
+        } else {
+            true
+        }
 
-        if (isReport) {
+        if (isReport || !deducted) {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
         } else {
             tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
@@ -65,17 +70,10 @@ class MoreDialogFragment : BaseDialogFragment() {
         background.setOnClickListener {
             listener?.onCancel()
         }
-
-        tv_problem_report.isEnabled = isLogin
-
-        if (!isLogin) {
-            tv_problem_report.isEnabled = false
-            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
-        }
     }
 
     interface OnMoreDialogListener {
-        fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean)
+        fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean)
         fun onCancel()
     }
 }

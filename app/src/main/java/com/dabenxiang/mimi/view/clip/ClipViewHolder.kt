@@ -70,6 +70,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             progress.visibility = View.GONE
 
         } else {
+            item.deducted = !isOverdue
             tvFavorite.setOnClickListener {
                 clipFuncItem.onFavoriteClick(item, pos, !item.favorite)
             }

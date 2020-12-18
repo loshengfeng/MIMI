@@ -182,10 +182,11 @@ class LoginFragment : BaseFragment() {
         viewModel.registerResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
-                    viewModel.mobile.value?.let { it1 ->
-                        viewModel.registerPw.value?.let { it2 ->
-                            viewModel.doLogin((tv_call_prefix.text.toString() + it1), it2)
+                    viewModel.mobile.value?.let { mobile ->
+                        viewModel.verificationCode.value?.let { code ->
+                            viewModel.doLogin((tv_call_prefix.text.toString() + mobile), code = code)
                         }
+
                     }
                 }
                 is Error -> onApiError(it.throwable)
@@ -320,6 +321,12 @@ class LoginFragment : BaseFragment() {
         })
 
         View.OnClickListener { buttonView ->
+            if (System.currentTimeMillis() - viewModel.clickTime > 500L) {
+                viewModel.clickTime = System.currentTimeMillis()
+            } else {
+                return@OnClickListener
+            }
+
             when (buttonView.id) {
                 R.id.btn_register_cancel, R.id.btn_login_cancel, R.id.btnClose -> navigateTo(NavigateItem.Up)
 

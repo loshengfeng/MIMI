@@ -22,13 +22,12 @@ import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
-import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.player.GuessLikeVideoAdapter
 import com.dabenxiang.mimi.view.player.GuessLikeVideoAdapter.OnGarbageItemClick
 import com.dabenxiang.mimi.view.player.SelectEpisodeAdapter
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
-import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_player_description.*
@@ -98,6 +97,7 @@ class PlayerDescriptionFragment : BaseFragment() {
     private var isReported: Boolean = false
     private lateinit var videoItem: VideoItem
 
+    private var moreDialog: MoreDialogFragment? = null
     private var reportDialog: ReportDialogFragment? = null
 
     private val onReportDialogListener = object : ReportDialogFragment.OnReportDialogListener {
@@ -258,31 +258,61 @@ class PlayerDescriptionFragment : BaseFragment() {
             checkStatus { descriptionViewModel.favorite(videoItem) }
         }
         imgMore.setOnClickListener {
-            if (videoItem.deducted == true) {
-                if (isReported) {
-                    GeneralUtils.showToast(
-                        requireContext(),
-                        getString(R.string.already_reported)
-                    )
-                } else {
-                    reportDialog =
-                        ReportDialogFragment.newInstance(
-                            item = MemberPostItem(type = PostType.VIDEO_ON_DEMAND),
-                            listener = onReportDialogListener,
-                            isComment = false
-                        ).also {
-                            it.show(
-                                requireActivity().supportFragmentManager,
-                                ReportDialogFragment::class.java.simpleName
-                            )
-                        }
-                }
-            } else {
-                checkStatus {
-                    val bundle = TopUpFragment.createBundle(this::class.java.simpleName)
-                    navigateTo(NavigateItem.Destination(R.id.action_to_topup, bundle))
-                }
+            Timber.d("onMoreClick, item:$videoItem")
+            videoItem.sources?.get(0)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.run {
+                showMoreDialog(this.id ?: 0, PostType.VIDEO, isReported, videoItem.deducted)
             }
+        }
+    }
+
+    private fun showMoreDialog(
+        id: Long,
+        type: PostType,
+        isReported: Boolean,
+        deducted: Boolean?,
+        isComment: Boolean = false
+    ) {
+        Timber.i("id: $id")
+        Timber.i("isReported: $isReported")
+
+        moreDialog = MoreDialogFragment.newInstance(
+            MemberPostItem(id = id, type = type, reported = isReported, deducted = deducted?:false),
+            onMoreDialogListener,
+            isComment,
+            mainViewModel?.checkIsLogin() ?: false
+        ).also {
+            it.show(
+                requireActivity().supportFragmentManager,
+                MoreDialogFragment::class.java.simpleName
+            )
+        }
+    }
+
+    private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
+        override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
+            if ((item as MemberPostItem).reported) {
+                GeneralUtils.showToast(
+                    App.applicationContext(),
+                    getString(R.string.already_reported)
+                )
+            } else {
+                reportDialog =
+                    ReportDialogFragment.newInstance(
+                        item = item,
+                        listener = onReportDialogListener,
+                        isComment = isComment
+                    ).also {
+                        it.show(
+                            requireActivity().supportFragmentManager,
+                            ReportDialogFragment::class.java.simpleName
+                        )
+                    }
+            }
+            moreDialog?.dismiss()
+        }
+
+        override fun onCancel() {
+            moreDialog?.dismiss()
         }
     }
 
@@ -301,13 +331,13 @@ class PlayerDescriptionFragment : BaseFragment() {
 
         val performers = videoItem.performers
 
-        val tags = ""
+        var tags = ""
         (videoItem.tags as List<String>).indices.mapNotNull {
             (videoItem.tags as List<String>)[it]
         }.forEach {
-            tags.plus(it).plus(",")
+            tags = tags.plus(it).plus(",")
         }
-        Timber.d("@@@ ${videoItem.tags}, tag $tags")
+        Timber.d("videoItem.tags ${videoItem.tags}, tag $tags")
         if(viewModel.videoContentId != descriptionViewModel.videoContentId) {
             descriptionViewModel.setupGuessLikeList(
                 tags,
