@@ -32,7 +32,9 @@ class CategoriesViewModel : BaseViewModel() {
                 pageSize = ApiRepository.NETWORK_PAGE_SIZE,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { VideoPagingSource(domainManager, category, orderByType, adWidth, adHeight, true) }
+            pagingSourceFactory = { VideoPagingSource(domainManager, category, orderByType, adWidth, adHeight, true,
+                isCategoryPage = true
+            ) }
         ).flow.cachedIn(viewModelScope)
     }
 

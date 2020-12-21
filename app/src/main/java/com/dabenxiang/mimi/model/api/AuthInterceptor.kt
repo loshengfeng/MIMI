@@ -114,7 +114,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             else -> pref.publicToken.accessToken
         }
 
-        if (!url.toString().contains("/v1/Business")) {
+        if (!url.toString().contains("/v1/Business") && !url.toString().contains("/v1/business")) {
             val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
             requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
         }

@@ -34,18 +34,20 @@ class MiMiViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository().getMenu()
                 if (!result.isSuccessful) throw HttpException(result)
 
-                val adItem = domainManager.getAdRepository()
-                    .getAD(adWidth, adHeight).body()?.content ?: AdItem()
-
                 val secondMenuItems = result.body()?.content?.get(0)?.menus
                 val sortedSecondMenuItems = secondMenuItems?.sortedBy { item -> item.sorting }
 
                 val thirdMenuItems: ArrayList<ThirdMenuItem> = arrayListOf()
 
                 sortedSecondMenuItems?.forEach { item ->
+                    val adCount = item.menus.size / 2
+                    val adItems =
+                        domainManager.getAdRepository().getAD("home", adWidth, adHeight, adCount)
+                            .body()?.content?.get(0)?.ad ?: arrayListOf()
+
                     item.menus.forEachIndexed { index, thirdMenuItem ->
                         if (index % 2 == 0 && index != 0) {
-                            thirdMenuItems.add(ThirdMenuItem(adItem = adItem))
+                            thirdMenuItems.add(getAdItem(adItems))
                         }
                         thirdMenuItems.add(thirdMenuItem)
                     }
@@ -73,5 +75,12 @@ class MiMiViewModel : BaseViewModel() {
             if (!result.isSuccessful) Timber.e(HttpException(result))
             result.body()?.content?.first()?.let { _announceConfig.postValue(it) }
         }
+    }
+
+    private fun getAdItem(adItems: ArrayList<AdItem>): ThirdMenuItem {
+        val adItem =
+            if (adItems.isEmpty()) AdItem()
+            else adItems.removeFirst()
+        return ThirdMenuItem(adItem = adItem)
     }
 }

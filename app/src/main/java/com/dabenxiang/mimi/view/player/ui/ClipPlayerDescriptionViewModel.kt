@@ -52,21 +52,6 @@ class ClipPlayerDescriptionViewModel : BaseViewModel() {
         }
     }
 
-    fun getAd(width: Int, height: Int) {
-        viewModelScope.launch {
-            flow {
-                val resp = domainManager.getAdRepository().getAD(width, height)
-                if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _getAdResult.value = it }
-        }
-    }
-
     fun favoritePost(item: MemberPostItem) {
         viewModelScope.launch {
             flow {
