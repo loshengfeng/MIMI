@@ -4,9 +4,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoListener
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.video.trimmer.interfaces.OnTrimVideoListener
 import com.video.trimmer.interfaces.OnVideoListener
 import kotlinx.android.synthetic.main.fragment_edit_video_range.*
@@ -43,6 +45,8 @@ class EditVideoRangeFragment : BaseFragment(), OnTrimVideoListener, OnVideoListe
 
         val uri = arguments?.getString(BUNDLE_URI)
 
+        FileUtil.getClipFile("")
+
         videoTrimmer.setTextTimeSelectionTypeface(null)
             .setOnTrimVideoListener(this)
             .setOnVideoListener(this)
@@ -50,7 +54,7 @@ class EditVideoRangeFragment : BaseFragment(), OnTrimVideoListener, OnVideoListe
             .setVideoInformationVisibility(true)
             .setMaxDuration(15)
             .setMinDuration(3)
-            .setDestinationPath(Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator)
+            .setDestinationPath("${FileUtil.getAppPath(App.applicationContext())}/clip")
     }
 
     fun save() {
