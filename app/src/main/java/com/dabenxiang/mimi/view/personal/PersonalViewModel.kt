@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.personal
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.APK_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.vo.ProfileItem
@@ -16,6 +17,7 @@ import org.koin.core.component.inject
 import retrofit2.HttpException
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.VersionManager
+import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
 import tw.gov.president.manager.submanager.update.data.VersionStatus
 
 class PersonalViewModel : BaseViewModel() {
@@ -140,10 +142,12 @@ class PersonalViewModel : BaseViewModel() {
         }
     }
 
-    fun isUpgradeApp(): Boolean {
-        val recordTimestamp = versionManager.getRecordTimestamp()
-        val hour = ((System.currentTimeMillis() - recordTimestamp) / 1000) / 60 / 60
-        val result = hour > 24
-        return result
+    fun updateApp(progressCallback: DownloadProgressCallback) {
+        viewModelScope.launch {
+            flow {
+                versionManager.updateApp(APK_NAME, progressCallback)
+                emit(null)
+            }.flowOn(Dispatchers.IO).collect { Timber.d("Update!") }
+        }
     }
 }

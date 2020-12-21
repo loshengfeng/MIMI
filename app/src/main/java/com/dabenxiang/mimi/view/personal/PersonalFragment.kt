@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -28,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.fragment_splash.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import timber.log.Timber
+import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
 import tw.gov.president.manager.submanager.update.data.VersionStatus
 import java.text.SimpleDateFormat
 import java.util.*
@@ -196,9 +198,9 @@ class PersonalFragment : BaseFragment() {
             Timber.i("versionStatus=$it isVersionChecked=${mainViewModel?.isVersionChecked}")
             if (mainViewModel?.isVersionChecked == true) return@Observer
             when (it) {
-                VersionStatus.UPDATE, VersionStatus.FORCE_UPDATE -> updateDialog(requireContext(), true)
+                VersionStatus.UPDATE, VersionStatus.FORCE_UPDATE -> updateDialog(requireContext())
                 else -> {
-                    updateDialog(requireContext(), false)
+                    Toast.makeText(requireContext(), getString(R.string.no_need_update_title), Toast.LENGTH_LONG).show()
                 }
             }
         })
@@ -334,16 +336,15 @@ class PersonalFragment : BaseFragment() {
         viewModel.getTotalUnread()
     }
 
-    private fun updateDialog(context: Context, needUpdate: Boolean = false) {
+    private fun updateDialog(context: Context) {
         Timber.d("updateDialog")
+
         CheckUpdateMessageAlertDialog(
             context,
-            if (needUpdate) R.string.updated_version_title else R.string.no_need_update_title,
-            if (needUpdate) R.string.update_immediately else -1,
-            R.string.btn_close,
+            {callback: DownloadProgressCallback -> viewModel.updateApp(callback)},
             object : OnSimpleDialogListener {
                 override fun onConfirm() {
-//                    viewModel.updateApp(progressCallback)
+                    Timber.d("update")
                 }
 
                 override fun onCancel() {
