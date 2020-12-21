@@ -520,6 +520,17 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     tools:text="v1.0.0" />
 
+                <ProgressBar
+                    android:id="@+id/progress_check_update"
+                    android:theme="@style/CircularBlackProgress"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_version_check_text"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <TextView
                     android:id="@+id/tv_version_check_text"
                     style="@style/personalStyle"

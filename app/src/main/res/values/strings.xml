@@ -163,6 +163,7 @@
     <string name="personal_version_text">版本</string>
     <string name="personal_version_v_char">V\u0020</string>
     <string name="personal_check_update">检查更新</string>
+    <string name="personal_checking_update">检查更新中…</string>
     <string name="btn_logout">登出</string>
     <string name="title_setting">个人设置</string>
     <string name="setting_photo">头像</string>
