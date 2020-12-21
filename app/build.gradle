@@ -199,6 +199,10 @@ android {
         exclude 'META-INF/kotlinx-io.kotlin_module'
         exclude 'META-INF/kotlinx-coroutines-io.kotlin_module'
         exclude 'META-INF/kotlinx-coroutines-core.kotlin_module'
+//        pickFirst 'lib/armeabi-v7a/libgojni.so'
+//        pickFirst 'lib/arm64-v8a/libgojni.so'
+//        pickFirst 'lib/x86_64/libgojni.so'
+//        pickFirst 'lib/x86/libgojni.so'
 //        pickFirst 'lib/x86/libc++_shared.so'
 //        pickFirst 'lib/x86_64/libc++_shared.so'
 //        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
@@ -375,8 +379,9 @@ dependencies {
 
 
     // Domain GoLib
-    implementation project(path: ':domain_libs')
+//    implementation project(path: ':domain_libs')
 
+    implementation 'com.silkrode.android:nbk_lib:1.0.0'
     // Video Editor
     implementation "org.cks.ffmpeg:FFmpegAndroid:$video_ffmpeg"
     implementation "org.cks.utils.video:video-editor:$video_editor"
