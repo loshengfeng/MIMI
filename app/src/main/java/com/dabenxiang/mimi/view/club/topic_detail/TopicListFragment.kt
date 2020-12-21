@@ -175,8 +175,6 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         } else if (mainViewModel?.deletePostIdList?.value?.isNotEmpty() == true) {
             checkRemovedItems()
         }
-
-        viewModel.getAd()
     }
 
     private fun checkRemovedItems(){
