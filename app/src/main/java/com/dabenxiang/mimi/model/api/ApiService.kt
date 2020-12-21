@@ -813,4 +813,13 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Operators/DecryptSetting")
     suspend fun getDecryptSetting(): Response<ApiBaseItem<List<DecryptSettingItem>>>
+
+    /**********************************************************
+     *
+     *         Configs 取得公告設定值
+     *
+     ***********************************************************/
+    @GET("/v1/Configs")
+    suspend fun getAnnounceConfigs(): Response<ApiBaseItem<List<AnnounceConfigItem>>>
+
 }

@@ -8,6 +8,8 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.AdItem
@@ -84,7 +86,10 @@ class ClubPicDetailAdapter(
         when (holder) {
             is AdHolder -> {
                 mAdItem?.also { item ->
-                    Glide.with(context).load(item.href).into(holder.adImg)
+                    val options = RequestOptions()
+                        .priority(Priority.NORMAL)
+                        .error(R.drawable.img_ad)
+                    Glide.with(context).load(item.href).apply(options).into(holder.adImg)
                     holder.adImg.setOnClickListener {
                         onPictureDetailListener.onOpenWebView(item.target)
                     }
@@ -98,8 +103,14 @@ class ClubPicDetailAdapter(
                 holder.posterTime.text =
                     GeneralUtils.getTimeDiff(memberPostItem.creationDate, Date())
                 holder.title.text = memberPostItem.title
-                holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), memberPostItem.likeCount)
-                holder.txtDisLikeCount.text = String.format(context.getString(R.string.club_dislike_count), memberPostItem.dislikeCount)
+                holder.txtLikeCount.text = String.format(
+                    context.getString(R.string.club_like_count),
+                    memberPostItem.likeCount
+                )
+                holder.txtDisLikeCount.text = String.format(
+                    context.getString(R.string.club_dislike_count),
+                    memberPostItem.dislikeCount
+                )
 
                 if (memberPostItem.likeType == LikeType.LIKE) {
                     holder.imgLike.setImageResource(R.drawable.ico_nice_s)
@@ -184,15 +195,28 @@ class ClubPicDetailAdapter(
 
                 holder.imgLike.setOnClickListener {
                     val isLike = memberPostItem.likeType != null
-                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike, LikeType.LIKE, memberPostItem.likeType) { like, item -> updateLike(like, item, holder) }
+                    clubPostFuncItem.onLikeClick(
+                        memberPostItem,
+                        !isLike,
+                        LikeType.LIKE,
+                        memberPostItem.likeType
+                    ) { like, item -> updateLike(like, item, holder) }
                 }
                 holder.imgDislike.setOnClickListener {
                     val isLike = memberPostItem.likeType != null
-                    clubPostFuncItem.onLikeClick(memberPostItem, !isLike, LikeType.DISLIKE, memberPostItem.likeType) { like, item -> updateLike(like, item, holder) }
+                    clubPostFuncItem.onLikeClick(
+                        memberPostItem,
+                        !isLike,
+                        LikeType.DISLIKE,
+                        memberPostItem.likeType
+                    ) { like, item -> updateLike(like, item, holder) }
                 }
                 holder.imgFavorite.setOnClickListener {
                     val isFavorite = memberPostItem.isFavorite
-                    clubPostFuncItem.onFavoriteClick(memberPostItem, !isFavorite) { favorite, count ->
+                    clubPostFuncItem.onFavoriteClick(
+                        memberPostItem,
+                        !isFavorite
+                    ) { favorite, count ->
                         updateFavorite(favorite, count, holder)
                     }
                 }
@@ -231,8 +255,10 @@ class ClubPicDetailAdapter(
             holder.imgLike.setImageResource(R.drawable.ico_nice)
             holder.imgDislike.setImageResource(R.drawable.ico_bad)
         }
-        holder.txtLikeCount.text = String.format(context.getString(R.string.club_like_count), item.likeCount)
-        holder.txtDisLikeCount.text = String.format(context.getString(R.string.club_dislike_count), item.dislikeCount)
+        holder.txtLikeCount.text =
+            String.format(context.getString(R.string.club_like_count), item.likeCount)
+        holder.txtDisLikeCount.text =
+            String.format(context.getString(R.string.club_dislike_count), item.dislikeCount)
     }
 
     private fun updateFavorite(isFavorite: Boolean, count: Int, holder: PictureDetailViewHolder) {

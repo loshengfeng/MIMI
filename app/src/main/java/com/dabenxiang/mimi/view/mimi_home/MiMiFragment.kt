@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.announce.AnnounceDialogFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_mimi_home.*
@@ -47,7 +48,9 @@ class MiMiFragment : BaseFragment() {
 
         viewModel.menusItems.observe(this, {
             when (it) {
-                is Success -> setupUi(it.result)
+                is Success -> {
+                    setupUi(it.result)
+                }
                 is Error -> {
                     onApiError(it.throwable)
                     layout_server_error.visibility = View.VISIBLE
@@ -57,8 +60,20 @@ class MiMiFragment : BaseFragment() {
             }
         })
 
+        viewModel.announceConfig.observe(this, {
+            if (it.status == 1) {
+                AnnounceDialogFragment.newInstance().also { fragment ->
+                    fragment.show(
+                        requireActivity().supportFragmentManager,
+                        AnnounceDialogFragment::class.java.simpleName
+                    )
+                }
+            }
+        })
+
         viewModel.getMenu()
         viewModel.startAnim(ANIMATE_INTERVAL)
+        viewModel.getAnnounceConfig()
     }
 
     override fun getLayoutId() = R.layout.fragment_mimi_home

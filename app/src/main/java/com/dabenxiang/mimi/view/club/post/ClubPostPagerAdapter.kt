@@ -12,14 +12,19 @@ class ClubPostPagerAdapter(f: Fragment, val data: MemberPostItem, val type: Adul
     override fun getItemCount() = 2
 
     override fun createFragment(position: Int): Fragment {
+        val adcode =
+            if(type == AdultTabType.TEXT)
+                "text_inside"
+            else
+                "image_inside"
         return if (position == 0) {
             if (type == AdultTabType.TEXT) {
-                ClubTextDetailFragment.createBundle(data)
+                ClubTextDetailFragment.createBundle(data, adcode)
             } else {
-                ClubPicDetailFragment.createBundle(data)
+                ClubPicDetailFragment.createBundle(data, adcode)
             }
         } else {
-            ClubCommentFragment.createBundle(data)
+            ClubCommentFragment.createBundle(data, adCode = adcode)
         }
     }
 }

@@ -123,6 +123,19 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
+    fun getStorageDomain(): String {
+        return if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
+            BuildConfig.STORAGE_HOST
+        } else {
+            val domains = getDomain()
+            if (domains.isEmpty()) {
+                BuildConfig.STORAGE_HOST
+            } else {
+                StringBuilder("https://storage.").append(getDomain()).toString()
+            }
+        }
+    }
+
     fun getOldDriverUrl(): String {
         return getWebDomain() + "/chat"
     }

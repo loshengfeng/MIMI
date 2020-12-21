@@ -8,6 +8,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.HomeListItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
@@ -58,8 +60,12 @@ class RecommendContentAdapter(private val recommendFuncItem: RecommendFuncItem) 
         val item = getItem(position)
         when (holder) {
             is AdHolder -> {
+                val options = RequestOptions()
+                    .priority(Priority.NORMAL)
+                    .error(R.drawable.img_ad)
                 Glide.with(holder.adImg.context)
                     .load(item?.adItem?.href)
+                    .apply(options)
                     .into(holder.adImg)
 
                 holder.adImg.setOnClickListener {

@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.generalvideo
 
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.GeneratedAdapter
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
@@ -46,7 +47,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     }
 
     private val generalVideoAdapter by lazy {
-        GeneralVideoAdapter(true, onItemClick, videoFuncItem)
+        GeneralVideoAdapter(onItemClick, videoFuncItem)
     }
 
     override fun setupFirstTime() {
@@ -83,10 +84,9 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
             it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.setHasFixedSize(true)
             val itemDecoration = GridSpaceItemDecoration(
-                2,
                 GeneralUtils.dpToPx(requireContext(), 10),
                 GeneralUtils.dpToPx(requireContext(), 10),
-                true
+                generalVideoAdapter
             )
             it.addItemDecoration(itemDecoration)
         }

@@ -187,8 +187,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
             adapter.notifyDataSetChanged()
         }
-
-        viewModel.getAd()
     }
 
     private fun checkRemovedItems(){

@@ -121,7 +121,7 @@ class PlayerDescriptionFragment : BaseFragment() {
         // for ui init
         val adWidth = GeneralUtils.getAdSize(requireActivity()).first
         val adHeight = GeneralUtils.getAdSize(requireActivity()).second
-        descriptionViewModel.getAd(adWidth, adHeight)
+        mainViewModel?.getAd(PlayerV2Fragment.CODE_PLAYER, adWidth, adHeight, 1)
     }
 
     override fun setupObservers() {
