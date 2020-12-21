@@ -5,10 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.AnnounceConfigItem
 import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
 import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -16,8 +15,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import kotlin.math.ceil
-import kotlin.math.round
+import timber.log.Timber
 
 class MiMiViewModel : BaseViewModel() {
 
@@ -26,6 +24,9 @@ class MiMiViewModel : BaseViewModel() {
 
     private val _inviteVipShake = MutableLiveData<Boolean>()
     val inviteVipShake: LiveData<Boolean> = _inviteVipShake
+
+    private val _announceConfig = MutableLiveData<AnnounceConfigItem>()
+    val announceConfig: LiveData<AnnounceConfigItem> = _announceConfig
 
     fun getMenu() {
         viewModelScope.launch {
@@ -65,6 +66,14 @@ class MiMiViewModel : BaseViewModel() {
             _inviteVipShake.postValue(true)
             delay(interval)
             _inviteVipShake.postValue(false)
+        }
+    }
+
+    fun getAnnounceConfig() {
+        viewModelScope.launch {
+            val result = domainManager.getApiRepository().getAnnounceConfigs()
+            if (!result.isSuccessful) Timber.e(HttpException(result))
+            result.body()?.content?.first()?.let { _announceConfig.postValue(it) }
         }
     }
 
