@@ -30,8 +30,7 @@ class ClipPagingSource(
                 hasNextPage(
                     item?.paging?.count ?: 0,
                     item?.paging?.offset ?: 0,
-                    videos?.size ?: 0,
-                    PER_LIMIT
+                    videos?.size ?: 0
                 ) -> offset + PER_LIMIT
                 else -> null
             }
@@ -46,7 +45,7 @@ class ClipPagingSource(
         }
     }
 
-    private fun hasNextPage(total: Long, offset: Long, currentSize: Int, loadSize: Int): Boolean {
+    private fun hasNextPage(total: Long, offset: Long, currentSize: Int, loadSize: Int = PER_LIMIT): Boolean {
         return when {
             currentSize < loadSize -> false
             offset >= total -> false
