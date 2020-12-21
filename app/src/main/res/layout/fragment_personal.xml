@@ -484,6 +484,57 @@
                 app:layout_constraintTop_toBottomOf="@id/item_is_Login"
                 app:layout_goneMarginTop="10dp" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/tv_version_check"
+                style="@style/personalStyle"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_old_driver"
+                app:layout_goneMarginTop="10dp" >
+
+                <TextView
+                    android:id="@+id/tv_version_text"
+                    style="@style/personalStyle"
+                    android:gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/personal_version_text"
+                    app:drawableStartCompat="@drawable/ico_version"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:text="版本" />
+
+                <TextView
+                    android:id="@+id/tv_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintStart_toEndOf="@+id/tv_version_text"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:text="v1.0.0" />
+
+                <TextView
+                    android:id="@+id/tv_version_check_text"
+                    style="@style/personalStyle"
+                    android:gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_blue_2"
+                    android:text="@string/personal_check_update"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:text="检查更新" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <TextView
                 android:id="@+id/tv_logout"
                 android:layout_width="0dp"
@@ -497,23 +548,8 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_old_driver"
+                app:layout_constraintTop_toBottomOf="@+id/tv_version_check"
                 tools:visibility="visible" />
-
-            <TextView
-                android:id="@+id/tv_version"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_logout"
-                app:layout_goneMarginBottom="0dp"
-                tools:text="v1.0.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
