@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
+import com.dabenxiang.mimi.view.my_pages.pages.like.MiMiLikeListDataSource
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import timber.log.Timber
@@ -42,6 +43,7 @@ class ClubItemMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
+                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, 0))
                     null
                 }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
@@ -49,13 +51,12 @@ class ClubItemMediator(
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByType(pageName)
                     }
-                    if(remoteKey==null){
-                        database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, 0))
-                    }
                     remoteKey.offset
 
                 }
-            }.takeIf { it == null }.run { 0 }
+            }?.toInt() ?: 0
+
+            Timber.i("ClubItemMediator pageName=$pageName offset=$offset")
 
             val result =
                     when (type) {
@@ -111,9 +112,13 @@ class ClubItemMediator(
                     database.postDBItemDao().deleteItemByClubTab(pageName)
                     database.remoteKeyDao().deleteByType(pageName)
                 }
+                val nextKey = if (hasNext) offset + PER_LIMIT else null
 
-                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName,
-                        result.body()?.paging?.offset ?: 0 +PER_LIMIT.toLong()))
+                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, nextKey?.toLong()))
+                val remoteKey = database.withTransaction {
+                    database.remoteKeyDao().remoteKeyByType(pageName)
+                }
+
                 memberPostItems?.let {
                     val postDBItems = it.mapIndexed() { index, item ->
                         val oldItem = database.postDBItemDao().getPostDBItem(pageName, item.id)
@@ -142,7 +147,7 @@ class ClubItemMediator(
 
             }
 
-            return MediatorResult.Success(endOfPaginationReached = hasNext)
+            return MediatorResult.Success(endOfPaginationReached = !hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {

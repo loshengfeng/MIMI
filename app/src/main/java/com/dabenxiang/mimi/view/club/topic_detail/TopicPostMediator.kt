@@ -31,8 +31,6 @@ class TopicPostMediator(
     }
     private val pageName= TopicPostMediator::class.simpleName + tag + orderBy.toString()
 
-    var adItem :AdItem ? =null
-
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, MemberPostWithPostDBItem>
@@ -40,7 +38,6 @@ class TopicPostMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
-                    adItem = null
                     database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, 0))
                     null
                 }
@@ -52,12 +49,7 @@ class TopicPostMediator(
                     remoteKey.offset
 
                 }
-            }.takeIf { it == null }.run { 0 }
-
-            adItem?.takeIf { adItem?.href?.isNotEmpty() ==true }?.let { adItem } ?: run {
-                adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
-                    ?: AdItem()
-            }
+            }?.toInt() ?: 0
 
             val result = domainManager.getApiRepository().getMembersPost(
                     offset, PER_LIMIT, tag, orderBy.value
@@ -74,7 +66,8 @@ class TopicPostMediator(
                     database.remoteKeyDao().deleteByType(pageName)
                 }
 
-                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, result.body()?.paging?.offset ?: 0))
+                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName,
+                    result.body()?.paging?.offset ?: 0 + ClubItemMediator.PER_LIMIT.toLong()))
                 memberPostItems?.let {
                     val postDBItems = it.mapIndexed() { index, item ->
                         val oldItem = database.postDBItemDao().getPostDBItem(pageName, item.id)

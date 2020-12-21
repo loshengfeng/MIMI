@@ -7,6 +7,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
@@ -79,12 +81,16 @@ class ClubItemAdapter(
             Timber.i("memberPostItem $memberPostItem position=$position  holder=$holder")
             when (holder) {
                 is AdHolder -> {
-                    Timber.i("memberPostItem $memberPostItem AdHolder=$holder")
-                    Glide.with(context).load(memberPostItem.adItem?.href)
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(holder.adImg)
+                    Timber.i("AdHolder memberPostItem: $memberPostItem position=$position  holder=$holder")
+                    val options = RequestOptions()
+                        .priority(Priority.NORMAL)
+                        .error(R.drawable.img_ad)
+                    Glide.with(context)
+                        .load(item.adItem?.href)
+                        .apply(options)
+                        .into(holder.adImg)
                     holder.adImg.setOnClickListener {
-                        GeneralUtils.openWebView(context, memberPostItem.adItem?.target ?: "")
+                        GeneralUtils.openWebView(context, item.adItem?.target ?: "")
                     }
                 }
 

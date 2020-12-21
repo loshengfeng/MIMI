@@ -29,7 +29,11 @@ import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
@@ -95,6 +99,15 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             }
         }
 
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .collect { posts_list.scrollToPosition(0) }
+        }
+
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
@@ -146,7 +159,6 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
     override fun onResume() {
         super.onResume()
-
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             viewModel.posts(topicTag, orderBy).collectLatest {

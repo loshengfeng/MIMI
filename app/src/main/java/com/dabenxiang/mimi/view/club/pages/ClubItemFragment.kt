@@ -36,6 +36,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.collect
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -106,6 +107,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     }
 
+    @OptIn(InternalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -116,6 +118,15 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             adapter.loadStateFlow.collectLatest { loadStates ->
                 layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .collect { posts_list.scrollToPosition(0) }
         }
 
         layout_refresh.setOnRefreshListener {
@@ -152,6 +163,19 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             }
         })
 
+        viewModel.adResult.observe(viewLifecycleOwner, {
+            getDatas()
+        })
+    }
+
+
+    fun getDatas(){
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(type).collectLatest {
+                adapter.submitData(it)
+            }
+        }
     }
 
     private fun loginPageToggle(isLogin: Boolean) {
@@ -173,16 +197,10 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         )
 
         if (adapter.snapshot().items.isEmpty()) {
-//            layout_refresh.isRefreshing = true
-//            adapter.refresh()
+
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            viewModel.posts(type).collectLatest {
-                adapter.submitData(it)
-            }
-        }
+
     }
 
     private fun checkRemovedItems(){

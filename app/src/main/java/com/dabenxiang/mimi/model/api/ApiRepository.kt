@@ -1013,5 +1013,10 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得各來源解碼key
      */
     suspend fun getDecryptSetting() = apiService.getDecryptSetting()
+
+    /**
+     * 取得公告設定值
+     */
+    suspend fun getAnnounceConfigs() = apiService.getAnnounceConfigs()
 }
 

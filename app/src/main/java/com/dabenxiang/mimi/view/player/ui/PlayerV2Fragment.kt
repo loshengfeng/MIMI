@@ -32,6 +32,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
     companion object {
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val KEY_IS_COMMENT = "KEY_IS_COMMENT"
+        const val CODE_PLAYER = "player"
 
         fun createBundle(item: PlayerItem, isComment: Boolean = false): Bundle {
             return Bundle().also {
@@ -127,7 +128,7 @@ class PlayerV2Fragment : BasePlayerFragment() {
             else -> {
                 val memberPostItem = MemberPostItem()
                 memberPostItem.id = viewModel.videoContentId
-                return ClubCommentFragment.createBundle(memberPostItem, true)
+                return ClubCommentFragment.createBundle(memberPostItem, true, CODE_PLAYER)
             }
         }
     }

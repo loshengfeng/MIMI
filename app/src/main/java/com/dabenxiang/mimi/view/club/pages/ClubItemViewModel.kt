@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
@@ -12,6 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 class ClubItemViewModel : ClubViewModel() {
 
@@ -37,13 +39,19 @@ class ClubItemViewModel : ClubViewModel() {
             it
         }.insertSeparators{ before, after->
             if(after!=null && after.postDBItem.index.rem(TopicListFragment.AD_GAP) == 0 ){
-                val adItem = MemberPostWithPostDBItem(after.postDBItem, after.memberPostItem)
-                adItem.apply {
-                    postDBItem.id = (1..2147483647).random().toLong()
-                    postDBItem.postType = PostType.AD
-                    postDBItem.timestamp = after.postDBItem.timestamp+1
-                    memberPostItem = MemberPostItem(type = PostType.AD, adItem = adResult.value)
-                }
+
+                val adItem = MemberPostItem(id= (1..2147483647).random().toLong(),
+                    type = PostType.AD, adItem = adResult.value)
+
+                val postDBItem =PostDBItem(
+                    id= adItem.id,
+                    postDBId =  adItem.id,
+                    postType = PostType.AD,
+                    timestamp = after.postDBItem.timestamp - 1,
+                    pageName = after.postDBItem.pageName,
+                    index = 0
+                )
+                MemberPostWithPostDBItem(postDBItem, adItem)
             }else {
                 null
             }

@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
@@ -82,7 +84,10 @@ class ClubCommentAdapter(
         when (holder) {
             is AdHolder -> {
                 mAdItem?.also { item ->
-                    Glide.with(context).load(item.href).into(holder.adImg)
+                    val options = RequestOptions()
+                        .priority(Priority.NORMAL)
+                        .error(R.drawable.img_ad)
+                    Glide.with(context).load(item.href).apply(options).into(holder.adImg)
                     holder.adImg.setOnClickListener {
                         onTextDetailListener.onOpenWebView(item.target)
                     }

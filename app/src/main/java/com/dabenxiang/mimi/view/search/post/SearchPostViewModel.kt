@@ -152,7 +152,7 @@ class SearchPostViewModel : BaseViewModel() {
         orderBy: StatisticsOrderType
     ): Flow<PagingData<MemberPostItem>> {
         return Pager(
-            config = PagingConfig(pageSize = SearchPostAllDataSource.PER_LIMIT.toInt()),
+            config = PagingConfig(pageSize = SearchPostAllDataSource.PER_LIMIT),
             pagingSourceFactory = {
                 SearchPostAllDataSource(
                     domainManager,
