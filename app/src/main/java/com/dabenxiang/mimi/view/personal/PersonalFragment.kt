@@ -26,7 +26,6 @@ import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
-import kotlinx.android.synthetic.main.fragment_splash.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
@@ -58,6 +57,19 @@ class PersonalFragment : BaseFragment() {
         layout_refresh.setOnRefreshListener {
             viewModel.getMemberInfo()
         }
+    }
+
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+        viewModel.versionStatus.observe(this, Observer {
+            Timber.i("versionStatus=$it isVersionChecked=${mainViewModel?.isVersionChecked}")
+            when (it) {
+                VersionStatus.UPDATE, VersionStatus.FORCE_UPDATE -> updateDialog(requireContext())
+                else -> {
+                    Toast.makeText(requireContext(), getString(R.string.no_need_update_title), Toast.LENGTH_LONG).show()
+                }
+            }
+        })
     }
 
     private fun initUi() {
@@ -191,17 +203,6 @@ class PersonalFragment : BaseFragment() {
                     mainViewModel?.refreshBottomNavigationBadge?.value = it.result
                 }
                 is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.versionStatus.observe(this, Observer {
-            Timber.i("versionStatus=$it isVersionChecked=${mainViewModel?.isVersionChecked}")
-            if (mainViewModel?.isVersionChecked == true) return@Observer
-            when (it) {
-                VersionStatus.UPDATE, VersionStatus.FORCE_UPDATE -> updateDialog(requireContext())
-                else -> {
-                    Toast.makeText(requireContext(), getString(R.string.no_need_update_title), Toast.LENGTH_LONG).show()
-                }
             }
         })
     }
