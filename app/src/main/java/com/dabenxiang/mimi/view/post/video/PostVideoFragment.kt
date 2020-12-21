@@ -193,7 +193,6 @@ class PostVideoFragment : BasePostFragment() {
     override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
         val trimmerUri = arguments?.getString(BUNDLE_TRIMMER_URI, "")
         val picUri = arguments?.getString(BUNDLE_COVER_URI, "")
-
         if (trimmerUri!!.isBlank()) {
             val postVideoAttachment = PostVideoAttachment(
                 videoAttachmentId = item.videoParameter.id,

@@ -439,7 +439,6 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun postAttachment(pic: String, context: Context, type: String) {
-        Timber.d("arvin pic ??? " + pic)
         viewModelScope.launch(context = job) {
             flow {
                 var realPath = when (type) {
