@@ -57,7 +57,7 @@ class TopicListViewModel : ClubViewModel() {
                     adItem.apply {
                         postDBItem.id = (1024..1024*10).random().toLong()
                         postDBItem.postType = PostType.AD
-                        postDBItem.timestamp = after.postDBItem.timestamp+1
+                        postDBItem.timestamp = after.postDBItem.timestamp-1
                         memberPostItem = MemberPostItem(type = PostType.AD, adItem = adResult.value)
                     }
                 }else {

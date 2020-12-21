@@ -60,6 +60,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         Timber.i("TopicListFragment topicTag=$topicTag")
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
+        viewModel.getAd()
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it
@@ -86,7 +87,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         posts_list.adapter = adapter
-        viewModel.getAd()
+
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->

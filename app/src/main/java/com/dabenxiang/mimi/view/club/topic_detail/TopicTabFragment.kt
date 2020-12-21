@@ -62,7 +62,6 @@ class TopicTabFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 

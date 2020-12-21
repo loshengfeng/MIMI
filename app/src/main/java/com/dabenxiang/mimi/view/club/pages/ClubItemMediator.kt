@@ -33,9 +33,7 @@ class ClubItemMediator(
         const val PER_LIMIT = 10
         const val AD_GAP: Int = 5
     }
-    private val pageName= ClubItemMediator::class.simpleName+ type.toString()
-
-    var adItem :AdItem ? =null
+    private val pageName = ClubItemMediator::class.simpleName+ type.toString()
 
     override suspend fun load(
             loadType: LoadType,
@@ -44,8 +42,6 @@ class ClubItemMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
-                    adItem = null
-                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, 0))
                     null
                 }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
@@ -53,15 +49,13 @@ class ClubItemMediator(
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByType(pageName)
                     }
+                    if(remoteKey==null){
+                        database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, 0))
+                    }
                     remoteKey.offset
 
                 }
             }.takeIf { it == null }.run { 0 }
-
-            adItem?.takeIf { adItem?.href?.isNotEmpty() ==true }?.let { adItem } ?: run {
-                adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
-                        ?: AdItem()
-            }
 
             val result =
                     when (type) {
@@ -105,6 +99,12 @@ class ClubItemMediator(
             val body = result.body()
             val memberPostItems = body?.content
 
+            val hasNext = hasNextPage(
+                    result.body()?.paging?.count ?: 0,
+                    result.body()?.paging?.offset ?: 0,
+                    memberPostItems?.size ?: 0
+            )
+
             pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
@@ -112,7 +112,8 @@ class ClubItemMediator(
                     database.remoteKeyDao().deleteByType(pageName)
                 }
 
-                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, result.body()?.paging?.offset ?: 0))
+                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName,
+                        result.body()?.paging?.offset ?: 0 +PER_LIMIT.toLong()))
                 memberPostItems?.let {
                     val postDBItems = it.mapIndexed() { index, item ->
                         val oldItem = database.postDBItemDao().getPostDBItem(pageName, item.id)
@@ -141,11 +142,6 @@ class ClubItemMediator(
 
             }
 
-            val hasNext = hasNextPage(
-                    result.body()?.paging?.count ?: 0,
-                    result.body()?.paging?.offset ?: 0,
-                    memberPostItems?.size ?: 0
-            )
             return MediatorResult.Success(endOfPaginationReached = hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)

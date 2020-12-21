@@ -80,6 +80,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         super.onAttach(context)
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
+        viewModel.getAd()
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it
@@ -182,8 +183,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 adapter.submitData(it)
             }
         }
-
-        viewModel.getAd()
     }
 
     private fun checkRemovedItems(){
