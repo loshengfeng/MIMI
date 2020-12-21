@@ -26,7 +26,6 @@ import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
-import kotlinx.android.synthetic.main.fragment_splash.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
@@ -58,6 +57,23 @@ class PersonalFragment : BaseFragment() {
         layout_refresh.setOnRefreshListener {
             viewModel.getMemberInfo()
         }
+    }
+
+    override fun setupFirstTime() {
+        super.setupFirstTime()
+        viewModel.versionStatus.observe(this, Observer {
+            Timber.i("versionStatus=$it isVersionChecked=${mainViewModel?.isVersionChecked}")
+            tv_version_check_text.text = getString(R.string.personal_check_update)
+            tv_version_check_text.setTextColor(requireContext().getColor(R.color.color_blue_2))
+            tv_version_check_text.isClickable = true
+            progress_check_update.visibility = View.GONE
+            when (it) {
+                VersionStatus.UPDATE, VersionStatus.FORCE_UPDATE -> updateDialog(requireContext())
+                else -> {
+                    Toast.makeText(requireContext(), getString(R.string.no_need_update_title), Toast.LENGTH_LONG).show()
+                }
+            }
+        })
     }
 
     private fun initUi() {
@@ -193,17 +209,6 @@ class PersonalFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
-
-        viewModel.versionStatus.observe(this, Observer {
-            Timber.i("versionStatus=$it isVersionChecked=${mainViewModel?.isVersionChecked}")
-            if (mainViewModel?.isVersionChecked == true) return@Observer
-            when (it) {
-                VersionStatus.UPDATE, VersionStatus.FORCE_UPDATE -> updateDialog(requireContext())
-                else -> {
-                    Toast.makeText(requireContext(), getString(R.string.no_need_update_title), Toast.LENGTH_LONG).show()
-                }
-            }
-        })
     }
 
     override fun setupListeners() {
@@ -233,6 +238,10 @@ class PersonalFragment : BaseFragment() {
                     startActivity(intent)
                 }
                 R.id.tv_version_check_text -> {
+                    tv_version_check_text.text = getString(R.string.personal_checking_update)
+                    tv_version_check_text.setTextColor(requireContext().getColor(R.color.color_black_1))
+                    tv_version_check_text.isClickable = false
+                    progress_check_update.visibility = View.VISIBLE
                     viewModel.checkVersion()
                 }
                 R.id.tv_logout -> {
