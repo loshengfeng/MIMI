@@ -114,8 +114,7 @@ class ClubItemAdapter(
                 is AdHolder -> {
                     val options = RequestOptions()
                         .priority(Priority.NORMAL)
-                        .placeholder(R.drawable.img_nopic_03)
-                        .error(R.drawable.img_nopic_03)
+                        .error(R.drawable.img_ad)
                     Glide.with(context)
                         .load(item.adItem?.href)
                         .apply(options)

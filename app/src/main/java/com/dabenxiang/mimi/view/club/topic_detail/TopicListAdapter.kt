@@ -108,8 +108,7 @@ class TopicListAdapter(
                 is AdHolder -> {
                     val options = RequestOptions()
                         .priority(Priority.NORMAL)
-                        .placeholder(R.drawable.img_nopic_03)
-                        .error(R.drawable.img_nopic_03)
+                        .error(R.drawable.img_ad)
                     Glide.with(context).load(item.adItem?.href).apply(options).into(holder.adImg)
                     holder.adImg.setOnClickListener {
                         GeneralUtils.openWebView(context, item.adItem?.target ?: "")
