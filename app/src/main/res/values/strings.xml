@@ -160,6 +160,9 @@
     <string name="personal_chat_history">对话记录</string>
     <string name="personal_setting">设置</string>
     <string name="personal_old_driver">蜜蜜老司机群</string>
+    <string name="personal_version_text">版本</string>
+    <string name="personal_version_v_char">V\u0020</string>
+    <string name="personal_check_update">检查更新</string>
     <string name="btn_logout">登出</string>
     <string name="title_setting">个人设置</string>
     <string name="setting_photo">头像</string>
@@ -517,6 +520,7 @@
     <string name="setting_version">版本：%s</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
+    <string name="no_need_update_title">已是最新版本</string>
 
     <!-- Order Detail -->
     <string name="order_detail_title">订单资讯</string>

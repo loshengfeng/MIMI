@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.personal
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,13 +17,18 @@ import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.dialog.CheckUpdateMessageAlertDialog
+import com.dabenxiang.mimi.view.listener.OnSimpleDialogListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
+import kotlinx.android.synthetic.main.fragment_splash.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
+import timber.log.Timber
+import tw.gov.president.manager.submanager.update.data.VersionStatus
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,9 +46,10 @@ class PersonalFragment : BaseFragment() {
         return R.layout.fragment_personal
     }
 
+    @SuppressLint("SetTextI18n")
     override fun initSettings() {
         super.initSettings()
-        tv_version.text = BuildConfig.VERSION_NAME
+        tv_version.text = getString(R.string.personal_version_v_char) + BuildConfig.VERSION_NAME
         initUi()
         viewModel.getMemberInfo()
 
@@ -184,6 +191,17 @@ class PersonalFragment : BaseFragment() {
                 is Error -> onApiError(it.throwable)
             }
         })
+
+        viewModel.versionStatus.observe(this, Observer {
+            Timber.i("versionStatus=$it isVersionChecked=${mainViewModel?.isVersionChecked}")
+            if (mainViewModel?.isVersionChecked == true) return@Observer
+            when (it) {
+                VersionStatus.UPDATE, VersionStatus.FORCE_UPDATE -> updateDialog(requireContext(), true)
+                else -> {
+                    updateDialog(requireContext(), false)
+                }
+            }
+        })
     }
 
     override fun setupListeners() {
@@ -211,6 +229,9 @@ class PersonalFragment : BaseFragment() {
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.data = Uri.parse(viewModel.getOldDriverUrl())
                     startActivity(intent)
+                }
+                R.id.tv_version_check_text -> {
+                    viewModel.checkVersion()
                 }
                 R.id.tv_logout -> {
                     Glide.with(this).clear(avatar)
@@ -288,6 +309,7 @@ class PersonalFragment : BaseFragment() {
             tv_my_post.setOnClickListener(it)
             setting.setOnClickListener(it)
             tv_old_driver.setOnClickListener(it)
+            tv_version_check_text.setOnClickListener(it)
             tv_logout.setOnClickListener(it)
             vippromote_now.setOnClickListener(it)
 
@@ -310,5 +332,25 @@ class PersonalFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         viewModel.getTotalUnread()
+    }
+
+    private fun updateDialog(context: Context, needUpdate: Boolean = false) {
+        Timber.d("updateDialog")
+        CheckUpdateMessageAlertDialog(
+            context,
+            if (needUpdate) R.string.updated_version_title else R.string.no_need_update_title,
+            if (needUpdate) R.string.update_immediately else -1,
+            R.string.btn_close,
+            object : OnSimpleDialogListener {
+                override fun onConfirm() {
+//                    viewModel.updateApp(progressCallback)
+                }
+
+                override fun onCancel() {
+                    Timber.d("close")
+                }
+
+            }
+        ).show()
     }
 }
