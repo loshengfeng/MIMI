@@ -109,6 +109,9 @@ class RecommendFragment : BaseFragment() {
 
         iv_rank.setOnClickListener { navToRanking() }
 
+        btn_retry.setOnClickListener {
+            getHomeList()
+        }
     }
 
     override fun getLayoutId(): Int {
