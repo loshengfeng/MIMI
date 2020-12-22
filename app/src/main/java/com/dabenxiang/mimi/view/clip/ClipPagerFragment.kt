@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -72,16 +73,17 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     override fun setupObservers() {
-        viewModel.videoChangedResult.observe(viewLifecycleOwner) {
+        viewModel.videoChangedResult.observe(owner = viewLifecycleOwner) {
             when (it) {
                 is Success -> {
                     mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
                 }
                 is Error -> onApiError(it.throwable)
+                else -> {}
             }
         }
 
-        viewModel.favoriteResult.observe(viewLifecycleOwner, {
+        viewModel.favoriteResult.observe(owner = viewLifecycleOwner) {
             when (it) {
                 is Loading -> progressHUD.show()
                 is Loaded -> progressHUD.dismiss()
@@ -93,9 +95,9 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 else -> {
                 }
             }
-        })
+        }
 
-        viewModel.likePostResult.observe(viewLifecycleOwner, {
+        viewModel.likePostResult.observe(owner =viewLifecycleOwner) {
             when (it) {
                 is Loading -> progressHUD.show()
                 is Loaded -> progressHUD.dismiss()
@@ -109,9 +111,9 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 else -> {
                 }
             }
-        })
+        }
 
-        viewModel.videoReport.observe(viewLifecycleOwner, {
+        viewModel.videoReport.observe(owner = viewLifecycleOwner) {
             when (it) {
                 is Loading -> progressHUD.show()
                 is Loaded -> progressHUD.dismiss()
@@ -125,13 +127,13 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 else -> {
                 }
             }
-        })
+        }
 
-        viewModel.rechargeVipResult.observe(viewLifecycleOwner, {
+        viewModel.rechargeVipResult.observe(owner = viewLifecycleOwner) {
             if (viewModel.isVip()) {
                 clipAdapter.getM3U8()
             }
-        })
+        }
     }
 
     override fun resetObservers() {

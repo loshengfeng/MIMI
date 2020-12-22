@@ -55,6 +55,7 @@ class GeneralVideoAdapter(
             VIEW_TYPE_AD -> {
                 val mView = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_ad, parent, false)
+                mView.tag = "ad"
                 AdHolder(mView)
             }
             else -> {
@@ -71,8 +72,7 @@ class GeneralVideoAdapter(
             is AdHolder -> {
                 val options = RequestOptions()
                     .priority(Priority.NORMAL)
-                    .placeholder(R.drawable.img_nopic_03)
-                    .error(R.drawable.img_nopic_03)
+                    .error(R.drawable.img_ad)
                 Glide.with(holder.adImg.context)
                     .load(item.adItem?.href)
                     .apply(options)

@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
 import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_AD
 
-class GridSpaceItemDecoration(
+class GridSpaceItemWithAdDecoration(
     private val spacing: Int,
     private val edgePadding: Int
 ) : RecyclerView.ItemDecoration() {
@@ -18,12 +18,15 @@ class GridSpaceItemDecoration(
         state: RecyclerView.State
     ) {
         val span = 2
+        val adInterval = 10
 
         val position = parent.getChildLayoutPosition(view)
-        val lEdgeRule = 0
-        val rEdgeRule = 1
+        val lEdgeRule = if ((position / (adInterval + 1)) % 2 == 0) 1 else 0
+        val rEdgeRule = if ((position / (adInterval + 1)) % 2 == 0) 0 else 1
 
         when {
+            view.tag == "ad" -> {
+            }
             position % span == lEdgeRule -> {
                 outRect.top = edgePadding
                 outRect.left = edgePadding

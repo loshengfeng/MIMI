@@ -796,6 +796,18 @@ interface ApiService {
 
     /**********************************************************
      *
+     *                   Members/Home/Menu
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/HomeList")
+    suspend fun getHomeList(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<HomeListItem>>>
+
+
+    /**********************************************************
+     *
      *         Operators/DecryptSetting 取得各來源解碼key
      *
      ***********************************************************/

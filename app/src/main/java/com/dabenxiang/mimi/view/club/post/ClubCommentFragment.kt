@@ -140,6 +140,7 @@ class ClubCommentFragment : BaseFragment() {
                                     viewModel.currentCommentType,
                                     commentAdapter!!
                                 )
+                                recyclerView.scrollToPosition(1)
                             }
                         } else {
                             replyRootNode?.also { parentNode ->
@@ -152,6 +153,7 @@ class ClubCommentFragment : BaseFragment() {
                                             it.result
                                         )
                                     )
+                                    adjustScroll(parentIndex)
                                 } else {
                                     replyCommentBlock = {
                                         commentAdapter?.expand(
@@ -160,6 +162,7 @@ class ClubCommentFragment : BaseFragment() {
                                             notify = true,
                                             parentPayload = CommentAdapter.EXPAND_COLLAPSE_PAYLOAD
                                         )
+                                        adjustScroll(parentIndex)
                                     }
                                     viewModel.getReplyComment(parentNode, memberPostItem!!)
                                 }
@@ -170,6 +173,24 @@ class ClubCommentFragment : BaseFragment() {
                 }
             }
         })
+    }
+
+    private fun adjustScroll(parentIndex: Int) {
+        commentAdapter?.recyclerView?.also { rv ->
+            recyclerView.postDelayed({
+                val vChild = rv.getChildAt(parentIndex + 1)
+                val vChildLoc = IntArray(2)
+                vChild.getLocationOnScreen(vChildLoc)
+
+                val barLoc = IntArray(2)
+                layout_edit_bar.getLocationOnScreen(barLoc)
+                val barTop = barLoc[1] - layout_edit_bar.height / 2
+
+                val center = barTop - content.height / 2
+
+                recyclerView.scrollBy(0, vChildLoc[1] - center)
+            }, 500)
+        }
     }
 
     override fun setupListeners() {
@@ -215,7 +236,7 @@ class ClubCommentFragment : BaseFragment() {
 
         recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                if(e.action == MotionEvent.ACTION_UP) lastClickY = e.getY(0).toInt()
+                if (e.action == MotionEvent.ACTION_UP) lastClickY = e.getY(0).toInt()
                 return false
             }
 
@@ -226,7 +247,7 @@ class ClubCommentFragment : BaseFragment() {
             }
 
         })
-        val adCode = arguments?.getString(KEY_AD_CODE)?:""
+        val adCode = arguments?.getString(KEY_AD_CODE) ?: ""
         mainViewModel?.getAd(adCode, adWidth, adHeight, 1)
     }
 

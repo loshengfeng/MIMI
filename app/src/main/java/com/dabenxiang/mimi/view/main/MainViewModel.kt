@@ -194,8 +194,8 @@ class MainViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val resp = domainManager.getAdRepository().getAD(code, width, height, count)
-                if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content?.get(0)?.ad?.first()))
+                if (!resp.isSuccessful) emit(ApiResult.success(AdItem()))
+                else emit(ApiResult.success(resp.body()?.content?.get(0)?.ad?.first()))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }

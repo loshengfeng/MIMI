@@ -4,11 +4,13 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
 import com.dabenxiang.mimi.model.api.vo.CategoryBanner
-import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -21,19 +23,60 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.to.aboomy.pager2banner.IndicatorView
 import com.to.aboomy.pager2banner.ScaleInTransformer
 import kotlinx.android.synthetic.main.fragment_recommend.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class RecommendFragment(
-    private val thirdMenuItems: List<ThirdMenuItem>
-) : BaseFragment() {
+class RecommendFragment : BaseFragment() {
+
+    companion object {
+        private const val INFO_TYPE_LOADING = 0
+        private const val INFO_TYPE_EMPTY = 1
+        private const val INFO_TYPE_ERROR = 2
+    }
 
     private val viewModel: RecommendViewModel by viewModels()
 
     private val recommendContentAdapter by lazy {
-        RecommendContentAdapter(thirdMenuItems, recommendFuncItem)
+        val adapter = RecommendContentAdapter(recommendFuncItem)
+        val loadStateListener = { loadStatus: CombinedLoadStates ->
+            when (loadStatus.refresh) {
+                is LoadState.Error -> {
+                    Timber.e("refresh Error:${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                    showInfoLayout(INFO_TYPE_ERROR)
+                }
+                is LoadState.Loading -> {
+                    Timber.d("refresh Loading endOfPaginationReached:${(loadStatus.refresh as LoadState.Loading).endOfPaginationReached}")
+                    showInfoLayout(INFO_TYPE_LOADING)
+                }
+                is LoadState.NotLoading -> {
+                    Timber.d("refresh NotLoading endOfPaginationReached:${(loadStatus.refresh as LoadState.NotLoading).endOfPaginationReached}")
+                    takeIf { adapter.itemCount > 0 }?.run { layout_info.visibility = View.GONE }
+                        ?: run { showInfoLayout(INFO_TYPE_EMPTY) }
+                }
+            }
+
+            when (loadStatus.append) {
+                is LoadState.Error -> {
+                    Timber.e("append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+                }
+                is LoadState.Loading -> {
+                    Timber.d("append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
+                }
+                is LoadState.NotLoading -> {
+                    Timber.d("append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
+                }
+            }
+        }
+        adapter.addLoadStateListener(loadStateListener)
+        adapter
     }
 
     override fun setupFirstTime() {
         super.setupFirstTime()
+
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         tv_search.text = String.format(
             getString(R.string.text_search_classification),
@@ -44,10 +87,16 @@ class RecommendFragment(
             when (it) {
                 is Success -> setupBannerUi(it.result)
                 is Error -> onApiError(it.throwable)
+                else -> {}
             }
         })
 
         viewModel.getBanners()
+
+        if (rv_recommend.adapter == null) {
+            rv_recommend.adapter = recommendContentAdapter
+            getHomeList()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,11 +112,21 @@ class RecommendFragment(
 
         iv_rank.setOnClickListener { navToRanking() }
 
-        rv_recommend.adapter = recommendContentAdapter
+        btn_retry.setOnClickListener {
+            getHomeList()
+        }
     }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_recommend
+    }
+
+    private fun getHomeList() {
+        lifecycleScope.launch {
+            viewModel.getHomeList().collectLatest {
+                (rv_recommend.adapter as RecommendContentAdapter).submitData(it)
+            }
+        }
     }
 
     private fun setupBannerUi(categoryBanners: List<CategoryBanner>) {
@@ -97,10 +156,11 @@ class RecommendFragment(
             { videoItem ->
                 navToPlayer(PlayerItem(videoItem.id))
             },
-            { thirdMenuItem ->
-                when (thirdMenuItem.name) {
+            { homeListItem ->
+                when (homeListItem.name) {
                     getString(R.string.recommend_today) -> navToRanking()
-                    else -> navToCategory(thirdMenuItem.category)
+                    getString(R.string.recommend_new) -> navToCategory()
+                    else -> navToCategory(homeListItem.category)
                 }
             },
             { source -> viewModel.getDecryptSetting(source) },
@@ -152,5 +212,23 @@ class RecommendFragment(
                 bundle
             )
         )
+    }
+
+    private fun showInfoLayout(type: Int) {
+        when(type) {
+            INFO_TYPE_LOADING -> {
+                tv_info.text = getString(R.string.load_video)
+                btn_retry.visibility = View.GONE
+            }
+            INFO_TYPE_EMPTY -> {
+                tv_info.text = getString(R.string.empty_video)
+                btn_retry.visibility = View.GONE
+            }
+            else -> {
+                tv_info.text = getString(R.string.error_server)
+                btn_retry.visibility = View.VISIBLE
+            }
+        }
+        layout_info.visibility = View.VISIBLE
     }
 }
