@@ -292,9 +292,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
-            onMoreClick(item, position) {
+            onMoreClick(item, position, isFromPostPage = true) {
                 it as MemberPostItem
-
 
                 val bundle = Bundle()
                 item.id
