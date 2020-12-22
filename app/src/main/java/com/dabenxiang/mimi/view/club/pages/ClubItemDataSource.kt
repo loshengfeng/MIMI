@@ -4,15 +4,12 @@ import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import kotlin.math.ceil
-import kotlin.math.round
 
 class ClubItemDataSource(
     private val domainManager: DomainManager,

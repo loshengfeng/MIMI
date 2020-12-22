@@ -3,14 +3,10 @@ package com.dabenxiang.mimi.view.club.topic_detail
 import androidx.paging.*
 import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.db.*
 import com.dabenxiang.mimi.model.enums.OrderBy
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.club.pages.ClubItemMediator
-import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -27,9 +23,8 @@ class TopicPostMediator(
 
     companion object {
         const val PER_LIMIT = 20
-        const val TOPIC_INDEX = "991"
     }
-    private val pageName= TopicPostMediator::class.simpleName + tag + orderBy.toString()
+    private val pageCode= TopicPostMediator::class.simpleName + tag + orderBy.toString()
 
     override suspend fun load(
         loadType: LoadType,
@@ -38,13 +33,13 @@ class TopicPostMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
-                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, 0))
+                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
                     null
                 }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
-                        database.remoteKeyDao().remoteKeyByType(pageName)
+                        database.remoteKeyDao().remoteKeyByPageCode(pageCode)
                     }
                     remoteKey.offset
 
@@ -62,20 +57,20 @@ class TopicPostMediator(
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
-                    database.postDBItemDao().deleteItemByClubTab(pageName)
-                    database.remoteKeyDao().deleteByType(pageName)
+                    database.postDBItemDao().deleteItemByPageCode(pageCode)
+                    database.remoteKeyDao().deleteByPageCode(pageCode)
                 }
 
-                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName,
+                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode,
                     result.body()?.paging?.offset ?: 0 + ClubItemMediator.PER_LIMIT.toLong()))
                 memberPostItems?.let {
                     val postDBItems = it.mapIndexed() { index, item ->
-                        val oldItem = database.postDBItemDao().getPostDBItem(pageName, item.id)
+                        val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
                         if(oldItem == null) {
                             PostDBItem(
                                 postDBId = item.id,
                                 postType = item.type,
-                                pageName= pageName,
+                                pageCode= pageCode,
                                 timestamp = System.nanoTime(),
                                 index =index
                             )

@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.club.topic_detail
 
-import androidx.annotation.Nullable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -8,7 +7,6 @@ import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
-import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
@@ -16,7 +14,6 @@ import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 class TopicListViewModel : ClubViewModel() {
 
@@ -47,7 +44,7 @@ class TopicListViewModel : ClubViewModel() {
                     adHeight
             )
     ) {
-        mimiDB.postDBItemDao().pagingSourceByClubTab( TopicPostMediator::class.simpleName+tag+orderBy.toString())
+        mimiDB.postDBItemDao().pagingSourceByPageCode( TopicPostMediator::class.simpleName+tag+orderBy.toString())
     }.flow.map { pagingData->
         pagingData.map {
             it

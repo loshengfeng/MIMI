@@ -6,18 +6,16 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.db.*
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.view.my_pages.pages.like.MiMiLikeListDataSource
-import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
+import kotlin.math.ceil
 
 @OptIn(ExperimentalPagingApi::class)
 class ClubItemMediator(
@@ -26,11 +24,11 @@ class ClubItemMediator(
         private val adWidth: Int,
         private val adHeight: Int,
         private val type: ClubTabItemType,
+        private val adCode:String,
         private val pagingCallback: PagingCallback,
 ) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
-        const val CLUB_INDEX = "990"
         const val PER_LIMIT = 10
         const val AD_GAP: Int = 5
     }
@@ -49,7 +47,7 @@ class ClubItemMediator(
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
-                        database.remoteKeyDao().remoteKeyByType(pageName)
+                        database.remoteKeyDao().remoteKeyByPageCode(pageName)
                     }
                     remoteKey.offset
 
@@ -106,37 +104,44 @@ class ClubItemMediator(
                     memberPostItems?.size ?: 0
             )
 
+            val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / AD_GAP).toInt()
+            val adItems = domainManager.getAdRepository().getAD(adCode, adWidth, adHeight, adCount)
+                    .body()?.content?.get(0)?.ad?.map {
+                        MemberPostItem(id= (1..2147483647).random().toLong(), type = PostType.AD, adItem = it)
+                    }?: arrayListOf()
+            Timber.i("adItems = $adItems ")
+
             pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
+
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
-                    database.postDBItemDao().deleteItemByClubTab(pageName)
-                    database.remoteKeyDao().deleteByType(pageName)
+                    database.postDBItemDao().deleteItemByPageCode(pageName)
+                    database.postDBItemDao().deleteItemByPageCode(adCode)
+                    database.remoteKeyDao().deleteByPageCode(pageName)
                 }
                 val nextKey = if (hasNext) offset + PER_LIMIT else null
 
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, nextKey?.toLong()))
-                val remoteKey = database.withTransaction {
-                    database.remoteKeyDao().remoteKeyByType(pageName)
-                }
+                database.postDBItemDao().insertMemberPostItemAll(adItems)
 
                 memberPostItems?.let {
-                    val postDBItems = it.mapIndexed() { index, item ->
+                    val postDBItems = it.mapIndexed { index, item ->
                         val oldItem = database.postDBItemDao().getPostDBItem(pageName, item.id)
 
                         when(oldItem) {
-                            null ->  PostDBItem(
+                            null->  PostDBItem(
                                     id= item.id,
                                     postDBId = item.id,
                                     postType = item.type,
-                                    pageName= pageName,
+                                    pageCode= pageName,
                                     timestamp = System.nanoTime(),
-                                    index = index
+                                    index = offset+index
 
                             )
                             else-> {
                                 oldItem.postDBId = item.id
                                 oldItem.timestamp = System.nanoTime()
-                                oldItem.index = index
+                                oldItem.index = offset+index
                                 oldItem
                             }
                         }
@@ -145,9 +150,23 @@ class ClubItemMediator(
                     database.postDBItemDao().insertAll(postDBItems)
                 }
 
+                adItems?.let {
+                    val adDBItems = it.mapIndexed { index, item ->
+                        PostDBItem(
+                            id= item.id,
+                            postDBId = item.id,
+                            postType = item.type,
+                            pageCode= adCode,
+                            timestamp = System.nanoTime(),
+                            index = index
+                        )
+                    }
+                    database.postDBItemDao().insertMemberPostItemAll(it)
+                    database.postDBItemDao().insertAll(adDBItems)
+                }
             }
 
-            return MediatorResult.Success(endOfPaginationReached = !hasNext)
+            return MediatorResult.Success(endOfPaginationReached = hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {

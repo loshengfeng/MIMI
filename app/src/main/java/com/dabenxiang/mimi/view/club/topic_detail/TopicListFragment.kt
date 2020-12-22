@@ -132,15 +132,11 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             )
         }
 
-//        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    Timber.i("deletePostResult")
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
+        viewModel.adResult.observe(viewLifecycleOwner, {
+            getDatas()
+        })
 
+        viewModel.getAd()
     }
 
 
@@ -157,14 +153,17 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    private fun getDatas(){
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             viewModel.posts(topicTag, orderBy).collectLatest {
                 adapter.submitData(it)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     private val postListener = object : MyPostListener {

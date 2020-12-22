@@ -1,8 +1,14 @@
 package com.dabenxiang.mimi.view.club.base
 
+import android.view.View
+import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
@@ -12,6 +18,7 @@ import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -214,6 +221,19 @@ abstract class ClubViewModel : BaseViewModel(){
                 .collect { _adResult.value = it}
         }
 
+    }
+
+    fun getTopAd(code:String) {
+        viewModelScope.launch {
+            flow {
+                val topAdItem =
+                    domainManager.getAdRepository().getAD(code, adWidth, adHeight)
+                        .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+                emit(topAdItem)
+            }
+                .flowOn(Dispatchers.IO)
+                .collect { _adResult.value = it }
+        }
     }
 
     open val pagingCallback = object : PagingCallback {

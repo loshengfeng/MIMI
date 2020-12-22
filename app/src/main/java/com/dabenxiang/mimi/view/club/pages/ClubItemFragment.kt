@@ -3,13 +3,19 @@ package com.dabenxiang.mimi.view.club.pages
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.ConcatAdapter
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
@@ -17,6 +23,7 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
+import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
 import com.dabenxiang.mimi.view.club.base.ClubItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
@@ -31,6 +38,7 @@ import kotlinx.android.synthetic.main.fragment_club_item.id_empty_group
 import kotlinx.android.synthetic.main.fragment_club_item.layout_refresh
 import kotlinx.android.synthetic.main.fragment_club_item.posts_list
 import kotlinx.android.synthetic.main.fragment_club_item.text_page_empty
+import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -45,6 +53,10 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val viewModel: ClubItemViewModel by viewModels()
     private val clubTabViewModel: ClubTabViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
+
+    private val adTop: AdHeaderAdapter by lazy {
+        AdHeaderAdapter(requireContext())
+    }
 
     private val adapter: ClubItemAdapter by lazy {
        ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
@@ -79,39 +91,29 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        viewModel.getTopAd(viewModel.getAdCode(type)+"_top")
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
-        viewModel.getAd()
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it
         }
-
-//        viewModel.followResult.observe(this, Observer {
-//            when (it) {
-//                is ApiResult.Empty -> {
-//                    adapter.notifyItemRangeChanged(
-//                        0,
-//                        viewModel.totalCount,
-//                        PAYLOAD_UPDATE_FOLLOW
-//                    )
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
 
         viewModel.postCount.observe(this) {
             Timber.i("type=$type postCount= $it")
             emptyPageToggle(it <=0)
         }
 
+        viewModel.adResult.observe(this) {
+            adTop.adItem = it
+            adTop.notifyDataSetChanged()
+        }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        posts_list.adapter = adapter
+        posts_list.adapter = ConcatAdapter(adTop, adapter)
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
@@ -120,13 +122,17 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             }
         }
 
+        getDatas()
+
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             @OptIn(FlowPreview::class)
             adapter.loadStateFlow
                 .distinctUntilChangedBy { it.refresh }
                 .filter { it.refresh is LoadState.NotLoading }
-                .collect { posts_list.scrollToPosition(0) }
+                .collect {
+                    posts_list?.scrollToPosition(0)
+                }
         }
 
         layout_refresh.setOnRefreshListener {
@@ -153,23 +159,13 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             )
         }
 
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
-            when (it) {
-                is ApiResult.Success -> {
-                    Timber.i("deletePostResult")
-                    checkRemovedItems()
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
 
-        viewModel.adResult.observe(viewLifecycleOwner, {
-            getDatas()
-        })
+
+
     }
 
 
-    fun getDatas(){
+    private fun getDatas(){
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             viewModel.posts(type).collectLatest {
@@ -196,24 +192,14 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             else true
         )
 
-        if (adapter.snapshot().items.isEmpty()) {
+//        viewModel.adResult.observe(viewLifecycleOwner, {
+//            getDatas()
+//        })
 
-        }
 
-
-    }
-
-    private fun checkRemovedItems(){
-//        val idList = adapter.snapshot().items.map { item ->
-//            item.id
-//        }
-//        Timber.i("idList =$idList")
-//        idList.forEach { id ->
-//            if (mainViewModel?.deletePostIdList?.value?.contains(id) == true) {
-//                val pos = idList.indexOf(id)
-//                Timber.i("id =$id pos =$pos")
-//                adapter.notifyItemChanged(pos)
-//            }
+//        if (layout_refresh?.isRefreshing != true
+//                && adapter.snapshot().items.isEmpty()) {
+//            adapter.refresh()
 //        }
     }
 
@@ -395,4 +381,18 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             )
         }
     }
+
+    fun setAD(adImg: ImageView, adItem: AdItem){
+        val options = RequestOptions()
+            .priority(Priority.NORMAL)
+            .error(R.drawable.img_ad)
+        Glide.with(requireContext())
+            .load(adItem?.href)
+            .apply(options)
+            .into(adImg)
+        adImg.setOnClickListener {
+            GeneralUtils.openWebView(requireContext(), adItem?.target ?: "")
+        }
+    }
+
 }

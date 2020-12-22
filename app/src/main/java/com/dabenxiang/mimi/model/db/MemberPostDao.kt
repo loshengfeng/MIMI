@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.model.db
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -27,33 +28,24 @@ interface PostDBItemDao {
     @Update
     fun updateMemberPostItem(item: MemberPostItem)
 
-    @Query("SELECT * FROM PostDBItems WHERE id= :id")
-    fun getPostDBItemsById(id:Long): PostDBItem?
-
-    @Query("SELECT * FROM PostDBItems WHERE pageName = :pageName and postDBId = :postDBId limit 1")
-    fun getPostDBItem(pageName:String, postDBId:Long): PostDBItem?
+    @Query("SELECT * FROM PostDBItems WHERE pageCode = :pageCode and postDBId = :postDBId limit 1")
+    fun getPostDBItem(pageCode:String, postDBId:Long): PostDBItem?
 
     @Query("SELECT * FROM PostDBItems WHERE postDBId = :postDBId")
     fun getPostDBItems(postDBId:Long): List<PostDBItem>?
 
-    @Query("SELECT * FROM PostDBItems WHERE pageName = :pageName and postType = :postType ")
-    fun getPostDBItem(pageName:String, postType:PostType): PostDBItem?
+    @Query("SELECT * FROM PostDBItems WHERE pageCode = :pageCode  ORDER BY timestamp")
+    fun getPostDBItemsByTime(pageCode:String): List<MemberPostWithPostDBItem>?
 
     @Query("SELECT * FROM MemberPostItems WHERE id= :id")
     fun getMemberPostItemById(id:Long): MemberPostItem?
 
-    @Query("SELECT * FROM PostDBItems")
-    fun pagingSourceAll(): PagingSource<Int, PostDBItem>
-
     @Transaction
-    @Query("SELECT * FROM PostDBItems WHERE pageName= :pageName ORDER BY timestamp")
-    fun pagingSourceByClubTab(pageName: String): PagingSource<Int, MemberPostWithPostDBItem>
+    @Query("SELECT * FROM PostDBItems WHERE pageCode= :pageCode ORDER BY `index`")
+    fun pagingSourceByPageCode(pageCode: String): PagingSource<Int, MemberPostWithPostDBItem>
 
-    @Query("DELETE FROM PostDBItems WHERE postType= :postType")
-    suspend fun deleteItemByPostType(postType: PostType)
-
-    @Query("DELETE FROM PostDBItems WHERE pageName = :pageName")
-    suspend fun deleteItemByClubTab(pageName: String)
+    @Query("DELETE FROM PostDBItems WHERE pageCode = :pageCode")
+    suspend fun deleteItemByPageCode(pageCode: String)
 
     @Query("DELETE FROM PostDBItems WHERE id = :id")
     suspend fun deleteItem(id: Long)
@@ -80,8 +72,8 @@ data class PostDBItem(
     @ColumnInfo(name = "postType")
     var postType: PostType,
 
-    @ColumnInfo(name = "pageName")
-    var pageName: String,
+    @ColumnInfo(name = "pageCode")
+    var pageCode: String,
 
     @ColumnInfo(name = "timestamp")
     var timestamp: Long,

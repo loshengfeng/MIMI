@@ -81,7 +81,6 @@ class ClubItemAdapter(
             Timber.i("memberPostItem $memberPostItem position=$position  holder=$holder")
             when (holder) {
                 is AdHolder -> {
-                    Timber.i("AdHolder memberPostItem: $memberPostItem position=$position  holder=$holder")
                     val options = RequestOptions()
                         .priority(Priority.NORMAL)
                         .error(R.drawable.img_ad)
