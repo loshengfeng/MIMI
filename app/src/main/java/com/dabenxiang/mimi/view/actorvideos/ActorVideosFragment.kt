@@ -195,7 +195,11 @@ class ActorVideosFragment : BaseFragment() {
     private val gridLayoutSpanSizeLookup =
         object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return 1
+                return if (position >= generalVideoAdapter.itemCount) 2
+                else when (generalVideoAdapter.getItemViewType(position)) {
+                    GeneralVideoAdapter.VIEW_TYPE_VIDEO -> 1
+                    else -> 2
+                }
             }
         }
 
