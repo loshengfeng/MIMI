@@ -1010,10 +1010,7 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 取得影片清單
      */
-    suspend fun getHomeList(
-        offset: String,
-        limit: String
-    ) = apiService.getHomeList(offset, limit)
+    suspend fun getHomeList() = apiService.getHomeList()
 
     /**
      * 取得各來源解碼key

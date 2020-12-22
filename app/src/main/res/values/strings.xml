@@ -598,6 +598,7 @@
 
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
+    <string name="recommend_new">最近更新</string>
     <string name="recommend">推荐</string>
 
     <!-- Category -->

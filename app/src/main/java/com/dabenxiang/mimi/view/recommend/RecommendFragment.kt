@@ -159,6 +159,7 @@ class RecommendFragment : BaseFragment() {
             { homeListItem ->
                 when (homeListItem.name) {
                     getString(R.string.recommend_today) -> navToRanking()
+                    getString(R.string.recommend_new) -> navToCategory()
                     else -> navToCategory(homeListItem.category)
                 }
             },
