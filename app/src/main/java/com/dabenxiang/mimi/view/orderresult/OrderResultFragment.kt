@@ -20,7 +20,7 @@ class OrderResultFragment : BaseFragment() {
 
     companion object {
         private const val KEY_ERROR = "error"
-        private const val DELAY_TOP_UP_TIME = 60000L
+        const val DELAY_TOP_UP_TIME = 20L
 
         fun createBundle(isError: Boolean): Bundle {
             return Bundle().also { it.putBoolean(KEY_ERROR, isError) }
@@ -160,11 +160,18 @@ class OrderResultFragment : BaseFragment() {
     }
 
     private fun startTopUpTimer() {
+        var count = 1L
         val task = timerTask {
-            epoxyController.setData(OrderPayloadItem())
+            if(count >= DELAY_TOP_UP_TIME) {
+                epoxyController.setData(OrderPayloadItem())
+                topUpTimer?.cancel()
+            } else {
+                epoxyController.setData(null)
+                count++
+            }
         }
         topUpTimer = Timer()
-        topUpTimer?.schedule(task, DELAY_TOP_UP_TIME)
+        topUpTimer?.schedule(task, 1000, 1000)
     }
 
     private fun stopTopUpTimer() {
