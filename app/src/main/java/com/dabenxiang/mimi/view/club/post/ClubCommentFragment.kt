@@ -140,6 +140,7 @@ class ClubCommentFragment : BaseFragment() {
                                     viewModel.currentCommentType,
                                     commentAdapter!!
                                 )
+                                recyclerView.scrollToPosition(1)
                             }
                         } else {
                             replyRootNode?.also { parentNode ->

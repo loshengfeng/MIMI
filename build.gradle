@@ -51,9 +51,9 @@ buildscript {
     ext.exoplayer_version = '2.11.7'
     ext.rounded_views_version = '1.3.0'
     ext.base_recycler_view_adapter_helper_version = '3.0.4'
-    ext.cks_log_version = '0.0.8'
-    ext.cks_update_version = '0.0.9'
-    ext.cks_manager = '0.0.9'
+    ext.cks_log_version = '0.0.13'
+    ext.cks_update_version = '0.0.13'
+    ext.cks_manager = '0.0.14'
     ext.cks_utils = '0.0.1'
     ext.cks_utils_general = '0.0.4'
     ext.cks_utils_loglevel = '0.0.6'
@@ -106,6 +106,10 @@ allprojects {
         }
         maven {
             url "http://nexus.silkrode.in:8081/repository/android/"
+        }
+
+        maven {
+            url 'http://nexus.silkrode.in:8081/repository/nbk_lib'
         }
         maven { url 'https://jitpack.io' }
         maven { url 'https://dl.bintray.com/cks/Utils' }
