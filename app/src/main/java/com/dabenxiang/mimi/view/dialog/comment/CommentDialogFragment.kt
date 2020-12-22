@@ -22,11 +22,7 @@ import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import jp.wasabeef.glide.transformations.BlurTransformation
-import kotlinx.android.synthetic.main.fragment_club_comment.*
 import kotlinx.android.synthetic.main.fragment_dialog_comment.*
-import kotlinx.android.synthetic.main.fragment_dialog_comment.btn_send
-import kotlinx.android.synthetic.main.fragment_dialog_comment.et_message
-import kotlinx.android.synthetic.main.fragment_dialog_comment.tv_replay_name
 
 
 class CommentDialogFragment : BaseDialogFragment() {
@@ -279,6 +275,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                                     memberPostItem.id,
                                     playerInfoAdapter
                                 )
+                                rv_comment.scrollToPosition(1)
                             }
                         } else {
                             replyRootNode?.also { parentNode ->
