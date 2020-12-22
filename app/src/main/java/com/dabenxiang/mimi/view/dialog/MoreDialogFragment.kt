@@ -16,13 +16,15 @@ class MoreDialogFragment : BaseDialogFragment() {
             item: BaseMemberPostItem,
             listener: OnMoreDialogListener,
             isComment: Boolean? = false,
-            isLogin: Boolean = false
+            isLogin: Boolean = false,
+            isFromPostPage: Boolean = false
         ): MoreDialogFragment {
             val fragment = MoreDialogFragment()
             fragment.item = item
             fragment.listener = listener
             fragment.isComment = isComment
             fragment.isLogin = isLogin
+            fragment.isFromPostPage = isFromPostPage
             return fragment
         }
     }
@@ -31,6 +33,7 @@ class MoreDialogFragment : BaseDialogFragment() {
     var isComment: Boolean? = false
     var listener: OnMoreDialogListener? = null
     var isLogin: Boolean = false
+    var isFromPostPage: Boolean = false
 
     override fun isFullLayout(): Boolean {
         return true
@@ -54,12 +57,23 @@ class MoreDialogFragment : BaseDialogFragment() {
             true
         }
 
-        if (isReport || !deducted) {
-            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+        if (isFromPostPage) {
+            if (!isLogin) {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            } else {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
+                tv_problem_report.setOnClickListener {
+                    listener?.onProblemReport(item!!, isComment!!)
+                }
+            }
         } else {
-            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
-            tv_problem_report.setOnClickListener {
-                listener?.onProblemReport(item!!, isComment!!)
+            if (isReport || !deducted) {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            } else {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
+                tv_problem_report.setOnClickListener {
+                    listener?.onProblemReport(item!!, isComment!!)
+                }
             }
         }
 
