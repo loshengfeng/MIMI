@@ -26,8 +26,8 @@ class GridSpaceItemDecoration(
         val rEdgeRule = if ((position / (adInterval + 1)) % 2 == 0) 0 else 1
 
         when {
-            adapter.getItemViewType(position) == VIEW_TYPE_AD -> {
-            }
+//            adapter.getItemViewType(position) == VIEW_TYPE_AD -> {
+//            }
             position % span == lEdgeRule -> {
                 outRect.top = edgePadding
                 outRect.left = edgePadding

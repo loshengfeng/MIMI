@@ -83,12 +83,12 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.setHasFixedSize(true)
-            val itemDecoration = GridSpaceItemDecoration(
-                GeneralUtils.dpToPx(requireContext(), 10),
-                GeneralUtils.dpToPx(requireContext(), 10),
-                generalVideoAdapter
-            )
-            it.addItemDecoration(itemDecoration)
+//            val itemDecoration = GridSpaceItemDecoration(
+//                GeneralUtils.dpToPx(requireContext(), 10),
+//                GeneralUtils.dpToPx(requireContext(), 10),
+//                generalVideoAdapter
+//            )
+//            it.addItemDecoration(itemDecoration)
         }
 
         lifecycleScope.launch {

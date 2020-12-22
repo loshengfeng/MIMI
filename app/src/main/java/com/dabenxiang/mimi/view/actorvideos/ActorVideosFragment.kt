@@ -84,13 +84,13 @@ class ActorVideosFragment : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
             it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
-            it.addItemDecoration(
-                GridSpaceItemDecoration(
-                    GeneralUtils.dpToPx(requireContext(), 10),
-                    GeneralUtils.dpToPx(requireContext(), 20),
-                    generalVideoAdapter
-                )
-            )
+//            it.addItemDecoration(
+//                GridSpaceItemDecoration(
+//                    GeneralUtils.dpToPx(requireContext(), 10),
+//                    GeneralUtils.dpToPx(requireContext(), 20),
+//                    generalVideoAdapter
+//                )
+//            )
         }
     }
 
@@ -196,10 +196,7 @@ class ActorVideosFragment : BaseFragment() {
     private val gridLayoutSpanSizeLookup =
         object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (generalVideoAdapter.getItemViewType(position)) {
-                    GeneralVideoAdapter.VIEW_TYPE_VIDEO -> 1
-                    else -> 2
-                }
+                return 1
             }
         }
 
