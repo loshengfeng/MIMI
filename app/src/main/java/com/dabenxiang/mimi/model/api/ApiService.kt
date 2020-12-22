@@ -800,10 +800,7 @@ interface ApiService {
      *
      ***********************************************************/
     @GET("/v1/Members/Home/HomeList")
-    suspend fun getHomeList(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<HomeListItem>>>
+    suspend fun getHomeList(): Response<ApiBasePagingItem<List<HomeListItem>>>
 
 
     /**********************************************************

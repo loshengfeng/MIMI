@@ -5,6 +5,7 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.HomeListItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
+import timber.log.Timber
 import kotlin.math.ceil
 
 class HomeListPagingSource(
@@ -14,15 +15,12 @@ class HomeListPagingSource(
     private val needAd: Boolean = true
 ): PagingSource<Long, HomeListItem>() {
     companion object {
-        const val PER_LIMIT = 20
+        const val PER_LIMIT = 30
     }
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, HomeListItem> {
         return try {
             val offset = params.key ?: 0L
-            val result = domainManager.getApiRepository().getHomeList(
-                offset = offset.toString(),
-                limit = PER_LIMIT.toString()
-            )
+            val result = domainManager.getApiRepository().getHomeList()
 
             if (!result.isSuccessful) throw HttpException(result)
             val item = result.body()
