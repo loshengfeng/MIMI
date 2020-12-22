@@ -75,6 +75,9 @@ class RecommendFragment : BaseFragment() {
     override fun setupFirstTime() {
         super.setupFirstTime()
 
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
+
         tv_search.text = String.format(
             getString(R.string.text_search_classification),
             getString(R.string.recommend)
