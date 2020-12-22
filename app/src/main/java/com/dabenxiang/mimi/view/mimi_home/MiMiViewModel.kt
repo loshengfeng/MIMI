@@ -4,10 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.AnnounceConfigItem
 import com.dabenxiang.mimi.model.api.vo.SecondMenuItem
-import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -37,23 +35,6 @@ class MiMiViewModel : BaseViewModel() {
                 val secondMenuItems = result.body()?.content?.get(0)?.menus
                 val sortedSecondMenuItems = secondMenuItems?.sortedBy { item -> item.sorting }
 
-                val thirdMenuItems: ArrayList<ThirdMenuItem> = arrayListOf()
-
-                sortedSecondMenuItems?.forEach { item ->
-                    val adCount = item.menus.size / 2
-                    val adItems =
-                        domainManager.getAdRepository().getAD("home", adWidth, adHeight, adCount)
-                            .body()?.content?.get(0)?.ad ?: arrayListOf()
-
-                    item.menus.forEachIndexed { index, thirdMenuItem ->
-                        if (index % 2 == 0 && index != 0) {
-                            thirdMenuItems.add(getAdItem(adItems))
-                        }
-                        thirdMenuItems.add(thirdMenuItem)
-                    }
-                    item.menus = thirdMenuItems
-                }
-
                 emit(ApiResult.success(sortedSecondMenuItems))
             }
                 .catch { e -> emit(ApiResult.error(e)) }
@@ -75,12 +56,5 @@ class MiMiViewModel : BaseViewModel() {
             if (!result.isSuccessful) Timber.e(HttpException(result))
             result.body()?.content?.first()?.let { _announceConfig.postValue(it) }
         }
-    }
-
-    private fun getAdItem(adItems: ArrayList<AdItem>): ThirdMenuItem {
-        val adItem =
-            if (adItems.isEmpty()) AdItem()
-            else adItems.removeFirst()
-        return ThirdMenuItem(adItem = adItem)
     }
 }

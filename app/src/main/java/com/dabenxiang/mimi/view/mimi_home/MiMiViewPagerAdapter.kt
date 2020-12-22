@@ -20,7 +20,7 @@ class MiMiViewPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         val item = secondMenuItems[position]
         return when (item.type) {
-            LayoutType.RECOMMEND -> RecommendFragment(item.menus)
+            LayoutType.RECOMMEND -> RecommendFragment()
             LayoutType.ACTOR -> ActorFragment()
             else -> GeneralVideoFragment(item.category)
         }
