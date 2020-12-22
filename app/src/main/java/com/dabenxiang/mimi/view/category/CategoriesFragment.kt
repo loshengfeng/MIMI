@@ -118,7 +118,8 @@ class CategoriesFragment : BaseFragment() {
     private val gridLayoutSpanSizeLookup =
         object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (videoListAdapter.getItemViewType(position)) {
+                return if (position >= videoListAdapter.itemCount) 2
+                else when (videoListAdapter.getItemViewType(position)) {
                     GeneralVideoAdapter.VIEW_TYPE_VIDEO -> 1
                     else -> 2
                 }
