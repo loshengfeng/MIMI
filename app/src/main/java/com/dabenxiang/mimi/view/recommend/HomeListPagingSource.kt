@@ -15,12 +15,15 @@ class HomeListPagingSource(
     private val needAd: Boolean = true
 ): PagingSource<Long, HomeListItem>() {
     companion object {
-        const val PER_LIMIT = 30
+        const val PER_LIMIT = 20
     }
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, HomeListItem> {
         return try {
             val offset = params.key ?: 0L
-            val result = domainManager.getApiRepository().getHomeList()
+            val result = domainManager.getApiRepository().getHomeList(
+                offset = offset.toString(),
+                limit = PER_LIMIT.toString()
+            )
 
             if (!result.isSuccessful) throw HttpException(result)
             val item = result.body()
