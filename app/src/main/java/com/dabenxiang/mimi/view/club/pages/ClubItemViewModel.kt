@@ -43,11 +43,8 @@ class ClubItemViewModel : ClubViewModel() {
         pagingData.map {
             it
         }.insertSeparators{ before, after->
-            if(before!=null && before.postDBItem.index >=AD_GAP
-                && before.postDBItem.index.rem(AD_GAP) == 0 ){
-                val adPostItem = getAdItem(adItems, before)
-                    Timber.i("adPostItem 2 =$adPostItem")
-                adPostItem
+            if(before!=null && before.postDBItem.index >=AD_GAP && before.postDBItem.index.rem(AD_GAP) == 0 ){
+                getAdItem(adItems, before)
             }else {
                 null
             }
@@ -65,15 +62,22 @@ class ClubItemViewModel : ClubViewModel() {
         }
     }
 
-    private fun getAdItem(adItems: ArrayList<MemberPostWithPostDBItem>, beforeDBItem:MemberPostWithPostDBItem): MemberPostWithPostDBItem? {
+    private fun getAdItem(adItems: ArrayList<MemberPostWithPostDBItem>, before:MemberPostWithPostDBItem): MemberPostWithPostDBItem? {
         return if (adItems.isEmpty()) {
-            val adItem = MemberPostWithPostDBItem(beforeDBItem.postDBItem, beforeDBItem.memberPostItem)
-            adItem.apply {
-                postDBItem.id = (1024..1024*10).random().toLong()
-                postDBItem.postType = PostType.AD
-                postDBItem.timestamp = beforeDBItem.postDBItem.timestamp+1
-                memberPostItem = MemberPostItem(type = PostType.AD, adItem = AdItem())
-            }
+            val adItem = MemberPostItem(id= (1..2147483647).random().toLong(),
+                type = PostType.AD, adItem = AdItem()
+            )
+
+            val postDBItem =PostDBItem(
+                id= adItem.id,
+                postDBId =  adItem.id,
+                postType = PostType.AD,
+                timestamp = before.postDBItem.timestamp + 1,
+                pageCode = before.postDBItem.pageCode,
+                index = 0
+            )
+            MemberPostWithPostDBItem(postDBItem, adItem)
+
         }
         else adItems.removeFirst()
     }
