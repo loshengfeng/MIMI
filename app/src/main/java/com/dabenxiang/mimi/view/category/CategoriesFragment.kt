@@ -28,6 +28,7 @@ import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
+import com.dabenxiang.mimi.widget.view.GridSpaceItemWithAdDecoration
 import kotlinx.android.synthetic.main.fragment_categories.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -171,13 +172,12 @@ class CategoriesFragment : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
             it.adapter = videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
-//            it.addItemDecoration(
-//                GridSpaceItemDecoration(
-//                    GeneralUtils.dpToPx(requireContext(), 10),
-//                    GeneralUtils.dpToPx(requireContext(), 20),
-//                    videoListAdapter
-//                )
-//            )
+            it.addItemDecoration(
+                GridSpaceItemWithAdDecoration(
+                    GeneralUtils.dpToPx(requireContext(), 10),
+                    GeneralUtils.dpToPx(requireContext(), 20)
+                )
+            )
         }
 
         lstFilterRV = listOf(rl_filter_0, rl_filter_1)

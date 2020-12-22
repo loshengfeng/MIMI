@@ -84,13 +84,12 @@ class ActorVideosFragment : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
             it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
-//            it.addItemDecoration(
-//                GridSpaceItemDecoration(
-//                    GeneralUtils.dpToPx(requireContext(), 10),
-//                    GeneralUtils.dpToPx(requireContext(), 20),
-//                    generalVideoAdapter
-//                )
-//            )
+            it.addItemDecoration(
+                GridSpaceItemDecoration(
+                    GeneralUtils.dpToPx(requireContext(), 10),
+                    GeneralUtils.dpToPx(requireContext(), 20)
+                )
+            )
         }
     }
 
