@@ -267,8 +267,10 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
-            navigationToVideo(bundle)
+            checkStatus {
+                val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
+                navigationToVideo(bundle)
+            }
         }
 
         override fun onChipClick(type: PostType, tag: String) {
@@ -283,35 +285,39 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = ClubPicFragment.createBundle(item)
-                    navigationToPicture(bundle)
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = ClubTextFragment.createBundle(item)
-                    navigationToText(bundle)
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipPlayerFragment.createBundle(item.id)
-                    navigationToVideo(bundle)
+            checkStatus {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = ClubPicFragment.createBundle(item)
+                        navigationToPicture(bundle)
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item)
+                        navigationToText(bundle)
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id)
+                        navigationToVideo(bundle)
+                    }
                 }
             }
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = ClubPicFragment.createBundle(item, 1)
-                    navigationToPicture(bundle)
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = ClubTextFragment.createBundle(item, 1)
-                    navigationToText(bundle)
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipPlayerFragment.createBundle(item.id, 1)
-                    navigationToVideo(bundle)
+            checkStatus {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = ClubPicFragment.createBundle(item, 1)
+                        navigationToPicture(bundle)
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item, 1)
+                        navigationToText(bundle)
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
+                        navigationToVideo(bundle)
+                    }
                 }
             }
         }
