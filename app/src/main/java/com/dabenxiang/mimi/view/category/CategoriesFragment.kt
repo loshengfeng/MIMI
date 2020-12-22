@@ -171,13 +171,13 @@ class CategoriesFragment : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.setHasFixedSize(true)
             it.adapter = videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
-            it.addItemDecoration(
-                GridSpaceItemDecoration(
-                    GeneralUtils.dpToPx(requireContext(), 10),
-                    GeneralUtils.dpToPx(requireContext(), 20),
-                    videoListAdapter
-                )
-            )
+//            it.addItemDecoration(
+//                GridSpaceItemDecoration(
+//                    GeneralUtils.dpToPx(requireContext(), 10),
+//                    GeneralUtils.dpToPx(requireContext(), 20),
+//                    videoListAdapter
+//                )
+//            )
         }
 
         lstFilterRV = listOf(rl_filter_0, rl_filter_1)
