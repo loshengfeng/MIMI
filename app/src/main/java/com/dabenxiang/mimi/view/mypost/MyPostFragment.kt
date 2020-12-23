@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.mypost
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -22,6 +23,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MY_POST
@@ -35,7 +37,15 @@ import timber.log.Timber
 
 class MyPostFragment : BaseFragment() {
 
-    private lateinit var adapter: MyPostPagedAdapter
+    private val adapter: MyPostPagedAdapter by lazy {
+        MyPostPagedAdapter(
+                requireContext(),
+                isAdultTheme,
+                myPostListener,
+                memberPostFuncItem,
+                viewModel.viewModelScope
+        )
+    }
 
     private val viewModel: MyPostViewModel by viewModels()
 
@@ -73,17 +83,21 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        Timber.d("MyPostFragment onResume")
+        if (adapter.currentList.isNullOrEmpty()) {
+            viewModel.getMyPost(userId, isAdult)
+        }
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_my_post
     }
 
-    override fun setupFirstTime() {
-        initSettings()
-        viewModel.getMyPost(userId, isAdult)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initSettings()
         useAdultTheme(false)
     }
 
@@ -95,13 +109,6 @@ class MyPostFragment : BaseFragment() {
             isAdultTheme = false
         }
 
-        adapter = MyPostPagedAdapter(
-            requireContext(),
-            isAdultTheme,
-            myPostListener,
-            memberPostFuncItem,
-           viewModel.viewModelScope
-        )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
@@ -218,11 +225,21 @@ class MyPostFragment : BaseFragment() {
 
     private val myPostListener = object : MyPostListener {
         override fun onLoginClick() {
-
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
+            )
         }
 
         override fun onRegisterClick() {
-
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
