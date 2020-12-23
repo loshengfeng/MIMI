@@ -5,6 +5,8 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.HomeListItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
+import timber.log.Timber
+import kotlin.math.ceil
 
 class HomeListPagingSource(
     private val domainManager: DomainManager,
@@ -23,9 +25,6 @@ class HomeListPagingSource(
                 limit = PER_LIMIT.toString()
             )
 
-            val adItem = domainManager.getAdRepository()
-                .getAD(adWidth, adHeight).body()?.content ?: AdItem()
-
             if (!result.isSuccessful) throw HttpException(result)
             val item = result.body()
 
@@ -40,14 +39,16 @@ class HomeListPagingSource(
                 else -> null
             }
 
+            val adCount = ceil((homeList?.size ?: 0).toFloat() / 2).toInt()
+            val adItems =
+                domainManager.getAdRepository().getAD("home", adWidth, adHeight, adCount)
+                    .body()?.content?.get(0)?.ad ?: arrayListOf()
             val resultList: ArrayList<HomeListItem> = arrayListOf()
-
             homeList?.takeIf { needAd && homeList.isNotEmpty() }?.forEachIndexed { index, homeListItem ->
-                if (index % 2 == 0 && index != 0) {
-                    resultList.add(HomeListItem(adItem = adItem))
-                }
                 resultList.add(homeListItem)
+                if (index % 2 == 1) resultList.add(getAdItem(adItems))
             }
+            if ((homeList?.size ?: 0) % 2 != 0) resultList.add(getAdItem(adItems))
 
             LoadResult.Page(
                 data = resultList,
@@ -66,5 +67,12 @@ class HomeListPagingSource(
             offset >= total -> false
             else -> true
         }
+    }
+
+    private fun getAdItem(adItems: ArrayList<AdItem>): HomeListItem {
+        val adItem =
+            if (adItems.isEmpty()) AdItem()
+            else adItems.removeFirst()
+        return HomeListItem(adItem = adItem)
     }
 }

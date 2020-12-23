@@ -83,9 +83,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
         viewModel.likePostResult.observe(this, {
             when (it) {
-                is ApiResult.Success -> it.result.let { position ->
-                    adapter.notifyItemChanged(position)
-                }
+                is ApiResult.Success -> viewModel.getData(adapter)
                 else -> {
                     onApiError(Exception("Unknown Error!"))
                 }
@@ -163,6 +161,14 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
     }
 
     private val postListener = object : MyPostListener {
+
+        override fun onLoginClick() {
+
+        }
+
+        override fun onRegisterClick() {
+
+        }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {

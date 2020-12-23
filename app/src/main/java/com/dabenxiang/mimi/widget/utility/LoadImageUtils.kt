@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.pref.Pref
 import io.ktor.client.*
+import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -37,7 +38,7 @@ object LoadImageUtils : KoinComponent {
     val accountManager: AccountManager by inject()
     val pref: Pref by inject()
 
-    suspend fun loadImage(id: Long? = 0, view: ImageView, type: LoadImageType, filePath: String = "") {
+    suspend fun loadImage(id: Long? = 0, view: ImageView, type: LoadImageType, filePath: String = "", blur: BlurTransformation? =null) {
         val defaultResId = when (type) {
             LoadImageType.AVATAR -> R.drawable.default_profile_picture
             LoadImageType.AVATAR_CS -> R.drawable.icon_cs_photo
@@ -93,6 +94,8 @@ object LoadImageUtils : KoinComponent {
                     options.transform(CenterInside(), RoundedCorners(15))
                 }
             }
+            if(blur!= null)  options.transform(blur)
+
             Glide.with(view.context).load(glideUrl ?: filePath)
                     .apply(options)
                     .into(view)

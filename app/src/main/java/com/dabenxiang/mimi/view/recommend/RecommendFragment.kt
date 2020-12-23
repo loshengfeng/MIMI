@@ -51,7 +51,7 @@ class RecommendFragment : BaseFragment() {
                 }
                 is LoadState.NotLoading -> {
                     Timber.d("refresh NotLoading endOfPaginationReached:${(loadStatus.refresh as LoadState.NotLoading).endOfPaginationReached}")
-                    takeIf { adapter.itemCount > 0 }?.run { layout_info.visibility = View.GONE }
+                    takeIf { adapter.itemCount > 0 }?.run { layout_info?.visibility = View.GONE }
                         ?: run { showInfoLayout(INFO_TYPE_EMPTY) }
                 }
             }
@@ -74,6 +74,9 @@ class RecommendFragment : BaseFragment() {
 
     override fun setupFirstTime() {
         super.setupFirstTime()
+
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         tv_search.text = String.format(
             getString(R.string.text_search_classification),
@@ -156,6 +159,7 @@ class RecommendFragment : BaseFragment() {
             { homeListItem ->
                 when (homeListItem.name) {
                     getString(R.string.recommend_today) -> navToRanking()
+                    getString(R.string.recommend_new) -> navToCategory()
                     else -> navToCategory(homeListItem.category)
                 }
             },

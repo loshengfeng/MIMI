@@ -119,6 +119,9 @@ abstract class ClubViewModel : BaseViewModel(){
                     else -> apiRepository.deleteLike(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
+                item.likeType = if (isLike) LikeType.LIKE else LikeType.DISLIKE
+                item.likeCount = item.likeCount
+                _postChangedResult.postValue(ApiResult.success(item))
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
