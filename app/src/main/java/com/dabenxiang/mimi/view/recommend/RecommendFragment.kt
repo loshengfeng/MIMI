@@ -51,7 +51,7 @@ class RecommendFragment : BaseFragment() {
                 }
                 is LoadState.NotLoading -> {
                     Timber.d("refresh NotLoading endOfPaginationReached:${(loadStatus.refresh as LoadState.NotLoading).endOfPaginationReached}")
-                    takeIf { adapter.itemCount > 0 }?.run { layout_info.visibility = View.GONE }
+                    takeIf { adapter.itemCount > 0 }?.run { layout_info?.visibility = View.GONE }
                         ?: run { showInfoLayout(INFO_TYPE_EMPTY) }
                 }
             }
