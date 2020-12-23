@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.mypost
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -36,7 +37,15 @@ import timber.log.Timber
 
 class MyPostFragment : BaseFragment() {
 
-    private lateinit var adapter: MyPostPagedAdapter
+    private val adapter: MyPostPagedAdapter by lazy {
+        MyPostPagedAdapter(
+                requireContext(),
+                isAdultTheme,
+                myPostListener,
+                memberPostFuncItem,
+                viewModel.viewModelScope
+        )
+    }
 
     private val viewModel: MyPostViewModel by viewModels()
 
@@ -74,17 +83,21 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        Timber.d("MyPostFragment onResume")
+        if (adapter.currentList.isNullOrEmpty()) {
+            viewModel.getMyPost(userId, isAdult)
+        }
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_my_post
     }
 
-    override fun setupFirstTime() {
-        initSettings()
-        viewModel.getMyPost(userId, isAdult)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initSettings()
         useAdultTheme(false)
     }
 
@@ -96,13 +109,6 @@ class MyPostFragment : BaseFragment() {
             isAdultTheme = false
         }
 
-        adapter = MyPostPagedAdapter(
-            requireContext(),
-            isAdultTheme,
-            myPostListener,
-            memberPostFuncItem,
-           viewModel.viewModelScope
-        )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
