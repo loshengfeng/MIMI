@@ -1,9 +1,10 @@
-package com.dabenxiang.mimi.view.adapter
+package com.dabenxiang.mimi.view.mypost
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
@@ -14,13 +15,11 @@ import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import kotlinx.coroutines.CoroutineScope
 
-class MyPostPagedAdapter(
+class MyPostAdapter(
     val context: Context,
-    private val isAdultTheme: Boolean,
     private val myPostListener: MyPostListener,
-    private val memberPostFuncItem: MemberPostFuncItem,
     private val viewModelScope: CoroutineScope
-) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
+) : PagingDataAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
 
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0

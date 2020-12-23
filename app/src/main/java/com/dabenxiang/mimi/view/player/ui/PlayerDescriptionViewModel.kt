@@ -40,12 +40,12 @@ class PlayerDescriptionViewModel : BaseViewModel() {
 
     var videoContentId = 0L
 
-    fun getAd(width: Int, height: Int) {
+    fun getAd(code: String, width: Int, height: Int, count: Int) {
         viewModelScope.launch {
             flow {
-                val resp = domainManager.getAdRepository().getAD(width, height)
+                val resp = domainManager.getAdRepository().getAD(code, width, height, count)
                 if (!resp.isSuccessful) throw HttpException(resp)
-                emit(ApiResult.success(resp.body()?.content))
+                emit(ApiResult.success(resp.body()?.content?.get(0)?.ad?.first()))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }

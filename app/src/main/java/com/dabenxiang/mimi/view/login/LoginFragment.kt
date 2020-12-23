@@ -69,12 +69,6 @@ class LoginFragment : BaseFragment() {
         setCopyText()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
-            activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN or WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_login
     }
@@ -321,6 +315,12 @@ class LoginFragment : BaseFragment() {
         })
 
         View.OnClickListener { buttonView ->
+            if (System.currentTimeMillis() - viewModel.clickTime > 500L) {
+                viewModel.clickTime = System.currentTimeMillis()
+            } else {
+                return@OnClickListener
+            }
+
             when (buttonView.id) {
                 R.id.btn_register_cancel, R.id.btn_login_cancel, R.id.btnClose -> navigateTo(NavigateItem.Up)
 

@@ -30,9 +30,6 @@ abstract class ClubViewModel : BaseViewModel(){
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
-    private val _adResult = MutableLiveData<ApiResult<AdItem>>()
-    val adResult: LiveData<ApiResult<AdItem>> = _adResult
-
     fun followMember(
         item: MemberPostItem,
         items: ArrayList<MemberPostItem>,
@@ -122,6 +119,9 @@ abstract class ClubViewModel : BaseViewModel(){
                     else -> apiRepository.deleteLike(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
+                item.likeType = if (isLike) LikeType.LIKE else LikeType.DISLIKE
+                item.likeCount = item.likeCount
+                _postChangedResult.postValue(ApiResult.success(item))
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -146,20 +146,6 @@ abstract class ClubViewModel : BaseViewModel(){
                     .catch { e -> emit(ApiResult.error(e)) }
                     .collect { _videoLikeResult.value = it }
         }
-    }
-
-    fun getAd() {
-        viewModelScope.launch {
-            flow {
-                val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
-                if (!adResult.isSuccessful) throw HttpException(adResult)
-                emit(ApiResult.success(adResult.body()?.content))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { emit(ApiResult.error(it)) }
-                .collect { _adResult.value = it}
-        }
-
     }
 
 }

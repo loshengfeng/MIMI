@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.my_pages.pages.like.MiMiLikeListDataSource
 import retrofit2.HttpException
+import kotlin.math.ceil
 
 class TopicPostDataSource(
     private val pagingCallback: PagingCallback,
@@ -27,16 +28,29 @@ class TopicPostDataSource(
         val offset = params.key ?: 0
         return try {
 
-            val adRepository = domainManager.getAdRepository()
-            val adItem = adRepository.getAD(adWidth, adHeight).body()?.content ?: AdItem()
-
             val result = domainManager.getApiRepository().getMembersPost(
                     0, PER_LIMIT, tag, orderBy.value
             )
             if (!result.isSuccessful) throw HttpException(result)
             val body = result.body()
             val memberPostItems = body?.content
-            memberPostItems?.add(0, MemberPostItem(type = PostType.AD, adItem = adItem))
+
+            val list = arrayListOf<MemberPostItem>()
+            if (offset == 0L) {
+                val topAdItem =
+                    domainManager.getAdRepository().getAD("community_top", adWidth, adHeight)
+                        .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+                list.add(MemberPostItem(type = PostType.AD, adItem = topAdItem))
+            }
+            val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / 5).toInt()
+            val adItems =
+                domainManager.getAdRepository().getAD("community", adWidth, adHeight, adCount)
+                    .body()?.content?.get(0)?.ad ?: arrayListOf()
+            memberPostItems?.forEachIndexed { index, item ->
+                list.add(item)
+                if (index % 5 == 4) list.add(getAdItem(adItems))
+            }
+            if ((memberPostItems?.size ?: 0) % 5 != 0) list.add(getAdItem(adItems))
 
             val hasNext = hasNextPage(
                     result.body()?.paging?.count ?: 0,
@@ -46,7 +60,7 @@ class TopicPostDataSource(
             val nextKey = if (hasNext) offset + MiMiLikeListDataSource.PER_LIMIT_LONG else null
             if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
             pagingCallback.onTotalCount(body?.paging?.count ?: 0)
-            LoadResult.Page(memberPostItems ?: listOf(), null, nextKey)
+            LoadResult.Page(list, null, nextKey)
         } catch (e: Exception) {
             LoadResult.Error(e)
         }
@@ -60,6 +74,11 @@ class TopicPostDataSource(
         }
     }
 
-
+    private fun getAdItem(adItems: ArrayList<AdItem>): MemberPostItem {
+        val adItem =
+            if (adItems.isEmpty()) AdItem()
+            else adItems.removeFirst()
+        return MemberPostItem(type = PostType.AD, adItem = adItem)
+    }
 
 }

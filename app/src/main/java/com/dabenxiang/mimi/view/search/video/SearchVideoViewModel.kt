@@ -2,23 +2,18 @@ package com.dabenxiang.mimi.view.search.video
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.search.post.paging.SearchPostFollowDataSource
-import com.dabenxiang.mimi.view.search.video.paging.SearchVideoListDataSource
-import com.dabenxiang.mimi.widget.utility.EditTextLiveData
-import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
+import com.dabenxiang.mimi.view.search.video.paging.SearchVideoDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -65,9 +60,9 @@ class SearchVideoViewModel : BaseViewModel() {
         videoType: VideoType? =null
     ): Flow<PagingData<VideoItem>> {
         return Pager(
-            config = PagingConfig(pageSize = SearchVideoListDataSource.PER_LIMIT.toInt()),
+            config = PagingConfig(pageSize = SearchVideoDataSource.PER_LIMIT),
             pagingSourceFactory = {
-                SearchVideoListDataSource(
+                SearchVideoDataSource(
                     domainManager,
                     pagingCallback,
                     category,

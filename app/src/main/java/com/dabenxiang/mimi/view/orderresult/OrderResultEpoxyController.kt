@@ -20,10 +20,14 @@ class OrderResultEpoxyController(
     private val successListener: OrderResultSuccessListener
 ) : TypedEpoxyController<OrderPayloadItem>() {
 
+    var count = OrderResultFragment.DELAY_TOP_UP_TIME
+
     override fun buildModels(item: OrderPayloadItem?) {
         if (item == null) {
             addOrderResultWaitingItemView()
+            count--
         } else {
+            count = OrderResultFragment.DELAY_TOP_UP_TIME
             if (item.isSuccessful) {
                 addOrderResultSuccessfulItemView(item)
             } else {
@@ -35,6 +39,7 @@ class OrderResultEpoxyController(
     private fun addOrderResultWaitingItemView() {
         orderResultWaitingItemView {
             id("order_result_waiting")
+            setupCountDown(count)
         }
     }
 

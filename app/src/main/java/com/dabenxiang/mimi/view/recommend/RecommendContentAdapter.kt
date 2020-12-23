@@ -4,20 +4,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ThirdMenuItem
+import com.dabenxiang.mimi.model.api.vo.HomeListItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_recommend.view.*
 
-class RecommendContentAdapter(
-    private val thirdMenuItems: List<ThirdMenuItem>,
-    private val recommendFuncItem: RecommendFuncItem
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
+class RecommendContentAdapter(private val recommendFuncItem: RecommendFuncItem) :
+    PagingDataAdapter<HomeListItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
+        private val diffCallback = object : DiffUtil.ItemCallback<HomeListItem>() {
+            override fun areItemsTheSame(
+                oldItem: HomeListItem,
+                newItem: HomeListItem
+            ): Boolean = oldItem.id == newItem.id
+
+            override fun areContentsTheSame(
+                oldItem: HomeListItem,
+                newItem: HomeListItem
+            ): Boolean = oldItem == newItem
+        }
         const val VIEW_TYPE_AD = 0
         const val VIEW_TYPE_VIDEO = 1
     }
@@ -39,35 +51,35 @@ class RecommendContentAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        val item = thirdMenuItems[position]
-        return if (item.adItem != null) VIEW_TYPE_AD
+        val item = getItem(position)
+        return if (item?.adItem != null) VIEW_TYPE_AD
         else VIEW_TYPE_VIDEO
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = thirdMenuItems[position]
+        val item = getItem(position)
         when (holder) {
             is AdHolder -> {
+                val options = RequestOptions()
+                    .priority(Priority.NORMAL)
+                    .error(R.drawable.img_ad)
                 Glide.with(holder.adImg.context)
-                    .load(item.adItem?.href)
+                    .load(item?.adItem?.href)
+                    .apply(options)
                     .into(holder.adImg)
 
                 holder.adImg.setOnClickListener {
-                    GeneralUtils.openWebView(holder.adImg.context, item.adItem?.target ?: "")
+                    GeneralUtils.openWebView(holder.adImg.context, item?.adItem?.target ?: "")
                 }
             }
             is RecommendViewHolder -> {
-                holder.titleText.text = item.name
-                holder.moreText.setOnClickListener { recommendFuncItem.onMoreClick(item) }
+                holder.titleText.text = item?.name
+                holder.moreText.setOnClickListener { item?.run { recommendFuncItem.onMoreClick(this) } }
                 holder.recommendContentRecycler.adapter = RecommendVideoAdapter(
-                    item.videos, recommendFuncItem
+                    item?.videos ?: arrayListOf(), recommendFuncItem
                 )
             }
         }
-    }
-
-    override fun getItemCount(): Int {
-        return thirdMenuItems.size
     }
 
     class RecommendViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

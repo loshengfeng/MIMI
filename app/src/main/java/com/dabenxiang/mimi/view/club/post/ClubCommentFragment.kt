@@ -32,7 +32,6 @@ import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_comment.*
-import kotlin.math.abs
 
 class ClubCommentFragment : BaseFragment() {
 
@@ -58,13 +57,16 @@ class ClubCommentFragment : BaseFragment() {
     companion object {
         const val KEY_DATA = "data"
         const val KEY_IS_DARK_MODE = "is_dark_mode"
+        const val KEY_AD_CODE = "AD_CODE"
         fun createBundle(
             item: MemberPostItem,
-            isDarkMode: Boolean = false
+            isDarkMode: Boolean = false,
+            adCode: String = ""
         ): ClubCommentFragment {
             val bundle = Bundle().also {
                 it.putSerializable(KEY_DATA, item)
                 it.putBoolean(KEY_IS_DARK_MODE, isDarkMode)
+                it.putString(KEY_AD_CODE, adCode)
             }
 
             val fragment = ClubCommentFragment()
@@ -138,6 +140,7 @@ class ClubCommentFragment : BaseFragment() {
                                     viewModel.currentCommentType,
                                     commentAdapter!!
                                 )
+                                recyclerView.scrollToPosition(1)
                             }
                         } else {
                             replyRootNode?.also { parentNode ->
@@ -150,6 +153,7 @@ class ClubCommentFragment : BaseFragment() {
                                             it.result
                                         )
                                     )
+                                    adjustScroll(parentIndex)
                                 } else {
                                     replyCommentBlock = {
                                         commentAdapter?.expand(
@@ -158,6 +162,7 @@ class ClubCommentFragment : BaseFragment() {
                                             notify = true,
                                             parentPayload = CommentAdapter.EXPAND_COLLAPSE_PAYLOAD
                                         )
+                                        adjustScroll(parentIndex)
                                     }
                                     viewModel.getReplyComment(parentNode, memberPostItem!!)
                                 }
@@ -168,6 +173,24 @@ class ClubCommentFragment : BaseFragment() {
                 }
             }
         })
+    }
+
+    private fun adjustScroll(parentIndex: Int) {
+        commentAdapter?.recyclerView?.also { rv ->
+            recyclerView.postDelayed({
+                val vChild = rv.getChildAt(parentIndex + 1)
+                val vChildLoc = IntArray(2)
+                vChild.getLocationOnScreen(vChildLoc)
+
+                val barLoc = IntArray(2)
+                layout_edit_bar.getLocationOnScreen(barLoc)
+                val barTop = barLoc[1] - layout_edit_bar.height / 2
+
+                val center = barTop - content.height / 2
+
+                recyclerView.scrollBy(0, vChildLoc[1] - center)
+            }, 500)
+        }
     }
 
     override fun setupListeners() {
@@ -202,16 +225,12 @@ class ClubCommentFragment : BaseFragment() {
             onTextDetailListener,
             onItemClickListener
         )
-
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
         recyclerView.addOnLayoutChangeListener { view, left, top, right, bottom, oLeft, oTop, oRight, oBottom ->
-            val h = GeneralUtils.getScreenSize(requireActivity()).second
-            if (oBottom - bottom > h/4 && (bottom < lastClickY || bottom - lastClickY < 20)) {
-                if(abs(lastClickY - bottom) < 30)
-                    recyclerView.scrollBy(0, 30 - abs(lastClickY - bottom))
-                else
-                    recyclerView.scrollBy(0, lastClickY - bottom)
+            if (oBottom > bottom && bottom < lastClickY) {
+                recyclerView.scrollBy(0, lastClickY - bottom)
+                lastClickY = bottom + 1
             }
         }
 
@@ -228,8 +247,8 @@ class ClubCommentFragment : BaseFragment() {
             }
 
         })
-
-        mainViewModel?.getAd(adWidth, adHeight)
+        val adCode = arguments?.getString(KEY_AD_CODE) ?: ""
+        mainViewModel?.getAd(adCode, adWidth, adHeight, 1)
     }
 
     private val onTextDetailListener = object : ClubCommentAdapter.OnTextDetailListener {

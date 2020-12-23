@@ -31,6 +31,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
@@ -80,11 +81,30 @@ class SearchPostFragment : BaseFragment() {
 
     private val postListener = object : MyPostListener {
 
+        override fun onLoginClick() {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
+            )
+        }
+
+        override fun onRegisterClick() {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
+        }
+
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             checkStatus { viewModel.likePost(item, position, isLike) }
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            checkStatus {
                 when (item.type) {
                     PostType.IMAGE -> {
                         val bundle = ClubPicFragment.createBundle(item, 1)
@@ -116,6 +136,7 @@ class SearchPostFragment : BaseFragment() {
                     else -> {
                     }
                 }
+            }
         }
 
         override fun onFavoriteClick(
@@ -184,35 +205,37 @@ class SearchPostFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (item.type) {
-                PostType.IMAGE -> {
-                    val bundle = ClubPicFragment.createBundle(item)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_to_clubPicFragment,
-                            bundle
+            checkStatus {
+                when (item.type) {
+                    PostType.IMAGE -> {
+                        val bundle = ClubPicFragment.createBundle(item)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clubPicFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                PostType.TEXT -> {
-                    val bundle = ClubTextFragment.createBundle(item)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_to_clubTextFragment,
-                            bundle
+                    }
+                    PostType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clubTextFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                PostType.VIDEO -> {
-                    val bundle = ClipPlayerFragment.createBundle(item.id)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_to_clipPlayerFragment,
-                            bundle
+                    }
+                    PostType.VIDEO -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
+                            )
                         )
-                    )
-                }
-                else -> {
+                    }
+                    else -> {
+                    }
                 }
             }
         }

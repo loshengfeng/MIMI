@@ -190,6 +190,21 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun getAd(code: String, width: Int, height: Int, count: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getAdRepository().getAD(code, width, height, count)
+                if (!resp.isSuccessful) emit(ApiResult.success(AdItem()))
+                else emit(ApiResult.success(resp.body()?.content?.get(0)?.ad?.first()))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _getAdResult.value = it }
+        }
+    }
+
     /**
      * 按下 back 離開的 timer
      */
@@ -424,7 +439,6 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun postAttachment(pic: String, context: Context, type: String) {
-        Timber.d("arvin pic ??? " + pic)
         viewModelScope.launch(context = job) {
             flow {
                 var realPath = when (type) {

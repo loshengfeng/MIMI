@@ -3,13 +3,22 @@ package com.dabenxiang.mimi.view.personal
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.dabenxiang.mimi.APK_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MeItem
 import com.dabenxiang.mimi.model.vo.ProfileItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 import retrofit2.HttpException
+import timber.log.Timber
+import tw.gov.president.manager.submanager.update.VersionManager
+import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
+import tw.gov.president.manager.submanager.update.data.VersionStatus
 
 class PersonalViewModel : BaseViewModel() {
 
@@ -21,6 +30,15 @@ class PersonalViewModel : BaseViewModel() {
 
     private val _unreadResult = MutableLiveData<ApiResult<Int>>()
     val unreadResult: LiveData<ApiResult<Int>> = _unreadResult
+
+    private val _versionStatus = MutableLiveData<VersionStatus>()
+    val versionStatus: LiveData<VersionStatus> = _versionStatus
+
+    private val versionManager: VersionManager by inject()
+
+    private val handler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e("$throwable")
+    }
 
     fun getMemberInfo() {
         viewModelScope.launch {
@@ -108,5 +126,28 @@ class PersonalViewModel : BaseViewModel() {
 
     fun getOldDriverUrl(): String {
         return domainManager.getOldDriverUrl()
+    }
+
+    fun checkVersion() {
+        viewModelScope.launch(handler) {
+            Timber.i("checkVersion")
+            flow {
+                val versionStatus = versionManager.checkVersion()
+                delay(100)
+                emit(versionStatus)
+            }.flowOn(Dispatchers.IO).collect {
+                Timber.i("checkVersion = $it")
+                _versionStatus.value =it
+            }
+        }
+    }
+
+    fun updateApp(progressCallback: DownloadProgressCallback) {
+        viewModelScope.launch {
+            flow {
+                versionManager.updateApp(APK_NAME, progressCallback)
+                emit(null)
+            }.flowOn(Dispatchers.IO).collect { Timber.d("Update!") }
+        }
     }
 }

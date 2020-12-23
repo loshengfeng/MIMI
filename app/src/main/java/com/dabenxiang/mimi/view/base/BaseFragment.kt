@@ -914,14 +914,15 @@ abstract class BaseFragment : Fragment() {
         item: MemberPostItem,
         position: Int,
         deducted: Boolean = true,
-        onEdit: (BaseMemberPostItem) -> Unit
+        isFromPostPage: Boolean = false,
+        onEdit: (BaseMemberPostItem) -> Unit,
     ) {
         val isMe = mainViewModel?.accountManager?.getProfile()?.userId == item.creatorId
         if (isMe) {
             showMeMoreDialog(item, position, onEdit)
         } else {
             if (deducted)
-                showMoreDialog(item)
+                showMoreDialog(item, isFromPostPage)
         }
     }
 
@@ -963,7 +964,7 @@ abstract class BaseFragment : Fragment() {
             }
     }
 
-    private fun showMoreDialog(item: MemberPostItem) {
+    private fun showMoreDialog(item: MemberPostItem, isFromPostPage: Boolean) {
         val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
             override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
                 moreDialog?.dismiss()
@@ -979,7 +980,7 @@ abstract class BaseFragment : Fragment() {
         }
 
         val isLogin = mainViewModel?.checkIsLogin()
-        moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, isLogin = isLogin!!).also {
+        moreDialog = MoreDialogFragment.newInstance(item, onMoreDialogListener, isLogin = isLogin!!, isFromPostPage = isFromPostPage).also {
             it.show(
                 requireActivity().supportFragmentManager,
                 MoreDialogFragment::class.java.simpleName

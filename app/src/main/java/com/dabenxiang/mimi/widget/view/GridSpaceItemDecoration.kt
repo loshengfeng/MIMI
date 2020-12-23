@@ -3,12 +3,12 @@ package com.dabenxiang.mimi.widget.view
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter
+import com.dabenxiang.mimi.view.generalvideo.GeneralVideoAdapter.Companion.VIEW_TYPE_AD
 
 class GridSpaceItemDecoration(
-    private val span: Int,
     private val spacing: Int,
-    private val edgePadding: Int,
-    private val ignoreFirst: Boolean = false
+    private val edgePadding: Int
 ) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(
@@ -17,13 +17,13 @@ class GridSpaceItemDecoration(
         parent: RecyclerView,
         state: RecyclerView.State
     ) {
+        val span = 2
+
         val position = parent.getChildLayoutPosition(view)
-        val lEdgeRule = if (ignoreFirst) 1 else 0
-        val rEdgeRule = if (ignoreFirst) 0 else span - 1
+        val lEdgeRule = 0
+        val rEdgeRule = 1
 
         when {
-            ignoreFirst && position == 0 -> {
-            }
             position % span == lEdgeRule -> {
                 outRect.top = edgePadding
                 outRect.left = edgePadding

@@ -19,6 +19,7 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment.Companion.CODE_VIDEO
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -79,7 +80,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
             }
         }
 
-        clipViewModel.getAdResult.observe(viewLifecycleOwner) {
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Success -> {
                     Glide.with(this)
@@ -307,6 +308,6 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         // for ui init
         val adWidth = GeneralUtils.getAdSize(requireActivity()).first
         val adHeight = GeneralUtils.getAdSize(requireActivity()).second
-        clipViewModel.getAd(adWidth, adHeight)
+        mainViewModel?.getAd(CODE_VIDEO, adWidth, adHeight, 1)
     }
 }

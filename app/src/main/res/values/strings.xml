@@ -151,6 +151,7 @@
     <string name="personal_not_login_tips_1">还没登录吗?</string>
     <string name="personal_not_login_tips_2">赶紧登录观看更多内容</string>
     <string name="personal_not_login_tips_3">若尚未成为会员，赶紧注册体验更多内容</string>
+    <string name="personal_not_login_tips_4">请立即登录享受完整功能</string>
     <string name="personal_topup_page">充值</string>
     <string name="personal_topup">充值去 ></string>
     <string name="personal_follow">我的收藏</string>
@@ -160,6 +161,10 @@
     <string name="personal_chat_history">对话记录</string>
     <string name="personal_setting">设置</string>
     <string name="personal_old_driver">蜜蜜老司机群</string>
+    <string name="personal_version_text">版本</string>
+    <string name="personal_version_v_char">V\u0020</string>
+    <string name="personal_check_update">检查更新</string>
+    <string name="personal_checking_update">检查更新中…</string>
     <string name="btn_logout">登出</string>
     <string name="title_setting">个人设置</string>
     <string name="setting_photo">头像</string>
@@ -517,6 +522,7 @@
     <string name="setting_version">版本：%s</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
+    <string name="no_need_update_title">亲～已经是最新版了</string>
 
     <!-- Order Detail -->
     <string name="order_detail_title">订单资讯</string>
@@ -593,6 +599,7 @@
 
     <!-- Recommend -->
     <string name="recommend_today">今日精选</string>
+    <string name="recommend_new">最近更新</string>
     <string name="recommend">推荐</string>
 
     <!-- Category -->

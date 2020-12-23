@@ -165,6 +165,14 @@ class MyFavoritesFragment(
 
     private val postListener = object : MyPostListener {
 
+        override fun onLoginClick() {
+
+        }
+
+        override fun onRegisterClick() {
+
+        }
+
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             checkStatus { viewModel.likePost(item, position, isLike) }
         }

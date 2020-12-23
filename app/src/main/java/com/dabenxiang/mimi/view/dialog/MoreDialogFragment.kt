@@ -16,13 +16,15 @@ class MoreDialogFragment : BaseDialogFragment() {
             item: BaseMemberPostItem,
             listener: OnMoreDialogListener,
             isComment: Boolean? = false,
-            isLogin: Boolean = false
+            isLogin: Boolean = false,
+            isFromPostPage: Boolean = false
         ): MoreDialogFragment {
             val fragment = MoreDialogFragment()
             fragment.item = item
             fragment.listener = listener
             fragment.isComment = isComment
             fragment.isLogin = isLogin
+            fragment.isFromPostPage = isFromPostPage
             return fragment
         }
     }
@@ -31,6 +33,7 @@ class MoreDialogFragment : BaseDialogFragment() {
     var isComment: Boolean? = false
     var listener: OnMoreDialogListener? = null
     var isLogin: Boolean = false
+    var isFromPostPage: Boolean = false
 
     override fun isFullLayout(): Boolean {
         return true
@@ -47,13 +50,30 @@ class MoreDialogFragment : BaseDialogFragment() {
             is MemberPostItem -> (item as MemberPostItem).reported
             else -> (item as MembersPostCommentItem).reported
         } ?: false
-
-        if (isReport || (item as MemberPostItem).deducted == false) {
-            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+        
+        val deducted = if ((item is MemberPostItem)) {
+            (item as MemberPostItem).deducted
         } else {
-            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
-            tv_problem_report.setOnClickListener {
-                listener?.onProblemReport(item!!, isComment!!)
+            true
+        }
+
+        if (isFromPostPage) {
+            if (!isLogin) {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            } else {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
+                tv_problem_report.setOnClickListener {
+                    listener?.onProblemReport(item!!, isComment!!)
+                }
+            }
+        } else {
+            if (isReport || !deducted) {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            } else {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
+                tv_problem_report.setOnClickListener {
+                    listener?.onProblemReport(item!!, isComment!!)
+                }
             }
         }
 

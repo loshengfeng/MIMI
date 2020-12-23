@@ -44,7 +44,7 @@ class ActorVideosFragment : BaseFragment() {
     }
 
     private val generalVideoAdapter by lazy {
-        GeneralVideoAdapter(false, onItemClick)
+        GeneralVideoAdapter(onItemClick)
     }
 
     private val onItemClick: (StatisticsItem) -> Unit = {
@@ -86,10 +86,8 @@ class ActorVideosFragment : BaseFragment() {
             it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.addItemDecoration(
                 GridSpaceItemDecoration(
-                    2,
                     GeneralUtils.dpToPx(requireContext(), 10),
-                    GeneralUtils.dpToPx(requireContext(), 20),
-                    false
+                    GeneralUtils.dpToPx(requireContext(), 20)
                 )
             )
         }
@@ -197,7 +195,8 @@ class ActorVideosFragment : BaseFragment() {
     private val gridLayoutSpanSizeLookup =
         object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (generalVideoAdapter.getItemViewType(position)) {
+                return if (position >= generalVideoAdapter.itemCount) 2
+                else when (generalVideoAdapter.getItemViewType(position)) {
                     GeneralVideoAdapter.VIEW_TYPE_VIDEO -> 1
                     else -> 2
                 }

@@ -23,7 +23,6 @@ class GeneralVideoViewModel : BaseViewModel() {
                         adWidth = adWidth,
                         adHeight = adHeight,
                         needAd = true
-
                 )
             }
         ).flow.cachedIn(viewModelScope)

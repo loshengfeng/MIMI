@@ -1002,16 +1002,27 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun getGuestInfo() = apiService.getGuestInfo()
 
-    /**********************************************************
-     *
-     *                  Members/Home/Menu
-     *
-     ***********************************************************/
+    /**
+     * 取得Menu清單
+     */
     suspend fun getMenu() = apiService.getMenu()
+
+    /**
+     * 取得影片清單
+     */
+    suspend fun getHomeList(
+        offset: String,
+        limit: String
+    ) = apiService.getHomeList(offset, limit)
 
     /**
      * 取得各來源解碼key
      */
     suspend fun getDecryptSetting() = apiService.getDecryptSetting()
+
+    /**
+     * 取得公告設定值
+     */
+    suspend fun getAnnounceConfigs() = apiService.getAnnounceConfigs()
 }
 

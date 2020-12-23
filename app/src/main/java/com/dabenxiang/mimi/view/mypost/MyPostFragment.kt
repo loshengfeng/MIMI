@@ -3,11 +3,14 @@ package com.dabenxiang.mimi.view.mypost
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
@@ -16,13 +19,14 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
-import com.dabenxiang.mimi.view.adapter.MyPostPagedAdapter
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel.Companion.USER_ID_ME
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MY_POST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
@@ -30,19 +34,26 @@ import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.item_follow_no_data.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
 class MyPostFragment : BaseFragment() {
 
-    private lateinit var adapter: MyPostPagedAdapter
+    private val adapter: MyPostAdapter by lazy {
+        MyPostAdapter(
+                requireContext(),
+                myPostListener,
+                viewModel.viewModelScope
+        )
+    }
 
     private val viewModel: MyPostViewModel by viewModels()
 
     private var userId: Long = USER_ID_ME
     private var userName: String = ""
     private var isAdult: Boolean = true
-    private var isAdultTheme: Boolean = false
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -73,18 +84,20 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (adapter.snapshot().items.isEmpty()) {
+            getMyPost(userId)
+        }
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_my_post
     }
 
-    override fun setupFirstTime() {
-        initSettings()
-        viewModel.getMyPost(userId, isAdult)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        useAdultTheme(false)
+        initSettings()
     }
 
     override fun initSettings() {
@@ -92,27 +105,55 @@ class MyPostFragment : BaseFragment() {
             userId = it.getLong(KEY_USER_ID, USER_ID_ME)
             userName = it.getString(KEY_USER_NAME, "")
             isAdult = it.getBoolean(KEY_IS_ADULT, true)
-            isAdultTheme = false
         }
-
-        adapter = MyPostPagedAdapter(
-            requireContext(),
-            isAdultTheme,
-            myPostListener,
-            memberPostFuncItem,
-           viewModel.viewModelScope
-        )
+        adapter.addLoadStateListener(loadStateListener)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = adapter
+        recyclerView.adapter = adapter.withMimiLoadStateFooter { adapter.retry() }
 
-        cl_layout_bg.isSelected = isAdultTheme
-        cl_bg.isSelected = isAdultTheme
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
-        tv_title.isSelected = isAdultTheme
-        tv_back.isSelected = isAdultTheme
         iv_icon.setImageResource(R.drawable.img_conment_empty)
         tv_text.text = getString(R.string.my_post_no_data)
-        if (isAdultTheme) layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
+    }
+
+    private val loadStateListener = { loadStatus: CombinedLoadStates ->
+        when (loadStatus.refresh) {
+            is LoadState.Error -> {
+                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                onApiError((loadStatus.refresh as LoadState.Error).error)
+
+                v_no_data?.run { this.visibility = View.VISIBLE }
+                recyclerView?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = false }
+            }
+            is LoadState.Loading -> {
+                v_no_data?.run { this.visibility = View.INVISIBLE }
+                recyclerView?.run { this.visibility = View.INVISIBLE }
+                layout_refresh?.run { this.isRefreshing = true }
+            }
+            is LoadState.NotLoading -> {
+                if (adapter.itemCount == 0) {
+                    v_no_data?.run { this.visibility = View.VISIBLE }
+                    recyclerView?.run { this.visibility = View.INVISIBLE }
+                } else {
+                    v_no_data?.run { this.visibility = View.INVISIBLE }
+                    recyclerView?.run { this.visibility = View.VISIBLE }
+                }
+
+                layout_refresh?.run { this.isRefreshing = false }
+            }
+        }
+
+        when (loadStatus.append) {
+            is LoadState.Error -> {
+                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+            }
+            is LoadState.Loading -> {
+                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
+            }
+            is LoadState.NotLoading -> {
+                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
+            }
+        }
     }
 
     override fun setupObservers() {
@@ -120,16 +161,12 @@ class MyPostFragment : BaseFragment() {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.myPostItemListResult.observe(viewLifecycleOwner, {
-            adapter.submitList(it)
-        })
-
         viewModel.likePostResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     adapter.notifyItemChanged(
                         it.result,
-                        MyPostPagedAdapter.PAYLOAD_UPDATE_LIKE
+                        MyPostAdapter.PAYLOAD_UPDATE_LIKE
                     )
                 }
                 is Error -> Timber.e(it.throwable)
@@ -141,7 +178,7 @@ class MyPostFragment : BaseFragment() {
                 is Success -> {
                     adapter.notifyItemChanged(
                         it.result,
-                        MyPostPagedAdapter.PAYLOAD_UPDATE_FAVORITE
+                        MyPostAdapter.PAYLOAD_UPDATE_FAVORITE
                     )
                 }
                 is Error -> onApiError(it.throwable)
@@ -150,24 +187,11 @@ class MyPostFragment : BaseFragment() {
 
         mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
             when (it) {
-                is Success -> {
-                    adapter.removedPosList.add(it.result)
-                    adapter.notifyItemChanged(it.result)
-
-                    viewModel.checkPostEmptyUi(adapter.removedPosList.size)
-                }
+                is Success -> getMyPost(userId)
                 is Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, {
-            adapter.removedPosList.clear()
-        })
-
-        viewModel.isNoData.observe(viewLifecycleOwner, {
-            v_no_data.visibility = if (it) View.VISIBLE else View.GONE
-            recyclerView.visibility = if (it) View.GONE else View.VISIBLE
-        })
     }
 
     override fun navigationToText(bundle: Bundle) {
@@ -212,11 +236,29 @@ class MyPostFragment : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getMyPost(userId, isAdult)
+            getMyPost(userId)
         }
     }
 
     private val myPostListener = object : MyPostListener {
+        override fun onLoginClick() {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
+            )
+        }
+
+        override fun onRegisterClick() {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
+        }
+
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
                 it as MemberPostItem
@@ -267,8 +309,10 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
-            navigationToVideo(bundle)
+            checkStatus {
+                val bundle = ClipFragment.createBundle(ArrayList(mutableListOf(item[position])), 0)
+                navigationToVideo(bundle)
+            }
         }
 
         override fun onChipClick(type: PostType, tag: String) {
@@ -283,35 +327,39 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = ClubPicFragment.createBundle(item)
-                    navigationToPicture(bundle)
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = ClubTextFragment.createBundle(item)
-                    navigationToText(bundle)
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipPlayerFragment.createBundle(item.id)
-                    navigationToVideo(bundle)
+            checkStatus {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = ClubPicFragment.createBundle(item)
+                        navigationToPicture(bundle)
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item)
+                        navigationToText(bundle)
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id)
+                        navigationToVideo(bundle)
+                    }
                 }
             }
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = ClubPicFragment.createBundle(item, 1)
-                    navigationToPicture(bundle)
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = ClubTextFragment.createBundle(item, 1)
-                    navigationToText(bundle)
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipPlayerFragment.createBundle(item.id, 1)
-                    navigationToVideo(bundle)
+            checkStatus {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = ClubPicFragment.createBundle(item, 1)
+                        navigationToPicture(bundle)
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item, 1)
+                        navigationToText(bundle)
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
+                        navigationToVideo(bundle)
+                    }
                 }
             }
         }
@@ -336,11 +384,15 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, view, type -> viewModel.loadImage(id, view, type) },
-            { _, _, _, _ -> }
-        )
+    private fun getMyPost(userId: Long) {
+        lifecycleScope.launch {
+            adapter.submitData(PagingData.empty())
+            viewModel.getMyPostPagingItems(userId)
+                .collectLatest {
+                    layout_refresh.isRefreshing = false
+                    adapter.submitData(it)
+                }
+        }
     }
+
 }

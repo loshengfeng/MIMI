@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.generalvideo
 
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.GeneratedAdapter
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
@@ -19,6 +20,7 @@ import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
+import com.dabenxiang.mimi.widget.view.GridSpaceItemWithAdDecoration
 import kotlinx.android.synthetic.main.fragment_actor_videos.layout_empty_data
 import kotlinx.android.synthetic.main.fragment_actor_videos.layout_refresh
 import kotlinx.android.synthetic.main.fragment_actor_videos.rv_video
@@ -46,7 +48,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     }
 
     private val generalVideoAdapter by lazy {
-        GeneralVideoAdapter(true, onItemClick, videoFuncItem)
+        GeneralVideoAdapter(onItemClick, videoFuncItem)
     }
 
     override fun setupFirstTime() {
@@ -82,11 +84,9 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
             it.layoutManager = gridLayoutManager
             it.adapter = generalVideoAdapter.withMimiLoadStateFooter { generalVideoAdapter.retry() }
             it.setHasFixedSize(true)
-            val itemDecoration = GridSpaceItemDecoration(
-                2,
+            val itemDecoration = GridSpaceItemWithAdDecoration(
                 GeneralUtils.dpToPx(requireContext(), 10),
-                GeneralUtils.dpToPx(requireContext(), 10),
-                true
+                GeneralUtils.dpToPx(requireContext(), 20)
             )
             it.addItemDecoration(itemDecoration)
         }
@@ -153,7 +153,8 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     private val gridLayoutSpanSizeLookup =
         object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (generalVideoAdapter.getItemViewType(position)) {
+                return if (position >= generalVideoAdapter.itemCount) 2
+                    else when (generalVideoAdapter.getItemViewType(position)) {
                     VIEW_TYPE_VIDEO -> 1
                     else -> 2
                 }

@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.model.manager
 
+import antiblock.Antiblock
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.model.api.AdRepository
@@ -123,6 +124,19 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
+    fun getStorageDomain(): String {
+        return if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
+            BuildConfig.STORAGE_HOST
+        } else {
+            val domains = getDomain()
+            if (domains.isEmpty()) {
+                BuildConfig.STORAGE_HOST
+            } else {
+                StringBuilder("https://storage.").append(getDomain()).toString()
+            }
+        }
+    }
+
     fun getOldDriverUrl(): String {
         return getWebDomain() + "/chat"
     }
@@ -157,10 +171,10 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
             )
 
         val input = gson.toJson(domainInputItem)
-        Timber.d("input: $input")
+        Timber.i("mimi getDomains input: $input")
 
-        val output = libs.Libs.getDomains(input)
-        Timber.d("output: $output")
+        val output = Antiblock.getDomains(input)
+        Timber.i("mimi getDomains output: $output")
 
         return if (output.isNullOrEmpty()) {
             DomainOutputListItem()
