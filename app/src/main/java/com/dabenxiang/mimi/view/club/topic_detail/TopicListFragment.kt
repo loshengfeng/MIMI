@@ -301,7 +301,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             Timber.i("TopicListFragment onMoreClick")
-            onMoreClick(item, position) {
+            onMoreClick(item, position, isFromPostPage = true) {
 
                 val searchPostItem = arguments?.getSerializable(KEY_DATA)
 
