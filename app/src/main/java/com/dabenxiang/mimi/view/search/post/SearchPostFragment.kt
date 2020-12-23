@@ -80,6 +80,14 @@ class SearchPostFragment : BaseFragment() {
 
     private val postListener = object : MyPostListener {
 
+        override fun onLoginClick() {
+            //TODO need to implement
+        }
+
+        override fun onRegisterClick() {
+            //TODO need to implement
+        }
+
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             checkStatus { viewModel.likePost(item, position, isLike) }
         }

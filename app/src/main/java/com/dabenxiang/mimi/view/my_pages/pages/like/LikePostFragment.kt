@@ -162,6 +162,14 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
     private val postListener = object : MyPostListener {
 
+        override fun onLoginClick() {
+
+        }
+
+        override fun onRegisterClick() {
+
+        }
+
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {

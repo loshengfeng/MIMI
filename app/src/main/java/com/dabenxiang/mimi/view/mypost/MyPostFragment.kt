@@ -217,6 +217,14 @@ class MyPostFragment : BaseFragment() {
     }
 
     private val myPostListener = object : MyPostListener {
+        override fun onLoginClick() {
+
+        }
+
+        override fun onRegisterClick() {
+
+        }
+
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             onMoreClick(item, position) {
                 it as MemberPostItem
