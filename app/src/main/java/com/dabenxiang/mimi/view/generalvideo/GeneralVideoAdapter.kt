@@ -55,6 +55,7 @@ class GeneralVideoAdapter(
             VIEW_TYPE_AD -> {
                 val mView = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_ad, parent, false)
+                mView.tag = "ad"
                 AdHolder(mView)
             }
             else -> {

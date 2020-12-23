@@ -290,10 +290,27 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             )
         }
 
-        override fun onMoreClick(item: MemberPostItem, position: Int) {
-            onMoreClick(item, position) {
-                it as MemberPostItem
+        override fun onLoginClick() {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
+            )
+        }
 
+        override fun onRegisterClick() {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
+        }
+
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+            onMoreClick(item, position, isFromPostPage = true) {
+                it as MemberPostItem
 
                 val bundle = Bundle()
                 item.id

@@ -139,8 +139,8 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         viewModel.deleteFavoriteResult.observe(this) {
-//            viewModel.getData(adapter, type, isLike)
             checkChangedItems()
+            viewModel.getData(adapter, type, isLike)
         }
 
         viewModel.showProgress.observe(this) {
@@ -167,12 +167,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
 
         viewModel.favoriteResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
-                        MyCollectionMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
-                    )
-                }
+                is ApiResult.Success -> viewModel.getData(adapter, type, isLike)
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })

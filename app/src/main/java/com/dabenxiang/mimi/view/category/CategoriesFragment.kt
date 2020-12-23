@@ -28,6 +28,7 @@ import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.GridSpaceItemDecoration
+import com.dabenxiang.mimi.widget.view.GridSpaceItemWithAdDecoration
 import kotlinx.android.synthetic.main.fragment_categories.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -117,7 +118,8 @@ class CategoriesFragment : BaseFragment() {
     private val gridLayoutSpanSizeLookup =
         object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (videoListAdapter.getItemViewType(position)) {
+                return if (position >= videoListAdapter.itemCount) 2
+                else when (videoListAdapter.getItemViewType(position)) {
                     GeneralVideoAdapter.VIEW_TYPE_VIDEO -> 1
                     else -> 2
                 }
@@ -172,10 +174,9 @@ class CategoriesFragment : BaseFragment() {
             it.setHasFixedSize(true)
             it.adapter = videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
             it.addItemDecoration(
-                GridSpaceItemDecoration(
+                GridSpaceItemWithAdDecoration(
                     GeneralUtils.dpToPx(requireContext(), 10),
-                    GeneralUtils.dpToPx(requireContext(), 20),
-                    videoListAdapter
+                    GeneralUtils.dpToPx(requireContext(), 20)
                 )
             )
         }
