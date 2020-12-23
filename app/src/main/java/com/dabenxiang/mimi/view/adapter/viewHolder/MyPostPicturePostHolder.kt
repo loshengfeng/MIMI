@@ -1,20 +1,17 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.callback.OnItemClickListener
+import com.dabenxiang.mimi.callback.OnPictureItemClickListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
@@ -28,22 +25,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_picture_post.view.*
-import kotlinx.android.synthetic.main.item_picture_post.view.chip_group_tag
-import kotlinx.android.synthetic.main.item_picture_post.view.img_avatar
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_comment
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_favorite
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_like
-import kotlinx.android.synthetic.main.item_picture_post.view.iv_more
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_comment_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_favorite_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_follow
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_like_count
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_name
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_time
-import kotlinx.android.synthetic.main.item_picture_post.view.tv_title
-import kotlinx.android.synthetic.main.item_picture_post.view.v_separator
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -142,9 +124,17 @@ class MyPostPicturePostHolder(
             pictureRecycler.adapter = PictureAdapter(
                 pictureRecycler.context,
                 contentItem.images ?: arrayListOf(),
-                object : OnItemClickListener {
+                object : OnPictureItemClickListener {
                     override fun onItemClick() {
                         item.also { myPostListener.onItemClick(item, AdultTabType.PICTURE) }
+                    }
+
+                    override fun onLoginClick() {
+                        myPostListener.onLoginClick()
+                    }
+
+                    override fun onRegisterClick() {
+                        myPostListener.onRegisterClick()
                     }
                 }, viewModelScope
             )
