@@ -113,7 +113,6 @@ class MyPostFragment : BaseFragment() {
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         iv_icon.setImageResource(R.drawable.img_conment_empty)
         tv_text.text = getString(R.string.my_post_no_data)
-        layout_refresh.setColorSchemeColors(requireContext().getColor(R.color.color_red_1))
     }
 
     private val loadStateListener = { loadStatus: CombinedLoadStates ->
