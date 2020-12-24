@@ -260,7 +260,7 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
-            onMoreClick(item, position) {
+            onMoreClick(item, position, isFromPostPage = true) {
                 it as MemberPostItem
                 when (item.type) {
                     PostType.TEXT -> {
