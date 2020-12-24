@@ -386,7 +386,7 @@ class ClipSingleFragment : BaseFragment() {
         Timber.i("id=$id")
         Timber.i("isReported=$isReported")
         moreDialog = MoreDialogFragment.newInstance(
-            MemberPostItem(id = id, type = type, reported = isReported),
+            MemberPostItem(id = id, type = type, reported = isReported, deducted = true), //recharge_reminder will show when deducted is false
             onMoreDialogListener,
             isComment
         ).also {
