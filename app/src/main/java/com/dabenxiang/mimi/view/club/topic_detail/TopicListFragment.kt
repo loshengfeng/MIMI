@@ -116,7 +116,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            viewModel.posts(topicTag, orderBy).collectLatest {
+            viewModel.posts(pageCode, topicTag, orderBy).collectLatest {
                 adapter.submitData(it)
             }
         }
