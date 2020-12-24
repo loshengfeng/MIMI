@@ -31,6 +31,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
@@ -81,11 +82,21 @@ class SearchPostFragment : BaseFragment() {
     private val postListener = object : MyPostListener {
 
         override fun onLoginClick() {
-            //TODO need to implement
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
+            )
         }
 
         override fun onRegisterClick() {
-            //TODO need to implement
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
         }
 
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
