@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostClubItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostAttachmentItem
@@ -115,12 +116,14 @@ class PostPicFragment : BasePostFragment() {
 
         val request = getRequest(title, PostType.IMAGE.value)
 
+        val postClubItem = PostClubItem(title = title, tags = getTags(), uploadPics = adapter.getData())
+
         val bundle = Bundle()
         bundle.putString(POST_TYPE, PIC)
-        bundle.putParcelable(MEMBER_REQUEST, request)
-        bundle.putParcelableArrayList(PIC_URI, adapter.getData())
+//        bundle.putParcelable(MEMBER_REQUEST, request)
         bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
         bundle.putLong(POST_ID, postId)
+        bundle.putSerializable(POST_DATA, postClubItem)
 
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem

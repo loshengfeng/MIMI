@@ -41,7 +41,6 @@ import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 import java.io.File
 import java.net.URLEncoder
-import java.util.*
 
 class MainViewModel : BaseViewModel() {
 
@@ -73,8 +72,8 @@ class MainViewModel : BaseViewModel() {
     private val _dailyCheckInItem = MutableLiveData<DailyCheckInItem>()
     val dailyCheckInItem: LiveData<DailyCheckInItem> = _dailyCheckInItem
 
-    private val _uploadPicItemResult = MutableLiveData<PicParameter>()
-    val uploadPicItemResult: LiveData<PicParameter> = _uploadPicItemResult
+    private val _picExtResult = MutableLiveData<PicParameter>()
+    val picExtResult: LiveData<PicParameter> = _picExtResult
 
     private val _uploadCoverItem = MutableLiveData<PicParameter>()
     val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
@@ -438,6 +437,47 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun postPicAttachment(localPath: String) {
+        viewModelScope.launch {
+            flow {
+                var realPath = localPath
+                val fileNameSplit = localPath.split("/")
+                val fileName = fileNameSplit.last()
+                val extSplit = fileName.split(".")
+                val ext = "." + extSplit.last()
+
+                val picParameter = PicParameter(ext = ext) //Set extension
+                _picExtResult.postValue(picParameter)
+
+                val file = File(realPath)
+                if (file.length() >= 5242880) {
+                    val tempFile = FileUtil.getTakePhoto( "temp.jpg")
+                    file.copyTo(tempFile, true)
+                    val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
+                    FileUtil.saveBitmapToJpegFile(bitmap, bitmap.width, bitmap.height, destPath = tempFile.absolutePath)
+
+                    realPath = tempFile.absolutePath
+                }
+
+                Timber.d("Upload pic path : $realPath")
+                Timber.d("Upload pic ext : $ext")
+
+                val result = domainManager.getApiRepository().postAttachment(
+                    File(realPath),
+                    fileName = URLEncoder.encode(fileName, "UTF-8")
+                )
+
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    _postPicResult.postValue(it)
+                }
+        }
+    }
+
     fun postAttachment(pic: String, context: Context, type: String) {
         viewModelScope.launch(context = job) {
             flow {
@@ -455,7 +495,7 @@ class MainViewModel : BaseViewModel() {
                 when (type) {
                     HomeViewModel.TYPE_PIC -> {
                         val picParameter = PicParameter(ext = ext) //Set extension
-                        _uploadPicItemResult.postValue(picParameter)
+                        _picExtResult.postValue(picParameter)
                     }
                     HomeViewModel.TYPE_COVER -> {
                         val picParameter = PicParameter(ext = ext) //Set extension
@@ -511,6 +551,34 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun postPicClub(id: Long = 0, postClubItem: PostClubItem, content: String, type: String) {
+        viewModelScope.launch(context = job) {
+            flow {
+                val request = PostMemberRequest(postClubItem.title, content, PostType.IMAGE.value, tags = postClubItem.tags)
+
+                request.content = content
+                Timber.d("Post member request : $request")
+
+                if (id.toInt() == 0) {
+                    val resp = domainManager.getApiRepository().postMembersPost(request)
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(resp.body()?.content))
+                } else {
+                    val resp = domainManager.getApiRepository().updatePost(id, request)
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(id))
+                }
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    _postPicMemberResult.value = it
+                }
+        }
+    }
+
     fun postPicOrVideo(id: Long = 0, request: PostMemberRequest, content: String, type: String) {
         viewModelScope.launch(context = job) {
             flow {
@@ -536,7 +604,6 @@ class MainViewModel : BaseViewModel() {
                         _postVideoMemberResult.value = it
                     } else {
                         _postPicMemberResult.value = it
-
                     }
                 }
         }
@@ -579,7 +646,7 @@ class MainViewModel : BaseViewModel() {
         _postPicResult.value = null
         _postCoverResult.value = null
         _postVideoResult.value = null
-        _uploadPicItemResult.value = null
+        _picExtResult.value = null
         _uploadCoverItem.value = null
         _postVideoMemberResult.value = null
         _postPicMemberResult.value = null
