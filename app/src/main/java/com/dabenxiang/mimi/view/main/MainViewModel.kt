@@ -410,14 +410,14 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun postArticle(title: String, content: String, tags: ArrayList<String>, item: MemberPostItem) {
+    fun postArticle(postClubItem: PostClubItem, item: MemberPostItem) {
         viewModelScope.launch {
             flow {
                 val request = PostMemberRequest(
-                    title = title,
-                    content = content,
+                    title = postClubItem.title,
+                    content = postClubItem.request,
                     type = PostType.TEXT.value,
-                    tags = tags
+                    tags = postClubItem.tags
                 )
 
                 if (item.id.toInt() == 0) {

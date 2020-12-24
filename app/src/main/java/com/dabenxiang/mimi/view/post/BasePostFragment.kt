@@ -60,14 +60,11 @@ open class BasePostFragment : BaseFragment() {
         const val TAG = "tag"
         const val REQUEST = "request"
         const val TITLE = "title"
-        const val UPLOAD_ARTICLE = "upload_article"
         const val POST_ID = "post_id"
         const val BUNDLE_PIC_URI = "bundle_pic_uri"
-        const val UPLOAD_PIC = "upload_pic"
         const val MEMBER_REQUEST = "member_request"
         const val PIC_URI = "pic_uri"
         const val DELETE_ATTACHMENT = "delete_attachment"
-        const val UPLOAD_VIDEO = "upload_video"
         const val VIDEO_DATA = "video_data"
         const val BUNDLE_TRIMMER_URI = "bundle_trimmer_uri"
         const val BUNDLE_COVER_URI = "bundle_cover_uri"
@@ -85,6 +82,7 @@ open class BasePostFragment : BaseFragment() {
         const val TYPE_TEXT = "text"
         const val TYPE_PIC = "pic"
         const val TYPE_VIDEO = "video"
+        const val POST_DATA = "post_data"
     }
 
     override val bottomNavigationVisibility: Int

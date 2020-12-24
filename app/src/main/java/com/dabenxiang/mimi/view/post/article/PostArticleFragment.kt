@@ -111,11 +111,11 @@ class PostArticleFragment : BasePostFragment() {
             }
         }
 
+        val postClubItem = PostClubItem(title, request, getTags())
+
         val bundle = Bundle()
         bundle.putString(POST_TYPE, TEXT)
-        bundle.putString(TITLE, title)
-        bundle.putString(REQUEST, request)
-        bundle.putStringArrayList(TAG, getTags())
+        bundle.putSerializable(POST_DATA, postClubItem)
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)

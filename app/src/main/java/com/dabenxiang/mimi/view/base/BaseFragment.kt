@@ -42,6 +42,7 @@ import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PIC_URI
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_PIC
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_TEXT
@@ -428,20 +429,18 @@ abstract class BaseFragment : Fragment() {
     }
 
     private fun combinationDataAndPostText(bundle: Bundle) {
-        val title = bundle.getString(BasePostFragment.TITLE)
-        val request = bundle.getString(BasePostFragment.REQUEST)
-        val tags = bundle.getStringArrayList(BasePostFragment.TAG)
-        val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
+        val postClubItem = bundle.getSerializable(POST_DATA) as PostClubItem
+        val memberData = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
 
-        if (data != null) { //If update novel
-            memberPostItem = data as MemberPostItem
+        if (memberData != null) { //If update novel
+            memberPostItem = memberData as MemberPostItem
         }
 
-        memberPostItem.title = title!!
-        memberPostItem.content = request!!
-        memberPostItem.tags = tags
+        memberPostItem.title = postClubItem.title
+        memberPostItem.content = postClubItem.request
+        memberPostItem.tags = postClubItem.tags
 
-        mainViewModel?.postArticle(title, request, tags!!, memberPostItem)
+        mainViewModel?.postArticle(postClubItem, memberPostItem)
     }
 
     fun handlePostClub() {
