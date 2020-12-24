@@ -239,6 +239,7 @@ class MyFavoritesFragment(
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
+            item.deducted = true //Just use reported for MoreDialog in favorite Post
             onMoreClick(item, position) {
                 it as MemberPostItem
 
