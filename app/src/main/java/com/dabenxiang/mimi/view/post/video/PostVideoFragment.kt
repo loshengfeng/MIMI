@@ -139,7 +139,7 @@ class PostVideoFragment : BasePostFragment() {
         setVideoTime()
 
         val bundle = Bundle()
-        bundle.putBoolean(UPLOAD_VIDEO, true)
+        bundle.putString(POST_TYPE, VIDEO)
         bundle.putParcelable(MEMBER_REQUEST, request)
         bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
         bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)

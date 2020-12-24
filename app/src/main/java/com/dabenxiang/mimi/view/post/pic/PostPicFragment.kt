@@ -116,7 +116,7 @@ class PostPicFragment : BasePostFragment() {
         val request = getRequest(title, PostType.IMAGE.value)
 
         val bundle = Bundle()
-        bundle.putBoolean(UPLOAD_PIC, true)
+        bundle.putString(POST_TYPE, PIC)
         bundle.putParcelable(MEMBER_REQUEST, request)
         bundle.putParcelableArrayList(PIC_URI, adapter.getData())
         bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)

@@ -46,7 +46,6 @@ class PostArticleFragment : BasePostFragment() {
     }
 
     override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
-//        edt_content.setText(item.textContent)
         txt_contentCount.text = String.format(getString(R.string.typing_count, item.textContent.length, CONTENT_LIMIT))
         viewModel.getPostDetail(memberPostItem)
     }
@@ -113,7 +112,7 @@ class PostArticleFragment : BasePostFragment() {
         }
 
         val bundle = Bundle()
-        bundle.putBoolean(UPLOAD_ARTICLE, true)
+        bundle.putString(POST_TYPE, TEXT)
         bundle.putString(TITLE, title)
         bundle.putString(REQUEST, request)
         bundle.putStringArrayList(TAG, getTags())

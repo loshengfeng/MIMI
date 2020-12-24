@@ -49,14 +49,12 @@ open class BasePostFragment : BaseFragment() {
     companion object {
         const val CONTENT_LIMIT = 2000
         const val PHOTO_LIMIT = 10
-        const val RECORD_LIMIT_TIME = 15
 
         const val INTENT_SELECT_IMG = 10001
         const val REQUEST_VIDEO_CAPTURE = 10002
 
         private const val TITLE_LIMIT = 60
         private const val HASHTAG_LIMIT = 20
-        private const val HASHTAG_TEXT_LIMIT = 10
         private const val INIT_VALUE = 0
 
         const val TAG = "tag"
@@ -83,6 +81,10 @@ open class BasePostFragment : BaseFragment() {
         const val TEXT = "text"
         const val PIC = "pic"
         const val FAVORITE = "favorite"
+        const val POST_TYPE = "post_type"
+        const val TYPE_TEXT = "text"
+        const val TYPE_PIC = "pic"
+        const val TYPE_VIDEO = "video"
     }
 
     override val bottomNavigationVisibility: Int

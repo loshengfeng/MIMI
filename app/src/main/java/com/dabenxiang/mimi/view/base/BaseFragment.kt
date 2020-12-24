@@ -42,9 +42,10 @@ import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PIC_URI
-import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_ARTICLE
-import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_PIC
-import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.UPLOAD_VIDEO
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_PIC
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_TEXT
+import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.dabenxiang.mimi.widget.utility.UriUtils
@@ -420,9 +421,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     private fun setPostTpe(type: PostType) {
-        arguments?.remove(UPLOAD_ARTICLE)
-        arguments?.remove(UPLOAD_PIC)
-        arguments?.remove(UPLOAD_VIDEO)
+        arguments?.remove(POST_TYPE)
 
         showSnackBar()
         postType = type
@@ -447,21 +446,13 @@ abstract class BaseFragment : Fragment() {
 
     fun handlePostClub() {
         arguments?.let {
-            val isNeedArticleUpload = it.getBoolean(UPLOAD_ARTICLE, false)
-            val isNeedPicUpload = it.getBoolean(UPLOAD_PIC, false)
-            val isNeedVideoUpload = it.getBoolean(UPLOAD_VIDEO)
-
-            when {
-                isNeedArticleUpload -> {
+            when (it.getString(POST_TYPE)) {
+                TYPE_TEXT -> {
                     setPostTpe(PostType.TEXT)
                     combinationDataAndPostText(it)
                 }
-                isNeedPicUpload -> {
-                    uploadPicFlow(it)
-                }
-                isNeedVideoUpload -> {
-                    uploadVideoFlow(it)
-                }
+                TYPE_PIC -> uploadPicFlow(it)
+                TYPE_VIDEO -> uploadVideoFlow(it)
                 else -> {
 
                 }
