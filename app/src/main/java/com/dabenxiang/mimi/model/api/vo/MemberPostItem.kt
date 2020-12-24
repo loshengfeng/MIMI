@@ -9,7 +9,9 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
-@Entity(tableName = "MemberPostItems")
+@Entity(
+    tableName = "MemberPostItems"
+)
 data class MemberPostItem(
     @PrimaryKey
     @ColumnInfo(name = "id")

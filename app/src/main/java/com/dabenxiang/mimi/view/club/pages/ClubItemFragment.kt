@@ -122,7 +122,12 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             }
         }
 
-        getDatas()
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(type).collectLatest {
+                adapter.submitData(it)
+            }
+        }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
@@ -159,20 +164,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             )
         }
 
-
-
-
     }
 
-
-    private fun getDatas(){
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            viewModel.posts(type).collectLatest {
-                adapter.submitData(it)
-            }
-        }
-    }
 
     private fun loginPageToggle(isLogin: Boolean) {
         Timber.i("loginPageToggle= $isLogin")
@@ -192,15 +185,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             else true
         )
 
-//        viewModel.adResult.observe(viewLifecycleOwner, {
-//            getDatas()
-//        })
-
-
-//        if (layout_refresh?.isRefreshing != true
-//                && adapter.snapshot().items.isEmpty()) {
-//            adapter.refresh()
-//        }
     }
 
     private val postListener = object : MyPostListener {

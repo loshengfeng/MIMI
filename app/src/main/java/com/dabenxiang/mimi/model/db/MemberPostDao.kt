@@ -37,6 +37,9 @@ interface PostDBItemDao {
     @Query("SELECT * FROM PostDBItems WHERE pageCode = :pageCode  ORDER BY timestamp")
     fun getPostDBItemsByTime(pageCode:String): List<MemberPostWithPostDBItem>?
 
+    @Query("SELECT DISTINCT postDBId FROM PostDBItems WHERE pageCode = :pageCode ")
+    fun getPostDBIdsByPageCode(pageCode:String): List<Long>?
+
     @Query("SELECT * FROM MemberPostItems WHERE id= :id")
     fun getMemberPostItemById(id:Long): MemberPostItem?
 
@@ -47,8 +50,11 @@ interface PostDBItemDao {
     @Query("DELETE FROM PostDBItems WHERE pageCode = :pageCode")
     suspend fun deleteItemByPageCode(pageCode: String)
 
-    @Query("DELETE FROM PostDBItems WHERE id = :id")
-    suspend fun deleteItem(id: Long)
+    @Query("DELETE FROM MemberPostItems WHERE id = :id")
+    suspend fun deleteMemberPostItem(id:Long)
+
+    @Query("DELETE FROM PostDBItems WHERE postDBId = :postDBId")
+    suspend fun deleteItem(postDBId: Long)
 
     @Query("DELETE FROM PostDBItems")
     suspend fun deleteAll()

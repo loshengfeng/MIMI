@@ -8,14 +8,16 @@ import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.ConcatAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.ApiResult
+
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
 import com.dabenxiang.mimi.view.club.base.ClubItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
@@ -41,7 +43,11 @@ import java.util.*
 class TopicListFragment(private val orderBy: OrderBy, private val topicTag:String) : BaseFragment() {
 
     private val viewModel: TopicListViewModel by viewModels()
-    private val topicviewmodel: TopicViewModel by viewModels({requireParentFragment()})
+    private val topicViewModel: TopicViewModel by viewModels({requireParentFragment()})
+
+    private val adTop: AdHeaderAdapter by lazy {
+        AdHeaderAdapter(requireContext())
+    }
 
     private val adapter: ClubItemAdapter by lazy {
         ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
@@ -51,6 +57,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
     companion object {
         const val KEY_DATA = "data"
+        const val AD_CODE = "community"
         const val AD_GAP: Int = 5
         fun createBundle(item: MemberPostItem): Bundle {
             return Bundle().also {
@@ -59,12 +66,14 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         }
     }
 
+    val pageCode = TopicListFragment::class.simpleName + tag + orderBy.toString()
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         Timber.i("TopicListFragment topicTag=$topicTag")
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
-        viewModel.getAd()
+        viewModel.getTopAd(AD_CODE+"_top")
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it
@@ -73,12 +82,18 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         viewModel.postCount.observe(this) {
             emptyPageToggle(it <=0)
         }
+
+        viewModel.adResult.observe(this, {
+            adTop.adItem = it
+            adTop.notifyDataSetChanged()
+        })
     }
 
     private fun emptyPageToggle(isHide:Boolean){
         if (isHide) {
             id_empty_group.visibility = View.VISIBLE
             text_page_empty.text = getText(R.string.empty_post)
+            posts_list.visibility = View.INVISIBLE
         } else {
             id_empty_group.visibility = View.GONE
             posts_list.visibility = View.VISIBLE
@@ -90,12 +105,19 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        posts_list.adapter = adapter
+        posts_list.adapter = ConcatAdapter(adTop, adapter)
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
                 layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(topicTag, orderBy).collectLatest {
+                adapter.submitData(it)
             }
         }
 
@@ -132,15 +154,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             )
         }
 
-        viewModel.adResult.observe(viewLifecycleOwner, {
-            getDatas()
-        })
-
-        viewModel.getAd()
     }
-
-
-    override fun initSettings() {}
 
     private fun loginPageToggle(isLogin: Boolean) {
         Timber.i("loginPageToggle= $isLogin")
@@ -153,17 +167,12 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         }
     }
 
-    private fun getDatas(){
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            viewModel.posts(topicTag, orderBy).collectLatest {
-                adapter.submitData(it)
-            }
-        }
-    }
-
     override fun onResume() {
         super.onResume()
+
+        if( !layout_refresh.isRefreshing  && adapter.snapshot().items.isEmpty()){
+            adapter.refresh()
+        }
     }
 
     private val postListener = object : MyPostListener {

@@ -7,13 +7,17 @@ import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
+import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
+import com.dabenxiang.mimi.view.club.pages.ClubItemMediator
+import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_CODE
 import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_GAP
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 class TopicListViewModel : ClubViewModel() {
 
@@ -23,77 +27,52 @@ class TopicListViewModel : ClubViewModel() {
     private val _deleteFavorites = MutableLiveData<Int>()
     val deleteFavorites: LiveData<Int> = _deleteFavorites
 
-    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(tag: String, orderBy: OrderBy) = flowOf(
-            clearListCh.receiveAsFlow().map { PagingData.empty() },
-            postItems(tag, orderBy)
+    fun posts(pageCode: String, tag: String, orderBy: OrderBy) = postItems(pageCode, tag, orderBy).cachedIn(viewModelScope)
 
-    ).flattenMerge(2).buffer().cachedIn(viewModelScope)
-
-    private fun postItems(tag: String, orderBy: OrderBy) = Pager(
+    private fun postItems(pageCode: String, tag: String, orderBy: OrderBy) = Pager(
             config = PagingConfig(pageSize = TopicPostMediator.PER_LIMIT),
             remoteMediator = TopicPostMediator(
                     mimiDB,
                     pagingCallback,
                     domainManager,
+                    pageCode,
                     tag,
                     orderBy,
                     adWidth,
                     adHeight
             )
     ) {
-        mimiDB.postDBItemDao().pagingSourceByPageCode( TopicPostMediator::class.simpleName+tag+orderBy.toString())
+        mimiDB.postDBItemDao().pagingSourceByPageCode(pageCode)
     }.flow.map { pagingData->
+        val adItems = (mimiDB.postDBItemDao().getPostDBItemsByTime(AD_CODE) as ArrayList<MemberPostWithPostDBItem>)
         pagingData.map {
             it
         }.insertSeparators{ before, after->
-                if(after!=null &&  after.postDBItem.index.rem(AD_GAP) == 0 ){
-                    val adItem = MemberPostWithPostDBItem(after.postDBItem, after.memberPostItem)
-                    adItem.apply {
-                        postDBItem.id = (1024..1024*10).random().toLong()
-                        postDBItem.postType = PostType.AD
-                        postDBItem.timestamp = after.postDBItem.timestamp-1
-                        memberPostItem = MemberPostItem(type = PostType.AD, adItem = adResult.value)
-                    }
-                }else {
-                    null
-                }
+            if(before!=null && before.postDBItem.index >= ClubItemMediator.AD_GAP && before.postDBItem.index.rem(
+                    ClubItemMediator.AD_GAP) == 0 ){
+                getAdItem(adItems, before)
+            }else {
+                null
             }
+        }
     }
 
+    fun clearDAItems(pageCode:String){
+        viewModelScope.launch {
+            mimiDB.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
+                Timber.i("ClubItemMediator delete id=$id ")
+                mimiDB.postDBItemDao().getPostDBItems(id).takeIf {
+                    it.isNullOrEmpty() || it.size <=1
+                }?.let {
+                    Timber.i("ClubItemMediator deleteMemberPostItem=$it ")
+                    mimiDB.postDBItemDao().deleteMemberPostItem(id)
+                }
+            }
+        }
 
-//    fun getData(adapter:TopicListAdapter, tag: String, orderBy: OrderBy) {
-//
-//        Timber.i("getData")
-//        CoroutineScope(Dispatchers.IO).launch {
-//            adapter.submitData(PagingData.empty())
-//            getPostItemList(tag, orderBy)
-//                    .collectLatest {
-//                        adapter.submitData(it)
-//                    }
-//        }
-//    }
-//
-//    private fun getPostItemList(tag: String, orderBy: OrderBy): Flow<PagingData<MemberPostItem>> {
-//        return Pager(
-//                config = PagingConfig(pageSize = TopicPostDataSource.PER_LIMIT.toInt()),
-//                pagingSourceFactory = {
-//                    TopicPostDataSource(
-//                            pagingCallback,
-//                            domainManager,
-//                            tag,
-//                            orderBy,
-//                            adWidth,
-//                            adHeight
-//                    )
-//                }
-//        )
-//                .flow
-//                .onStart {  setShowProgress(true) }
-//                .onCompletion { setShowProgress(false) }
-//                .cachedIn(viewModelScope)
-//    }
+    }
+
 
 }

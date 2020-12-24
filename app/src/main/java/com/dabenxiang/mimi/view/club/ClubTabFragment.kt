@@ -180,7 +180,7 @@ class ClubTabFragment : BaseFragment() {
             }
 
         })
-        if(viewModel.currentTab == -1)  view.club_tabs.getTabAt(DEFAULT_TAB)?.select()
+        if(viewModel.currentTab == -1) view.club_tabs.getTabAt(DEFAULT_TAB)?.select()
 
         view.topic_tabs.adapter = topicListAdapter
 

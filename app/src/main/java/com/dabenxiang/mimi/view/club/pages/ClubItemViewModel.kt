@@ -39,7 +39,6 @@ class ClubItemViewModel : ClubViewModel() {
 
     }.flow.map { pagingData->
         val adItems = (mimiDB.postDBItemDao().getPostDBItemsByTime(getAdCode(type)) as ArrayList<MemberPostWithPostDBItem>)
-        Timber.i("adPostItem adItems =$adItems")
         pagingData.map {
             it
         }.insertSeparators{ before, after->
@@ -60,26 +59,6 @@ class ClubItemViewModel : ClubViewModel() {
             ClubTabItemType.PICTURE -> "image"
             ClubTabItemType.NOVEL -> "text"
         }
-    }
-
-    private fun getAdItem(adItems: ArrayList<MemberPostWithPostDBItem>, before:MemberPostWithPostDBItem): MemberPostWithPostDBItem? {
-        return if (adItems.isEmpty()) {
-            val adItem = MemberPostItem(id= (1..2147483647).random().toLong(),
-                type = PostType.AD, adItem = AdItem()
-            )
-
-            val postDBItem =PostDBItem(
-                id= adItem.id,
-                postDBId =  adItem.id,
-                postType = PostType.AD,
-                timestamp = before.postDBItem.timestamp + 1,
-                pageCode = before.postDBItem.pageCode,
-                index = 0
-            )
-            MemberPostWithPostDBItem(postDBItem, adItem)
-
-        }
-        else adItems.removeFirst()
     }
 
 }

@@ -15,8 +15,11 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.db.MiMiDB
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
@@ -243,6 +246,26 @@ abstract class ClubViewModel : BaseViewModel(){
         override fun onTotalCount(count: Long) {
             _postCount.postValue(count.toInt())
         }
+    }
+
+    fun getAdItem(adItems: ArrayList<MemberPostWithPostDBItem>, before: MemberPostWithPostDBItem): MemberPostWithPostDBItem? {
+        return if (adItems.isEmpty()) {
+            val adItem = MemberPostItem(id= (1..2147483647).random().toLong(),
+                type = PostType.AD, adItem = AdItem()
+            )
+
+            val postDBItem = PostDBItem(
+                id= adItem.id,
+                postDBId =  adItem.id,
+                postType = PostType.AD,
+                timestamp = before.postDBItem.timestamp + 1,
+                pageCode = before.postDBItem.pageCode,
+                index = 0
+            )
+            MemberPostWithPostDBItem(postDBItem, adItem)
+
+        }
+        else adItems.removeFirst()
     }
 
 }

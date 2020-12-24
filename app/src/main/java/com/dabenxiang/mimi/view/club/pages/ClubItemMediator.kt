@@ -29,10 +29,10 @@ class ClubItemMediator(
 ) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
-        const val PER_LIMIT = 10
+        const val PER_LIMIT = 20
         const val AD_GAP: Int = 5
     }
-    private val pageName = ClubItemMediator::class.simpleName+ type.toString()
+    private val pageCode = ClubItemMediator::class.simpleName+ type.toString()
 
     override suspend fun load(
             loadType: LoadType,
@@ -41,20 +41,20 @@ class ClubItemMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
-                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, 0))
+                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
                     null
                 }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
-                        database.remoteKeyDao().remoteKeyByPageCode(pageName)
+                        database.remoteKeyDao().remoteKeyByPageCode(pageCode)
                     }
                     remoteKey.offset
 
                 }
             }?.toInt() ?: 0
 
-            Timber.i("ClubItemMediator pageName=$pageName offset=$offset")
+            Timber.i("ClubItemMediator pageName=$pageCode offset=$offset")
 
             val result =
                     when (type) {
@@ -115,25 +115,31 @@ class ClubItemMediator(
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
-                    database.postDBItemDao().deleteItemByPageCode(pageName)
+                    database.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
+                        database.postDBItemDao().getPostDBItems(id).takeIf {
+                            it.isNullOrEmpty() || it.size <=1
+                        }?.let {
+                            database.postDBItemDao().deleteMemberPostItem(id)
+                        }
+
+                    }
+                    database.postDBItemDao().deleteItemByPageCode(pageCode)
                     database.postDBItemDao().deleteItemByPageCode(adCode)
-                    database.remoteKeyDao().deleteByPageCode(pageName)
+                    database.remoteKeyDao().deleteByPageCode(pageCode)
                 }
                 val nextKey = if (hasNext) offset + PER_LIMIT else null
 
-                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageName, nextKey?.toLong()))
-                database.postDBItemDao().insertMemberPostItemAll(adItems)
+                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
                 memberPostItems?.let {
                     val postDBItems = it.mapIndexed { index, item ->
-                        val oldItem = database.postDBItemDao().getPostDBItem(pageName, item.id)
+                        val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
 
                         when(oldItem) {
                             null->  PostDBItem(
-                                    id= item.id,
                                     postDBId = item.id,
                                     postType = item.type,
-                                    pageCode= pageName,
+                                    pageCode= pageCode,
                                     timestamp = System.nanoTime(),
                                     index = offset+index
 
@@ -153,7 +159,6 @@ class ClubItemMediator(
                 adItems?.let {
                     val adDBItems = it.mapIndexed { index, item ->
                         PostDBItem(
-                            id= item.id,
                             postDBId = item.id,
                             postType = item.type,
                             pageCode= adCode,
@@ -166,7 +171,7 @@ class ClubItemMediator(
                 }
             }
 
-            return MediatorResult.Success(endOfPaginationReached = hasNext)
+            return MediatorResult.Success(endOfPaginationReached = !hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {

@@ -158,6 +158,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
                         mimiDB.postDBItemDao().getPostDBItems(item.id)?.forEach { postItem ->
+                            mimiDB.postDBItemDao().deleteMemberPostItem(postItem.id)
                             mimiDB.postDBItemDao().deleteItem(postItem.id)
                         }
                     }

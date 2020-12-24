@@ -3,18 +3,25 @@ package com.dabenxiang.mimi.view.club.topic_detail
 import androidx.paging.*
 import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.db.*
 import com.dabenxiang.mimi.model.enums.OrderBy
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.club.pages.ClubItemMediator
+import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_CODE
+import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_GAP
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.IOException
+import kotlin.math.ceil
 
 @OptIn(ExperimentalPagingApi::class)
 class TopicPostMediator(
     private val database: MiMiDB,
     private val pagingCallback: PagingCallback,
     private val domainManager: DomainManager,
+    private val pageCode: String,
     private val tag: String,
     private val orderBy: OrderBy,
     private val adWidth: Int,
@@ -24,7 +31,6 @@ class TopicPostMediator(
     companion object {
         const val PER_LIMIT = 20
     }
-    private val pageCode= TopicPostMediator::class.simpleName + tag + orderBy.toString()
 
     override suspend fun load(
         loadType: LoadType,
@@ -32,20 +38,18 @@ class TopicPostMediator(
     ): MediatorResult {
         try {
             val offset = when (loadType) {
-                LoadType.REFRESH -> {
-                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
-                    null
-                }
+                LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByPageCode(pageCode)
                     }
-                    remoteKey.offset
+
+                    remoteKey?.offset ?:0
 
                 }
             }?.toInt() ?: 0
-
+            Timber.i("TopicPostMediator pageCode=$pageCode offset=$offset ")
             val result = domainManager.getApiRepository().getMembersPost(
                     offset, PER_LIMIT, tag, orderBy.value
             )
@@ -53,48 +57,72 @@ class TopicPostMediator(
             val body = result.body()
             val memberPostItems = body?.content
 
-            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
-
-            database.withTransaction {
-                if(loadType == LoadType.REFRESH){
-                    database.postDBItemDao().deleteItemByPageCode(pageCode)
-                    database.remoteKeyDao().deleteByPageCode(pageCode)
-                }
-
-                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode,
-                    result.body()?.paging?.offset ?: 0 + ClubItemMediator.PER_LIMIT.toLong()))
-                memberPostItems?.let {
-                    val postDBItems = it.mapIndexed() { index, item ->
-                        val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
-                        if(oldItem == null) {
-                            PostDBItem(
-                                postDBId = item.id,
-                                postType = item.type,
-                                pageCode= pageCode,
-                                timestamp = System.nanoTime(),
-                                index =index
-                            )
-                        }else{
-                            oldItem.postDBId = item.id
-                            oldItem.timestamp = System.nanoTime()
-                            oldItem.index =index
-                            oldItem
-                        }
-
-
-                    }
-                    database.postDBItemDao().insertMemberPostItemAll(it)
-                    database.postDBItemDao().insertAll(postDBItems)
-                }
-
-            }
-
+            Timber.i("TopicPostMediator pageCode=$pageCode memberPostItems=$memberPostItems ")
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
                 result.body()?.paging?.offset ?: 0,
                 memberPostItems?.size ?: 0
             )
-            return MediatorResult.Success(endOfPaginationReached = hasNext)
+
+            Timber.i("hasNext =$hasNext")
+            val nextKey = if (hasNext) offset + ClubItemMediator.PER_LIMIT else null
+
+            val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / AD_GAP).toInt()
+            val adItems = domainManager.getAdRepository().getAD(AD_CODE, adWidth, adHeight, adCount)
+                .body()?.content?.get(0)?.ad?.map {
+                    MemberPostItem(id= (1..2147483647).random().toLong(), type = PostType.AD, adItem = it)
+                }?: arrayListOf()
+
+            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
+
+            database.withTransaction {
+                if(loadType == LoadType.REFRESH){
+                    database.postDBItemDao().deleteItemByPageCode(pageCode)
+                    database.postDBItemDao().deleteItemByPageCode(AD_CODE)
+                    database.remoteKeyDao().deleteByPageCode(pageCode)
+                }
+
+                database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
+
+                memberPostItems?.let {
+                    val postDBItems = it.mapIndexed { index, item ->
+                        val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
+                        when(oldItem) {
+                            null->  PostDBItem(
+                                postDBId = item.id,
+                                postType = item.type,
+                                pageCode= pageCode,
+                                timestamp = System.nanoTime(),
+                                index = offset+index
+
+                            )
+                            else-> {
+                                oldItem.postDBId = item.id
+                                oldItem.timestamp = System.nanoTime()
+                                oldItem.index = offset+index
+                                oldItem
+                            }
+                        }
+                    }
+                    database.postDBItemDao().insertMemberPostItemAll(it)
+                    database.postDBItemDao().insertAll(postDBItems)
+                }
+            }
+
+            adItems?.let {
+                val adDBItems = it.mapIndexed { index, item ->
+                    PostDBItem(
+                        postDBId = item.id,
+                        postType = item.type,
+                        pageCode= AD_CODE,
+                        timestamp = System.nanoTime(),
+                        index = index
+                    )
+                }
+                database.postDBItemDao().insertMemberPostItemAll(it)
+                database.postDBItemDao().insertAll(adDBItems)
+            }
+            return MediatorResult.Success(endOfPaginationReached = !hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {
@@ -104,7 +132,7 @@ class TopicPostMediator(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
-            currentSize < ClubItemMediator.PER_LIMIT -> false
+            currentSize < PER_LIMIT -> false
             offset >= total -> false
             else -> true
         }
