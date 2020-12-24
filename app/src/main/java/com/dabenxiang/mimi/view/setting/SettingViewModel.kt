@@ -132,6 +132,19 @@ class SettingViewModel : BaseViewModel() {
         }
     }
 
+    fun deleteAttachment(id: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().deleteAttachment(id)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { }
+        }
+    }
+
     fun putAvatar(id: Long) {
         viewModelScope.launch {
             flow {

@@ -47,6 +47,8 @@ class SettingFragment : BaseFragment() {
 
     val file: File = FileUtil.getAvatarFile()
 
+    private var avatarId: Long? = null
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -80,6 +82,8 @@ class SettingFragment : BaseFragment() {
                             iv_photo,
                             LoadImageType.AVATAR
                     )
+
+                    avatarId = viewModel.profileData?.avatarAttachmentId
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -125,6 +129,10 @@ class SettingFragment : BaseFragment() {
                 is Loaded -> progressHUD?.dismiss()
                 is Success -> {
                     viewModel.loadImage(it.result, iv_photo, LoadImageType.AVATAR)
+
+                    avatarId?.let {
+                        viewModel.deleteAttachment(it.toString())
+                    }
                 }
                 is Error -> onApiError(it.throwable)
             }
