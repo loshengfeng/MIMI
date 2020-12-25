@@ -58,7 +58,7 @@ class MoreDialogFragment : BaseDialogFragment() {
         }
 
         if (isFromPostPage) {
-            if (!isLogin) {
+            if (!isLogin || isReport || !deducted) {
                 tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             } else {
                 tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
