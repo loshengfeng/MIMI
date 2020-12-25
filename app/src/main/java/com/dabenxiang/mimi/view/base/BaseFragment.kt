@@ -40,7 +40,6 @@ import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_PIC
@@ -273,7 +272,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.uploadCoverItem?.observe(viewLifecycleOwner, Observer {
+        mainViewModel?.coverExtResult?.observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 return@Observer
             }
@@ -289,7 +288,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postCoverResult?.observe(viewLifecycleOwner, {
+        mainViewModel?.postCoverResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     picParameter.id = it.result.toString()
@@ -310,7 +309,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.postVideoResult?.observe(viewLifecycleOwner, {
+        mainViewModel?.postVideoResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
                     arguments?.let { bundle ->
@@ -320,18 +319,15 @@ abstract class BaseFragment : Fragment() {
                             videoParameter.id = it.result.toString()
                             videoParameter.length = uploadVideoList[0].length
 
-                            val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
-
                             val mediaItem = MediaItem()
                             mediaItem.picParameter.add(picParameter)
                             mediaItem.videoParameter = videoParameter
                             mediaItem.textContent = postMemberRequest.content
                             val content = Gson().toJson(mediaItem)
                             memberPostItem.content = content
-                            postMemberRequest.title = memberRequest!!.title
                             Timber.d("Post video content item : $content")
                             mainViewModel?.clearLiveDataValue()
-                            mainViewModel?.postPicOrVideo(request = postMemberRequest, content = content, type = HomeViewModel.TYPE_VIDEO)
+                            mainViewModel?.postVideoClub(postClubItem = postClubItem, content = content, type = HomeViewModel.TYPE_VIDEO)
 
                             postType = PostType.VIDEO
                         } else {
@@ -342,8 +338,6 @@ abstract class BaseFragment : Fragment() {
                             videoParameter.id = uploadVideoList[0].videoAttachmentId
                             videoParameter.length = uploadVideoList[0].length
 
-                            val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
-
                             val picParameter = PicParameter(
                                 id = uploadVideoList[0].picAttachmentId,
                                 ext = uploadVideoList[0].ext
@@ -353,16 +347,14 @@ abstract class BaseFragment : Fragment() {
                             mediaItem.picParameter.add(picParameter)
                             mediaItem.videoParameter = videoParameter
                             mediaItem.textContent = postMemberRequest.content
+
                             val content = Gson().toJson(mediaItem)
-                            postMemberRequest.type = memberRequest!!.type
-                            postMemberRequest.title = memberRequest.title
-                            postMemberRequest.content = content
-                            postMemberRequest.tags = memberRequest.tags
                             memberPostItem.content = content
+
                             Timber.d("Post id : $postId")
-                            Timber.d("Request : $postMemberRequest")
                             Timber.d("Post video content item : $content")
-                            mainViewModel?.postPicOrVideo(postId!!, postMemberRequest, content, HomeViewModel.TYPE_VIDEO)
+
+                            mainViewModel?.postVideoClub(postClubItem = postClubItem, content = content, type = HomeViewModel.TYPE_VIDEO)
                         }
                     }
                 }
@@ -401,7 +393,7 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        mainViewModel?.uploadVideoParameter?.observe(viewLifecycleOwner, {
+        mainViewModel?.videoExtResult?.observe(viewLifecycleOwner, {
             videoParameter.ext = it
         })
     }
@@ -476,18 +468,17 @@ abstract class BaseFragment : Fragment() {
 
     private fun uploadVideoFlow(bundle: Bundle) {
         setPostTpe(PostType.VIDEO)
-
-        val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
-
-        deleteVideoItem =
-            bundle.getParcelableArrayList(BasePostFragment.DELETE_ATTACHMENT)!!
-        uploadVideoList = bundle.getParcelableArrayList(BasePostFragment.VIDEO_DATA)!!
+        
         postId = bundle.getLong(BasePostFragment.POST_ID, 0)
+        val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
+        postClubItem = bundle.getSerializable(POST_DATA) as PostClubItem
+        uploadVideoList = postClubItem.uploadVideo
+        deleteVideoItem = postClubItem.deleteVideo
 
-        if (postId.toInt() == 0) {
-            postVideoCoverAttachment(memberRequest!!)
+        if (data == null) {
+            postVideoCoverAttachment()
         } else {
-            updateVideoPost(memberRequest!!)
+            updateVideoPost()
         }
     }
 
@@ -539,17 +530,14 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    private fun postVideoCoverAttachment(memberRequest: PostMemberRequest) {
-        postMemberRequest = memberRequest
-        memberPostItem.title = memberRequest.title
-        memberPostItem.tags = memberRequest.tags
-        mainViewModel?.postAttachment(
-            uploadVideoList[0].picUrl, requireContext(),
-            HomeViewModel.TYPE_COVER
-        )
+    private fun postVideoCoverAttachment() {
+        memberPostItem.title = postClubItem.title
+        memberPostItem.tags = postClubItem.tags
+
+        mainViewModel?.postCoverAttachment(uploadVideoList[0].picUrl, requireContext())
     }
 
-    private fun updateVideoPost(memberRequest: PostMemberRequest) {
+    private fun updateVideoPost() {
         if (uploadVideoList[0].picAttachmentId.isBlank()) {
             mainViewModel?.postAttachment(
                 uploadVideoList[0].picUrl, requireContext(),
@@ -568,7 +556,6 @@ abstract class BaseFragment : Fragment() {
                 ext = uploadVideoList[0].ext
             )
 
-            mediaItem.textContent = memberRequest.content
             mediaItem.videoParameter = videoParameter
             mediaItem.picParameter.add(picParameter)
 
@@ -576,7 +563,7 @@ abstract class BaseFragment : Fragment() {
             memberPostItem.content = content
             Timber.d("Post video content item : $content")
 
-            mainViewModel?.postPicOrVideo(postId, memberRequest, content, HomeViewModel.TYPE_VIDEO)
+            mainViewModel?.postVideoClub(postId, postClubItem, content, HomeViewModel.TYPE_VIDEO)
         }
     }
 
@@ -806,11 +793,7 @@ abstract class BaseFragment : Fragment() {
             object : PostManager.VideoCompressListener {
                 override fun onSuccess() {
                     uploadVideoList[0].videoUrl = outPutPath
-                    mainViewModel?.postAttachment(
-                        uploadVideoList[0].videoUrl,
-                        requireContext(),
-                        HomeViewModel.TYPE_VIDEO
-                    )
+                    mainViewModel?.postVideoAttachment(uploadVideoList[0].videoUrl)
                 }
 
                 override fun onFail() {

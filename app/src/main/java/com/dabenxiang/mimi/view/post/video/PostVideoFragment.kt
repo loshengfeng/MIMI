@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.callback.PostVideoItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostClubItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
@@ -134,16 +135,15 @@ class PostVideoFragment : BasePostFragment() {
             }
         }
 
-        val request = getRequest(title, PostType.VIDEO.value)
-
         setVideoTime()
+
+        val postClubItem = PostClubItem(title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList)
 
         val bundle = Bundle()
         bundle.putString(POST_TYPE, VIDEO)
-        bundle.putParcelable(MEMBER_REQUEST, request)
-        bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
-        bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
+//        bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
         bundle.putLong(POST_ID, postId)
+        bundle.putSerializable(POST_DATA, postClubItem)
 
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem

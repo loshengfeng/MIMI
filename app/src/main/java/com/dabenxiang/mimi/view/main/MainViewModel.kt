@@ -75,11 +75,11 @@ class MainViewModel : BaseViewModel() {
     private val _picExtResult = MutableLiveData<PicParameter>()
     val picExtResult: LiveData<PicParameter> = _picExtResult
 
-    private val _uploadCoverItem = MutableLiveData<PicParameter>()
-    val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
+    private val _coverExtResult = MutableLiveData<PicParameter>()
+    val coverExtResult: LiveData<PicParameter> = _coverExtResult
 
-    private val _uploadVideoParameter = MutableLiveData<String>()
-    val uploadVideoParameter: LiveData<String> = _uploadVideoParameter
+    private val _videoExtResult = MutableLiveData<String>()
+    val videoExtResult: LiveData<String> = _videoExtResult
 
     private val _postPicResult = MutableLiveData<ApiResult<Long>>()
     val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
@@ -438,26 +438,15 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun postPicAttachment(localPath: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(context = job) {
             flow {
-                var realPath = localPath
-                val fileNameSplit = localPath.split("/")
-                val fileName = fileNameSplit.last()
-                val extSplit = fileName.split(".")
-                val ext = "." + extSplit.last()
+                val fileName = getFileName(localPath)
+                val ext = getFileExt(fileName)
 
                 val picParameter = PicParameter(ext = ext) //Set extension
                 _picExtResult.postValue(picParameter)
 
-                val file = File(realPath)
-                if (file.length() >= 5242880) {
-                    val tempFile = FileUtil.getTakePhoto( "temp.jpg")
-                    file.copyTo(tempFile, true)
-                    val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
-                    FileUtil.saveBitmapToJpegFile(bitmap, bitmap.width, bitmap.height, destPath = tempFile.absolutePath)
-
-                    realPath = tempFile.absolutePath
-                }
+                val realPath = getPicCompressPath(localPath)
 
                 Timber.d("Upload pic path : $realPath")
                 Timber.d("Upload pic ext : $ext")
@@ -475,6 +464,92 @@ class MainViewModel : BaseViewModel() {
                 .collect {
                     _postPicResult.postValue(it)
                 }
+        }
+    }
+
+    fun postCoverAttachment(localPath: String, context: Context) {
+        viewModelScope.launch(context = job) {
+            flow {
+                var realPath = UriUtils.getPath(context, Uri.parse(localPath))
+                val fileName = getFileName(localPath)
+                val ext = getFileExt(fileName)
+
+                val picParameter = PicParameter(ext = ext) //Set extension
+                _coverExtResult.postValue(picParameter)
+
+                realPath = getPicCompressPath(realPath!!)
+
+                Timber.d("Upload cover path : $realPath")
+                Timber.d("Upload cover ext : $ext")
+
+                val result = domainManager.getApiRepository().postAttachment(
+                    File(realPath),
+                    fileName = URLEncoder.encode(fileName, "UTF-8")
+                )
+
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    _postCoverResult.postValue(it)
+                }
+        }
+    }
+
+    fun postVideoAttachment(localPath: String) {
+        viewModelScope.launch(context = job) {
+            flow {
+                val fileName = getFileName(localPath)
+                val ext = getFileExt(fileName)
+
+                _videoExtResult.postValue(ext)
+                val mmr = MediaMetadataRetriever()
+                mmr.setDataSource(localPath)
+                val mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+
+                Timber.d("Upload video path : $localPath")
+                Timber.d("Upload video ext : $ext")
+
+                val result = domainManager.getApiRepository().postAttachment(
+                    File(localPath),
+                    fileName = URLEncoder.encode(fileName, "UTF-8"),
+                    type = mime!!
+                )
+
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(result.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    _postVideoResult.postValue(it)
+                }
+        }
+    }
+
+    private fun getFileName(path: String): String {
+        val fileNameSplit = path.split("/")
+        return fileNameSplit.last()
+    }
+
+    private fun getFileExt(fileName: String): String {
+        val extSplit = fileName.split(".")
+        return "." + extSplit.last()
+    }
+
+    private fun getPicCompressPath(path: String): String {
+        val file = File(path)
+        return if (file.length() >= 5242880) {
+            val tempFile = FileUtil.getTakePhoto( "temp.jpg")
+            file.copyTo(tempFile, true)
+            val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
+            FileUtil.saveBitmapToJpegFile(bitmap, bitmap.width, bitmap.height, destPath = tempFile.absolutePath)
+
+            tempFile.absolutePath
+        } else {
+            path
         }
     }
 
@@ -499,10 +574,10 @@ class MainViewModel : BaseViewModel() {
                     }
                     HomeViewModel.TYPE_COVER -> {
                         val picParameter = PicParameter(ext = ext) //Set extension
-                        _uploadCoverItem.postValue(picParameter)
+                        _coverExtResult.postValue(picParameter)
                     }
                     HomeViewModel.TYPE_VIDEO -> {
-                        _uploadVideoParameter.postValue(ext)
+                        _videoExtResult.postValue(ext)
                         val mmr = MediaMetadataRetriever()
                         mmr.setDataSource(realPath)
                         mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
@@ -579,6 +654,34 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun postVideoClub(id: Long = 0, postClubItem: PostClubItem, content: String, type: String) {
+        viewModelScope.launch(context = job) {
+            flow {
+                val request = PostMemberRequest(postClubItem.title, content, PostType.VIDEO.value, tags = postClubItem.tags)
+
+                request.content = content
+                Timber.d("Post member request : $request")
+
+                if (id.toInt() == 0) {
+                    val resp = domainManager.getApiRepository().postMembersPost(request)
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(resp.body()?.content))
+                } else {
+                    val resp = domainManager.getApiRepository().updatePost(id, request)
+                    if (!resp.isSuccessful) throw HttpException(resp)
+                    emit(ApiResult.success(id))
+                }
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    _postVideoMemberResult.value = it
+                }
+        }
+    }
+
     fun postPicOrVideo(id: Long = 0, request: PostMemberRequest, content: String, type: String) {
         viewModelScope.launch(context = job) {
             flow {
@@ -647,7 +750,7 @@ class MainViewModel : BaseViewModel() {
         _postCoverResult.value = null
         _postVideoResult.value = null
         _picExtResult.value = null
-        _uploadCoverItem.value = null
+        _coverExtResult.value = null
         _postVideoMemberResult.value = null
         _postPicMemberResult.value = null
     }
