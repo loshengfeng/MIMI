@@ -12,6 +12,9 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 object CryptUtils {
+    external fun cEncrypt(str: String?): String?
+    external fun cDecrypt(str: String?): String?
+    external fun cIsVerify(): Boolean
 
     private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 

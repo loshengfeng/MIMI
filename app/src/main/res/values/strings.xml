@@ -619,4 +619,5 @@
     <string name="show_more"> 显示更多</string>
     <string name="small_video">小视频</string>
     <string name="actor">女优</string>
+    <string name="device_not_support">不支援此装置</string>
 </resources>

@@ -8,7 +8,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
+import android.content.pm.Signature
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.SpannableString
@@ -50,6 +53,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.security.MessageDigest
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -460,4 +464,32 @@ object GeneralUtils {
     fun getMaxCount(count: Int): Int {
         return if (count > 1000) 999 else count
     }
+
+    @SuppressLint("PackageManagerGetSignatures")
+    fun getApplicationSignature(packageName: String = App.self.packageName): List<Signature> {
+
+        val signatureList: List<Signature>
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val sig = App.self.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo
+                signatureList = if (sig.hasMultipleSigners()) {
+                    sig.apkContentsSigners.map { it }
+                } else {
+                    sig.signingCertificateHistory.map {
+                       it
+                    }
+                }
+            } else {
+                val sig = App.self.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
+                signatureList = sig.map {it}
+            }
+
+            return signatureList
+        } catch (e: Exception) {
+           Timber.i("getApplicationSignature failed :$e")
+        }
+        return emptyList()
+    }
+
+
 }

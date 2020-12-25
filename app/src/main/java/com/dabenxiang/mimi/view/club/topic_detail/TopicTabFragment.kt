@@ -132,13 +132,15 @@ class TopicTabFragment : BaseFragment() {
 
     private fun setupUI(item:MemberClubItem) {
         Timber.i("MemberClubItem =$topicItem")
+        val isUpdateSetUp =this::memberClubItem.isInitialized
+
         memberClubItem = item
         memberClubItem?.let{item->
             tv_title.text = item.title
             tv_desc.text = item.description
 
             tv_desc.post {
-                if (tv_desc.lineCount > 1) {
+                if (!isUpdateSetUp && tv_desc.lineCount > 1) {
                     val params = toolbar_layout.layoutParams
                     params.height = toolbar_layout.height +tv_desc.height/2
                     toolbar_layout.layoutParams = params

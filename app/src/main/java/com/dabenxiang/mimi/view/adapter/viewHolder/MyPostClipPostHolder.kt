@@ -107,7 +107,7 @@ class MyPostClipPostHolder(
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
+            if (it == searchTag || it == searchStr) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
             else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
                 myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
