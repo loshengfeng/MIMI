@@ -114,15 +114,11 @@ class PostPicFragment : BasePostFragment() {
             }
         }
 
-        val request = getRequest(title, PostType.IMAGE.value)
 
-        val postClubItem = PostClubItem(title = title, tags = getTags(), uploadPics = adapter.getData())
+        val postClubItem = PostClubItem(title = title, tags = getTags(), uploadPics = adapter.getData(), deletePics = deletePicList)
 
         val bundle = Bundle()
         bundle.putString(POST_TYPE, PIC)
-//        bundle.putParcelable(MEMBER_REQUEST, request)
-        bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
-        bundle.putLong(POST_ID, postId)
         bundle.putSerializable(POST_DATA, postClubItem)
 
         if (isEdit && page == MY_POST) {

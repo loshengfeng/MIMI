@@ -41,7 +41,6 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
-import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PIC_URI
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_PIC
@@ -205,6 +204,7 @@ abstract class BaseFragment : Fragment() {
                             )
                         }
                     } else {
+                        data as MemberPostItem
                         uploadPicList[uploadCurrentPicPosition].id = it.result.toString()
                         uploadCurrentPicPosition += 1
 
@@ -219,9 +219,9 @@ abstract class BaseFragment : Fragment() {
 
                             memberPostItem.content = content
 
-                            val postId = arguments?.getLong(BasePostFragment.POST_ID)
                             mainViewModel?.clearLiveDataValue()
-                            mainViewModel?.postPicOrVideo(postId!!, postMemberRequest, content, HomeViewModel.TYPE_PIC)
+                            mainViewModel?.postPicClub(data.id, postClubItem = postClubItem, content = content, type = HomeViewModel.TYPE_PIC)
+
                         } else {
                             val pic = uploadPicList[uploadCurrentPicPosition]
                             mainViewModel?.clearPicResultValue()
@@ -468,7 +468,7 @@ abstract class BaseFragment : Fragment() {
         val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
 
         if (data != null) {
-            updatePicPostAttachment(bundle, data)
+            updatePicPostAttachment(data)
         } else {
             handelNewPicPostAttachment(postClubItem)
         }
@@ -501,13 +501,9 @@ abstract class BaseFragment : Fragment() {
         memberPostItem.tags = postClubItem.tags
     }
 
-    private fun updatePicPostAttachment(
-        bundle: Bundle,
-        data: Serializable
-    ) {
-        deletePicList = bundle.getStringArrayList(BasePostFragment.DELETE_ATTACHMENT)!! // Delete pic attachment list
+    private fun updatePicPostAttachment(data: Serializable) {
+        deletePicList = postClubItem.deletePics
         memberPostItem = data as MemberPostItem
-        postId = bundle.getLong(BasePostFragment.POST_ID)
 
         for (pic in postClubItem.uploadPics) {
             if (pic.attachmentId.isBlank()) {
@@ -539,7 +535,7 @@ abstract class BaseFragment : Fragment() {
             memberPostItem.content = content
             Timber.d("Post pic content item : $content")
 
-            mainViewModel?.postPicClub(postId, postClubItem, content, HomeViewModel.TYPE_PIC)
+            mainViewModel?.postPicClub(memberPostItem.id, postClubItem, content, HomeViewModel.TYPE_PIC)
         }
     }
 
@@ -801,8 +797,6 @@ abstract class BaseFragment : Fragment() {
         memberPostItem.content = content
         mainViewModel?.clearLiveDataValue()
         mainViewModel?.postPicClub(postClubItem = postClubItem, content = content, type = HomeViewModel.TYPE_PIC)
-
-//        mainViewModel?.postPicOrVideo(request = postMemberRequest, content = content, type = HomeViewModel.TYPE_PIC)
     }
 
     private fun compressVideoAndUpload(realPath: String, outPutPath: String) {

@@ -7,5 +7,6 @@ data class PostClubItem(
     val title: String = "",
     val request: String = "",
     val tags: ArrayList<String> = arrayListOf(),
-    val uploadPics: ArrayList<PostAttachmentItem> = arrayListOf()
+    val uploadPics: ArrayList<PostAttachmentItem> = arrayListOf(),
+    val deletePics: ArrayList<String> = arrayListOf()
 ): Serializable
