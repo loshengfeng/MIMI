@@ -170,11 +170,14 @@
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
         <action
-            android:id="@+id/action_to_clubTextFragment"
+            android:id="@+id/action_myPostFragment_to_clubTextFragment"
             app:destination="@id/clubTextFragment" />
         <action
-            android:id="@+id/action_to_clubPicFragment"
+            android:id="@+id/action_myPostFragment_to_clubPicFragment"
             app:destination="@id/clubPicFragment" />
+        <action
+            android:id="@+id/action_myPostFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
     </fragment>
 
     <fragment

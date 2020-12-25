@@ -210,33 +210,35 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
         }
 
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = ClubPicFragment.createBundle(item, 1)
-                    navigateTo(
+            checkStatus {
+                when (adultTabType) {
+                    AdultTabType.PICTURE -> {
+                        val bundle = ClubPicFragment.createBundle(item, 1)
+                        navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_to_clubPicFragment,
-                                    bundle
+                                R.id.action_to_clubPicFragment,
+                                bundle
                             )
-                    )
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = ClubTextFragment.createBundle(item, 1)
-                    navigateTo(
+                        )
+                    }
+                    AdultTabType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item, 1)
+                        navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_to_clubTextFragment,
-                                    bundle
+                                R.id.action_to_clubTextFragment,
+                                bundle
                             )
-                    )
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipPlayerFragment.createBundle(item.id, 1)
-                    navigateTo(
+                        )
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
+                        navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_to_clipPlayerFragment,
-                                    bundle
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
                             )
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -299,7 +301,7 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
             Timber.i("TopicListFragment onMoreClick")
-            onMoreClick(item, position) {
+            onMoreClick(item, position, isFromPostPage = true) {
 
                 val searchPostItem = arguments?.getSerializable(KEY_DATA)
 
@@ -337,35 +339,37 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             Timber.d("onItemClick =${adultTabType}, ${item.likeType}")
-            when (adultTabType) {
-                AdultTabType.TEXT -> {
-                    val bundle = ClubTextFragment.createBundle(item)
-                    navigateTo(
+            checkStatus {
+                when (adultTabType) {
+                    AdultTabType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item)
+                        navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_to_clubTextFragment,
-                                    bundle
+                                R.id.action_to_clubTextFragment,
+                                bundle
                             )
-                    )
-                }
-                AdultTabType.PICTURE -> {
-                    val bundle = ClubPicFragment.createBundle(item)
-                    navigateTo(
+                        )
+                    }
+                    AdultTabType.PICTURE -> {
+                        val bundle = ClubPicFragment.createBundle(item)
+                        navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_to_clubPicFragment,
-                                    bundle
+                                R.id.action_to_clubPicFragment,
+                                bundle
                             )
-                    )
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipPlayerFragment.createBundle(item.id)
-                    navigateTo(
+                        )
+                    }
+                    AdultTabType.CLIP -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id)
+                        navigateTo(
                             NavigateItem.Destination(
-                                    R.id.action_to_clipPlayerFragment,
-                                    bundle
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
                             )
-                    )
-                }
-                else -> {
+                        )
+                    }
+                    else -> {
+                    }
                 }
             }
         }

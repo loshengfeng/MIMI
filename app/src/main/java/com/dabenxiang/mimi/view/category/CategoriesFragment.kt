@@ -257,8 +257,8 @@ class CategoriesFragment : BaseFragment() {
             }
         adapter.submitList(list, initSelectIndex)
         updateFirstTab(initSelectIndex == null)
-
         lstFilterRV[index].adapter = adapter
+        lstFilterRV[index].scrollToPosition(initSelectIndex ?: 0)
     }
 
     private fun getVideos() {

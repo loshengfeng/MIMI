@@ -84,9 +84,7 @@ class PictureAdapter(
                 }
             }
 
-            isNotLogin.visibility = if(position==0 || accountManager.isLogin()) View.GONE else{
-                View.VISIBLE
-            }
+            isNotLogin.visibility = if(position==0 || accountManager.isLogin()) View.GONE else View.VISIBLE
 
             picture.setOnClickListener {
                 onItemClickListener.onItemClick()
