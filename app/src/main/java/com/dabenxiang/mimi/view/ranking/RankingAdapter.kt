@@ -86,7 +86,9 @@ class RankingAdapter(
 
             val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
             contentItem.images?.also { images ->
-                if (!TextUtils.isEmpty(images[0].url)) {
+                if (images.isEmpty()) {
+                    return@also
+                } else if (!TextUtils.isEmpty(images[0].url)) {
                     Glide.with(picture.context)
                         .load(images[0].url).placeholder(R.drawable.img_nopic_03)
                         .into(picture)
