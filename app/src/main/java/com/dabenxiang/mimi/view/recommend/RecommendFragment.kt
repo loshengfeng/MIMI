@@ -217,18 +217,18 @@ class RecommendFragment : BaseFragment() {
     private fun showInfoLayout(type: Int) {
         when(type) {
             INFO_TYPE_LOADING -> {
-                tv_info.text = getString(R.string.load_video)
-                btn_retry.visibility = View.GONE
+                tv_info?.text = getString(R.string.load_video)
+                btn_retry?.visibility = View.GONE
             }
             INFO_TYPE_EMPTY -> {
-                tv_info.text = getString(R.string.empty_video)
-                btn_retry.visibility = View.GONE
+                tv_info?.text = getString(R.string.empty_video)
+                btn_retry?.visibility = View.GONE
             }
             else -> {
-                tv_info.text = getString(R.string.error_server)
-                btn_retry.visibility = View.VISIBLE
+                tv_info?.text = getString(R.string.error_server)
+                btn_retry?.visibility = View.VISIBLE
             }
         }
-        layout_info.visibility = View.VISIBLE
+        layout_info?.visibility = View.VISIBLE
     }
 }
