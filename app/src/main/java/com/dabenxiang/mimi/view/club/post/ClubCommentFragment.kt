@@ -31,6 +31,7 @@ import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.android.synthetic.main.fragment_club_comment.*
 
 class ClubCommentFragment : BaseFragment() {
@@ -132,6 +133,11 @@ class ClubCommentFragment : BaseFragment() {
 
                         memberPostItem?.commentCount =
                             memberPostItem?.commentCount?.let { count -> count + 1 } ?: run { 1 }
+
+                        LruCacheUtils.getShortVideoCount(memberPostItem?.id ?: 0)?.run {
+                            this.commentCount = this.commentCount?.let { count -> count + 1 } ?: 1
+                            LruCacheUtils.putShortVideoDataCache(this.id, this)
+                        }
 
                         if (isParent) {
                             memberPostItem?.also { memberPostItem ->

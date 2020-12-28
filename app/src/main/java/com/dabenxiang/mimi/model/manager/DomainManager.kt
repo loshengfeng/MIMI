@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.model.manager
 import antiblock.Antiblock
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.model.api.AdRepository
 import com.dabenxiang.mimi.model.api.AdService
 import com.dabenxiang.mimi.model.api.ApiRepository
@@ -16,6 +17,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
+import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClient) {
 
@@ -165,6 +167,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
     private fun fetchDomainItem(): DomainOutputListItem {
         val domainInputItem =
             DomainInputItem(
+                if(BuildConfig.DEBUG) 1 else 7,
                 MIMI_PROJECT_ID,
                 App.applicationContext().filesDir.path,
                 GeneralUtils.getLibEnv()
@@ -173,7 +176,13 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         val input = gson.toJson(domainInputItem)
         Timber.i("mimi getDomains input: $input")
 
-        val output = Antiblock.getDomains(input)
+        val output = try {
+            Antiblock.getDomains(input)
+        }catch (e:Exception){
+            Timber.i("getDomains Exception: $e")
+            SendLogManager.e( PROJECT_NAME, "getDomains Exception: $e")
+            null
+        }
         Timber.i("mimi getDomains output: $output")
 
         return if (output.isNullOrEmpty()) {
