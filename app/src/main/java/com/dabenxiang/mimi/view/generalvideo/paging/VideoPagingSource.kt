@@ -28,12 +28,8 @@ class VideoPagingSource(
 
             val result = domainManager.getApiRepository()
                 .statisticsHomeVideos(
-                    startTime = "",
-                    endTime = "",
                     orderByType = orderByType,
                     category = category,
-                    offset = 0,
-                    limit = NETWORK_PAGE_SIZE,
                     lastId = lastId
                 )
             if (!result.isSuccessful) throw HttpException(result)

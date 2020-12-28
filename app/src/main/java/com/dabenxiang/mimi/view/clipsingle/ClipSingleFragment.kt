@@ -24,6 +24,7 @@ import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -362,6 +363,8 @@ class ClipSingleFragment : BaseFragment() {
             }
 
             override fun onUpdateCommentCount(count: Int) {
+                playItem?.commentCount = count
+                playItem?.run { LruCacheUtils.putShortVideoDataCache(this.id, this)}
                 tv_comment.text = count.toString()
             }
         }
@@ -386,7 +389,7 @@ class ClipSingleFragment : BaseFragment() {
         Timber.i("id=$id")
         Timber.i("isReported=$isReported")
         moreDialog = MoreDialogFragment.newInstance(
-            MemberPostItem(id = id, type = type, reported = isReported),
+            MemberPostItem(id = id, type = type, reported = isReported, deducted = true), //recharge_reminder will show when deducted is false
             onMoreDialogListener,
             isComment
         ).also {

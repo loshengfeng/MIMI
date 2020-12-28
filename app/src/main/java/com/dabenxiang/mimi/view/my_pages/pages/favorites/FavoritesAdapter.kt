@@ -113,6 +113,7 @@ class FavoritesAdapter(
             item = changedItem
         }
         item?.also {
+            it.deducted = true //Just use reported for MoreDialog in favorite Post
             when (holder) {
                 is AdHolder->{
                     Glide.with(context).load(item.adItem?.href).into(holder.adImg)

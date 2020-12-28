@@ -38,6 +38,8 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             return chain.proceed(chain.request())
         }
 
+        val requestBody = request.body
+
         val hasMemberToken = checkHasMemberToken(url.toString())
         if (hasMemberToken) {
             when (accountManager.getMemberTokenResult()) {

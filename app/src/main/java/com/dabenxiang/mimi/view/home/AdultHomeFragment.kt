@@ -27,7 +27,6 @@ import com.dabenxiang.mimi.model.enums.CategoryType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.*
-import com.dabenxiang.mimi.view.category.CategoryVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter.Companion.PAYLOAD_UPDATE_FOLLOW
@@ -189,7 +188,7 @@ class AdultHomeFragment : BaseFragment() {
         })
 
         viewModel.videoList.observe(this, {
-            videoListAdapter.submitList(it)
+//            videoListAdapter.submitList(it)
 //            videoListAdapter.notifyDataSetChanged()
         })
 
@@ -566,7 +565,7 @@ class AdultHomeFragment : BaseFragment() {
                 takeIf { rv_video.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_video.layoutManager = GridLayoutManager(requireContext(), 2)
-                    rv_video.adapter = videoListAdapter
+//                    rv_video.adapter = videoListAdapter
                 }
                 viewModel.getVideos(null, true)
             }
@@ -736,7 +735,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val videoListAdapter by lazy {
-        CategoryVideoListAdapter(adapterListener)
+        //CategoryVideoListAdapter(adapterListener)
     }
 
     private val adultListener = object : AdultListener {

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -37,13 +38,20 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mimi_home.MiMiFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
+import com.dabenxiang.mimi.widget.utility.CryptUtils
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getApplicationSignature
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.lang.reflect.Method
 import java.util.*
+import kotlin.system.exitProcess
 
 class MainActivity : BaseActivity() {
 
@@ -66,6 +74,12 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // check it's emulator and we want to block them.
+        if (GeneralUtils.isProbablyRunningOnEmulator())
+            exitProcess(0);
+
+        checkValidApp()
 
         setupBottomNavigationBar()
 
@@ -137,6 +151,11 @@ class MainActivity : BaseActivity() {
         viewModel.isStatusBardDark.observe(this, { setupStatusBar(it) })
 
         viewModel.getTotalUnread()
+    }
+
+    private fun checkValidApp() {
+        Timber.i("checkValidApp = ${CryptUtils.cIsVerify()} ")
+
     }
 
     override fun onResume() {

@@ -196,7 +196,7 @@ class SearchVideoViewHolder(
                 .inflate(R.layout.chip_item, reflowGroup, false) as Chip
             chip.text = tag
 
-            if (tag == data?.searchingTag) {
+            if (tag == data?.searchingTag || tag == data?.searchingStr) {
                 chip.setTextColor(chip.context.getColor(R.color.color_red_1))
             } else {
                 chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))

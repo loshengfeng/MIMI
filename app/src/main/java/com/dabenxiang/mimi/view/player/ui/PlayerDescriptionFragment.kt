@@ -8,6 +8,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.setNot
@@ -166,11 +168,17 @@ class PlayerDescriptionFragment : BaseFragment() {
             )
         }
 
-        descriptionViewModel.getAdResult.observe(viewLifecycleOwner) {
+        mainViewModel?.getAdResult?.observe(viewLifecycleOwner) {
             when (it) {
                 is ApiResult.Success -> {
+                    val options = RequestOptions()
+                        .priority(Priority.NORMAL)
+                        .placeholder(R.drawable.img_ad)
+                        .error(R.drawable.img_ad)
+                        .fitCenter()
                     Glide.with(this)
                         .load(it.result.href)
+                        .apply(options)
                         .into(iv_ad)
 
                     iv_ad.setOnClickListener { view ->

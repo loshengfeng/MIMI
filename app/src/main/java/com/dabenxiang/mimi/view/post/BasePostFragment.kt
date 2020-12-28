@@ -37,6 +37,7 @@ import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 
 open class BasePostFragment : BaseFragment() {
 
@@ -240,6 +241,7 @@ open class BasePostFragment : BaseFragment() {
         haveMainTag = true
 
         setUI(contentItem, item)
+        enableHastEditText()
     }
 
     open fun setUI(item: MediaItem, memberPostItem: MemberPostItem ) {
@@ -264,6 +266,7 @@ open class BasePostFragment : BaseFragment() {
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
                 setTagCount()
+                enableHastEditText()
             }
         } else {
             viewModel.getClub(tag)

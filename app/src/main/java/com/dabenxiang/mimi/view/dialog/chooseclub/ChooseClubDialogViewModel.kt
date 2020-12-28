@@ -7,14 +7,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import timber.log.Timber
 
 class ChooseClubDialogViewModel : BaseViewModel() {
 
-    private val _postList = MutableLiveData<PagedList<Any>>()
-    val postList: LiveData<PagedList<Any>> = _postList
+    private val _clubList = MutableLiveData<ArrayList<MemberClubItem>>()
+    val clubList: LiveData<ArrayList<MemberClubItem>> = _clubList
 
     private val _loadingStatus = MutableLiveData<Boolean>()
     val loadingStatus: LiveData<Boolean> = _loadingStatus
@@ -24,41 +29,21 @@ class ChooseClubDialogViewModel : BaseViewModel() {
 
     fun getClubList() {
         viewModelScope.launch {
-            val dataSrc = ChooseClubDataSource(
-                viewModelScope,
-                domainManager,
-                pagingCallback
-            )
-            dataSrc.isInvalid
+            flow {
+                val resp = domainManager.getApiRepository().getMembersClub(
+                    ""
+                )
+                if (!resp.isSuccessful) throw HttpException(resp)
+                val item = resp.body()
+                val clubItems = item?.content
 
-            val factory = ChooseClubFactory(dataSrc)
-            val config = PagedList.Config.Builder()
-                .setPageSize(ChooseClubDataSource.PER_LIMIT.toInt())
-                .build()
-
-            LivePagedListBuilder(factory, config).build().asFlow()
-                .collect { _postList.postValue(it) }
-        }
-    }
-
-    private val pagingCallback = object : PagingCallback {
-        override fun onLoading() {
-            _loadingStatus.value = true
-        }
-
-        override fun onLoaded() {
-            _loadingStatus.value = false
-        }
-
-        override fun onSucceed() {
-
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-        }
-
-        override fun onTotalCount(count: Long) {
-            _totalCount.postValue(count)
+                emit(clubItems)
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { _loadingStatus.value = true }
+                .catch { e -> Timber.d("e: $e") }
+                .onCompletion {  _loadingStatus.value = false }
+                .collect { _clubList.value = it }
         }
     }
 }

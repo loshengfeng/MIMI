@@ -109,11 +109,7 @@ class ClubTabFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_tab_club
     override fun setupObservers() {
         mainViewModel?.isShowSnackBar?.observe(viewLifecycleOwner, {
-            if (it) {
-                iv_post.isEnabled = false
-            } else {
-                iv_post.isEnabled = true
-            }
+            iv_post.isEnabled = !it
         })
     }
     override fun setupListeners() {

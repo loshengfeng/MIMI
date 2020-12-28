@@ -13,7 +13,7 @@ class AdRepository(private val adService: AdService) {
     }
 
     suspend fun getAD(code: String, width: Int, height: Int, count: Int = 1): Response<ApiBaseItem<ArrayList<BlockAdItem>>> {
-        return adService.getAD(code, width, height, count)
+        return adService.getAD(code, width * 2, height * 2, count)
     }
 
     /**

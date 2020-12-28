@@ -8,7 +8,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
+import android.content.pm.Signature
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.SpannableString
@@ -47,9 +50,8 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
-import java.io.File
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.*
+import java.lang.reflect.Method
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -459,5 +461,85 @@ object GeneralUtils {
 
     fun getMaxCount(count: Int): Int {
         return if (count > 1000) 999 else count
+    }
+
+    @SuppressLint("PackageManagerGetSignatures")
+    fun getApplicationSignature(packageName: String = App.self.packageName): List<Signature> {
+
+        val signatureList: List<Signature>
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val sig = App.self.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo
+                signatureList = if (sig.hasMultipleSigners()) {
+                    sig.apkContentsSigners.map { it }
+                } else {
+                    sig.signingCertificateHistory.map {
+                       it
+                    }
+                }
+            } else {
+                val sig = App.self.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
+                signatureList = sig.map {it}
+            }
+
+            return signatureList
+        } catch (e: Exception) {
+           Timber.i("getApplicationSignature failed :$e")
+        }
+        return emptyList()
+    }
+
+    /**
+     * Check this device is emulator
+     */
+    fun isProbablyRunningOnEmulator(): Boolean {
+        // Android SDK emulator
+        return ((Build.FINGERPRINT.startsWith("google/sdk_gphone_")
+                && Build.FINGERPRINT.endsWith(":user/release-keys")
+                && Build.MANUFACTURER == "Google" && Build.PRODUCT.startsWith("sdk_gphone_") && Build.BRAND == "google"
+                && Build.MODEL.startsWith("sdk_gphone_"))
+                //
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                //bluestacks
+                || "QC_Reference_Phone" == Build.BOARD && !"Xiaomi".equals(Build.MANUFACTURER, ignoreCase = true) //bluestacks
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.HOST.startsWith("Build") //MSI App Player
+                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.PRODUCT == "google_sdk"
+                // another Android SDK emulator check
+                || SystemProperties.getProp("ro.kernel.qemu") == "1")
+    }
+
+    object SystemProperties {
+        private var failedUsingReflection = false
+        private var getPropMethod: Method? = null
+
+        @SuppressLint("PrivateApi")
+        fun getProp(propName: String, defaultResult: String = ""): String {
+            if (!failedUsingReflection) try {
+                if (getPropMethod == null) {
+                    val clazz = Class.forName("android.os.SystemProperties")
+                    getPropMethod = clazz.getMethod("get", String::class.java, String::class.java)
+                }
+                return getPropMethod!!.invoke(null, propName, defaultResult) as String? ?: defaultResult
+            } catch (e: Exception) {
+                getPropMethod = null
+                failedUsingReflection = true
+            }
+            var process: Process? = null
+            try {
+                process = Runtime.getRuntime().exec("getprop \"$propName\" \"$defaultResult\"")
+                val reader = BufferedReader(InputStreamReader(process.inputStream))
+                return reader.readLine()
+            } catch (e: IOException) {
+            } finally {
+                process?.destroy()
+            }
+            return defaultResult
+        }
     }
 }
