@@ -121,6 +121,7 @@ class PostVideoFragment : BasePostFragment() {
         val title = edt_title.text.toString()
         var searchPostItem: SearchPostItem? = null
         var memberClubItem: MemberClubItem? =null
+        var memberPostItem: MemberPostItem? = null
 
         arguments?.let {
             isEdit = it.getBoolean(MyPostFragment.EDIT, false)
@@ -133,14 +134,17 @@ class PostVideoFragment : BasePostFragment() {
                     memberClubItem = data
                 }
             }
+
+            if (it.containsKey(MyPostFragment.MEMBER_DATA)) {
+                memberPostItem = it.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            }
         }
 
         setVideoTime()
 
-        val postClubItem = PostClubItem(type = PostType.VIDEO.value, title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList)
+        val postClubItem = PostClubItem(type = PostType.VIDEO.value, title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList, memberPostItem = memberPostItem)
 
         val bundle = Bundle()
-//        bundle.putLong(POST_ID, postId)
         bundle.putSerializable(POST_DATA, postClubItem)
 
         if (isEdit && page == MY_POST) {
@@ -173,8 +177,6 @@ class PostVideoFragment : BasePostFragment() {
                 bundle
             )
         } else if (isEdit && page == TAB) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
         } else {
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)

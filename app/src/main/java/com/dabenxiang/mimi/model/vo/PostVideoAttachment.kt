@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.model.vo
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
 @Parcelize
 data class PostVideoAttachment (
@@ -11,4 +12,4 @@ data class PostVideoAttachment (
     var videoUrl: String = "",
     var ext: String = "",
     var length: String = ""
-) : Parcelable
+) : Parcelable, Serializable

@@ -100,6 +100,7 @@ class PostPicFragment : BasePostFragment() {
         var page = ""
         var searchPostItem: SearchPostItem? = null
         var memberClubItem: MemberClubItem? =null
+        var memberPostItem: MemberPostItem? = null
 
         arguments?.let {
             isEdit = it.getBoolean(MyPostFragment.EDIT, false)
@@ -112,10 +113,13 @@ class PostPicFragment : BasePostFragment() {
                     memberClubItem = data
                 }
             }
+
+            if (it.containsKey(MyPostFragment.MEMBER_DATA)) {
+                memberPostItem = it.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            }
         }
 
-
-        val postClubItem = PostClubItem(type = PostType.IMAGE.value, title = title, tags = getTags(), uploadPics = adapter.getData(), deletePics = deletePicList)
+        val postClubItem = PostClubItem(type = PostType.IMAGE.value, title = title, tags = getTags(), uploadPics = adapter.getData(), deletePics = deletePicList, memberPostItem = memberPostItem)
 
         val bundle = Bundle()
         bundle.putSerializable(POST_DATA, postClubItem)
@@ -135,8 +139,6 @@ class PostPicFragment : BasePostFragment() {
             bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
             findNavController().navigate(R.id.action_postPicFragment_to_topicDetailFragment, bundle)
         } else if (isEdit && page == TAB) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         } else if (isEdit && page == PIC) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem

@@ -626,7 +626,7 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun postPicClub(id: Long = 0, postClubItem: PostClubItem, content: String, type: String) {
+    fun postPicClub(postClubItem: PostClubItem, content: String) {
         viewModelScope.launch(context = job) {
             flow {
                 val request = PostMemberRequest(postClubItem.title, content, PostType.IMAGE.value, tags = postClubItem.tags)
@@ -634,14 +634,14 @@ class MainViewModel : BaseViewModel() {
                 request.content = content
                 Timber.d("Post member request : $request")
 
-                if (id.toInt() == 0) {
+                if (postClubItem.memberPostItem == null) {
                     val resp = domainManager.getApiRepository().postMembersPost(request)
                     if (!resp.isSuccessful) throw HttpException(resp)
                     emit(ApiResult.success(resp.body()?.content))
                 } else {
-                    val resp = domainManager.getApiRepository().updatePost(id, request)
+                    val resp = domainManager.getApiRepository().updatePost(postClubItem.memberPostItem.id, request)
                     if (!resp.isSuccessful) throw HttpException(resp)
-                    emit(ApiResult.success(id))
+                    emit(ApiResult.success(postClubItem.memberPostItem.id))
                 }
             }
                 .flowOn(Dispatchers.IO)
@@ -654,7 +654,7 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun postVideoClub(id: Long = 0, postClubItem: PostClubItem, content: String, type: String) {
+    fun postVideoClub(postClubItem: PostClubItem, content: String) {
         viewModelScope.launch(context = job) {
             flow {
                 val request = PostMemberRequest(postClubItem.title, content, PostType.VIDEO.value, tags = postClubItem.tags)
@@ -662,14 +662,14 @@ class MainViewModel : BaseViewModel() {
                 request.content = content
                 Timber.d("Post member request : $request")
 
-                if (id.toInt() == 0) {
+                if (postClubItem.memberPostItem == null) {
                     val resp = domainManager.getApiRepository().postMembersPost(request)
                     if (!resp.isSuccessful) throw HttpException(resp)
                     emit(ApiResult.success(resp.body()?.content))
                 } else {
-                    val resp = domainManager.getApiRepository().updatePost(id, request)
+                    val resp = domainManager.getApiRepository().updatePost(postClubItem.memberPostItem.id, request)
                     if (!resp.isSuccessful) throw HttpException(resp)
-                    emit(ApiResult.success(id))
+                    emit(ApiResult.success(postClubItem.memberPostItem.id))
                 }
             }
                 .flowOn(Dispatchers.IO)
