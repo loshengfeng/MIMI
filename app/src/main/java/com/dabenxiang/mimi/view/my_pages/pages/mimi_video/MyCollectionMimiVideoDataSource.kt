@@ -6,6 +6,7 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.DomainManager
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import timber.log.Timber
@@ -40,6 +41,10 @@ class MyCollectionMimiVideoDataSource(
 
             val body = result?.body()
             val memberPostItems = body?.content
+
+            memberPostItems?.forEach {
+                LruCacheUtils.putShortVideoDataCache(it.id, it)
+            }
 
             val hasNext = hasNextPage(
                     result?.body()?.paging?.count ?: 0,
