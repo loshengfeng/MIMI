@@ -85,15 +85,7 @@ class ClubPicDetailAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is AdHolder -> {
-                mAdItem?.also { item ->
-                    val options = RequestOptions()
-                        .priority(Priority.NORMAL)
-                        .error(R.drawable.img_ad)
-                    Glide.with(context).load(item.href).apply(options).into(holder.adImg)
-                    holder.adImg.setOnClickListener {
-                        onPictureDetailListener.onOpenWebView(item.target)
-                    }
-                }
+                holder.onBind(mAdItem?: AdItem())
             }
             is PictureDetailViewHolder -> {
                 val contentItem =

@@ -424,9 +424,19 @@ class ApiRepository(private val apiService: ApiService) {
         isAdult: Boolean = true,
         offset: String,
         limit: String,
-        tag: String?= null,
+        tag: String? = null,
         type: VideoType? = null
-    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag, type?.value)
+    ) = apiService.searchHomeVideos(
+        category,
+        q,
+        country,
+        years,
+        isAdult,
+        offset,
+        limit,
+        tag,
+        type?.value
+    )
 
     /**
      * 取得小视频影片(需Client Credentials|需登入帳號)
@@ -476,17 +486,17 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        startTime: String = "",
-        endTime: String = "",
+        startTime: String? = null,
+        endTime: String? = null,
         orderByType: Int = StatisticsOrderType.HOTTEST.value,
-        category: String? = "",
-        tags: String? = "",
+        category: String? = null,
+        tags: String? = null,
         isAdult: Boolean = true,
-        isRandom: Boolean = false,
-        offset: Int,
-        limit: Int,
+        isRandom: Boolean? = null,
+        offset: Int? = null,
+        limit: Int? = null,
         lastId: Long = 0L,
-        excludeId: String = "",
+        excludeId: String? = null,
         type: PostType = PostType.VIDEO_ON_DEMAND
     ) = apiService.statisticsHomeVideos(
         startTime = startTime,
