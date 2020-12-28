@@ -144,15 +144,7 @@ class MainActivity : BaseActivity() {
 
     private fun checkValidApp() {
         Timber.i("checkValidApp = ${CryptUtils.cIsVerify()} ")
-//        val signatures =getApplicationSignature()
-//        signatures.forEach {
-//            Timber.i("checkValidApp signatures=${signatures[0].toCharsString()}")
-//        }
-//        val signaturesEncrypt = CryptUtils.cEncrypt(signatures[0].toCharsString())
-//        Timber.i("checkValidApp signaturesEncrypt=${signaturesEncrypt}")
-//
-//        val signaturesDecrypt = CryptUtils.cDecrypt(signaturesEncrypt)
-//        Timber.i("checkValidApp signaturesDecrypt=${signaturesDecrypt}")
+
     }
 
     override fun onResume() {
