@@ -336,8 +336,8 @@ class ApiRepository(private val apiService: ApiService) {
 
     suspend fun getMembersClub(
         tag: String,
-        offset: Int?,
-        limit: Int?
+        offset: Int?=null,
+        limit: Int?=null
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
         Timber.i("ClubTabFragment getMembersClub")
         return apiService.getMembersClub(tag, offset, limit)
