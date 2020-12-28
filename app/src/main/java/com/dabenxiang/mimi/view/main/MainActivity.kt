@@ -37,8 +37,10 @@ import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mimi_home.MiMiFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
+import com.dabenxiang.mimi.widget.utility.CryptUtils
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getApplicationSignature
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -66,6 +68,7 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkValidApp()
 
         setupBottomNavigationBar()
 
@@ -137,6 +140,19 @@ class MainActivity : BaseActivity() {
         viewModel.isStatusBardDark.observe(this, { setupStatusBar(it) })
 
         viewModel.getTotalUnread()
+    }
+
+    private fun checkValidApp() {
+        Timber.i("checkValidApp = ${CryptUtils.cIsVerify()} ")
+//        val signatures =getApplicationSignature()
+//        signatures.forEach {
+//            Timber.i("checkValidApp signatures=${signatures[0].toCharsString()}")
+//        }
+//        val signaturesEncrypt = CryptUtils.cEncrypt(signatures[0].toCharsString())
+//        Timber.i("checkValidApp signaturesEncrypt=${signaturesEncrypt}")
+//
+//        val signaturesDecrypt = CryptUtils.cDecrypt(signaturesEncrypt)
+//        Timber.i("checkValidApp signaturesDecrypt=${signaturesDecrypt}")
     }
 
     override fun onResume() {
