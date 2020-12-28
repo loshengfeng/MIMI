@@ -137,12 +137,10 @@ class PostVideoFragment : BasePostFragment() {
 
         setVideoTime()
 
-        val postClubItem = PostClubItem(title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList)
+        val postClubItem = PostClubItem(type = PostType.VIDEO.value, title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList)
 
         val bundle = Bundle()
-        bundle.putString(POST_TYPE, VIDEO)
-//        bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
-        bundle.putLong(POST_ID, postId)
+//        bundle.putLong(POST_ID, postId)
         bundle.putSerializable(POST_DATA, postClubItem)
 
         if (isEdit && page == MY_POST) {

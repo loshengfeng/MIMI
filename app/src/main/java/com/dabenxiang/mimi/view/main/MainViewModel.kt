@@ -409,7 +409,7 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun postArticle(postClubItem: PostClubItem, item: MemberPostItem) {
+    fun postArticle(postClubItem: PostClubItem) {
         viewModelScope.launch {
             flow {
                 val request = PostMemberRequest(
@@ -419,14 +419,14 @@ class MainViewModel : BaseViewModel() {
                     tags = postClubItem.tags
                 )
 
-                if (item.id.toInt() == 0) {
+                if (postClubItem.memberPostItem == null) {
                     val resp = domainManager.getApiRepository().postMembersPost(request)
                     if (!resp.isSuccessful) throw HttpException(resp)
                     emit(ApiResult.success(resp.body()?.content))
                 } else {
-                    val resp = domainManager.getApiRepository().updatePost(item.id, request)
+                    val resp = domainManager.getApiRepository().updatePost(postClubItem.memberPostItem.id, request)
                     if (!resp.isSuccessful) throw HttpException(resp)
-                    emit(ApiResult.success(item.id))
+                    emit(ApiResult.success(postClubItem.memberPostItem.id))
                 }
             }
                 .flowOn(Dispatchers.IO)

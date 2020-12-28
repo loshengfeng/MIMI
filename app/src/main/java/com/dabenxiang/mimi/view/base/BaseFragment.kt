@@ -42,9 +42,6 @@ import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
-import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_PIC
-import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_TEXT
-import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.TYPE_VIDEO
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.dabenxiang.mimi.widget.utility.UriUtils
@@ -421,42 +418,35 @@ abstract class BaseFragment : Fragment() {
         postType = type
     }
 
-    private fun combinationDataAndPostText(bundle: Bundle) {
-        val postClubItem = bundle.getSerializable(POST_DATA) as PostClubItem
-        val memberData = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
-
-        if (memberData != null) { //If update novel
-            memberPostItem = memberData as MemberPostItem
-        }
-
+    private fun combinationDataAndPostText() {
         memberPostItem.title = postClubItem.title
         memberPostItem.content = postClubItem.request
         memberPostItem.tags = postClubItem.tags
 
-        mainViewModel?.postArticle(postClubItem, memberPostItem)
+        mainViewModel?.postArticle(postClubItem)
     }
 
     fun handlePostClub() {
         arguments?.let {
-            when (it.getString(POST_TYPE)) {
-                TYPE_TEXT -> {
-                    setPostTpe(PostType.TEXT)
-                    combinationDataAndPostText(it)
-                }
-                TYPE_PIC -> uploadPicFlow(it)
-                TYPE_VIDEO -> uploadVideoFlow(it)
-                else -> {
+            if (it.containsKey(POST_DATA)) {
+                postClubItem = it.getSerializable(POST_DATA) as PostClubItem
+                setPostTpe(PostType.getTypeByValue(postClubItem.type))
 
+                when (postClubItem.type) {
+                    PostType.TEXT.value -> combinationDataAndPostText()
+                    PostType.IMAGE.value -> uploadPicFlow(it)
+                    PostType.VIDEO.value -> uploadVideoFlow(it)
+                    else -> {
+
+                    }
                 }
+
+                it.remove(POST_DATA)
             }
         }
     }
 
     private fun uploadPicFlow(bundle: Bundle) {
-        setPostTpe(PostType.IMAGE)
-
-        postClubItem = bundle.getSerializable(POST_DATA) as PostClubItem
-
         val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
 
         if (data != null) {
@@ -467,11 +457,7 @@ abstract class BaseFragment : Fragment() {
     }
 
     private fun uploadVideoFlow(bundle: Bundle) {
-        setPostTpe(PostType.VIDEO)
-        
-        postId = bundle.getLong(BasePostFragment.POST_ID, 0)
         val data = bundle.getSerializable(MyPostFragment.MEMBER_DATA)
-        postClubItem = bundle.getSerializable(POST_DATA) as PostClubItem
         uploadVideoList = postClubItem.uploadVideo
         deleteVideoItem = postClubItem.deleteVideo
 

@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
@@ -97,6 +98,7 @@ class PostArticleFragment : BasePostFragment() {
         var page = ""
         var searchPostItem: SearchPostItem? = null
         var memberClubItem: MemberClubItem? = null
+        var memberPostItem: MemberPostItem? = null
 
         arguments?.let {
             isEdit = it.getBoolean(EDIT, false)
@@ -109,12 +111,15 @@ class PostArticleFragment : BasePostFragment() {
                     memberClubItem = data
                 }
             }
+
+            if (it.containsKey(MEMBER_DATA)) {
+                memberPostItem = it.getSerializable(MEMBER_DATA) as MemberPostItem
+            }
         }
 
-        val postClubItem = PostClubItem(title, request, getTags())
+        val postClubItem = PostClubItem(PostType.TEXT.value, title, request, getTags(), memberPostItem = memberPostItem)
 
         val bundle = Bundle()
-        bundle.putString(POST_TYPE, TEXT)
         bundle.putSerializable(POST_DATA, postClubItem)
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
@@ -131,8 +136,6 @@ class PostArticleFragment : BasePostFragment() {
             bundle.putSerializable(KEY_DATA, memberClubItem)
             findNavController().navigate(R.id.action_postArticleFragment_to_topicDetailFragment, bundle)
         } else if (isEdit && page == TAB) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         } else if (isEdit && page == TEXT) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem

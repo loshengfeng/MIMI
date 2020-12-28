@@ -57,15 +57,8 @@ open class BasePostFragment : BaseFragment() {
         private const val HASHTAG_LIMIT = 20
         private const val INIT_VALUE = 0
 
-        const val TAG = "tag"
-        const val REQUEST = "request"
-        const val TITLE = "title"
         const val POST_ID = "post_id"
         const val BUNDLE_PIC_URI = "bundle_pic_uri"
-        const val MEMBER_REQUEST = "member_request"
-        const val PIC_URI = "pic_uri"
-        const val DELETE_ATTACHMENT = "delete_attachment"
-        const val VIDEO_DATA = "video_data"
         const val BUNDLE_TRIMMER_URI = "bundle_trimmer_uri"
         const val BUNDLE_COVER_URI = "bundle_cover_uri"
         const val PAGE = "page"
