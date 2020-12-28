@@ -173,7 +173,9 @@ class PlayerDescriptionFragment : BaseFragment() {
                 is ApiResult.Success -> {
                     val options = RequestOptions()
                         .priority(Priority.NORMAL)
+                        .placeholder(R.drawable.img_ad)
                         .error(R.drawable.img_ad)
+                        .fitCenter()
                     Glide.with(this)
                         .load(it.result.href)
                         .apply(options)

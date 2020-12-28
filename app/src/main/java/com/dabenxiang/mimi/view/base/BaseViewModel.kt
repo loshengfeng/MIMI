@@ -33,6 +33,7 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.gson.Gson
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
@@ -136,12 +137,14 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     protected var _postChangedResult = MutableLiveData<ApiResult<MemberPostItem>>()
     val postChangedResult: LiveData<ApiResult<MemberPostItem>> = _postChangedResult
 
-    var postItemChangedList = MutableLiveData<HashMap<Long, MemberPostItem>>().also { it.value = HashMap() }
+    var postItemChangedList =
+        MutableLiveData<HashMap<Long, MemberPostItem>>().also { it.value = HashMap() }
 
     protected var _videoChangedResult = MutableLiveData<ApiResult<VideoItem>>()
     val videoChangedResult: LiveData<ApiResult<VideoItem>> = _videoChangedResult
 
-    var videoItemChangedList = MutableLiveData<HashMap<Long, VideoItem>>().also { it.value = HashMap() }
+    var videoItemChangedList =
+        MutableLiveData<HashMap<Long, VideoItem>>().also { it.value = HashMap() }
 
     fun deletePost(
         item: MemberPostItem,
@@ -158,7 +161,8 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
                     deletePostIdList.value?.add(item.id)
-                    _deletePostResult.value = it }
+                    _deletePostResult.value = it
+                }
         }
     }
 
@@ -171,64 +175,8 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     }
 
     fun loadImage(id: Long? = 0, view: ImageView, type: LoadImageType, filePath: String = "") {
-        val defaultResId = when (type) {
-            LoadImageType.AVATAR -> R.drawable.default_profile_picture
-            LoadImageType.AVATAR_CS -> R.drawable.icon_cs_photo
-            LoadImageType.PICTURE_THUMBNAIL -> R.drawable.img_nopic_02
-            LoadImageType.PICTURE_FULL -> R.drawable.img_nopic_03
-            LoadImageType.CLUB -> R.drawable.ico_group
-            LoadImageType.CHAT_CONTENT -> R.drawable.bg_gray_6_radius_16
-            LoadImageType.CLUB_TOPIC -> R.drawable.bg_topic_tab
-            LoadImageType.PICTURE_EMPTY -> 0
-        }
-        if ((id == null || id == 0L) && TextUtils.isEmpty(filePath)) {
-            Glide.with(view.context).load(defaultResId).into(view)
-        } else {
-            val accessToken = if (accountManager.isLogin()) {
-                pref.memberToken.accessToken
-            } else {
-                pref.publicToken.accessToken
-            }
-            val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
-            var glideUrl: GlideUrl? = null
-
-            if (TextUtils.isEmpty(filePath)) {
-                val url = "${domainManager.getApiDomain()}/v1/Attachments/$id"
-                glideUrl = GlideUrl(
-                    url,
-                    LazyHeaders.Builder()
-                        .addHeader(ApiRepository.AUTHORIZATION, auth)
-                        .addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
-                        .build()
-                )
-            }
-
-            val options = RequestOptions()
-                .priority(Priority.NORMAL)
-                .placeholder(defaultResId)
-                .error(defaultResId)
-            when (type) {
-                LoadImageType.AVATAR,
-                LoadImageType.AVATAR_CS,
-                LoadImageType.CLUB -> {
-                    options.transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                }
-                LoadImageType.PICTURE_THUMBNAIL -> {
-                    options.transform(MultiTransformation(CenterCrop()))
-                }
-                LoadImageType.PICTURE_FULL -> {
-                }
-                LoadImageType.CHAT_CONTENT -> {
-                    options.transform(CenterCrop(), RoundedCorners(16))
-                }
-
-                LoadImageType.CLUB_TOPIC -> {
-                    options.transform(CenterInside(), RoundedCorners(15))
-                }
-            }
-            Glide.with(view.context).load(glideUrl ?: filePath)
-                .apply(options)
-                .into(view)
+        viewModelScope.launch {
+            LoadImageUtils.loadImage(id, view, type, filePath)
         }
     }
 

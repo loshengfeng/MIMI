@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -45,7 +46,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.lang.reflect.Method
 import java.util.*
+import kotlin.system.exitProcess
 
 class MainActivity : BaseActivity() {
 
@@ -68,6 +74,11 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // check it's emulator and we want to block them.
+        if (GeneralUtils.isProbablyRunningOnEmulator())
+            exitProcess(0);
+
         checkValidApp()
 
         setupBottomNavigationBar()
