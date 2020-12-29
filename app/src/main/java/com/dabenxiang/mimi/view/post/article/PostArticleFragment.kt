@@ -141,9 +141,9 @@ class PostArticleFragment : BasePostFragment() {
             bundle.putSerializable(MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
         } else if (isEdit && page == FAVORITE) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postArticleFragment_to_myCollectionFragment, bundle)
+            findNavController().navigateUp()
+        } else if (isEdit && page == LIKE) {
+            findNavController().navigateUp()
         } else {
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         }

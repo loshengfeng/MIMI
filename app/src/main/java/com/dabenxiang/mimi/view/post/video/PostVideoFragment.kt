@@ -178,6 +178,12 @@ class PostVideoFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
+
+        } else if (isEdit && page == FAVORITE) {
+            findNavController().navigateUp()
+
+        } else if (isEdit && page == LIKE) {
+            findNavController().navigateUp()
         } else {
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
         }
