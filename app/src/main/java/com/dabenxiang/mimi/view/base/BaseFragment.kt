@@ -95,8 +95,6 @@ abstract class BaseFragment : Fragment() {
     private var deleteVideoItem = arrayListOf<PostVideoAttachment>()
     private var uploadVideoList = arrayListOf<PostVideoAttachment>()
 
-    private var memberPostItem = MemberPostItem()
-    private var postMemberRequest = PostMemberRequest()
     private var picParameter = PicParameter()
     private var videoParameter = VideoParameter()
     private var postClubItem = PostClubItem()
@@ -202,15 +200,13 @@ abstract class BaseFragment : Fragment() {
 
                         if (uploadCurrentPicPosition > uploadPicList.size - 1) {
                             val mediaItem = MediaItem()
-                            mediaItem.textContent = postMemberRequest.content
                             mediaItem.picParameter.addAll(picParameterList)
                             mediaItem.picParameter.addAll(uploadPicList)
 
                             val content = Gson().toJson(mediaItem)
                             Timber.d("Post pic content item : $content")
-
-                            memberPostItem.content = content
-
+                            
+                            postClubItem.request = content
                             mainViewModel?.clearLiveDataValue()
                             mainViewModel?.postPicClub(postClubItem, content)
 
@@ -310,14 +306,14 @@ abstract class BaseFragment : Fragment() {
                         val mediaItem = MediaItem()
                         mediaItem.picParameter.add(picParameter)
                         mediaItem.videoParameter = videoParameter
-                        mediaItem.textContent = postMemberRequest.content
+
                         val content = Gson().toJson(mediaItem)
-                        memberPostItem.content = content
                         Timber.d("Post video content item : $content")
+
+                        postClubItem.request = content
+
                         mainViewModel?.clearLiveDataValue()
                         mainViewModel?.postVideoClub(postClubItem, content)
-
-                        postType = PostType.VIDEO
                     } else {
                         uploadVideoList[0].videoAttachmentId = it.result.toString()
 
@@ -332,13 +328,13 @@ abstract class BaseFragment : Fragment() {
                         val mediaItem = MediaItem()
                         mediaItem.picParameter.add(picParameter)
                         mediaItem.videoParameter = videoParameter
-                        mediaItem.textContent = postMemberRequest.content
 
                         val content = Gson().toJson(mediaItem)
-                        memberPostItem.content = content
 
                         Timber.d("Post id : ${postClubItem.memberPostItem!!.id}")
                         Timber.d("Post video content item : $content")
+
+                        postClubItem.request = content
 
                         mainViewModel?.clearLiveDataValue()
                         mainViewModel?.postVideoClub(postClubItem, content)
@@ -407,14 +403,6 @@ abstract class BaseFragment : Fragment() {
         postType = type
     }
 
-    private fun combinationDataAndPostText() {
-        memberPostItem.title = postClubItem.title
-        memberPostItem.content = postClubItem.request
-        memberPostItem.tags = postClubItem.tags
-
-        mainViewModel?.postArticle(postClubItem)
-    }
-
     fun handlePostClub() {
         arguments?.let {
             if (it.containsKey(POST_DATA)) {
@@ -422,7 +410,7 @@ abstract class BaseFragment : Fragment() {
                 setPostTpe(PostType.getTypeByValue(postClubItem.type))
 
                 when (postClubItem.type) {
-                    PostType.TEXT.value -> combinationDataAndPostText()
+                    PostType.TEXT.value ->  mainViewModel?.postArticle(postClubItem)
                     PostType.IMAGE.value -> uploadPicFlow()
                     PostType.VIDEO.value -> uploadVideoFlow()
                     else -> {
@@ -448,7 +436,7 @@ abstract class BaseFragment : Fragment() {
         deleteVideoItem = postClubItem.deleteVideo
 
         if (postClubItem.memberPostItem == null) {
-            postVideoCoverAttachment()
+            mainViewModel?.postCoverAttachment(uploadVideoList[0].picUrl, requireContext())
         } else {
             updateVideoPost()
         }
@@ -459,9 +447,6 @@ abstract class BaseFragment : Fragment() {
 
         val pic = uploadPicUri[uploadCurrentPicPosition]
         mainViewModel?.postPicAttachment(pic.uri)
-
-        memberPostItem.title = postClubItem.title
-        memberPostItem.tags = postClubItem.tags
     }
 
     private fun updatePicPostAttachment() {
@@ -492,20 +477,11 @@ abstract class BaseFragment : Fragment() {
             }
 
             val content = Gson().toJson(mediaItem)
-
-            memberPostItem.title = postClubItem.title
-            memberPostItem.content = content
             Timber.d("Post pic content item : $content")
 
+            postClubItem.request = content
             mainViewModel?.postPicClub(postClubItem, content)
         }
-    }
-
-    private fun postVideoCoverAttachment() {
-        memberPostItem.title = postClubItem.title
-        memberPostItem.tags = postClubItem.tags
-
-        mainViewModel?.postCoverAttachment(uploadVideoList[0].picUrl, requireContext())
     }
 
     private fun updateVideoPost() {
@@ -530,8 +506,8 @@ abstract class BaseFragment : Fragment() {
             mediaItem.picParameter.add(picParameter)
 
             val content = Gson().toJson(mediaItem)
-            memberPostItem.content = content
             Timber.d("Post video content item : $content")
+            postClubItem.request = content
 
             mainViewModel?.postVideoClub(postClubItem, content)
         }
@@ -751,7 +727,8 @@ abstract class BaseFragment : Fragment() {
 
         val content = Gson().toJson(mediaItem)
         Timber.d("Post pic content item : $content")
-        memberPostItem.content = content
+
+        postClubItem.request = content
         mainViewModel?.clearLiveDataValue()
         mainViewModel?.postPicClub(postClubItem, content)
     }
@@ -772,7 +749,7 @@ abstract class BaseFragment : Fragment() {
             })
     }
 
-    private fun setSnackBarPostStatus(postId: Long = 0) {
+    private fun setSnackBarPostStatus(postId: Long) {
         if (snackBar == null) {
             return
         }
@@ -781,11 +758,19 @@ abstract class BaseFragment : Fragment() {
 
         PostManager().dismissSnackBar(
             snackBar!!,
-            postId,
-            memberPostItem,
-            mainViewModel,
             object : PostManager.SnackBarListener {
-                override fun onClick(memberPostItem: MemberPostItem) {
+                override fun onClick() {
+                    val profileItem = mainViewModel!!.pref.profileItem
+
+                    val memberPostItem = MemberPostItem(
+                        id = postId,
+                        title = postClubItem.title,
+                        content = postClubItem.request,
+                        tags = postClubItem.tags,
+                        creatorId = profileItem.userId,
+                        postFriendlyName = profileItem.friendlyName,
+                        avatarAttachmentId = profileItem.avatarAttachmentId
+                    )
                     postNavigation(memberPostItem)
                 }
             })

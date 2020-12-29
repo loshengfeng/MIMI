@@ -631,7 +631,6 @@ class MainViewModel : BaseViewModel() {
             flow {
                 val request = PostMemberRequest(postClubItem.title, content, PostType.IMAGE.value, tags = postClubItem.tags)
 
-                request.content = content
                 Timber.d("Post member request : $request")
 
                 if (postClubItem.memberPostItem == null) {

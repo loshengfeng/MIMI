@@ -7,7 +7,7 @@ import java.io.Serializable
 data class PostClubItem(
     val type: Int = -1,
     val title: String = "",
-    val request: String = "",
+    var request: String = "",
     val tags: ArrayList<String> = arrayListOf(),
     val uploadPics: ArrayList<PostAttachmentItem> = arrayListOf(),
     val deletePics: ArrayList<String> = arrayListOf(),
