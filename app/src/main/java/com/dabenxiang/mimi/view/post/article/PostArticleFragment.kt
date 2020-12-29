@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment
@@ -117,6 +118,12 @@ class PostArticleFragment : BasePostFragment() {
         bundle.putString(TITLE, title)
         bundle.putString(REQUEST, request)
         bundle.putStringArrayList(TAG, getTags())
+        if(isEdit){
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        }
+        mainViewModel?.uploadData?.value = bundle
+
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)
@@ -136,10 +143,11 @@ class PostArticleFragment : BasePostFragment() {
             bundle.putSerializable(MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         } else if (isEdit && page == TEXT) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(KEY_DATA, item)
-            bundle.putSerializable(MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
+//            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+//            bundle.putSerializable(KEY_DATA, item)
+//            bundle.putSerializable(MEMBER_DATA, item)
+//            findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
+            findNavController().navigateUp()
         } else if (isEdit && page == FAVORITE) {
             findNavController().navigateUp()
         } else if (isEdit && page == LIKE) {

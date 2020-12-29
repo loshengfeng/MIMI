@@ -144,6 +144,11 @@ class PostVideoFragment : BasePostFragment() {
         bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
         bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
         bundle.putLong(POST_ID, postId)
+        if(isEdit){
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        }
+        mainViewModel?.uploadData?.value = bundle
 
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
@@ -166,14 +171,15 @@ class PostVideoFragment : BasePostFragment() {
                 bundle
             )
         } else if (isEdit && page == VIDEO) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
-            bundle.putLong(ClipPlayerFragment.KEY_PLAYER_SRC, item.id)
-            findNavController().navigate(
-                R.id.action_postVideoFragment_to_clipPlayerFragment,
-                bundle
-            )
+//            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+//            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+//            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
+//            bundle.putLong(ClipPlayerFragment.KEY_PLAYER_SRC, item.id)
+//            findNavController().navigate(
+//                R.id.action_postVideoFragment_to_clipPlayerFragment,
+//                bundle
+//            )
+            findNavController().navigateUp()
         } else if (isEdit && page == TAB) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
