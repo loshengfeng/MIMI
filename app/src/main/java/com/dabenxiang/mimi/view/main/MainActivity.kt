@@ -76,8 +76,9 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         // check it's emulator and we want to block them.
-        if (GeneralUtils.isProbablyRunningOnEmulator())
-            exitProcess(0);
+        Timber.d("@@@@  build type ${BuildConfig.BUILD_TYPE}")
+        if (GeneralUtils.isProbablyRunningOnEmulator() && BuildConfig.BUILD_TYPE.contains("prod") && !BuildConfig.DEBUG)
+            exitProcess(0)
 
         checkValidApp()
 
