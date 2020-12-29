@@ -240,6 +240,10 @@
         <action
             android:id="@+id/action_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
+
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@+id/postVideoFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchPostFragment"
@@ -302,6 +306,11 @@
             app:destination="@id/searchPostFragment"
             app:popUpTo="@+id/searchPostFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postPicFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment"
+            app:popUpTo="@+id/myCollectionFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -331,6 +340,12 @@
         <action
             android:id="@+id/action_postVideoFragment_to_clipPlayerFragment"
             app:destination="@id/clipPlayerFragment" />
+
+        <action
+            android:id="@+id/action_postVideoFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment"
+            app:popUpTo="@+id/myCollectionFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
