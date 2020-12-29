@@ -29,6 +29,7 @@ class AdHeaderAdapter(
     override fun onBindViewHolder(holder: AdHolder, position: Int) {
         val options = RequestOptions()
             .priority(Priority.NORMAL)
+            .placeholder(R.drawable.img_ad)
             .error(R.drawable.img_ad)
         Glide.with(context)
             .load(adItem?.href)

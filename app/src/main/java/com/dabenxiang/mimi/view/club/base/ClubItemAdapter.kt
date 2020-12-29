@@ -78,9 +78,7 @@ class ClubItemAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-//        val item = getItem(position)?.postDBId?.let {
-//            mimiDB.postDBItemDao().getMemberPostItemById(it)
-//        }
+
         val item = getItem(position)?.memberPostItem
         item?.also {memberPostItem->
             Timber.i("memberPostItem $memberPostItem position=$position  holder=$holder")
@@ -88,6 +86,7 @@ class ClubItemAdapter(
                 is AdHolder -> {
                     val options = RequestOptions()
                         .priority(Priority.NORMAL)
+                         .placeholder(R.drawable.img_ad)
                         .error(R.drawable.img_ad)
                     Glide.with(context)
                         .load(item.adItem?.href)

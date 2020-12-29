@@ -41,10 +41,7 @@ import kotlinx.android.synthetic.main.fragment_club_item.text_page_empty
 import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -124,7 +121,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            viewModel.posts(type).collectLatest {
+
+            viewModel.posts(type).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
         }

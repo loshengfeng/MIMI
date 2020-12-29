@@ -38,18 +38,21 @@ class TopicPostMediator(
     ): MediatorResult {
         try {
             val offset = when (loadType) {
-                LoadType.REFRESH -> null
+                LoadType.REFRESH -> {
+                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                    null
+                }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByPageCode(pageCode)
                     }
-
-                    remoteKey?.offset ?:0
+                    remoteKey.offset
 
                 }
             }?.toInt() ?: 0
-            Timber.i("TopicPostMediator pageCode=$pageCode offset=$offset ")
+
+            Timber.w("TopicPostMediator pageCode=$pageCode offset=$offset tag=$tag orderBy=$orderBy")
             val result = domainManager.getApiRepository().getMembersPost(
                     offset, PER_LIMIT, tag, orderBy.value
             )
@@ -57,14 +60,14 @@ class TopicPostMediator(
             val body = result.body()
             val memberPostItems = body?.content
 
-            Timber.i("TopicPostMediator pageCode=$pageCode memberPostItems=$memberPostItems ")
+            Timber.w("TopicPostMediator pageCode=$pageCode memberPostItems=$memberPostItems ")
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
                 result.body()?.paging?.offset ?: 0,
                 memberPostItems?.size ?: 0
             )
 
-            Timber.i("hasNext =$hasNext")
+            Timber.w("hasNext =$hasNext")
             val nextKey = if (hasNext) offset + ClubItemMediator.PER_LIMIT else null
 
             val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / AD_GAP).toInt()

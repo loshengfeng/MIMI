@@ -50,29 +50,12 @@ class TopicListViewModel : ClubViewModel() {
         pagingData.map {
             it
         }.insertSeparators{ before, after->
-            if(before!=null && before.postDBItem.index >= ClubItemMediator.AD_GAP
-                && before.postDBItem.index.rem(AD_GAP) == 0 ){
+            if(before!=null && before.postDBItem.index >0 && before.postDBItem.index.rem(AD_GAP) == 0 ){
                 getAdItem(adItems, before)
             }else {
                 null
             }
         }
     }
-
-    fun clearDAItems(pageCode:String){
-        viewModelScope.launch {
-            mimiDB.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
-                Timber.i("ClubItemMediator delete id=$id ")
-                mimiDB.postDBItemDao().getPostDBItems(id).takeIf {
-                    it.isNullOrEmpty() || it.size <=1
-                }?.let {
-                    Timber.i("ClubItemMediator deleteMemberPostItem=$it ")
-                    mimiDB.postDBItemDao().deleteMemberPostItem(id)
-                }
-            }
-        }
-
-    }
-
-
+    
 }

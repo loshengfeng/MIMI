@@ -31,12 +31,10 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
@@ -67,7 +65,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
         }
     }
 
-    val pageCode = TopicListFragment::class.simpleName + tag + orderBy.toString()
+    val pageCode = TopicListFragment::class.simpleName + topicTag + orderBy.toString()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -106,6 +104,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.i("pageCode=$pageCode onViewCreated")
         posts_list.adapter = ConcatAdapter(adTop, adapter)
 
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -117,7 +116,8 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            viewModel.posts(pageCode, topicTag, orderBy).collectLatest {
+            Timber.i("pageCode=$pageCode onViewCreated posts")
+            viewModel.posts(pageCode, topicTag, orderBy).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
         }
@@ -172,6 +172,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
         super.onResume()
 
         if( !layout_refresh.isRefreshing  && adapter.snapshot().items.isEmpty()){
+            Timber.i("pageCode=$pageCode  onResume")
             adapter.refresh()
         }
     }

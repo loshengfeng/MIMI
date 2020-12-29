@@ -29,7 +29,7 @@ class ClubItemMediator(
 ) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
-        const val PER_LIMIT = 20
+        const val PER_LIMIT = 5
         const val AD_GAP: Int = 5
     }
     private val pageCode = ClubItemMediator::class.simpleName+ type.toString()

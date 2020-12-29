@@ -42,7 +42,7 @@ class ClubItemViewModel : ClubViewModel() {
         pagingData.map {
             it
         }.insertSeparators{ before, after->
-            if(before!=null && before.postDBItem.index >=AD_GAP && before.postDBItem.index.rem(AD_GAP) == 0 ){
+            if(before!=null && before.postDBItem.index >0 && before.postDBItem.index.rem(AD_GAP) == AD_GAP-1 ){
                 getAdItem(adItems, before)
             }else {
                 null
