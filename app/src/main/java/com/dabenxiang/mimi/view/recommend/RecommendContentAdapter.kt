@@ -7,16 +7,15 @@ import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.HomeListItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.item_recommend.view.*
 
-class RecommendContentAdapter(private val recommendFuncItem: RecommendFuncItem) :
+class RecommendContentAdapter(
+    private val recommendFuncItem: RecommendFuncItem
+) :
     PagingDataAdapter<HomeListItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<HomeListItem>() {
@@ -60,17 +59,7 @@ class RecommendContentAdapter(private val recommendFuncItem: RecommendFuncItem) 
         val item = getItem(position)
         when (holder) {
             is AdHolder -> {
-                val options = RequestOptions()
-                    .priority(Priority.NORMAL)
-                    .error(R.drawable.img_ad)
-                Glide.with(holder.adImg.context)
-                    .load(item?.adItem?.href)
-                    .apply(options)
-                    .into(holder.adImg)
-
-                holder.adImg.setOnClickListener {
-                    GeneralUtils.openWebView(holder.adImg.context, item?.adItem?.target ?: "")
-                }
+                holder.onBind(item?.adItem?: AdItem())
             }
             is RecommendViewHolder -> {
                 holder.titleText.text = item?.name

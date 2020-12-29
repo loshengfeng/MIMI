@@ -49,13 +49,14 @@ class TopicTabFragment : BaseFragment() {
     lateinit var memberClubItem:MemberClubItem
 
     private val topicItem: MemberClubItem by lazy {
+        Timber.i("topicItem arguments =$arguments")
         (arguments?.getSerializable(KEY_DATA) as MemberClubItem)
     }
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            TAB_HOTTEST to { TopicListFragment(OrderBy.HOTTEST, topicItem.tag) },
-            TAB_LATEST to { TopicListFragment(OrderBy.NEWEST, topicItem.tag)  },
-            TAB_VIDEO to {  TopicListFragment(OrderBy.VIDEO, topicItem.tag)   }
+            TAB_HOTTEST to { TopicListFragment(topicItem, OrderBy.HOTTEST, topicItem.tag) },
+            TAB_LATEST to { TopicListFragment(topicItem, OrderBy.NEWEST, topicItem.tag)  },
+            TAB_VIDEO to {  TopicListFragment(topicItem, OrderBy.VIDEO, topicItem.tag)  }
     )
 
     override fun getLayoutId() = R.layout.fragment_club_topic_v2
@@ -133,13 +134,15 @@ class TopicTabFragment : BaseFragment() {
 
     private fun setupUI(item:MemberClubItem) {
         Timber.i("MemberClubItem =$topicItem")
+        val isUpdateSetUp =this::memberClubItem.isInitialized
+
         memberClubItem = item
         memberClubItem?.let{item->
             tv_title.text = item.title
             tv_desc.text = item.description
 
             tv_desc.post {
-                if (tv_desc.lineCount > 1) {
+                if (!isUpdateSetUp && tv_desc.lineCount > 1) {
                     val params = toolbar_layout.layoutParams
                     params.height = toolbar_layout.height +tv_desc.height/2
                     toolbar_layout.layoutParams = params

@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -20,7 +21,7 @@ import kotlinx.android.synthetic.main.item_general_video.view.*
 
 class GeneralVideoAdapter(
     val onItemClick: (StatisticsItem) -> Unit,
-    private val videoFuncItem: GeneralVideoFuncItem? = null,
+    private val videoFuncItem: GeneralVideoFuncItem? = null
 ) : PagingDataAdapter<StatisticsItem, RecyclerView.ViewHolder>(COMPARATOR) {
 
     companion object {
@@ -70,17 +71,7 @@ class GeneralVideoAdapter(
         val item = getItem(position) ?: StatisticsItem()
         when (holder) {
             is AdHolder -> {
-                val options = RequestOptions()
-                    .priority(Priority.NORMAL)
-                    .error(R.drawable.img_ad)
-                Glide.with(holder.adImg.context)
-                    .load(item.adItem?.href)
-                    .apply(options)
-                    .into(holder.adImg)
-
-                holder.adImg.setOnClickListener {
-                    GeneralUtils.openWebView(holder.adImg.context, item.adItem?.target ?: "")
-                }
+                holder.onBind(item.adItem?: AdItem())
             }
             is GeneralVideoViewHolder -> {
 

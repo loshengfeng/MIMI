@@ -361,9 +361,9 @@ interface ApiService {
         @Query("category") category: String?,
         @Query("tags") tags: String?,
         @Query("isAdult") isAdult: Boolean,
-        @Query("isRandom") isRandom: Boolean,
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int,
+        @Query("isRandom") isRandom: Boolean?,
+        @Query("offset") offset: Int?,
+        @Query("limit") limit: Int?,
         @Query("lastId") lastId: Long,
         @Query("excludeId") excludeId: String?,
         @Query("type") type: Int?

@@ -12,6 +12,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
@@ -114,13 +115,7 @@ class SearchPostAdapter(
         item?.also {
             when (holder) {
                 is AdHolder -> {
-                    val options = RequestOptions()
-                        .priority(Priority.NORMAL)
-                        .error(R.drawable.img_ad)
-                    Glide.with(context).load(item.adItem?.href).apply(options).into(holder.adImg)
-                    holder.adImg.setOnClickListener {
-                        GeneralUtils.openWebView(context, item.adItem?.target ?: "")
-                    }
+                    holder.onBind(item.adItem?: AdItem())
                 }
                 is MyPostClipPostHolder -> {
                     if (payloads.size == 1) {

@@ -24,6 +24,7 @@ class TopicPostDataSource(
         const val PER_LIMIT = 20
     }
 
+    private var adIndex = 0
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MemberPostItem> {
         val offset = params.key ?: 0
         return try {
@@ -42,6 +43,7 @@ class TopicPostDataSource(
                         .body()?.content?.get(0)?.ad?.first() ?: AdItem()
                 list.add(MemberPostItem(type = PostType.AD, adItem = topAdItem))
             }
+            adIndex = 0
             val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / 5).toInt()
             val adItems =
                 domainManager.getAdRepository().getAD("community", adWidth, adHeight, adCount)
@@ -75,9 +77,11 @@ class TopicPostDataSource(
     }
 
     private fun getAdItem(adItems: ArrayList<AdItem>): MemberPostItem {
+        if (adIndex + 1 > adItems.size) adIndex = 0
         val adItem =
             if (adItems.isEmpty()) AdItem()
-            else adItems.removeFirst()
+            else adItems[adIndex]
+        adIndex++
         return MemberPostItem(type = PostType.AD, adItem = adItem)
     }
 
