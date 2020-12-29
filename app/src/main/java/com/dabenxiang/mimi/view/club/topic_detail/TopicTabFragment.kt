@@ -49,13 +49,14 @@ class TopicTabFragment : BaseFragment() {
     lateinit var memberClubItem:MemberClubItem
 
     private val topicItem: MemberClubItem by lazy {
+        Timber.i("topicItem arguments =$arguments")
         (arguments?.getSerializable(KEY_DATA) as MemberClubItem)
     }
 
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            TAB_HOTTEST to { TopicListFragment(OrderBy.HOTTEST, topicItem.tag) },
-            TAB_LATEST to { TopicListFragment(OrderBy.NEWEST, topicItem.tag)  },
-            TAB_VIDEO to {  TopicListFragment(OrderBy.VIDEO, topicItem.tag)   }
+            TAB_HOTTEST to { TopicListFragment(topicItem, OrderBy.HOTTEST, topicItem.tag) },
+            TAB_LATEST to { TopicListFragment(topicItem, OrderBy.NEWEST, topicItem.tag)  },
+            TAB_VIDEO to {  TopicListFragment(topicItem, OrderBy.VIDEO, topicItem.tag)  }
     )
 
     override fun getLayoutId() = R.layout.fragment_club_topic_v2
