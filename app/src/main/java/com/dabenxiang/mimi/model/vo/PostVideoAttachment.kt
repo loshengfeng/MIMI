@@ -10,6 +10,7 @@ data class PostVideoAttachment (
     var videoAttachmentId: String = "",
     var picUrl: String = "",
     var videoUrl: String = "",
-    var ext: String = "",
+    var picExt: String = "",
+    var videoExt: String = "",
     var length: String = ""
 ) : Parcelable, Serializable

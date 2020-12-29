@@ -198,7 +198,7 @@ class PostVideoFragment : BasePostFragment() {
                 videoAttachmentId = item.videoParameter.id,
                 length = item.videoParameter.length,
                 picAttachmentId = item.picParameter[0].id,
-                ext = item.picParameter[0].ext
+                picExt = item.picParameter[0].ext
             )
             videoAttachmentList.add(postVideoAttachment)
 

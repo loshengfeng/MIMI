@@ -626,10 +626,10 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun postPicClub(postClubItem: PostClubItem, content: String) {
+    fun postPicClub(postClubItem: PostClubItem) {
         viewModelScope.launch(context = job) {
             flow {
-                val request = PostMemberRequest(postClubItem.title, content, PostType.IMAGE.value, tags = postClubItem.tags)
+                val request = PostMemberRequest(postClubItem.title, postClubItem.request, PostType.IMAGE.value, tags = postClubItem.tags)
 
                 Timber.d("Post member request : $request")
 
@@ -653,12 +653,11 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun postVideoClub(postClubItem: PostClubItem, content: String) {
+    fun postVideoClub(postClubItem: PostClubItem) {
         viewModelScope.launch(context = job) {
             flow {
-                val request = PostMemberRequest(postClubItem.title, content, PostType.VIDEO.value, tags = postClubItem.tags)
+                val request = PostMemberRequest(postClubItem.title, postClubItem.request, PostType.VIDEO.value, tags = postClubItem.tags)
 
-                request.content = content
                 Timber.d("Post member request : $request")
 
                 if (postClubItem.memberPostItem == null) {
@@ -752,6 +751,7 @@ class MainViewModel : BaseViewModel() {
         _coverExtResult.value = null
         _postVideoMemberResult.value = null
         _postPicMemberResult.value = null
+        _videoExtResult.value = null
     }
 
     fun clearPicResultValue() {
