@@ -11,7 +11,8 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -40,7 +41,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
-class TopicListFragment(private val orderBy: OrderBy, private val topicTag:String) : BaseFragment() {
+class TopicListFragment(private val memberClubItem: MemberClubItem, private val orderBy: OrderBy, private val topicTag:String) : BaseFragment() {
 
     private val viewModel: TopicListViewModel by viewModels()
     private val topicViewModel: TopicViewModel by viewModels({requireParentFragment()})
@@ -286,13 +287,11 @@ class TopicListFragment(private val orderBy: OrderBy, private val topicTag:Strin
             Timber.i("TopicListFragment onMoreClick")
             onMoreClick(item, position, isFromPostPage = true) {
 
-                val searchPostItem = arguments?.getSerializable(KEY_DATA)
-
                 val bundle = Bundle()
                 bundle.putBoolean(MyPostFragment.EDIT, true)
                 bundle.putString(BasePostFragment.PAGE, BasePostFragment.CLUB)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-                bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
+                bundle.putSerializable(KEY_DATA, memberClubItem)
 
                 it as MemberPostItem
                 when (item.type) {
