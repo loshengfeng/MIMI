@@ -17,7 +17,6 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -35,7 +34,6 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
@@ -43,7 +41,6 @@ import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_re
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -51,7 +48,7 @@ import timber.log.Timber
 
 class MyFavoritesFragment(
     val tab: Int,
-    val type: MyCollectionTabItemType,
+    val myPagesType: MyPagesType,
     val isLike: Boolean = false
 ) : BaseFragment() {
 
@@ -74,41 +71,6 @@ class MyFavoritesFragment(
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })
-
-        viewModel.postCount.observe(this, {
-            if (it == 0) {
-                id_empty_group.visibility = View.VISIBLE
-                recycler_view.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                recycler_view.visibility = View.VISIBLE
-            }
-            myPagesViewModel.changeDataCount(tab, it)
-            layout_refresh.isRefreshing = false
-        })
-
-//        viewModel.likePostResult.observe(this, {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    it.result.let { position ->
-//                        adapter.notifyItemChanged(position, MyPagesPostAdapter.PAYLOAD_UPDATE_LIKE)
-//                    }
-//                }
-//
-//                else -> {
-//                    onApiError(Exception("Unknown Error!"))
-//                }
-//            }
-//        })
-
-//        viewModel.favoriteResult.observe(this, {
-//            when (it) {
-//                is ApiResult.Success -> viewModel.getData(adapter, isLike)
-//                else -> {
-//                    onApiError(Exception("Unknown Error!"))
-//                }
-//            }
-//        })
 
         viewModel.cleanResult.observe(this, {
             when (it) {
@@ -138,6 +100,11 @@ class MyFavoritesFragment(
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(adapter.snapshot().items.isEmpty()) adapter.refresh()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
@@ -149,7 +116,7 @@ class MyFavoritesFragment(
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
 
-            viewModel.posts(MyPagesType.FAVORITES).flowOn(Dispatchers.IO).collectLatest {
+            viewModel.posts(myPagesType).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
         }
@@ -169,6 +136,18 @@ class MyFavoritesFragment(
 
         myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
             viewModel.deleteFavorites(adapter.snapshot().items.map { it.memberPostItem })
+        })
+
+        viewModel.postCount.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                id_empty_group.visibility = View.VISIBLE
+                recycler_view.visibility = View.INVISIBLE
+            } else {
+                id_empty_group.visibility = View.GONE
+                recycler_view.visibility = View.VISIBLE
+            }
+            myPagesViewModel.changeDataCount(tab, it)
+            layout_refresh.isRefreshing = false
         })
 
         text_page_empty.text =
@@ -237,7 +216,7 @@ class MyFavoritesFragment(
         ) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    checkStatus { viewModel.favoritePost(item, position, isFavorite) }
+                    checkStatus { viewModel.favoritePost(item, position, isFavorite, myPagesType) }
                 }
             })
 

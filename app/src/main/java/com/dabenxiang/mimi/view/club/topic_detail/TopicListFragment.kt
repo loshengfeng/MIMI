@@ -112,7 +112,6 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            Timber.i("pageCode=$pageCode onViewCreated posts")
             viewModel.posts(pageCode, topicTag, orderBy).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
@@ -164,7 +163,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
     override fun onResume() {
         super.onResume()
 
-        if( !layout_refresh.isRefreshing  && adapter.snapshot().items.isEmpty()){
+        if(adapter.snapshot().items.isEmpty()){
             Timber.i("pageCode=$pageCode  onResume")
             adapter.refresh()
         }

@@ -1,14 +1,9 @@
 package com.dabenxiang.mimi.view.club.base
 
-import android.view.View
-import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.request.RequestOptions
-import com.dabenxiang.mimi.R
+import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
@@ -16,16 +11,13 @@ import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
-import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.component.inject
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -120,6 +112,7 @@ abstract class ClubViewModel : BaseViewModel(){
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
+                    mimiDB.withTransaction {
                         mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
                             val item = memberPostItem.apply {
                                 this.isFavorite = isFavorite
@@ -130,12 +123,14 @@ abstract class ClubViewModel : BaseViewModel(){
                             }
                             mimiDB.postDBItemDao().insertMemberPostItem(item)
                         }
+                    }
+
                  }
                 .collect { _favoriteResult.value = it }
         }
     }
 
-    fun likePost(
+    open fun likePost(
             item: MemberPostItem,
             position: Int,
             isLike: Boolean) {
@@ -162,21 +157,24 @@ abstract class ClubViewModel : BaseViewModel(){
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
-                    mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
-                        val item = memberPostItem.apply {
-                            when {
-                                isLike -> {
-                                    this.likeType = LikeType.LIKE
-                                    this.likeCount += 1
-                                }
-                                else-> {
-                                    this.likeType = LikeType.DISLIKE
-                                    this.likeCount -= 1
+                    mimiDB.withTransaction {
+                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
+                            val item = memberPostItem.apply {
+                                when {
+                                    isLike -> {
+                                        this.likeType = LikeType.LIKE
+                                        this.likeCount += 1
+                                    }
+                                    else-> {
+                                        this.likeType = LikeType.DISLIKE
+                                        this.likeCount -= 1
+                                    }
                                 }
                             }
+                            mimiDB.postDBItemDao().insertMemberPostItem(item)
                         }
-                        mimiDB.postDBItemDao().insertMemberPostItem(item)
                     }
+
                 }
                 .collect {
                     _likePostResult.value = it }
@@ -195,21 +193,22 @@ abstract class ClubViewModel : BaseViewModel(){
                     .flowOn(Dispatchers.IO)
                     .onStart { emit(ApiResult.loading()) }
                     .onCompletion {
-                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
-                            val item = memberPostItem.apply {
-                                this.likeType = type
-                                when(type) {
-                                    LikeType.LIKE -> {
-                                        this.likeCount += 1
-                                    }
-                                    else-> {
-                                        this.likeCount -= 1
+                        mimiDB.withTransaction {
+                            mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
+                                val item = memberPostItem.apply {
+                                    this.likeType = type
+                                    when(type) {
+                                        LikeType.LIKE -> {
+                                            this.likeCount += 1
+                                        }
+                                        else-> {
+                                            this.likeCount -= 1
+                                        }
                                     }
                                 }
+                                mimiDB.postDBItemDao().insertMemberPostItem(item)
                             }
-                            mimiDB.postDBItemDao().insertMemberPostItem(item)
                         }
-                        emit(ApiResult.loaded())
                     }
                     .catch { e -> emit(ApiResult.error(e)) }
                     .collect { _videoLikeResult.value = it }

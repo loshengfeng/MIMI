@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
 import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
@@ -96,12 +97,13 @@ class MyCollectionMIMIVideoViewHolder(
                     item,
                     position,
                     item.favorite ?: false,
-                    MyCollectionTabItemType.MIMI_VIDEO
+                    MyPagesType.MIMI_VIDEO
             )
         }
         ivFavorite.setOnClickListener(onFavoriteClickListener)
         tvFavoriteCount.setOnClickListener(onFavoriteClickListener)
 
+        Timber.i("MyCollectionMIMIVideoViewHolder like =$item")
         updateLike(item)
         val onLikeClickListener = View.OnClickListener {
             item.like = item.like != true
@@ -113,14 +115,14 @@ class MyCollectionMIMIVideoViewHolder(
 
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
-            listener.onCommentClick(item, MyCollectionTabItemType.MIMI_VIDEO)
+            listener.onCommentClick(item, MyPagesType.MIMI_VIDEO)
         }
 
         ivComment.setOnClickListener(onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
-            listener.onItemClick(item, MyCollectionTabItemType.MIMI_VIDEO)
+            listener.onItemClick(item, MyPagesType.MIMI_VIDEO)
         }
 
     }

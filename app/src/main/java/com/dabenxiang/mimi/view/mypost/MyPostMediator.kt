@@ -33,13 +33,17 @@ class MyPostMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
-                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, null))
                     null
                 }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByPageCode(pageCode)
+                    }
+
+                    if (remoteKey?.offset == null) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
                     }
                     remoteKey.offset
 

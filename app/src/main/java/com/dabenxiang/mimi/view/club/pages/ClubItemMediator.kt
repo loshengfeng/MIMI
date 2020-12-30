@@ -41,13 +41,17 @@ class ClubItemMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
-                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, null))
                     null
                 }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByPageCode(pageCode)
+                    }
+
+                    if (remoteKey?.offset == null) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
                     }
                     remoteKey.offset
 
@@ -115,14 +119,14 @@ class ClubItemMediator(
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
-                    database.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
-                        database.postDBItemDao().getPostDBItems(id).takeIf {
-                            it.isNullOrEmpty() || it.size <=1
-                        }?.let {
-                            database.postDBItemDao().deleteMemberPostItem(id)
-                        }
-
-                    }
+//                    database.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
+//                        database.postDBItemDao().getPostDBItems(id).takeIf {
+//                            it.isNullOrEmpty() || it.size <=1
+//                        }?.let {
+//                            database.postDBItemDao().deleteMemberPostItem(id)
+//                        }
+//
+//                    }
                     database.postDBItemDao().deleteItemByPageCode(pageCode)
                     database.postDBItemDao().deleteItemByPageCode(adCode)
                     database.remoteKeyDao().deleteByPageCode(pageCode)
@@ -171,7 +175,7 @@ class ClubItemMediator(
                 }
             }
 
-            return MediatorResult.Success(endOfPaginationReached = !hasNext)
+            return MediatorResult.Success(endOfPaginationReached = hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {

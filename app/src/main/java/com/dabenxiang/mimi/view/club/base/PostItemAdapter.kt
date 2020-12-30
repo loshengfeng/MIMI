@@ -81,7 +81,7 @@ class PostItemAdapter(
 
         val item = getItem(position)?.memberPostItem
         item?.also {memberPostItem->
-            Timber.i("memberPostItem $memberPostItem position=$position  holder=$holder")
+            Timber.i("PostItemAdapter position=$position  holder=$holder")
             when (holder) {
                 is AdHolder -> {
                     val options = RequestOptions()

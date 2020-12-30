@@ -10,15 +10,16 @@ import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
-import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoDataSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
+import timber.log.Timber
 
 class LikeMimiVideoViewModel : BaseViewModel() {
 
@@ -82,7 +83,7 @@ class LikeMimiVideoViewModel : BaseViewModel() {
         }
     }
 
-    fun favorite(item: PlayItem, position: Int) {
+    fun favorite(item: PlayItem, position: Int, type:MyPagesType) {
         viewModelScope.launch {
             flow {
                 val originFavorite = item.favorite ?: false
@@ -118,30 +119,65 @@ class LikeMimiVideoViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
+                .onCompletion {
+                    item.videoId?.let { videoId->
+                        mimiDB.postDBItemDao().getMemberPostItemByVideoId(videoId)?.let { memberPostItem->
+                            val item = memberPostItem.apply {
+                                Timber.i("$type favorite item= $this")
+                                this.isFavorite = false
+                                this.favoriteCount = this.favoriteCount-1
+                            }
+                            mimiDB.postDBItemDao().insertMemberPostItem(item)
+                        }
+                    }
+
+                }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _favoriteResult.value = it }
         }
     }
 
-    fun like(item: VideoItem, type: LikeType) {
+    fun like(item: VideoItem, likeType: LikeType, type:MyPagesType) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val request = LikeRequest(type)
+                val request = LikeRequest(likeType)
                 val result = apiRepository.like(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
+                .onCompletion {
+                    item.id?.let { id->
+                        mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem->
+                            val item = memberPostItem.apply {
+                                Timber.i("$type like item= $this")
+                                when(likeType) {
+                                    LikeType.LIKE -> {
+                                        this.likeType = LikeType.LIKE
+                                        this.likeCount += 1
+                                    }
+                                    else-> {
+                                        this.likeType = LikeType.DISLIKE
+                                        this.likeCount -= 1
+                                    }
+                                }
+                            }
+                            mimiDB.postDBItemDao().insertMemberPostItem(item)
+                            mimiDB.postDBItemDao().deleteItemByPageCode(
+                                    pageCode= MyPagesPostMediator::class.simpleName + type.toString(),
+                                    postDBId = memberPostItem.id
+                            )
+                        }
+                    }
+                }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likeResult.value = it }
         }
     }
 
-    fun deleteAllLike(items: List<PlayItem>) {
+    fun deleteAllLike(type:MyPagesType, items: List<PlayItem>) {
         if (items.isEmpty()) return
         viewModelScope.launch {
             flow {
@@ -155,7 +191,13 @@ class LikeMimiVideoViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
+                .onCompletion {
+                    val pageCode =MyPagesPostMediator::class.simpleName + type.toString()
+                    mimiDB.postDBItemDao().deleteItemByPageCode(
+                            pageCode= pageCode
+                    )
+                    mimiDB.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                }
                 .collect { _cleanResult.value = it }
         }
     }

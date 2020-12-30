@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
-
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -12,21 +11,21 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.view.adapter.viewHolder.*
+import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.MyCollectionMIMIVideoViewHolder
+import com.dabenxiang.mimi.view.adapter.viewHolder.MyCollectionShortVideoViewHolder
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoAdapter
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 
 class LikeMimiVideoAdapter(
     val context: Context,
     val viewModelScope: CoroutineScope,
     val listener: MyCollectionVideoListener,
-    val itemType: MyCollectionTabItemType
+    val itemType: MyPagesType
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -56,16 +55,13 @@ class LikeMimiVideoAdapter(
         }
     }
 
-    var changedPosList = HashMap<Long, VideoItem>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        val changedItem = changedPosList[item?.videoId]
-        return if (changedItem != null && changedItem.like != true) {
-            VIEW_TYPE_DELETED
-        } else if (item?.playlistType?.toInt() == PostType.AD.value) {
+
+        return if (item?.playlistType?.toInt() == PostType.AD.value) {
             VIEW_TYPE_AD
-        } else if (itemType == MyCollectionTabItemType.MIMI_VIDEO) {
+        } else if (itemType == MyPagesType.MIMI_VIDEO || itemType == MyPagesType.LIKE_MIMI) {
             MIMI_VIDEO
         } else {
             SHORT_VIDEO
@@ -111,13 +107,7 @@ class LikeMimiVideoAdapter(
         payloads: MutableList<Any>
     ) {
         val item = getItem(position)
-        val changedItem = changedPosList[item?.videoId]
-        if (changedItem != null) {
-            item?.like = changedItem.like
-            item?.likeCount = changedItem.likeCount
-            item?.favorite = changedItem.favorite
-            item?.favoriteCount = changedItem.favoriteCount
-        }
+
         item?.also {
             when (holder) {
                 is AdHolder -> {
@@ -127,19 +117,12 @@ class LikeMimiVideoAdapter(
                     }
                 }
                 is MyCollectionMIMIVideoViewHolder -> {
-                    if (payloads.size == 1) {
-                        when (payloads[0]) {
-                            PAYLOAD_UPDATE_FAVORITE -> holder.updateFavorite(it)
-                            PAYLOAD_UPDATE_LIKE -> holder.updateLike(it)
-                        }
-                    } else {
-                        holder.onBind(
+                    holder.onBind(
                             it,
                             position,
                             listener,
                             viewModelScope
-                        )
-                    }
+                    )
                 }
                 is MyCollectionShortVideoViewHolder -> {
                     holder.onBind(

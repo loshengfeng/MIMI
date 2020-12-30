@@ -10,6 +10,7 @@ import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
@@ -64,4 +65,46 @@ class MyFavoritesViewModel : ClubViewModel() {
         }
     }
 
+    fun favoritePost(
+            item: MemberPostItem,
+            position: Int,
+            isFavorite: Boolean,
+            type:MyPagesType
+    ) {
+
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = when {
+                    isFavorite -> apiRepository.addFavorite(item.id)
+                    else -> apiRepository.deleteFavorite(item.id)
+                }
+                if (!result.isSuccessful) throw HttpException(result)
+                item.isFavorite = isFavorite
+                _postChangedResult.postValue(ApiResult.success(item))
+                emit(ApiResult.success(position))
+            }
+                    .flowOn(Dispatchers.IO)
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion {
+                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
+                            val item = memberPostItem.apply {
+                                this.isFavorite = isFavorite
+                                this.favoriteCount = when(isFavorite) {
+                                    true -> this.favoriteCount+1
+                                    else -> this.favoriteCount-1
+                                }
+                            }
+                            val pageCode = MyPagesPostMediator::class.simpleName + type.toString()
+                            mimiDB.postDBItemDao().insertMemberPostItem(item)
+                            mimiDB.postDBItemDao().deleteItemByPageCode(
+                                    pageCode= MyPagesPostMediator::class.simpleName + type.toString(),
+                                    postDBId = memberPostItem.id
+                            )
+                            mimiDB.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                        }
+                    }
+                    .collect {}
+        }
+    }
 }

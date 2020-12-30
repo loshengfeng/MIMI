@@ -3,22 +3,19 @@ package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.dabenxiang.mimi.callback.PagingCallback
+import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
+import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
-import com.dabenxiang.mimi.view.my_pages.pages.like.MiMiLikeListDataSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -35,70 +32,58 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
 
     var totalCount: Int = 0
 
-    fun getData(adapter: MyCollectionMimiVideoAdapter, type: MyCollectionTabItemType, isLike: Boolean) {
-        Timber.i("getData")
-        CoroutineScope(Dispatchers.IO).launch {
-            adapter.submitData(PagingData.empty())
-            if(isLike) {
-                getLikeItemList()
-                    .collect {
-                        adapter.submitData(it)
-                    }
-            } else {
-                getPostItemList(type)
-                    .collectLatest {
-                        adapter.submitData(it)
-                    }
-            }
+    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(type: MyPagesType) = flowOf(
+            clearListCh.receiveAsFlow().map { PagingData.empty() },
+            postItems(type)
+
+    ).flattenMerge(2).cachedIn(viewModelScope)
+
+    private fun postItems(type: MyPagesType) = Pager(
+            config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
+            remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pagingCallback)
+    ) {
+        mimiDB.postDBItemDao().pagingSourceByPageCode(MyPagesPostMediator::class.simpleName + type.toString())
+
+
+    }.flow.map { pagingData->
+        pagingData.map { dbItem->
+            dbItem.memberPostItem.toPlayItem()
         }
     }
 
-    fun getPostItemList(type: MyCollectionTabItemType): Flow<PagingData<PlayItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = MyCollectionMimiVideoDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                MyCollectionMimiVideoDataSource(
-                    domainManager,
-                    pagingCallback,
-                    adWidth,
-                    adHeight,
-                    type
-                )
-            }
-        )
-            .flow
-            .onStart {  setShowProgress(true) }
-            .onCompletion { setShowProgress(false) }
-            .cachedIn(viewModelScope)
-    }
-
-    fun getLikeItemList(): Flow<PagingData<PlayItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = MyCollectionMimiVideoDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                MiMiLikeListDataSource(
-                    domainManager,
-                    pagingCallback,
-                )
-            }
-        )
-            .flow
-            .onStart {  setShowProgress(true) }
-            .onCompletion { setShowProgress(false) }
-            .cachedIn(viewModelScope)
-    }
-
-    fun deleteMIMIVideoFavorite(videoId : String){
+    fun deleteMIMIVideoFavorite(type: MyPagesType, videoId : String){
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.deleteMePlaylist(videoId)
+                Timber.i("$type deleteMIMIVideoFavorite result= $result")
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(result.isSuccessful))
             }
                     .flowOn(Dispatchers.IO)
                     .catch { e -> emit(ApiResult.error(e)) }
-                    .collect { _deleteFavoriteResult.value = it }
+                    .onCompletion {
+                        mimiDB.postDBItemDao().getMemberPostItemByVideoId(videoId.toLong())?.let { memberPostItem->
+                            val item = memberPostItem.apply {
+                                Timber.i("$type deleteMIMIVideoFavorite item= $this")
+                                this.isFavorite = false
+                                this.favoriteCount = this.favoriteCount-1
+                            }
+                            val pageCode = MyPagesPostMediator::class.simpleName + type.toString()
+                            mimiDB.postDBItemDao().insertMemberPostItem(item)
+                            mimiDB.postDBItemDao().deleteItemByPageCode(
+                                    pageCode= MyPagesPostMediator::class.simpleName + type.toString(),
+                                    postDBId = memberPostItem.id
+                            )
+                            mimiDB.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                        }
+                    }
+                    .collect {
+                        Timber.i("deleteMIMIVideoFavorite = $it")
+                        _deleteFavoriteResult.value = it }
         }
     }
 

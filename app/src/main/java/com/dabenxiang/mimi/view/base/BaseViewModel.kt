@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.withTransaction
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.MultiTransformation
@@ -160,11 +161,13 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
+                    mimiDB.withTransaction {
                         mimiDB.postDBItemDao().getPostDBItems(item.id)?.forEach { postItem ->
                             mimiDB.postDBItemDao().deleteMemberPostItem(postItem.id)
                             mimiDB.postDBItemDao().deleteItem(postItem.id)
                         }
                     }
+                }
                 .collect {
                     deletePostIdList.value?.add(item.id)
                     _deletePostResult.value = it

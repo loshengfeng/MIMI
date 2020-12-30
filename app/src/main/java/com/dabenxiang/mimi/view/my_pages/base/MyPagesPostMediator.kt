@@ -6,10 +6,13 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.vo.PlayItem
+import com.dabenxiang.mimi.model.api.vo.PostFavoriteItem
 import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
+import com.dabenxiang.mimi.model.enums.PlayListType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 import timber.log.Timber
@@ -35,7 +38,7 @@ class MyPagesPostMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
-                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, null))
                     null
                 }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
@@ -43,24 +46,38 @@ class MyPagesPostMediator(
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByPageCode(pageCode)
                     }
+
+                    if (remoteKey?.offset == null) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
+                    }
                     remoteKey.offset
 
                 }
             }?.toInt() ?: 0
 
-            Timber.i("MyPagesPostMediator pageName=$pageCode offset=$offset")
+            Timber.i("MyPagesPostMediator $loadType pageName=$pageCode offset=$offset")
 
             val result =
                     when(myPagesType) {
-                        MyPagesType.LIKE -> domainManager.getApiRepository().getPostLike(offset.toLong(), PER_LIMIT, 7)
+                        MyPagesType.LIKE_POST -> domainManager.getApiRepository().getPostLike(offset.toLong(), PER_LIMIT, 7)
                         MyPagesType.LIKE_MIMI -> domainManager.getApiRepository().getPostLike(offset.toLong(), PER_LIMIT,8 )
+                        MyPagesType.MIMI_VIDEO -> domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value,
+                                true, isShortVideo = false, offset = offset.toString(), limit = PER_LIMIT.toString())
+
+                        MyPagesType.SHORT_VIDEO -> domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value,
+                                true, isShortVideo = true, offset = offset.toString(), limit = PER_LIMIT.toString())
+
                         else -> domainManager.getApiRepository().getPostFavorite( offset.toLong(), PER_LIMIT, 7)
                     }
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result.body()
             val memberPostItems = body?.content?.map {
-                it.toMemberPostItem()
+                when(it){
+                    is PlayItem ->  it.toMemberPostItem()
+                    is PostFavoriteItem -> it.toMemberPostItem()
+                    else -> (it as PostFavoriteItem).toMemberPostItem()
+                }
             }
 
             val hasNext = hasNextPage(
@@ -73,19 +90,19 @@ class MyPagesPostMediator(
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
-                    database.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
-                        database.postDBItemDao().getPostDBItems(id).takeIf {
-                            it.isNullOrEmpty() || it.size <=1
-                        }?.let {
-                            database.postDBItemDao().deleteMemberPostItem(id)
-                        }
-
-                    }
+//                    database.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
+//                        database.postDBItemDao().getPostDBItems(id).takeIf {
+//                            it.isNullOrEmpty() || it.size <=1
+//                        }?.let {
+//                            database.postDBItemDao().deleteMemberPostItem(id)
+//                        }
+//
+//                    }
                     database.postDBItemDao().deleteItemByPageCode(pageCode)
                     database.remoteKeyDao().deleteByPageCode(pageCode)
                 }
                 val nextKey = if (hasNext) offset + PER_LIMIT else null
-
+                Timber.i("MyPagesPostMediator $loadType nextKey=$nextKey ")
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
                 memberPostItems?.let {
@@ -125,6 +142,7 @@ class MyPagesPostMediator(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
+            currentSize <= 0 -> false
             currentSize < PER_LIMIT -> false
             offset >= total -> false
             else -> true

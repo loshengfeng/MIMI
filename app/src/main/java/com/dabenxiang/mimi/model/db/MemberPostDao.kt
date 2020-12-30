@@ -43,12 +43,18 @@ interface PostDBItemDao {
     @Query("SELECT * FROM MemberPostItems WHERE id= :id")
     fun getMemberPostItemById(id:Long): MemberPostItem?
 
+    @Query("SELECT * FROM MemberPostItems WHERE videoId= :videoId")
+    fun getMemberPostItemByVideoId(videoId:Long): MemberPostItem?
+
     @Transaction
     @Query("SELECT * FROM PostDBItems WHERE pageCode= :pageCode ORDER BY `index`")
     fun pagingSourceByPageCode(pageCode: String): PagingSource<Int, MemberPostWithPostDBItem>
 
     @Query("DELETE FROM PostDBItems WHERE pageCode = :pageCode")
     suspend fun deleteItemByPageCode(pageCode: String)
+
+    @Query("DELETE FROM PostDBItems WHERE pageCode = :pageCode and postDBId = :postDBId")
+    suspend fun deleteItemByPageCode(pageCode: String, postDBId:Long)
 
     @Query("DELETE FROM MemberPostItems WHERE id = :id")
     suspend fun deleteMemberPostItem(id:Long)

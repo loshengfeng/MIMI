@@ -4,8 +4,8 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.my_pages.base.BaseMyPagesTabFragment
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.my_pages.pages.favorites.MyFavoritesFragment
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoFragment
@@ -24,9 +24,9 @@ class MyCollectionFragment: BaseMyPagesTabFragment() {
     override val viewModel: MyPagesViewModel by viewModels()
 
     override val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(TAB_MiMI_VIDEO, MyCollectionTabItemType.MIMI_VIDEO) },
-            TAB_SHORT_VIDEO to { MyCollectionMimiVideoFragment(TAB_SHORT_VIDEO, MyCollectionTabItemType.SHORT_VIDEO) },
-            TAB_FAVORITES to {  MyFavoritesFragment(TAB_FAVORITES, MyCollectionTabItemType.POST)  }
+            TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(TAB_MiMI_VIDEO, MyPagesType.MIMI_VIDEO) },
+            TAB_SHORT_VIDEO to { MyCollectionMimiVideoFragment(TAB_SHORT_VIDEO, MyPagesType.SHORT_VIDEO) },
+            TAB_FAVORITES to {  MyFavoritesFragment(TAB_FAVORITES, MyPagesType.FAVORITES)  }
     )
 
     override fun setFragmentTitle() {

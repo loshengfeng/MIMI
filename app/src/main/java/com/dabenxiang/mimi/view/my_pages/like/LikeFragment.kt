@@ -4,9 +4,9 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.my_pages.base.BaseMyPagesTabFragment
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.my_pages.pages.like.LikeMimiVideoFragment
 import com.dabenxiang.mimi.view.my_pages.pages.like.LikePostFragment
@@ -25,8 +25,8 @@ class LikeFragment : BaseMyPagesTabFragment() {
     }
 
     override val tabFragmentsCreators: Map<Int, () -> Fragment> =mapOf(
-           TAB_MiMI_VIDEO to { LikeMimiVideoFragment(TAB_MiMI_VIDEO, MyCollectionTabItemType.MIMI_VIDEO) },
-           TAB_POST to {  LikePostFragment(TAB_POST, MyCollectionTabItemType.POST)  }
+           TAB_MiMI_VIDEO to { LikeMimiVideoFragment(TAB_MiMI_VIDEO, MyPagesType.LIKE_MIMI) },
+           TAB_POST to {  LikePostFragment(TAB_POST, MyPagesType.LIKE_POST)  }
     )
 
     override fun setFragmentTitle() {

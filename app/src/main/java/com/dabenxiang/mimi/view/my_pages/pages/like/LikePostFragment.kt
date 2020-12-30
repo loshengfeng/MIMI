@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
@@ -34,21 +33,16 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFragment() {
+class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragment() {
 
     private val viewModel: LikePostViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
@@ -66,53 +60,8 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        viewModel.postChangedResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    val changeItem = mainViewModel?.postItemChangedList?.value?.get(it.result.id)
-                    if(changeItem != null) {
-                        if (it.result.isFavorite) changeItem.favoriteCount++
-                        else changeItem.favoriteCount--
-                    }
-                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
         viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
-        })
-
-        viewModel.postCount.observe(this, {
-            if (it == 0) {
-                id_empty_group.visibility = View.VISIBLE
-                recycler_view.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                recycler_view.visibility = View.VISIBLE
-            }
-            layout_refresh.isRefreshing = false
-            myPagesViewModel.changeDataCount(tab, it)
-        })
-
-        viewModel.cleanResult.observe(this, {
-            when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
-                is ApiResult.Empty -> adapter.refresh()
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
-        mainViewModel?.deletePostResult?.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-//                    adapter.removedPosList.add(it.result)
-                    adapter.notifyItemChanged(it.result)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
         })
 
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
@@ -129,8 +78,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-
-            viewModel.posts(MyPagesType.LIKE).flowOn(Dispatchers.IO).collectLatest {
+            viewModel.posts(myPagesType).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
         }
@@ -150,7 +98,22 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
         }
 
         myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
-            if (it == tab) viewModel.deleteAllLike(adapter.snapshot().items.map { it.memberPostItem })
+            if (it == tab) {
+                layout_refresh.isRefreshing = false
+                viewModel.deleteAllLike(myPagesType, adapter.snapshot().items.map { it.memberPostItem })
+            }
+        })
+
+        viewModel.postCount.observe(viewLifecycleOwner, {
+            if (it == 0) {
+                id_empty_group.visibility = View.VISIBLE
+                recycler_view.visibility = View.INVISIBLE
+            } else {
+                id_empty_group.visibility = View.GONE
+                recycler_view.visibility = View.VISIBLE
+            }
+            myPagesViewModel.changeDataCount(tab, it)
+            layout_refresh.isRefreshing = false
         })
 
         text_page_empty.text = getString(R.string.like_empty_msg)
@@ -165,13 +128,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
 
     override fun onResume() {
         super.onResume()
-        Timber.i("onResume isLogin:${accountManager.isLogin()}")
-//        if (accountManager.isLogin() && viewModel.postCount.value ?: -1 <= 0) {
-//            viewModel.getData(adapter)
-//        }  else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
-//            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
-//            adapter.notifyDataSetChanged()
-//        }
+        if(adapter.snapshot().items.isEmpty()) adapter.refresh()
     }
 
     private val postListener = object : MyPostListener {
@@ -187,7 +144,7 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    viewModel.likePost(item, position, isLike)
+                    viewModel.like(item, position, isLike, myPagesType)
                 }
             })
 

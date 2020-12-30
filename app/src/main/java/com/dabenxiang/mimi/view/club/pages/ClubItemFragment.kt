@@ -179,8 +179,12 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             if (type == ClubTabItemType.FOLLOW) accountManager.isLogin()
             else true
         )
+        if(adapter.snapshot().items.isEmpty()){
+            adapter.refresh()
+        }
 
     }
+
 
     private val postListener = object : MyPostListener {
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {

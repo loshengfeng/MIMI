@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.Dispatchers
@@ -20,13 +21,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class MyPostViewModel : BaseViewModel() {
-
-    private var _likePostResult = MutableLiveData<ApiResult<Int>>()
-    val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
-
-    private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
-    val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
+class MyPostViewModel : ClubViewModel() {
 
     companion object {
         const val TYPE_PIC = "type_pic"
@@ -65,44 +60,44 @@ class MyPostViewModel : BaseViewModel() {
 //        ).flow.cachedIn(viewModelScope)
 //    }
 //
-    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val likeType = when {
-                    isLike -> LikeType.LIKE
-                    else -> LikeType.DISLIKE
-                }
-                val request = LikeRequest(likeType)
-                val result = apiRepository.like(item.id, request)
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likePostResult.value = it }
-        }
-    }
+//    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
+//        viewModelScope.launch {
+//            flow {
+//                val apiRepository = domainManager.getApiRepository()
+//                val likeType = when {
+//                    isLike -> LikeType.LIKE
+//                    else -> LikeType.DISLIKE
+//                }
+//                val request = LikeRequest(likeType)
+//                val result = apiRepository.like(item.id, request)
+//                if (!result.isSuccessful) throw HttpException(result)
+//                emit(ApiResult.success(position))
+//            }
+//                .flowOn(Dispatchers.IO)
+//                .catch { e -> emit(ApiResult.error(e)) }
+//                .collect { _likePostResult.value = it }
+//        }
+//    }
 
-    fun favoritePost(
-        item: MemberPostItem,
-        position: Int,
-        isFavorite: Boolean
-    ) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = when {
-                    isFavorite -> apiRepository.addFavorite(item.id)
-                    else -> apiRepository.deleteFavorite(item.id)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
-        }
-    }
+//    fun favoritePost(
+//        item: MemberPostItem,
+//        position: Int,
+//        isFavorite: Boolean
+//    ) {
+//        viewModelScope.launch {
+//            flow {
+//                val apiRepository = domainManager.getApiRepository()
+//                val result = when {
+//                    isFavorite -> apiRepository.addFavorite(item.id)
+//                    else -> apiRepository.deleteFavorite(item.id)
+//                }
+//                if (!result.isSuccessful) throw HttpException(result)
+//                emit(ApiResult.success(position))
+//            }
+//                .flowOn(Dispatchers.IO)
+//                .catch { e -> emit(ApiResult.error(e)) }
+//                .collect { _favoriteResult.value = it }
+//        }
+//    }
 
 }

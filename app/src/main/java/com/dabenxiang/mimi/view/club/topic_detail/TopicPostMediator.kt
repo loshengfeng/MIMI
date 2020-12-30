@@ -39,13 +39,16 @@ class TopicPostMediator(
         try {
             val offset = when (loadType) {
                 LoadType.REFRESH -> {
-                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                    database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, null))
                     null
                 }
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val remoteKey = database.withTransaction {
                         database.remoteKeyDao().remoteKeyByPageCode(pageCode)
+                    }
+                    if (remoteKey?.offset == null) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
                     }
                     remoteKey.offset
 
@@ -125,7 +128,7 @@ class TopicPostMediator(
                 database.postDBItemDao().insertMemberPostItemAll(it)
                 database.postDBItemDao().insertAll(adDBItems)
             }
-            return MediatorResult.Success(endOfPaginationReached = !hasNext)
+            return MediatorResult.Success(endOfPaginationReached = hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {

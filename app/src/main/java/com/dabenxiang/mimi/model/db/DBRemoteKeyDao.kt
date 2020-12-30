@@ -8,7 +8,7 @@ interface DBRemoteKeyDao {
     suspend fun insertOrReplace(remoteKey: DBRemoteKey)
 
     @Query("SELECT * FROM db_remote_keys WHERE pageCode = :pageCode")
-    suspend fun remoteKeyByPageCode(pageCode: String): DBRemoteKey
+    suspend fun remoteKeyByPageCode(pageCode: String): DBRemoteKey?
 
     @Query("DELETE FROM db_remote_keys WHERE pageCode = :pageCode")
     suspend fun deleteByPageCode(pageCode: String)
