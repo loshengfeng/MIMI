@@ -2,7 +2,9 @@ package com.dabenxiang.mimi.view.my_pages.pages.like
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -94,28 +96,6 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
             myPagesViewModel.changeDataCount(tab, it)
         })
 
-//        viewModel.likePostResult.observe(this, {
-//            when (it) {
-//                is ApiResult.Success -> viewModel.getData(adapter)
-//                else -> {
-//                    onApiError(Exception("Unknown Error!"))
-//                }
-//            }
-//        })
-
-//        viewModel.favoriteResult.observe(this, {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    it.result.let { position ->
-//                        adapter.notifyItemChanged(position, MyPagesPostAdapter.PAYLOAD_UPDATE_FAVORITE)
-//                    }
-//                }
-//                else -> {
-//                    onApiError(Exception("Unknown Error!"))
-//                }
-//            }
-//        })
-
         viewModel.cleanResult.observe(this, {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
@@ -139,6 +119,26 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+
+            viewModel.posts(MyPagesType.LIKE).flowOn(Dispatchers.IO).collectLatest {
+                adapter.submitData(it)
+            }
+        }
+
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -161,31 +161,6 @@ class LikePostFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFr
             )
         )
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
-            }
-        }
-
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-
-            viewModel.posts(MyPagesType.LIKE).flowOn(Dispatchers.IO).collectLatest {
-                adapter.submitData(it)
-            }
-        }
-
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            @OptIn(FlowPreview::class)
-            adapter.loadStateFlow
-                    .distinctUntilChangedBy { it.refresh }
-                    .filter { it.refresh is LoadState.NotLoading }
-                    .collect {
-                        posts_list?.scrollToPosition(0)
-                    }
-        }
     }
 
     override fun onResume() {

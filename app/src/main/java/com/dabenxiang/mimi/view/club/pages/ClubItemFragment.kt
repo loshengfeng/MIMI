@@ -2,7 +2,9 @@ package com.dabenxiang.mimi.view.club.pages
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
@@ -105,11 +107,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        posts_list.adapter = ConcatAdapter(adTop, adapter)
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Timber.i("ClubItemFragment $type onCreateView")
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
@@ -125,16 +124,16 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             }
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            @OptIn(FlowPreview::class)
-            adapter.loadStateFlow
-                .distinctUntilChangedBy { it.refresh }
-                .filter { it.refresh is LoadState.NotLoading }
-                .collect {
-                    posts_list?.scrollToPosition(0)
-                }
-        }
+        return super.onCreateView(inflater, container, savedInstanceState)
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        posts_list.adapter = ConcatAdapter(adTop, adapter)
+
+        Timber.i("ClubItemFragment $type onViewCreated")
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false

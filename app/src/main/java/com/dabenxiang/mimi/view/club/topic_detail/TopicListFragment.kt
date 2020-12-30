@@ -2,7 +2,9 @@ package com.dabenxiang.mimi.view.club.topic_detail
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
@@ -100,11 +102,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Timber.i("pageCode=$pageCode onViewCreated")
-        posts_list.adapter = ConcatAdapter(adTop, adapter)
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
@@ -119,16 +117,13 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
                 adapter.submitData(it)
             }
         }
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            @OptIn(FlowPreview::class)
-            adapter.loadStateFlow
-                .distinctUntilChangedBy { it.refresh }
-                .filter { it.refresh is LoadState.NotLoading }
-                .collect { posts_list.scrollToPosition(0) }
-        }
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Timber.i("pageCode=$pageCode onViewCreated")
+        posts_list.adapter = ConcatAdapter(adTop, adapter)
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
