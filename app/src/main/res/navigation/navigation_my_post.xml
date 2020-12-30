@@ -123,19 +123,6 @@
         <action
             android:id="@+id/action_postPicFragment_to_postViewerFragment"
             app:destination="@id/postViewerFragment" />
-        <action
-            android:id="@+id/action_postPicFragment_to_myPostFragment"
-            app:destination="@id/myPostFragment"
-            app:popUpTo="@+id/myPostFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_postPicFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment"
-            app:popUpTo="@+id/searchPostFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_postPicFragment_to_clubPicFragment"
-            app:destination="@id/clubPicFragment" />
     </fragment>
 
     <fragment
