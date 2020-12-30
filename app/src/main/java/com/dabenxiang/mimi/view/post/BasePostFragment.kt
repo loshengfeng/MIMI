@@ -73,10 +73,8 @@ open class BasePostFragment : BaseFragment() {
         const val PIC = "pic"
         const val FAVORITE = "favorite"
         const val POST_TYPE = "post_type"
-        const val TYPE_TEXT = "text"
-        const val TYPE_PIC = "pic"
-        const val TYPE_VIDEO = "video"
         const val POST_DATA = "post_data"
+        const val LIKE = "like"
     }
 
     override val bottomNavigationVisibility: Int

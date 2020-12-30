@@ -17,6 +17,7 @@ class HomeListPagingSource(
     companion object {
         const val PER_LIMIT = 20
     }
+    private var adIndex = 0
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, HomeListItem> {
         return try {
             val offset = params.key ?: 0L
@@ -39,6 +40,7 @@ class HomeListPagingSource(
                 else -> null
             }
 
+            adIndex = 0
             val adCount = ceil((homeList?.size ?: 0).toFloat() / 2).toInt()
             val adItems =
                 domainManager.getAdRepository().getAD("home", adWidth, adHeight, adCount)
@@ -70,9 +72,11 @@ class HomeListPagingSource(
     }
 
     private fun getAdItem(adItems: ArrayList<AdItem>): HomeListItem {
+        if (adIndex + 1 > adItems.size) adIndex = 0
         val adItem =
             if (adItems.isEmpty()) AdItem()
-            else adItems.removeFirst()
+            else adItems[adIndex]
+        adIndex++
         return HomeListItem(adItem = adItem)
     }
 }

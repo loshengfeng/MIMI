@@ -381,13 +381,13 @@ abstract class BaseFragment : Fragment() {
     }
 
     fun handlePostClub() {
-        arguments?.let {
+        mainViewModel?.uploadData?.value?.let {
             if (it.containsKey(POST_DATA)) {
                 postClubItem = it.getSerializable(POST_DATA) as PostClubItem
                 setPostTpe(PostType.getTypeByValue(postClubItem.type))
 
                 when (postClubItem.type) {
-                    PostType.TEXT.value ->  mainViewModel?.postArticle(postClubItem)
+                    PostType.TEXT.value -> mainViewModel?.postArticle(postClubItem)
                     PostType.IMAGE.value -> uploadPicFlow()
                     PostType.VIDEO.value -> uploadVideoFlow()
                     else -> {

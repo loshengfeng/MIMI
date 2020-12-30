@@ -1,11 +1,8 @@
 package com.dabenxiang.mimi.view.generalvideo.paging
 
 import androidx.paging.PagingSource
-import com.dabenxiang.mimi.model.api.ApiRepository.Companion.NETWORK_PAGE_SIZE
 import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
@@ -21,6 +18,8 @@ class VideoPagingSource(
     private val needAd: Boolean,
     private val isCategoryPage: Boolean = false
 ) : PagingSource<Long, StatisticsItem>() {
+
+    private var adIndex = 0
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, StatisticsItem> {
         return try {
@@ -52,6 +51,7 @@ class VideoPagingSource(
                             .body()?.content?.get(0)?.ad?.first() ?: AdItem()
                     itemsWithAd.add(StatisticsItem(adItem = topAdItem))
                 }
+                adIndex = 0
                 val adCount = ceil((items?.size ?: 0).toFloat() / 10).toInt()
                 val adItems =
                     domainManager.getAdRepository()
@@ -99,9 +99,11 @@ class VideoPagingSource(
     }
 
     private fun getAdItem(adItems: ArrayList<AdItem>): StatisticsItem {
+        if (adIndex + 1 > adItems.size) adIndex = 0
         val adItem =
             if (adItems.isEmpty()) AdItem()
-            else adItems.removeFirst()
+            else adItems[adIndex]
+        adIndex++
         return StatisticsItem(adItem = adItem)
     }
 }

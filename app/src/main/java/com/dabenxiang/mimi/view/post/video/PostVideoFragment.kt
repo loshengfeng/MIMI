@@ -147,6 +147,12 @@ class PostVideoFragment : BasePostFragment() {
         val bundle = Bundle()
         bundle.putSerializable(POST_DATA, postClubItem)
 
+        if(isEdit){
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        }
+        mainViewModel?.uploadData?.value = bundle
+
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
@@ -168,16 +174,23 @@ class PostVideoFragment : BasePostFragment() {
                 bundle
             )
         } else if (isEdit && page == VIDEO) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
-            bundle.putLong(ClipPlayerFragment.KEY_PLAYER_SRC, item.id)
-            findNavController().navigate(
-                R.id.action_postVideoFragment_to_clipPlayerFragment,
-                bundle
-            )
+//            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+//            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+//            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
+//            bundle.putLong(ClipPlayerFragment.KEY_PLAYER_SRC, item.id)
+//            findNavController().navigate(
+//                R.id.action_postVideoFragment_to_clipPlayerFragment,
+//                bundle
+//            )
+            findNavController().navigateUp()
         } else if (isEdit && page == TAB) {
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
+
+        } else if (isEdit && page == FAVORITE) {
+            findNavController().navigateUp()
+
+        } else if (isEdit && page == LIKE) {
+            findNavController().navigateUp()
         } else {
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
         }

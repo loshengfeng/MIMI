@@ -124,6 +124,12 @@ class PostPicFragment : BasePostFragment() {
         val bundle = Bundle()
         bundle.putSerializable(POST_DATA, postClubItem)
 
+        if(isEdit){
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        }
+        mainViewModel?.uploadData?.value = bundle
+
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
@@ -141,10 +147,15 @@ class PostPicFragment : BasePostFragment() {
         } else if (isEdit && page == TAB) {
             findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         } else if (isEdit && page == PIC) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(ClubPicFragment.KEY_DATA, item)
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item) //TODO fix key
-            findNavController().navigate(R.id.action_postPicFragment_to_clubPicFragment, bundle)
+//            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+//            bundle.putSerializable(ClubPicFragment.KEY_DATA, item)
+//            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item) //TODO fix key
+//            findNavController().navigate(R.id.action_postPicFragment_to_clubPicFragment, bundle)
+            findNavController().navigateUp()
+        } else if (isEdit && page == FAVORITE) {
+            findNavController().navigateUp()
+        } else if (isEdit && page == LIKE) {
+            findNavController().navigateUp()
         } else {
             findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         }

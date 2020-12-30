@@ -4,15 +4,12 @@ import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.OrderBy
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import kotlin.math.ceil
-import kotlin.math.round
 
 class ClubItemDataSource(
     private val domainManager: DomainManager,
@@ -26,12 +23,10 @@ class ClubItemDataSource(
         const val PER_LIMIT = 10
     }
 
+    private var adIndex = 0
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MemberPostItem> {
         val offset = params.key ?: 0
         return try {
-
-//            val adItem = domainManager.getAdRepository().getAD(adWidth, adHeight).body()?.content
-//                ?: AdItem()
 
             val result =
                 when (type) {
@@ -82,6 +77,7 @@ class ClubItemDataSource(
                         .body()?.content?.get(0)?.ad?.first() ?: AdItem()
                 list.add(MemberPostItem(type = PostType.AD, adItem = topAdItem))
             }
+            adIndex = 0
             val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / 5).toInt()
             val adItems =
                 domainManager.getAdRepository().getAD(getAdCode(), adWidth, adHeight, adCount)
@@ -128,9 +124,11 @@ class ClubItemDataSource(
     }
 
     private fun getAdItem(adItems: ArrayList<AdItem>): MemberPostItem {
+        if (adIndex + 1 > adItems.size) adIndex = 0
         val adItem =
             if (adItems.isEmpty()) AdItem()
-            else adItems.removeFirst()
+            else adItems[adIndex]
+        adIndex++
         return MemberPostItem(type = PostType.AD, adItem = adItem)
     }
 }
