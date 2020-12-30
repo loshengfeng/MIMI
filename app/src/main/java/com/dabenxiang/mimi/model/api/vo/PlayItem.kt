@@ -1,6 +1,9 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.annotations.SerializedName
+import java.util.ArrayList
 
 data class PlayItem(
     @SerializedName("id")
@@ -56,4 +59,21 @@ data class PlayItem(
 
     val adItem: AdItem? = null
 
-) : BaseItem()
+) : BaseItem(){
+    fun toMemberPostItem(): MemberPostItem {
+        return MemberPostItem(
+            id = id,
+            videoId= videoId?:0,
+            title = title?:"",
+            cover = cover?:"",
+            type = PostType.getTypeByValue(playlistType?.toInt()),
+            videoSource = source?:"",
+            likeType = if(like ==null) null else if(like==true) LikeType.LIKE else LikeType.DISLIKE,
+            likeCount = likeCount?:0,
+            isFavorite = favorite?:false,
+            favoriteCount = favoriteCount?:0,
+            commentCount = commentCount?:0,
+            tags = tags as ArrayList<String>? ?: arrayListOf()
+        )
+    }
+}

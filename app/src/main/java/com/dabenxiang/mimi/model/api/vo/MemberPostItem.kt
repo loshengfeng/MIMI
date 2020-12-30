@@ -22,6 +22,9 @@ data class MemberPostItem(
     @SerializedName("postId")
     var postId: Long = 0,
 
+    @ColumnInfo(name = "videoId")
+    val videoId: Long =0,
+
     @ColumnInfo(name = "title")
     @SerializedName("title")
     var title: String = "",
