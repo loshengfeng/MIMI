@@ -14,7 +14,6 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
@@ -24,7 +23,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
-import com.dabenxiang.mimi.view.club.base.ClubItemAdapter
+import com.dabenxiang.mimi.view.club.base.PostItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -38,7 +37,6 @@ import kotlinx.android.synthetic.main.fragment_club_item.id_empty_group
 import kotlinx.android.synthetic.main.fragment_club_item.layout_refresh
 import kotlinx.android.synthetic.main.fragment_club_item.posts_list
 import kotlinx.android.synthetic.main.fragment_club_item.text_page_empty
-import kotlinx.android.synthetic.main.item_ad.*
 import kotlinx.android.synthetic.main.item_club_is_not_login.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -55,8 +53,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         AdHeaderAdapter(requireContext())
     }
 
-    private val adapter: ClubItemAdapter by lazy {
-       ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
+    private val adapter: PostItemAdapter by lazy {
+       PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
     override fun getLayoutId() = R.layout.fragment_club_item
 

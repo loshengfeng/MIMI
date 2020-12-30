@@ -25,7 +25,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
-class ClubItemAdapter(
+class PostItemAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
         private val viewModelScope: CoroutineScope

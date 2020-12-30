@@ -11,10 +11,11 @@ import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -26,36 +27,23 @@ class MyFavoritesViewModel : ClubViewModel() {
     private val _deleteFavorites = MutableLiveData<Int>()
     val deleteFavorites: LiveData<Int> = _deleteFavorites
 
-    fun getData(adapter: FavoritesAdapter, isLike: Boolean) {
+    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
 
-        Timber.i("getData")
-        CoroutineScope(Dispatchers.IO).launch {
-            adapter.submitData(PagingData.empty())
-            getPostItemList(isLike)
-                    .collectLatest {
-                        adapter.submitData(it)
-                    }
-        }
-    }
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(type: MyPagesType) = flowOf(
+            clearListCh.receiveAsFlow().map { PagingData.empty() },
+            postItems(type)
 
-    fun getPostItemList(isLike: Boolean): Flow<PagingData<MemberPostItem>> {
-        return Pager(
-                config = PagingConfig(pageSize = FavoritesListDataSource.PER_LIMIT.toInt()),
-                pagingSourceFactory = {
-                    FavoritesListDataSource(
-                            domainManager,
-                            pagingCallback,
-                            adWidth,
-                            adHeight,
-                            isLike
-                    )
-                }
-        )
-                .flow
-                .onStart {  setShowProgress(true) }
-                .onCompletion { setShowProgress(false) }
-                .cachedIn(viewModelScope)
-    }
+    ).flattenMerge(2).cachedIn(viewModelScope)
+
+    private fun postItems(type: MyPagesType) = Pager(
+            config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
+            remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pagingCallback)
+    ) {
+        mimiDB.postDBItemDao().pagingSourceByPageCode( MyPagesPostMediator::class.simpleName+ type.toString())
+
+
+    }.flow
 
     fun deleteFavorites(items: List<MemberPostItem>) {
         if (items.isEmpty()) return
@@ -76,22 +64,4 @@ class MyFavoritesViewModel : ClubViewModel() {
         }
     }
 
-    fun deleteAllLike(items: List<MemberPostItem>) {
-        if (items.isEmpty()) return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository()
-                    .deleteAllLike(
-                        items.map {it.id}.joinToString(separator = ",")
-                    )
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _cleanResult.value = it }
-        }
-    }
 }

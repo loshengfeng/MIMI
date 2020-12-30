@@ -10,7 +10,12 @@ import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -30,18 +35,36 @@ class MyPostViewModel : BaseViewModel() {
         const val USER_ID_ME: Long = -1
     }
 
-    fun getMyPostPagingItems(
-        userId: Long
-    ): Flow<PagingData<MemberPostItem>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = ApiRepository.NETWORK_PAGE_SIZE,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { MyPostPagingSource(userId, domainManager) }
-        ).flow.cachedIn(viewModelScope)
-    }
+    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(userId: Long) = flowOf(
+            clearListCh.receiveAsFlow().map { PagingData.empty() },
+            postItems(userId)
+
+    ).flattenMerge(2).cachedIn(viewModelScope)
+
+    private fun postItems(userId: Long) = Pager(
+            config = PagingConfig(pageSize = MyPostMediator.PER_LIMIT),
+            remoteMediator = MyPostMediator(mimiDB, domainManager, userId)
+    ) {
+        mimiDB.postDBItemDao().pagingSourceByPageCode( MyPostMediator::class.simpleName+ userId.toString())
+
+
+    }.flow
+
+//    fun getMyPostPagingItems(
+//        userId: Long
+//    ): Flow<PagingData<MemberPostItem>> {
+//        return Pager(
+//            config = PagingConfig(
+//                pageSize = ApiRepository.NETWORK_PAGE_SIZE,
+//                enablePlaceholders = false
+//            ),
+//            pagingSourceFactory = { MyPostPagingSource(userId, domainManager) }
+//        ).flow.cachedIn(viewModelScope)
+//    }
+//
     fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
         viewModelScope.launch {
             flow {

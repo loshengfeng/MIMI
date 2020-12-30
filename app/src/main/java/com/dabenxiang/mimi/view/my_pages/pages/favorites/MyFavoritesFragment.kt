@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -20,17 +21,29 @@ import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.base.PostItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -44,8 +57,8 @@ class MyFavoritesFragment(
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
-    private val adapter: FavoritesAdapter by lazy {
-        FavoritesAdapter(requireActivity(), postListener, viewModel.viewModelScope)
+    private val adapter: PostItemAdapter by lazy {
+        PostItemAdapter(requireActivity(), postListener, viewModel.viewModelScope)
     }
 
     override val bottomNavigationVisibility: Int
@@ -72,35 +85,36 @@ class MyFavoritesFragment(
             layout_refresh.isRefreshing = false
         })
 
-        viewModel.likePostResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result.let { position ->
-                        adapter.notifyItemChanged(position, FavoritesAdapter.PAYLOAD_UPDATE_LIKE)
-                    }
-                }
+//        viewModel.likePostResult.observe(this, {
+//            when (it) {
+//                is ApiResult.Success -> {
+//                    it.result.let { position ->
+//                        adapter.notifyItemChanged(position, MyPagesPostAdapter.PAYLOAD_UPDATE_LIKE)
+//                    }
+//                }
+//
+//                else -> {
+//                    onApiError(Exception("Unknown Error!"))
+//                }
+//            }
+//        })
 
-                else -> {
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-        })
-
-        viewModel.favoriteResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> viewModel.getData(adapter, isLike)
-                else -> {
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-        })
+//        viewModel.favoriteResult.observe(this, {
+//            when (it) {
+//                is ApiResult.Success -> viewModel.getData(adapter, isLike)
+//                else -> {
+//                    onApiError(Exception("Unknown Error!"))
+//                }
+//            }
+//        })
 
         viewModel.cleanResult.observe(this, {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Empty -> {
-                    viewModel.getData(adapter, isLike)
+//                    viewModel.getData(adapter, isLike)
+                    adapter.refresh()
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -115,7 +129,6 @@ class MyFavoritesFragment(
         mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is ApiResult.Success -> {
-                    adapter.removedPosList.add(it.result)
                     adapter.notifyItemChanged(it.result)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -130,37 +143,56 @@ class MyFavoritesFragment(
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter, isLike)
+            adapter.refresh()
         }
 
         myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
-            if (it == tab) {
-                if (isLike) viewModel.deleteAllLike(adapter.snapshot().items)
-                else viewModel.deleteFavorites(adapter.snapshot().items)
-            }
+            viewModel.deleteFavorites(adapter.snapshot().items.map { it.memberPostItem })
         })
 
         text_page_empty.text =
             if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
         img_page_empty.setImageDrawable(
             ContextCompat.getDrawable(
-                requireContext(),
-                when (isLike) {
-                    false -> R.drawable.img_history_empty_2
-                    true -> R.drawable.img_love_empty
-                }
+                requireContext(), R.drawable.img_love_empty
             )
         )
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+
+            viewModel.posts(MyPagesType.FAVORITES).flowOn(Dispatchers.IO).collectLatest {
+                adapter.submitData(it)
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                    .distinctUntilChangedBy { it.refresh }
+                    .filter { it.refresh is LoadState.NotLoading }
+                    .collect {
+                        posts_list?.scrollToPosition(0)
+                    }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (accountManager.isLogin() && adapter.snapshot().items.isEmpty()) {
-            viewModel.getData(adapter, isLike)
-        } else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
-            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
-            adapter.notifyDataSetChanged()
-        }
+//        if (accountManager.isLogin() && adapter.snapshot().items.isEmpty()) {
+//            viewModel.getData(adapter, isLike)
+//        } else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+//            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
+//            adapter.notifyDataSetChanged()
+//        }
     }
 
     private val postListener = object : MyPostListener {
