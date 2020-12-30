@@ -189,17 +189,6 @@
             app:destination="@id/adultHomeFragment"
             app:popUpTo="@+id/adultHomeFragment"
             app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_postArticleFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment"
-            app:popUpTo="@+id/searchPostFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_postArticleFragment_to_topicDetailFragment"
-            app:destination="@id/topicDetailFragment"
-            app:popUpTo="@+id/topicDetailFragment"
-            app:popUpToInclusive="true" />
-
     </fragment>
 
     <fragment

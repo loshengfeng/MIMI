@@ -113,21 +113,6 @@
         android:id="@+id/postArticleFragment"
         android:name="com.dabenxiang.mimi.view.post.article.PostArticleFragment"
         tools:layout="@layout/fragment_post_article" >
-        <action
-            android:id="@+id/action_postArticleFragment_to_myPostFragment"
-            app:destination="@id/myPostFragment"
-            app:popUpTo="@+id/myPostFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_postArticleFragment_to_searchPostFragment"
-            app:destination="@id/searchPostFragment"
-            app:popUpTo="@+id/searchPostFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_postArticleFragment_to_clubTextFragment"
-            app:destination="@id/clubTextFragment"
-            app:popUpTo="@+id/clubTextFragment"
-            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment

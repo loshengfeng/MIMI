@@ -144,7 +144,6 @@ class ClubTabFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getClubItemList()
     }
 
     override fun onCreateView(
@@ -193,6 +192,9 @@ class ClubTabFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         Timber.i("ClubTabFragment onResume")
+
+        getClubItemList()
+
         val tabs = resources.getStringArray(R.array.club_tabs)
         search_bar.text = String.format(
             getString(R.string.text_search_classification),
