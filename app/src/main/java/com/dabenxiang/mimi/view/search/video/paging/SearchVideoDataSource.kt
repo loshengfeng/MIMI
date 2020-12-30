@@ -3,14 +3,12 @@ package com.dabenxiang.mimi.view.search.video.paging
 import androidx.paging.PagingSource
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 import kotlin.math.ceil
-import kotlin.math.round
 
 class SearchVideoDataSource(
     private val domainManager: DomainManager,
@@ -61,7 +59,6 @@ class SearchVideoDataSource(
                 if (index % 5 == 4) list.add(getAdItem(adItems))
             }
             if ((memberPostItems?.size ?: 0) % 5 != 0) list.add(getAdItem(adItems))
-            adjustData(list)
 
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
@@ -81,14 +78,6 @@ class SearchVideoDataSource(
             currentSize < PER_LIMIT -> false
             offset >= total -> false
             else -> true
-        }
-    }
-
-    private fun adjustData(list: List<VideoItem>) {
-        list.forEach { videoItem ->
-            videoItem.isAdult = true
-            videoItem.searchingTag = tag ?: ""
-            videoItem.searchingStr = keyword ?: ""
         }
     }
 

@@ -37,7 +37,6 @@ import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import timber.log.Timber
 
 open class BasePostFragment : BaseFragment() {
 
@@ -231,7 +230,7 @@ open class BasePostFragment : BaseFragment() {
 
     private fun setUI() {
         val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-        val contentItem = Gson().fromJson(item.content, MediaItem::class.java)
+        val contentItem = Gson().fromJson(item.postContent, MediaItem::class.java)
 
         postId = item.id
 

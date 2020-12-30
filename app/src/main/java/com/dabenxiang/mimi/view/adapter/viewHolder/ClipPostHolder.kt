@@ -99,7 +99,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
         var contentItem: MediaContentItem? = null
         try {
-            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+            contentItem = Gson().fromJson(item.postContent, MediaContentItem::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
         }

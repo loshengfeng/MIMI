@@ -18,6 +18,10 @@ data class MemberPostItem(
     @SerializedName("id")
     var id: Long = 0,
 
+    @ColumnInfo(name = "postId")
+    @SerializedName("postId")
+    var postId: Long = 0,
+
     @ColumnInfo(name = "title")
     @SerializedName("title")
     var title: String = "",
@@ -26,8 +30,30 @@ data class MemberPostItem(
     @SerializedName("cover")
     var cover: String = "",
 
+    @ColumnInfo(name = "postContent")
     @SerializedName("content")
-    var content: String = "",
+    var postContent: String = "",
+
+    @ColumnInfo(name = "videoDescription")
+    val videoDescription: String = "",
+
+    @ColumnInfo(name = "videoCountry")
+    val videoCountry: String = "",
+
+    @ColumnInfo(name = "videoSource")
+    val videoSource: String = "",
+
+    @ColumnInfo(name = "videoSources")
+    val videoSources: ArrayList<Source> = arrayListOf(),
+
+    @ColumnInfo(name = "videoEpisodes")
+    val videoEpisodes: ArrayList<VideoEpisode> = arrayListOf(),
+
+    @ColumnInfo(name = "videoTimesWatched")
+    val videoTimesWatched: Int = 0,
+
+    @ColumnInfo(name = "videoPerformers")
+    val videoPerformers: String = "",
 
     @ColumnInfo(name = "type")
     @SerializedName("type")
@@ -37,9 +63,36 @@ data class MemberPostItem(
     @SerializedName("creationDate")
     val creationDate: Date = Date(),
 
-    @ColumnInfo(name = "isFavorite")
-    @SerializedName("isFavorite")
-    var isFavorite: Boolean = false,
+    @ColumnInfo(name = "updateDate")
+    val updateDate: Date = Date(),
+
+    @ColumnInfo(name = "avatarAttachmentId")
+    @SerializedName("avatarAttachmentId")
+    var avatarAttachmentId: Long = 0,
+
+    @ColumnInfo(name = "creatorId")
+    @SerializedName("creatorId")
+    var creatorId: Long = 0,
+
+    @ColumnInfo(name = "postFriendlyName")
+    @SerializedName("postFriendlyName")
+    var postFriendlyName: String = "",
+
+    @ColumnInfo(name = "isFollow")
+    @SerializedName("isFollow")
+    var isFollow: Boolean = false,
+
+    @ColumnInfo(name = "reported")
+    @SerializedName("reported")
+    var reported: Boolean = false,
+
+    @ColumnInfo(name = "deducted")
+    @SerializedName("deducted")
+    var deducted: Boolean = false,
+
+    @ColumnInfo(name = "likeType")
+    @SerializedName("likeType")
+    var likeType: LikeType? = null,
 
     @ColumnInfo(name = "likeCount")
     @SerializedName("likeCount")
@@ -49,9 +102,9 @@ data class MemberPostItem(
     @SerializedName("dislikeCount")
     var dislikeCount: Int = 0,
 
-    @ColumnInfo(name = "likeType")
-    @SerializedName("likeType")
-    var likeType: LikeType? = null,
+    @ColumnInfo(name = "isFavorite")
+    @SerializedName("isFavorite")
+    var isFavorite: Boolean = false,
 
     @ColumnInfo(name = "favoriteCount")
     @SerializedName("favoriteCount")
@@ -65,54 +118,14 @@ data class MemberPostItem(
     @SerializedName("tags")
     var tags: ArrayList<String>? = arrayListOf(),
 
-    @ColumnInfo(name = "clickThroughCount")
-    @SerializedName("clickThroughCount")
-    val clickThroughCount: Int = 0,
-
-    @ColumnInfo(name = "avatarAttachmentId")
-    @SerializedName("avatarAttachmentId")
-    var avatarAttachmentId: Long = 0,
-
-    @ColumnInfo(name = "creatorId")
-    @SerializedName("creatorId")
-    var creatorId: Long = 0,
-
-    @ColumnInfo(name = "isFollow")
-    @SerializedName("isFollow")
-    var isFollow: Boolean = false,
-
-    @ColumnInfo(name = "reported")
-    @SerializedName("reported")
-    var reported: Boolean = false,
-
-    @ColumnInfo(name = "postFriendlyName")
-    @SerializedName("postFriendlyName")
-    var postFriendlyName: String = "",
-
     @ColumnInfo(name = "status")
     @SerializedName("status")
     val status: PostStatus? = PostStatus.ONLINE,
 
-    @ColumnInfo(name = "category")
-    @SerializedName("category")
-    val category: String? = "",
-
     @ColumnInfo(name = "adItem")
     var adItem: AdItem? = null,
 
-    @ColumnInfo(name = "isFullContent")
-    @SerializedName("isFullContent")
-    val isFullContent: Boolean = false,
-
-    @ColumnInfo(name = "deducted")
-    @SerializedName("deducted")
-    var deducted: Boolean = false,
-
-    @ColumnInfo(name = "postId")
-    @SerializedName("postId")
-    var postId: Long = 0
-
-) : BaseMemberPostItem()
+    ) : BaseMemberPostItem()
 
 class MemberPostItemConverters {
 

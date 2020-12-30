@@ -2,9 +2,7 @@ package com.dabenxiang.mimi.model.db
 
 import android.content.Context
 import androidx.room.*
-import com.dabenxiang.mimi.model.api.vo.AdItemConverters
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItemConverters
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -12,22 +10,25 @@ import java.lang.reflect.Type
 import java.util.*
 
 @Database(
-        entities = [
-            DBRemoteKey::class,
-            PostDBItem::class,
-            MemberPostItem::class],
-        version = 1,
-        exportSchema = false
+    entities = [
+        DBRemoteKey::class,
+        PostDBItem::class,
+        MemberPostItem::class],
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(
-        MemberPostItemConverters::class,
-        PostTypeConverter::class,
-        DateConverter::class,
-        LikeTypeConverter::class,
-        StringArrayListConverters::class,
-        PostStatusConverter::class,
-        AdItemConverters::class,
-        ClubTabItemTypeConverter::class)
+    MemberPostItemConverters::class,
+    PostTypeConverter::class,
+    DateConverter::class,
+    LikeTypeConverter::class,
+    StringArrayListConverters::class,
+    PostStatusConverter::class,
+    AdItemConverters::class,
+    ClubTabItemTypeConverter::class,
+    SourceArrayListConverters::class,
+    VideoEpisodeArrayListConverters::class
+)
 abstract class MiMiDB : RoomDatabase() {
     companion object {
         fun create(context: Context): MiMiDB {

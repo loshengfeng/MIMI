@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.AdultListener
@@ -17,7 +15,6 @@ import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
@@ -26,7 +23,6 @@ import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_club_short.view.*
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.*
 
 class ShortVideoHolder(itemView: View): BaseViewHolder(itemView), KoinComponent {
@@ -96,7 +92,7 @@ class ShortVideoHolder(itemView: View): BaseViewHolder(itemView), KoinComponent 
 
         var contentItem: MediaContentItem? = null
         try {
-            contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+            contentItem = Gson().fromJson(item.postContent, MediaContentItem::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
         }

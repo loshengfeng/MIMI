@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
@@ -62,7 +61,7 @@ class MyPostTextPostHolder(
         tvTitle.text = if (searchStr.isNotBlank()) getSpanString(tvTitle.context, item.title, searchStr) else item.title
 
         try {
-            val contentItem = Gson().fromJson(item.content, TextContentItem::class.java)
+            val contentItem = Gson().fromJson(item.postContent, TextContentItem::class.java)
             tvTextDesc.text = contentItem.text
         } catch (e: Exception) {
             Timber.e(e)

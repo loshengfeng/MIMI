@@ -62,10 +62,10 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyCollectionTabItemTy
                 viewModel.videoLike(VideoItem(
                         id = item.videoId?:0,
                         favorite = item.favorite ?: false,
-                        favoriteCount = item.favoriteCount?.toLong(),
+                        favoriteCount = item.favoriteCount?:0,
                         like = item.like,
                         likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
-                        likeCount = item.likeCount?.toLong()?:0
+                        likeCount = item.likeCount?:0
 
                 ), LikeType.LIKE)
             }

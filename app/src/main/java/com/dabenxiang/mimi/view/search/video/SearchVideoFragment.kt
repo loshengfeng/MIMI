@@ -38,7 +38,6 @@ import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_FAVORITE
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_LIKE
@@ -78,7 +77,9 @@ class SearchVideoFragment : BaseFragment() {
     var moreDialog: MoreDialogFragment? = null
 
     private val videoListAdapter by lazy {
-        SearchVideoAdapter(requireContext(), adapterListener)
+        SearchVideoAdapter(requireContext(), adapterListener,
+            { viewModel.searchingStr },
+            { viewModel.searchingTag })
     }
 
     override fun getLayoutId(): Int {
@@ -234,7 +235,8 @@ class SearchVideoFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
-            videoListAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
+            videoListAdapter.changedPosList =
+                mainViewModel?.videoItemChangedList?.value ?: HashMap()
             videoListAdapter.notifyDataSetChanged()
         }
     }
@@ -260,7 +262,7 @@ class SearchVideoFragment : BaseFragment() {
 
     private val adapterListener = object : SearchVideoAdapter.EventListener {
         override fun onVideoClick(item: VideoItem) {
-            when(viewModel.videoType) {
+            when (viewModel.videoType) {
                 VideoType.SHORT_VIDEO -> {
                     navigateTo(
                         NavigateItem.Destination(
@@ -273,7 +275,7 @@ class SearchVideoFragment : BaseFragment() {
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_searchVideoFragment_to_navigation_player,
-                            PlayerFragment.createBundle(PlayerItem(item.id))
+                            PlayerV2Fragment.createBundle(PlayerItem(item.id))
                         )
                     )
                 }

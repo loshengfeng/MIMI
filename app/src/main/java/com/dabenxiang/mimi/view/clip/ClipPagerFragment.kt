@@ -254,7 +254,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             override fun onUpdateCommentCount(count: Int) {
                 val currentPos = clipAdapter.getCurrentPos()
                 if (currentPos >= 0) {
-                    clipAdapter.getVideoItem(currentPos)?.commentCount = count.toLong()
+                    clipAdapter.getVideoItem(currentPos)?.commentCount = count
                     rv_clip.adapter?.notifyItemChanged(currentPos, ClipAdapter.PAYLOAD_UPDATE_UI)
                 }
             }

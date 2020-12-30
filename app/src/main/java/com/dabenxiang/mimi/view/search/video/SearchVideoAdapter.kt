@@ -9,23 +9,20 @@ import android.widget.ImageView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.SearchVideoViewHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class SearchVideoAdapter(
     val context: Context,
-    private val listener: EventListener
+    private val listener: EventListener,
+    private val getSearchText: () -> String,
+    private val getSearchTag: () -> String
 ) : PagingDataAdapter<VideoItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -74,7 +71,7 @@ class SearchVideoAdapter(
                         R.layout.item_favorite_normal,
                         parent,
                         false
-                    ), listener
+                    )
                 )
             }
         }
@@ -101,7 +98,7 @@ class SearchVideoAdapter(
                         UPDATE_FAVORITE -> holder.updateFavorite(item as VideoItem)
                     }
                 } else {
-                    holder.bind(item as VideoItem, position)
+                    holder.onBind(item as VideoItem, listener, getSearchText.invoke(), getSearchTag.invoke())
                 }
             }
         }

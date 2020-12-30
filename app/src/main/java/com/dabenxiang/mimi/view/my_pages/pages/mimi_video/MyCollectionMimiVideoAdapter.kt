@@ -114,9 +114,9 @@ class MyCollectionMimiVideoAdapter(
         val changedItem = changedPosList[item?.videoId]
         if (changedItem != null) {
             item?.like = changedItem.like
-            item?.likeCount = changedItem.likeCount.toInt()
+            item?.likeCount = changedItem.likeCount
             item?.favorite = changedItem.favorite
-            item?.favoriteCount = changedItem.favoriteCount?.toInt()
+            item?.favoriteCount = changedItem.favoriteCount
         }
         item?.also {
             when (holder) {

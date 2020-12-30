@@ -39,7 +39,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         tvTitle.text = item.title
         tvFavorite.text = item.favoriteCount.toString()
 
-        LruCacheUtils.getShortVideoCount(item.id)?.commentCount?.run { item.commentCount = this.toLong() }
+        LruCacheUtils.getShortVideoCount(item.id)?.commentCount?.run { item.commentCount = this }
         tvComment.text = item.commentCount.toString()
 
         tvTitle.isSelected = true

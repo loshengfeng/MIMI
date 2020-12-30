@@ -47,7 +47,7 @@ class ClipSingleViewModel : BaseViewModel() {
                         VideoItem(
                             id = item.videoId ?: 0,
                             favorite = item.favorite ?: false,
-                            favoriteCount = item.favoriteCount?.toLong()
+                            favoriteCount = item.favoriteCount?:0
                         )
                     )
                 )

@@ -356,7 +356,7 @@ class PlayerDescriptionFragment : BaseFragment() {
             descriptionViewModel.videoContentId = viewModel.videoContentId
         }
 
-        val dateString = videoItem.updateTime?.let { date ->
+        val dateString = videoItem.updateDate?.let { date ->
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
         }
 
@@ -498,7 +498,6 @@ class PlayerDescriptionFragment : BaseFragment() {
         val bundle = SearchVideoFragment.createBundle(
             tag = tag
         )
-        bundle.putBoolean(PlayerFragment.KEY_IS_FROM_PLAYER, true)
         findNavController().navigate(
             R.id.action_playerFragment_to_searchVideoFragment,
             bundle

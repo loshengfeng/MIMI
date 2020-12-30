@@ -9,7 +9,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -115,7 +114,7 @@ class MyPostClipPostHolder(
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        val contentItem = Gson().fromJson(item.postContent, MediaContentItem::class.java)
 
         tvLength.text = contentItem.shortVideo?.length
         contentItem.images?.also { images ->

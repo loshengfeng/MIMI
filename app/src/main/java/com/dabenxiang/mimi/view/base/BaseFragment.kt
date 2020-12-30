@@ -38,7 +38,6 @@ import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MEMBER_REQUEST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PIC_URI
@@ -144,10 +143,6 @@ abstract class BaseFragment : Fragment() {
         setupListeners()
         setupObservers()
 
-        if (arguments?.getBoolean(PlayerFragment.KEY_IS_FROM_PLAYER) == true) {
-            mainViewModel?.isFromPlayer = true
-        }
-
         handlePostClub()
     }
 
@@ -214,7 +209,7 @@ abstract class BaseFragment : Fragment() {
                             val content = Gson().toJson(mediaItem)
                             Timber.d("Post pic content item : $content")
 
-                            memberPostItem.content = content
+                            memberPostItem.postContent = content
 
                             val postId = arguments?.getLong(BasePostFragment.POST_ID)
                             mainViewModel?.clearLiveDataValue()
@@ -324,7 +319,7 @@ abstract class BaseFragment : Fragment() {
                             mediaItem.videoParameter = videoParameter
                             mediaItem.textContent = postMemberRequest.content
                             val content = Gson().toJson(mediaItem)
-                            memberPostItem.content = content
+                            memberPostItem.postContent = content
                             postMemberRequest.title = memberRequest!!.title
                             Timber.d("Post video content item : $content")
                             mainViewModel?.clearLiveDataValue()
@@ -355,7 +350,7 @@ abstract class BaseFragment : Fragment() {
                             postMemberRequest.title = memberRequest.title
                             postMemberRequest.content = content
                             postMemberRequest.tags = memberRequest.tags
-                            memberPostItem.content = content
+                            memberPostItem.postContent = content
                             Timber.d("Post id : $postId")
                             Timber.d("Request : $postMemberRequest")
                             Timber.d("Post video content item : $content")
@@ -439,7 +434,7 @@ abstract class BaseFragment : Fragment() {
         }
 
         memberPostItem.title = title!!
-        memberPostItem.content = request!!
+        memberPostItem.postContent = request!!
         memberPostItem.tags = tags
 
         mainViewModel?.postArticle(title, request, tags!!, memberPostItem)
@@ -555,7 +550,7 @@ abstract class BaseFragment : Fragment() {
             val memberRequest = bundle.getParcelable<PostMemberRequest>(MEMBER_REQUEST)
 
             memberPostItem.title = memberRequest!!.title
-            memberPostItem.content = content
+            memberPostItem.postContent = content
             Timber.d("Post pic content item : $content")
 
             mainViewModel?.postPicOrVideo(postId, postMemberRequest, content, HomeViewModel.TYPE_PIC)
@@ -596,7 +591,7 @@ abstract class BaseFragment : Fragment() {
             mediaItem.picParameter.add(picParameter)
 
             val content = Gson().toJson(mediaItem)
-            memberPostItem.content = content
+            memberPostItem.postContent = content
             Timber.d("Post video content item : $content")
 
             mainViewModel?.postPicOrVideo(postId, memberRequest, content, HomeViewModel.TYPE_VIDEO)
@@ -818,7 +813,7 @@ abstract class BaseFragment : Fragment() {
 
         val content = Gson().toJson(mediaItem)
         Timber.d("Post pic content item : $content")
-        memberPostItem.content = content
+        memberPostItem.postContent = content
         mainViewModel?.clearLiveDataValue()
         mainViewModel?.postPicOrVideo(request = postMemberRequest, content = content, type = HomeViewModel.TYPE_PIC)
     }

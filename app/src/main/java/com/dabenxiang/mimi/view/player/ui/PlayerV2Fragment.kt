@@ -30,6 +30,7 @@ import java.net.UnknownHostException
 class PlayerV2Fragment : BasePlayerFragment() {
 
     companion object {
+        const val KEY_DEST_ID = "DEST_ID"
         private const val KEY_PLAYER_SRC = "KEY_PLAYER_SRC"
         private const val KEY_IS_COMMENT = "KEY_IS_COMMENT"
         const val CODE_PLAYER = "player"

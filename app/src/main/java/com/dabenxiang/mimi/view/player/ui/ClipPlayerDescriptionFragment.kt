@@ -305,7 +305,6 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         val bundle = SearchPostFragment.createBundle(
             SearchPostItem(PostType.VIDEO, tag = tag)
         )
-        bundle.putBoolean(PlayerFragment.KEY_IS_FROM_PLAYER, true)
         findNavController().navigate(
             R.id.action_to_searchPostFragment,
             bundle

@@ -114,7 +114,7 @@ class MyPostPicturePostHolder(
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        val contentItem = Gson().fromJson(item.postContent, MediaContentItem::class.java)
         if (pictureRecycler.adapter == null || tvPictureCount.tag != position) {
             tvPictureCount.tag = position
             pictureRecycler.layoutManager = LinearLayoutManager(
