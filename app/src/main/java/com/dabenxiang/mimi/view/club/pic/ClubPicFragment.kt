@@ -71,6 +71,10 @@ class ClubPicFragment : BaseFragment() {
             tab.text = title[position]
         }.attach()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
         viewPager.post {
             val position = arguments?.getInt(KEY_POSITION, 0)
             viewPager.currentItem = position!!

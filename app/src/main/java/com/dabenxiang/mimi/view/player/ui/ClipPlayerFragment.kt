@@ -39,10 +39,6 @@ class ClipPlayerFragment : BasePlayerFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        player_pager.post {
-            val position = arguments?.getInt(KEY_POSITION, 0)
-            player_pager.currentItem = position ?: 0
-        }
     }
 
     override fun createViewPagerFragment(position: Int): Fragment = when (position) {
@@ -65,6 +61,10 @@ class ClipPlayerFragment : BasePlayerFragment() {
 
     override fun onResume() {
         super.onResume()
+        player_pager.post {
+            val position = arguments?.getInt(KEY_POSITION, 0)
+            player_pager.currentItem = position ?: 0
+        }
         getPostContent()
     }
 

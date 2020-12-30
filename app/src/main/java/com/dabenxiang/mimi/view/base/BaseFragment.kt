@@ -446,11 +446,12 @@ abstract class BaseFragment : Fragment() {
     }
 
     fun handlePostClub() {
-        arguments?.let {
+        mainViewModel?.uploadData?.value?.let {
+            Timber.i("handlePostClub = $it")
             val isNeedArticleUpload = it.getBoolean(UPLOAD_ARTICLE, false)
             val isNeedPicUpload = it.getBoolean(UPLOAD_PIC, false)
             val isNeedVideoUpload = it.getBoolean(UPLOAD_VIDEO)
-
+            mainViewModel?.uploadData?.value =null
             when {
                 isNeedArticleUpload -> {
                     setPostTpe(PostType.TEXT)
