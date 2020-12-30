@@ -125,7 +125,22 @@ data class MemberPostItem(
     @ColumnInfo(name = "adItem")
     var adItem: AdItem? = null,
 
-    ) : BaseMemberPostItem()
+    ) : BaseMemberPostItem(){
+
+    fun toPlayItem(): PlayItem {
+        return PlayItem(
+                videoId = id,
+                title = title,
+                favorite = isFavorite,
+                likeCount = likeCount,
+                favoriteCount = favoriteCount,
+                commentCount = commentCount,
+                tags = tags,
+                like =  likeType?.value == 0,
+                cover = cover,
+        )
+    }
+    }
 
 class MemberPostItemConverters {
 

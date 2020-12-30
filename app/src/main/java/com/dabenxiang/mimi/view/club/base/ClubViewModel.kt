@@ -258,9 +258,9 @@ abstract class ClubViewModel : BaseViewModel(){
                 id= adItem.id,
                 postDBId =  adItem.id,
                 postType = PostType.AD,
-                timestamp = before.postDBItem.timestamp + 1,
+                timestamp = before.postDBItem.timestamp ,
                 pageCode = before.postDBItem.pageCode,
-                index = 0
+                index = before.postDBItem.index-1
             )
             MemberPostWithPostDBItem(postDBItem, adItem)
 

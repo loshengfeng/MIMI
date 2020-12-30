@@ -3,10 +3,7 @@ package com.dabenxiang.mimi.view.my_pages.pages.like
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
@@ -15,11 +12,12 @@ import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoDataSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class LikeMimiVideoViewModel : BaseViewModel() {
@@ -41,31 +39,28 @@ class LikeMimiVideoViewModel : BaseViewModel() {
 
     var totalCount: Int = 0
 
-    fun getData(adapter: LikeMimiVideoAdapter) {
-        CoroutineScope(Dispatchers.IO).launch {
-            adapter.submitData(PagingData.empty())
-            getLikeItemList()
-                .collect {
-                    adapter.submitData(it)
-                }
+    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(type: MyPagesType) = flowOf(
+            clearListCh.receiveAsFlow().map { PagingData.empty() },
+            postItems(type)
+
+    ).flattenMerge(2).cachedIn(viewModelScope)
+
+    private fun postItems(type: MyPagesType) = Pager(
+            config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
+            remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pagingCallback)
+    ) {
+        mimiDB.postDBItemDao().pagingSourceByPageCode(MyPagesPostMediator::class.simpleName + type.toString())
+
+
+    }.flow.map { pagingData->
+        pagingData.map { dbItem->
+            dbItem.memberPostItem.toPlayItem()
         }
     }
 
-    private fun getLikeItemList(): Flow<PagingData<PlayItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = MyCollectionMimiVideoDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                MiMiLikeListDataSource(
-                    domainManager,
-                    pagingCallback,
-                )
-            }
-        )
-            .flow
-            .onStart { setShowProgress(true) }
-            .onCompletion { setShowProgress(false) }
-            .cachedIn(viewModelScope)
-    }
 
     fun deleteMIMIVideoFavorite(videoId: String) {
         viewModelScope.launch {

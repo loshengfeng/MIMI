@@ -11,7 +11,6 @@ import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.manager.DomainManager
-
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -54,6 +53,7 @@ class MyPagesPostMediator(
             val result =
                     when(myPagesType) {
                         MyPagesType.LIKE -> domainManager.getApiRepository().getPostLike(offset.toLong(), PER_LIMIT, 7)
+                        MyPagesType.LIKE_MIMI -> domainManager.getApiRepository().getPostLike(offset.toLong(), PER_LIMIT,8 )
                         else -> domainManager.getApiRepository().getPostFavorite( offset.toLong(), PER_LIMIT, 7)
                     }
             if (!result.isSuccessful) throw HttpException(result)
