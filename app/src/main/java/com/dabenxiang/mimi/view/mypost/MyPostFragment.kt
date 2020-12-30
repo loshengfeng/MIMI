@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.mypost
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -90,21 +92,11 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-//        if (adapter.snapshot().items.isEmpty()) {
-//            getMyPost(userId)
-//        }
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_my_post
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initSettings()
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
@@ -114,22 +106,18 @@ class MyPostFragment : BaseFragment() {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-
             viewModel.posts(userId).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            @OptIn(FlowPreview::class)
-            adapter.loadStateFlow
-                    .distinctUntilChangedBy { it.refresh }
-                    .filter { it.refresh is LoadState.NotLoading }
-                    .collect {
-                        posts_list?.scrollToPosition(0)
-                    }
-        }
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initSettings()
+
     }
 
     override fun initSettings() {

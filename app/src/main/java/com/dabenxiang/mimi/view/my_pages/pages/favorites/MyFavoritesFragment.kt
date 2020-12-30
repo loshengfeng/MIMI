@@ -2,7 +2,9 @@ package com.dabenxiang.mimi.view.my_pages.pages.favorites
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -136,6 +138,25 @@ class MyFavoritesFragment(
         })
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+
+            viewModel.posts(MyPagesType.FAVORITES).flowOn(Dispatchers.IO).collectLatest {
+                adapter.submitData(it)
+            }
+        }
+
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -158,41 +179,6 @@ class MyFavoritesFragment(
             )
         )
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
-            }
-        }
-
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-
-            viewModel.posts(MyPagesType.FAVORITES).flowOn(Dispatchers.IO).collectLatest {
-                adapter.submitData(it)
-            }
-        }
-
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            @OptIn(FlowPreview::class)
-            adapter.loadStateFlow
-                    .distinctUntilChangedBy { it.refresh }
-                    .filter { it.refresh is LoadState.NotLoading }
-                    .collect {
-                        posts_list?.scrollToPosition(0)
-                    }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-//        if (accountManager.isLogin() && adapter.snapshot().items.isEmpty()) {
-//            viewModel.getData(adapter, isLike)
-//        } else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
-//            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
-//            adapter.notifyDataSetChanged()
-//        }
     }
 
     private val postListener = object : MyPostListener {
