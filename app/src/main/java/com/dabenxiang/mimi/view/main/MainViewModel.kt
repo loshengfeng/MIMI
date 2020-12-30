@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -134,6 +135,8 @@ class MainViewModel : BaseViewModel() {
     val switchBottomTap = MutableLiveData<Int>()
     val changeNavigationPosition = MutableLiveData<Int>()
     val refreshBottomNavigationBadge = MutableLiveData<Int>()
+
+    val uploadData = MutableLiveData<Bundle>()
 
     private var job = Job()
 
