@@ -17,8 +17,7 @@ class FavoritesListDataSource constructor(
 ) : PagingSource<Long, MemberPostItem>() {
 
     companion object {
-        const val PER_LIMIT = "10"
-        val PER_LIMIT_LONG = PER_LIMIT.toLong()
+        const val PER_LIMIT = 10
     }
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MemberPostItem> {
@@ -27,8 +26,8 @@ class FavoritesListDataSource constructor(
 
             val result =
                 when(isLike) {
-                    false -> domainManager.getApiRepository().getPostFavorite( offset, LikeListDataSource.PER_LIMIT, 7)
-                    true -> domainManager.getApiRepository().getPostLike(offset, LikeListDataSource.PER_LIMIT, 7)
+                    false -> domainManager.getApiRepository().getPostFavorite( offset, PER_LIMIT, 7)
+                    true -> domainManager.getApiRepository().getPostLike(offset, PER_LIMIT, 7)
                 }
             if (!result.isSuccessful) throw HttpException(result)
 
@@ -41,7 +40,7 @@ class FavoritesListDataSource constructor(
                 result.body()?.paging?.offset ?: 0,
                     memberPostItems?.size ?: 0
             )
-            val nextKey = if (hasNext) offset + PER_LIMIT_LONG else null
+            val nextKey = if (hasNext) offset + PER_LIMIT.toLong() else null
             if (offset == 0L) pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
             pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
             LoadResult.Page(memberPostItems ?: listOf(), null, nextKey)
@@ -52,7 +51,7 @@ class FavoritesListDataSource constructor(
 
     private fun hasNextPage(total: Long, offset: Long, currentSize: Int): Boolean {
         return when {
-            currentSize < PER_LIMIT_LONG -> false
+            currentSize < PER_LIMIT.toLong() -> false
             offset >= total -> false
             else -> true
         }

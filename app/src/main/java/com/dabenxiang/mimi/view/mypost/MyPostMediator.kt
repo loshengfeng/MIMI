@@ -1,33 +1,30 @@
-package com.dabenxiang.mimi.view.my_pages.base
+package com.dabenxiang.mimi.view.mypost
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.manager.DomainManager
-
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
-class MyPagesPostMediator(
+class MyPostMediator(
         private val database: MiMiDB,
         private val domainManager: DomainManager,
-        private val myPagesType: MyPagesType,
-        private val pagingCallback: PagingCallback,
+        private val userId: Long
 ) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
         const val PER_LIMIT = 10
     }
-    private val pageCode = MyPagesPostMediator::class.simpleName + myPagesType.toString()
+    private val pageCode = MyPostMediator::class.simpleName + userId.toString()
 
     override suspend fun load(
             loadType: LoadType,
@@ -52,24 +49,23 @@ class MyPagesPostMediator(
             Timber.i("MyPagesPostMediator pageName=$pageCode offset=$offset")
 
             val result =
-                    when(myPagesType) {
-                        MyPagesType.LIKE -> domainManager.getApiRepository().getPostLike(offset.toLong(), PER_LIMIT, 7)
-                        else -> domainManager.getApiRepository().getPostFavorite( offset.toLong(), PER_LIMIT, 7)
-                    }
+                    if (userId == MyPostViewModel.USER_ID_ME) domainManager.getApiRepository().getMyPost(offset = 0, limit = PER_LIMIT)
+                    else domainManager.getApiRepository().getMembersPost(
+                            offset = 0,
+                            limit = PER_LIMIT,
+                            creatorId = userId,
+                            isAdult = true
+                    )
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result.body()
-            val memberPostItems = body?.content?.map {
-                it.toMemberPostItem()
-            }
+            val memberPostItems = body?.content
 
             val hasNext = hasNextPage(
                     result.body()?.paging?.count ?: 0,
                     result.body()?.paging?.offset ?: 0,
                     memberPostItems?.size ?: 0
             )
-
-            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
