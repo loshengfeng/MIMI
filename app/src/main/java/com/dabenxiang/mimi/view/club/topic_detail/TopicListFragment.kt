@@ -11,7 +11,6 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
@@ -19,7 +18,7 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
-import com.dabenxiang.mimi.view.club.base.ClubItemAdapter
+import com.dabenxiang.mimi.view.club.base.PostItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -37,7 +36,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
 
 class TopicListFragment(private val memberClubItem: MemberClubItem, private val orderBy: OrderBy, private val topicTag:String) : BaseFragment() {
 
@@ -48,8 +46,8 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
         AdHeaderAdapter(requireContext())
     }
 
-    private val adapter: ClubItemAdapter by lazy {
-        ClubItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
+    private val adapter: PostItemAdapter by lazy {
+        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item
