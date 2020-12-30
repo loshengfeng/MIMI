@@ -88,7 +88,8 @@ data class PostFavoriteItem(
             avatarAttachmentId = posterAvatarAttachmentId,
             creatorId = posterId,
             isFollow = isFollow,
-            postFriendlyName = posterName
+            postFriendlyName = posterName,
+            cover = cover
         )
     }
 
