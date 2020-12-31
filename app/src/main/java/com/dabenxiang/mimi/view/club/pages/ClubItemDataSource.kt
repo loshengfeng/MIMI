@@ -83,6 +83,7 @@ class ClubItemDataSource(
                 domainManager.getAdRepository().getAD(getAdCode(), adWidth, adHeight, adCount)
                     .body()?.content?.get(0)?.ad ?: arrayListOf()
             memberPostItems?.forEachIndexed { index, item ->
+                if(type == ClubTabItemType.FOLLOW ) item.deducted = true
                 list.add(item)
                 if (index % 5 == 4) list.add(getAdItem(adItems))
             }
