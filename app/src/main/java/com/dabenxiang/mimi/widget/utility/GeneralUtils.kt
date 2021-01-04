@@ -8,21 +8,39 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
+import android.content.pm.Signature
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
 import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.view.main.MainActivity
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.dash.DashMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -32,13 +50,15 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
-import java.io.File
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.*
+import java.lang.reflect.Method
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.math.ceil
 import kotlin.math.roundToInt
+
 
 object GeneralUtils {
 
@@ -63,6 +83,7 @@ object GeneralUtils {
         val url = oriResponse?.raw()?.request?.url.toString()
 
         val errorBody = oriResponse?.errorBody()
+        val errorCode = oriResponse?.code()
         val jsonStr = errorBody?.string()
         val type = object : TypeToken<ErrorItem>() {}.type
 
@@ -70,7 +91,7 @@ object GeneralUtils {
             Gson().fromJson(jsonStr, type)
         } catch (e: Exception) {
             e.printStackTrace()
-            ErrorItem(null, null, null)
+            ErrorItem(errorCode.toString(), "伺服器错误", null)
         }
 
         val responseBody = Gson().toJson(
@@ -177,19 +198,19 @@ object GeneralUtils {
         val time = (endDate.time - startDate.time) / 1000
         return when {
             (time / (60 * 60 * 24 * 30)) > 0 -> {
-                (time / (60 * 60 * 24 * 30)).toString().plus("月個前")
+                (time / (60 * 60 * 24 * 30)).toString().plus("个月前")
             }
             (time / (60 * 60 * 24)) > 0 -> {
                 (time / (60 * 60 * 24)).toString().plus("天前")
             }
             (time / (60 * 60)) > 0 -> {
-                (time / (60 * 60)).toString().plus("小時前")
+                (time / (60 * 60)).toString().plus("小时前")
             }
             (time / 60) > 0 -> {
-                (time / 60).toString().plus("分鐘前")
+                (time / 60).toString().plus("分钟前")
             }
             else -> {
-                time.toString().plus("秒鐘前")
+                time.toString().plus("秒钟前")
             }
         }
     }
@@ -197,6 +218,11 @@ object GeneralUtils {
     fun dpToPx(context: Context, dp: Int): Int {
         val density = context.resources.displayMetrics.density
         return (dp.toFloat() * density).roundToInt()
+    }
+
+    fun pxToDp(context: Context, px: Int): Int {
+        val density = context.resources.displayMetrics.density
+        return (px.toFloat() / density).roundToInt()
     }
 
     fun hideKeyboard(activity: Activity) {
@@ -214,6 +240,14 @@ object GeneralUtils {
             val inputManager =
                 activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputManager.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
+    fun hideKeyboard(fragment: Fragment) {
+        fragment.view?.run {
+            val inputManager =
+                fragment.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputManager.hideSoftInputFromWindow(this.windowToken, 0)
         }
     }
 
@@ -235,9 +269,8 @@ object GeneralUtils {
 
     fun openWebView(context: Context, url: String) {
         try {
-            val intent = Intent(Intent.ACTION_VIEW);
-            val url = Uri.parse(url)
-            intent.data = url
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
             context.startActivity(intent)
         } catch (e: Exception) {
             Timber.e(e)
@@ -320,7 +353,7 @@ object GeneralUtils {
         return decimalFormat.format(amount)
     }
 
-    private fun checkPhoneNum(num: String): Boolean{
+    private fun checkPhoneNum(num: String): Boolean {
         val regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$"
         val p = Pattern.compile(regExp)
         val m = p.matcher(num)
@@ -332,5 +365,181 @@ object GeneralUtils {
         val clipData = clipboard.primaryClip
         val clipDataItem = clipData?.getItemAt(0)
         return clipDataItem?.text.toString()
+    }
+
+    fun getSpanString(context: Context, text: String, keyword: String): SpannableString {
+        if (keyword.isBlank()) return SpannableString(text)
+        val result = SpannableString(text)
+        var index = text.toLowerCase().indexOf(keyword.toLowerCase())
+        while (index != -1) {
+            result.setSpan(
+                ForegroundColorSpan(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.color_red_1
+                    )
+                ),
+                index,
+                index + keyword.length,
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+            )
+            index = text.toLowerCase().indexOf(keyword.toLowerCase(), index + keyword.length)
+        }
+        return result
+    }
+
+    fun getMediaSource(
+        uriString: String,
+        sourceFactory: DefaultDataSourceFactory
+    ): MediaSource? {
+        val uri = Uri.parse(uriString)
+
+        val sourceType = Util.inferContentType(uri)
+        Timber.d("#sourceType: $sourceType")
+
+        return when (sourceType) {
+            C.TYPE_DASH ->
+                DashMediaSource.Factory(sourceFactory)
+                    .createMediaSource(uri)
+            C.TYPE_HLS ->
+                HlsMediaSource.Factory(sourceFactory)
+                    .createMediaSource(uri)
+            C.TYPE_SS ->
+                SsMediaSource.Factory(sourceFactory)
+                    .createMediaSource(uri)
+            C.TYPE_OTHER -> {
+                when {
+                    uriString.startsWith("rtmp://") ->
+                        ProgressiveMediaSource.Factory(RtmpDataSourceFactory())
+                            .createMediaSource(uri)
+                    uriString.contains("m3u8") -> HlsMediaSource.Factory(sourceFactory)
+                        .createMediaSource(uri)
+                    else ->
+                        ProgressiveMediaSource.Factory(sourceFactory)
+                            .createMediaSource(uri)
+                }
+            }
+            else -> null
+        }
+    }
+
+    fun getStringLength(str: String): Int {
+        Timber.i("getStringLength str =$str 1.0")
+        var valueLength = 0.0
+        val pattern = Pattern.compile("""^[_A-z0-9]*((\s)*[_A-z0-9])*${'$'}""")
+        for (i in str.indices) {
+
+            val temp: String = str.substring(i, i + 1)
+            valueLength += if (pattern.matcher(temp).matches()) {
+                Timber.i("getStringLength temp =$temp 1.0")
+                1.0
+            } else {
+                Timber.i("getStringLength temp =$temp 2.0")
+                2.0
+            }
+        }
+        return ceil(valueLength).toInt()
+    }
+
+    fun parseTimeToUTC(date: Date): String {
+        var time: String
+        try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            time = sdf.format(date)
+        } catch (e: Exception) {
+            Timber.d("parse time error: $e")
+            time = "0000-00-00T00:00:00Z"
+        }
+        Timber.d("parse time to UTC: $time")
+        return time
+    }
+
+    fun getAdSize(activity: Activity): Pair<Int, Int> {
+        return Pair(getScreenSize(activity).first / 3, getScreenSize(activity).first / 3 / 3)
+    }
+
+    fun getMaxCount(count: Int): Int {
+        return if (count > 1000) 999 else count
+    }
+
+    @SuppressLint("PackageManagerGetSignatures")
+    fun getApplicationSignature(packageName: String = App.self.packageName): List<Signature> {
+
+        val signatureList: List<Signature>
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val sig = App.self.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo
+                signatureList = if (sig.hasMultipleSigners()) {
+                    sig.apkContentsSigners.map { it }
+                } else {
+                    sig.signingCertificateHistory.map {
+                       it
+                    }
+                }
+            } else {
+                val sig = App.self.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
+                signatureList = sig.map {it}
+            }
+
+            return signatureList
+        } catch (e: Exception) {
+           Timber.i("getApplicationSignature failed :$e")
+        }
+        return emptyList()
+    }
+
+    /**
+     * Check this device is emulator
+     */
+    fun isProbablyRunningOnEmulator(): Boolean {
+        // Android SDK emulator
+        return ((Build.FINGERPRINT.startsWith("google/sdk_gphone_")
+                && Build.FINGERPRINT.endsWith(":user/release-keys")
+                && Build.MANUFACTURER == "Google" && Build.PRODUCT.startsWith("sdk_gphone_") && Build.BRAND == "google"
+                && Build.MODEL.startsWith("sdk_gphone_"))
+                //
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                //bluestacks
+                || "QC_Reference_Phone" == Build.BOARD && !"Xiaomi".equals(Build.MANUFACTURER, ignoreCase = true) //bluestacks
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.HOST.startsWith("Build") //MSI App Player
+                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.PRODUCT == "google_sdk"
+                // another Android SDK emulator check
+                || SystemProperties.getProp("ro.kernel.qemu") == "1")
+    }
+
+    object SystemProperties {
+        private var failedUsingReflection = false
+        private var getPropMethod: Method? = null
+
+        @SuppressLint("PrivateApi")
+        fun getProp(propName: String, defaultResult: String = ""): String {
+            if (!failedUsingReflection) try {
+                if (getPropMethod == null) {
+                    val clazz = Class.forName("android.os.SystemProperties")
+                    getPropMethod = clazz.getMethod("get", String::class.java, String::class.java)
+                }
+                return getPropMethod!!.invoke(null, propName, defaultResult) as String? ?: defaultResult
+            } catch (e: Exception) {
+                getPropMethod = null
+                failedUsingReflection = true
+            }
+            var process: Process? = null
+            try {
+                process = Runtime.getRuntime().exec("getprop \"$propName\" \"$defaultResult\"")
+                val reader = BufferedReader(InputStreamReader(process.inputStream))
+                return reader.readLine()
+            } catch (e: IOException) {
+            } finally {
+                process?.destroy()
+            }
+            return defaultResult
+        }
     }
 }

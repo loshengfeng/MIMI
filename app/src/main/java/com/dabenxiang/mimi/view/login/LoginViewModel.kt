@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.SingUpRequest
 import com.dabenxiang.mimi.model.api.vo.ValidateMessageRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_REGISTER
 import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.isFriendlyNameValid
@@ -25,8 +26,12 @@ import kotlin.concurrent.schedule
 @ExperimentalCoroutinesApi
 class LoginViewModel : BaseViewModel() {
     var type = TYPE_REGISTER
+    var clickType = TYPE_REGISTER
+
+    var clickTime: Long = 0
 
     var changePrefixCount = 0
+    var changePWDCount = 0 // 登入使用 password
     var mobileValidCount = 0
     var timer: Timer? = null
 
@@ -40,6 +45,7 @@ class LoginViewModel : BaseViewModel() {
     val loginPw = EditTextMutableLiveData()
     val mobile = EditTextMutableLiveData()
     val verificationCode = EditTextMutableLiveData()
+    val loginVerificationCode = EditTextMutableLiveData()
     val inviteCode = EditTextMutableLiveData()
 
     // Register
@@ -71,36 +77,43 @@ class LoginViewModel : BaseViewModel() {
     private val _loginPasswordError = MutableLiveData<String>()
     val loginPasswordError: LiveData<String> = _loginPasswordError
 
+    private val _loginVerificationCodeError = MutableLiveData<String>()
+    val loginVerificationCodeError: LiveData<String> = _loginVerificationCodeError
+
     private val _loginResult = MutableLiveData<ApiResult<Nothing>>()
     val loginResult: LiveData<ApiResult<Nothing>> = _loginResult
 
     private val _validateMessageResult = MutableLiveData<ApiResult<Nothing>>()
     val validateMessageResult: LiveData<ApiResult<Nothing>> = _validateMessageResult
 
+    /**
+     * 註冊邏輯
+     */
     fun doRegisterValidateAndSubmit(callPrefix: String) {
+        clickType = TYPE_REGISTER
         _accountError.value = isValidateFriendlyName(account.value ?: "")
         _mobileError.value = isValidateMobile(mobile.value ?: "", callPrefix)
 //        _registerAccountError.value = isValidateAccount(registerAccount.value ?: "")
         _validateCodeError.value = isValidateValidateCode(verificationCode.value ?: "")
-        _registerPasswordError.value = isValidatePassword(registerPw.value ?: "")
-        _confirmPasswordError.value =
-            isValidateConfirmPassword(registerPw.value ?: "", confirmPw.value ?: "")
+//        _registerPasswordError.value = isValidatePassword(registerPw.value ?: "")
+//        _confirmPasswordError.value =
+//            isValidateConfirmPassword(registerPw.value ?: "", confirmPw.value ?: "")
 
         if ("" == _accountError.value &&
-            "" == _mobileError.value &&
-            "" == _registerPasswordError.value &&
-            "" == _confirmPasswordError.value &&
-            "" == _validateCodeError.value
+                "" == _mobileError.value &&
+//            "" == _registerPasswordError.value &&
+//            "" == _confirmPasswordError.value &&
+                "" == _validateCodeError.value
         ) {
             viewModelScope.launch {
                 accountManager.signUp(
-                    SingUpRequest(
-                        username = callPrefix + mobile.value,
-                        friendlyName = account.value,
-                        password = registerPw.value,
-                        referrerCode = inviteCode.value,
-                        code = verificationCode.value
-                    )
+                        SingUpRequest(
+                                username = callPrefix + mobile.value,
+                                friendlyName = account.value,
+//                        password = registerPw.value,
+                                referrerCode = inviteCode.value,
+                                code = verificationCode.value
+                        )
                 ).collect {
                     _registerResult.value = it
                 }
@@ -108,21 +121,32 @@ class LoginViewModel : BaseViewModel() {
         }
     }
 
-    fun doLoginValidateAndSubmit(callPrefix: String) {
+    /**
+     * 登入邏輯
+     */
+    fun doLoginValidateAndSubmit(callPrefix: String, isPwd: Boolean) {
+        clickType = TYPE_LOGIN
         _loginAccountError.value = isValidateMobile(loginAccount.value ?: "", callPrefix)
-        _loginPasswordError.value = isValidatePassword(loginPw.value ?: "")
+        _loginVerificationCodeError.value = isValidateValidateCode(loginVerificationCode.value ?: "")
 
-        if ("" == _loginAccountError.value &&
-            "" == _loginPasswordError.value
-        ) {
-            loginAccount.value?.let { loginPw.value?.let { it1 -> doLogin(callPrefix + it, it1) } }
+        if (isPwd) {
+            _loginPasswordError.value = isValidatePassword(loginPw.value ?: "")
+        }
+
+        if ("" == _loginAccountError.value  && "" == _loginVerificationCodeError.value) {
+
+            val account: String = loginAccount.value ?: ""
+            val pwd: String = if (isPwd) loginPw.value ?: "" else ""
+            val code: String = loginVerificationCode.value ?: ""
+
+            doLogin(callPrefix + account, password = pwd, code = code)
         }
     }
 
-    fun doLogin(userName: String, password: String) {
+    fun doLogin(userName: String, password: String = "", code: String = "") {
         viewModelScope.launch {
-            accountManager.signIn(userName, password)
-                .collect { _loginResult.value = it }
+            accountManager.signIn(userName, password, code)
+                    .collect { _loginResult.value = it }
         }
     }
 
@@ -177,20 +201,20 @@ class LoginViewModel : BaseViewModel() {
         _validateCodeError.value = app.getString(s)
     }
 
-    fun callValidateMessage(callPrefix: String) {
+    fun callValidateMessage(callPrefix: String, phoneNumber: String) {
         viewModelScope.launch {
             flow {
-                val body = ValidateMessageRequest(callPrefix + mobile.value)
+                val body = ValidateMessageRequest(callPrefix + phoneNumber)
 
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.validateMessage(body)
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _validateMessageResult.value = it }
+                    .onStart { emit(ApiResult.loading()) }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .onCompletion { emit(ApiResult.loaded()) }
+                    .collect { _validateMessageResult.value = it }
         }
     }
 

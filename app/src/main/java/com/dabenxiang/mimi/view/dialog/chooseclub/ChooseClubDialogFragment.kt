@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubListener
@@ -56,11 +55,7 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
     override fun setupObservers() {
         super.setupObservers()
 
-        viewModel.postList.observe(viewLifecycleOwner, Observer {
-            adapter.submitList(it)
-        })
-
-        viewModel.loadingStatus.observe(viewLifecycleOwner, Observer {
+        viewModel.loadingStatus.observe(viewLifecycleOwner, {
             if (it) {
                 progress_bar.visibility = View.VISIBLE
                 recyclerView.visibility = View.GONE
@@ -70,8 +65,8 @@ class ChooseClubDialogFragment : BaseDialogFragment() {
             }
         })
 
-        viewModel.totalCount.observe(viewLifecycleOwner, Observer {
-            adapter.totalCount = it.toInt()
+        viewModel.clubList.observe(viewLifecycleOwner, {
+            adapter.updateData(it)
         })
     }
 

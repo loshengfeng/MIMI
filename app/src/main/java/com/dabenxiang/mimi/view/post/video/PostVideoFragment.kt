@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostVideoItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -22,14 +23,17 @@ import com.dabenxiang.mimi.model.vo.PostVideoAttachment
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.ScrollVideoAdapter
+import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
@@ -59,6 +63,7 @@ class PostVideoFragment : BasePostFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initSettings()
+        btn_tag_confirm.setOnClickListener { hashTagConfirm() }
     }
 
     override fun initSettings() {
@@ -68,13 +73,7 @@ class PostVideoFragment : BasePostFragment() {
             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
-        tv_clean.isEnabled = true
-        val img = requireContext().getDrawable(R.drawable.btn_close_n)
-        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
-
         edt_hashtag.imeOptions = EditorInfo.IME_ACTION_DONE
-
-        useAdultTheme(false)
 
         arguments?.let {
             isEdit = it.getBoolean(MyPostFragment.EDIT, false)
@@ -91,6 +90,9 @@ class PostVideoFragment : BasePostFragment() {
         )
 
         tv_clean.setOnClickListener {
+
+            GeneralUtils.hideKeyboard(requireActivity())
+
             if (checkFieldIsEmpty()) {
                 return@setOnClickListener
             }
@@ -101,22 +103,34 @@ class PostVideoFragment : BasePostFragment() {
                 return@setOnClickListener
             }
 
+            if (!checkTagCountIsValid()) {
+                return@setOnClickListener
+            }
+
             navigation()
         }
 
         tv_back.setOnClickListener {
             discardDialog()
         }
+
     }
 
     private fun navigation() {
         val title = edt_title.text.toString()
         var searchPostItem: SearchPostItem? = null
+        var memberClubItem: MemberClubItem? =null
 
         arguments?.let {
+            isEdit = it.getBoolean(MyPostFragment.EDIT, false)
+            page = it.getString(PAGE, "")
             val data = it.getSerializable(SearchPostFragment.KEY_DATA)
             if (data != null) {
-                searchPostItem = data as SearchPostItem
+                if (data is SearchPostItem) {
+                    searchPostItem = data
+                } else if (data is MemberClubItem){
+                    memberClubItem = data
+                }
             }
         }
 
@@ -130,15 +144,16 @@ class PostVideoFragment : BasePostFragment() {
         bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
         bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
         bundle.putLong(POST_ID, postId)
+        if(isEdit){
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        }
+        mainViewModel?.uploadData?.value = bundle
 
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postVideoFragment_to_myPostFragment, bundle)
-        } else if (isEdit && page == ADULT) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
         } else if (isEdit && page == SEARCH) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
@@ -150,13 +165,33 @@ class PostVideoFragment : BasePostFragment() {
         } else if (isEdit && page == CLUB) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
+            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
             findNavController().navigate(
-                R.id.action_postVideoFragment_to_clubDetailFragment,
+                R.id.action_postVideoFragment_to_topicDetailFragment,
                 bundle
             )
+        } else if (isEdit && page == VIDEO) {
+//            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+//            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+//            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
+//            bundle.putLong(ClipPlayerFragment.KEY_PLAYER_SRC, item.id)
+//            findNavController().navigate(
+//                R.id.action_postVideoFragment_to_clipPlayerFragment,
+//                bundle
+//            )
+            findNavController().navigateUp()
+        } else if (isEdit && page == TAB) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
+
+        } else if (isEdit && page == FAVORITE) {
+            findNavController().navigateUp()
+
+        } else if (isEdit && page == LIKE) {
+            findNavController().navigateUp()
         } else {
-            findNavController().navigate(R.id.action_postVideoFragment_to_adultHomeFragment, bundle)
+            findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
         }
     }
 
@@ -167,10 +202,9 @@ class PostVideoFragment : BasePostFragment() {
         videoAttachmentList.add(postVideoAttachment)
     }
 
-    override fun setUI(item: MediaItem) {
+    override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
         val trimmerUri = arguments?.getString(BUNDLE_TRIMMER_URI, "")
         val picUri = arguments?.getString(BUNDLE_COVER_URI, "")
-
         if (trimmerUri!!.isBlank()) {
             val postVideoAttachment = PostVideoAttachment(
                 videoAttachmentId = item.videoParameter.id,
@@ -188,8 +222,6 @@ class PostVideoFragment : BasePostFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 REQUEST_VIDEO_CAPTURE -> {
@@ -317,9 +349,9 @@ class PostVideoFragment : BasePostFragment() {
         } else if (isEdit && page == SEARCH) {
             Navigation.findNavController(requireView()).popBackStack(R.id.searchPostFragment, false)
         } else if (isEdit && page == CLUB) {
-            Navigation.findNavController(requireView()).popBackStack(R.id.clubDetailFragment, false)
+            Navigation.findNavController(requireView()).popBackStack(R.id.topicDetailFragment, false)
         } else {
-            Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
+            navigateTo(NavigateItem.PopBackStack(R.id.clubTabFragment, true))
         }
     }
 

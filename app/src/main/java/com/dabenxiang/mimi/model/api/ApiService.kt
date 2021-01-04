@@ -163,15 +163,29 @@ interface ApiService {
     ): Response<Void>
 
     @GET("/v1/Members/VideoReport")
-    suspend fun getMemberVideoReport(@Query("videoId") videoId: Long,
-                                     @Query("type") type: Int,
-                                     @Query("unhealthy") unhealthy:Boolean): Response<Void>
+    suspend fun getMemberVideoReport(
+        @Query("videoId") videoId: Long,
+        @Query("type") type: Int,
+        @Query("unhealthy") unhealthy: Boolean
+    ): Response<Void>
 
     /**********************************************************
      *
      *                  Members/Post
      *
      ***********************************************************/
+    @GET("/v1/Members/Post")
+    suspend fun getMembersPost(
+        @Query("type") type: Int,
+        @Query("tag") tag: String? = null,
+        @Query("key") keyword: String? = null,
+        @Query("orderBy") orderBy: Int,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("isAdult") isAdult: Boolean = true,
+        @Query("status") status: Int = 1
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
+
     @GET("/v1/Members/Post")
     suspend fun getMembersPost(
         @Query("type") type: Int,
@@ -213,7 +227,7 @@ interface ApiService {
     suspend fun postMembersPostComment(
         @Path("postId") postId: Long,
         @Body request: PostCommentRequest
-    ): Response<Void>
+    ): Response<ApiBaseItem<Long>>
 
     @POST("/v1/Members/Post/{postId}/Comment/{commentId}/Like")
     suspend fun postMembersPostCommentLike(
@@ -241,13 +255,15 @@ interface ApiService {
      ***********************************************************/
     @GET("/v1/Members/Club")
     suspend fun getMembersClub(
-        @Query("tag") tag: String
+        @Query("tag") tag: String,
+        @Query("offset") offset: Int?,
+        @Query("limit") limit: Int?
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>>
 
     @GET("/v1/Members/Club/{id}")
     suspend fun getMembersClub(
         @Path("id") clubId: Long
-    ): Response<ApiBasePagingItem<MemberClubItem>>
+    ): Response<ApiBaseItem<MemberClubItem>>
 
     @GET("/v1/Members/Club/Post")
     suspend fun getMembersClubPost(
@@ -270,7 +286,8 @@ interface ApiService {
         @Query("orderBy") orderBy: Int = 1,
         @Query("isAdult") isAdult: Boolean = true,
         @Query("isFullContent") isFullContent: Boolean = false,
-        @Query("status") status: Int = 1
+        @Query("status") status: Int = 1,
+        @Query("type") type: Int = 7
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
     @POST("/v1/Members/Club/{clubId}/Follow")
@@ -297,6 +314,9 @@ interface ApiService {
     @GET("/v1/Members/Home/Categories")
     suspend fun fetchHomeCategories(): Response<ApiBaseItem<RootCategoriesItem>>
 
+    @GET("/v1/Members/Home/Categories")
+    suspend fun fetchHomeCategories(@Query("parentId") parentId: Int): Response<ApiBaseItem<ArrayList<CategoriesItem>>>
+
     /**********************************************************
      *
      *                  Members/Home/Videos
@@ -311,7 +331,18 @@ interface ApiService {
         @Query("isAdult") isAdult: Boolean?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,
-        @Query("tag") tag: String?
+        @Query("tag") tag: String?,
+        @Query("type") type: Int?
+    ): Response<ApiBasePagingItem<VideoSearchItem>>
+
+    @GET("/v1/Members/Home/Videos/SearchShortVideo")
+    suspend fun searchShortVideo(
+        @Query("q") q: String?,
+        @Query("startTime") startTime: String? = null,
+        @Query("endTime") endTime: String? = null,
+        @Query("orderByType") orderByType: Int?,
+        @Query("offset") offset: String?,
+        @Query("limit") limit: String?,
     ): Response<ApiBasePagingItem<VideoSearchItem>>
 
     @GET("/v1/Members/Home/Videos/SearchWithCategory")
@@ -324,12 +355,19 @@ interface ApiService {
 
     @GET("/v1/Members/Home/Videos/Statistics")
     suspend fun statisticsHomeVideos(
-        @Query("statisticsType") statisticsType: Int?,
+        @Query("startTime") startTime: String?,
+        @Query("endTime") endTime: String?,
+        @Query("orderByType") orderByType: Int?,
         @Query("category") category: String?,
+        @Query("tags") tags: String?,
         @Query("isAdult") isAdult: Boolean,
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int
-    ): Response<ApiBasePagingItem<List<StatisticsItem>>>
+        @Query("isRandom") isRandom: Boolean?,
+        @Query("offset") offset: Int?,
+        @Query("limit") limit: Int?,
+        @Query("lastId") lastId: Long,
+        @Query("excludeId") excludeId: String?,
+        @Query("type") type: Int?
+    ): Response<ApiBasePagingItem<ArrayList<StatisticsItem>>>
 
     @GET("/v1/Members/Home/Videos/PostStatistics")
     suspend fun getRankingList(
@@ -343,6 +381,26 @@ interface ApiService {
     suspend fun sendVideoReport(
         @Body body: ReportRequest
     ): Response<Void>
+
+    /**********************************************************
+     *
+     *                  Members/Home/Actors
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Actors")
+    suspend fun getActors(): Response<ApiBaseItem<ActorsItem>>
+
+    @GET("/v1/Members/Home/Actors/ActorsList")
+    suspend fun getActorsList(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<ActorCategoriesItem>>>
+
+
+    @GET("/v1/Members/Home/Actors/ActorsList/{id}")
+    suspend fun getActorsList(
+        @Path("id") id: Long
+    ): Response<ApiBaseItem<ActorVideosItem>>
 
 
     /**********************************************************
@@ -366,7 +424,7 @@ interface ApiService {
 
     @DELETE("/v1/Members/Me/ClubFollow/{clubId}")
     suspend fun cancelMyClubFollow(
-        @Path("clubId") id: Long
+        @Path("clubId") id: String
     ): Response<Void>
 
     @GET("/v1/Members/Me/MemberFollow")
@@ -377,8 +435,14 @@ interface ApiService {
 
     @DELETE("/v1/Members/Me/MemberFollow/{userId}")
     suspend fun cancelMyMemberFollow(
-        @Path("userId") id: Long
+        @Path("userId") id: String
     ): Response<Void>
+
+    @GET("/v1/Members/Me/Fans")
+    suspend fun getMyFans(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<FansItem>>>
 
     @GET("/v1/Members/Me/Chat")
     suspend fun getMeChat(
@@ -413,14 +477,22 @@ interface ApiService {
     suspend fun getPlaylist(
         @Path("playlistType") playlistType: Int,
         @Query("isAdult") isAdult: Boolean,
+        @Query("isShortVideo") isShortVideo: Boolean,
         @Query("offset") offset: String,
         @Query("limit") limit: String
-    ): Response<ApiBasePagingItem<List<PlayItem>>>
+    ): Response<ApiBasePagingItem<ArrayList<PlayItem>>>
 
     @GET("/v1/Members/Me/PostFavorite")
     suspend fun getPostFavorite(
-        @Query("offset") offset: String,
-        @Query("limit") limit: String
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
+
+    @GET("/v1/Members/Me/PostFavorite")
+    suspend fun getPostFavorite(
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int,
+        @Query("postType") postType: Int
     ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
 
     @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
@@ -430,6 +502,8 @@ interface ApiService {
 
     @GET("/v1/Members/Me/PostFollow")
     suspend fun getPostFollow(
+        @Query("keyword") keyword: String? = null,
+        @Query("tag") tag: String? = null,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("status") status: Int = 1
@@ -442,6 +516,13 @@ interface ApiService {
     suspend fun updateProfile(
         @Body body: ProfileRequest
     ): Response<Void>
+
+    @GET("/v1/Members/Me/PostLike")
+    suspend fun getPostLike(
+        @Query("offset") offset: Long,
+        @Query("limit") limit: Int,
+        @Query("postType") postType: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>>
 
     /**********************************************************
      *
@@ -480,6 +561,16 @@ interface ApiService {
     suspend fun like(
         @Path("postId") postId: Long,
         @Body body: LikeRequest
+    ): Response<Void>
+
+    @DELETE("/v1/Members/Post/{postId}/Like")
+    suspend fun deleteLike(
+        @Path("postId") postId: Long
+    ): Response<Void>
+
+    @DELETE("/v1/Members/Post/{postId}/Like")
+    suspend fun deleteAllLike(
+        @Path("postId") postId: String
     ): Response<Void>
 
     @POST("/v1/Members/Post/{postId}/PostReport")
@@ -692,5 +783,43 @@ interface ApiService {
         @Query("offset") offset: String,
         @Query("limit") limit: String
     ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>>
+
+
+    /**********************************************************
+     *
+     *                   Members/Home/Menu
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/Menu")
+    suspend fun getMenu(): Response<ApiBaseItem<List<MenuItem>>>
+
+
+    /**********************************************************
+     *
+     *                   Members/Home/Menu
+     *
+     ***********************************************************/
+    @GET("/v1/Members/Home/HomeList")
+    suspend fun getHomeList(
+        @Query("offset") offset: String,
+        @Query("limit") limit: String
+    ): Response<ApiBasePagingItem<List<HomeListItem>>>
+
+
+    /**********************************************************
+     *
+     *         Operators/DecryptSetting 取得各來源解碼key
+     *
+     ***********************************************************/
+    @GET("/v1/Operators/DecryptSetting")
+    suspend fun getDecryptSetting(): Response<ApiBaseItem<List<DecryptSettingItem>>>
+
+    /**********************************************************
+     *
+     *         Configs 取得公告設定值
+     *
+     ***********************************************************/
+    @GET("/v1/Configs")
+    suspend fun getAnnounceConfigs(): Response<ApiBaseItem<List<AnnounceConfigItem>>>
 
 }

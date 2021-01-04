@@ -3,17 +3,20 @@ package com.dabenxiang.mimi.view.post.article
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.ArticleItem
-import com.dabenxiang.mimi.model.api.vo.MediaItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
+import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment.Companion.KEY_DATA
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.hideKeyboard
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -25,22 +28,35 @@ class PostArticleFragment : BasePostFragment() {
         return R.layout.fragment_post_article
     }
 
-    override fun setUI(item: MediaItem) {
-        edt_content.setText(item.textContent)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        txt_contentCount.text = String.format(getString(R.string.typing_count, edt_content.text.count(), CONTENT_LIMIT))
+
+        viewModel.postDetailResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is ApiResult.Success -> {
+                    val item = it.result.content
+                    val contentItem =
+                        Gson().fromJson(item?.content, TextContentItem::class.java)
+                    edt_content.setText(contentItem.text)
+
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+    }
+
+    override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
+//        edt_content.setText(item.textContent)
         txt_contentCount.text = String.format(getString(R.string.typing_count, item.textContent.length, CONTENT_LIMIT))
+        viewModel.getPostDetail(memberPostItem)
     }
 
     override fun setupListeners() {
         super.setupListeners()
-
+        btn_tag_confirm.setOnClickListener { hashTagConfirm() }
         edt_content.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > CONTENT_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_title.setText(content)
-                    }
-                }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -52,6 +68,9 @@ class PostArticleFragment : BasePostFragment() {
         })
 
         tv_clean.setOnClickListener {
+
+            hideKeyboard(requireActivity())
+            
             val title = edt_title.text.toString()
             val content = edt_content.text.toString()
 
@@ -61,6 +80,10 @@ class PostArticleFragment : BasePostFragment() {
 
             if (content.isBlank()) {
                 Toast.makeText(requireContext(), R.string.post_warning_content, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!checkTagCountIsValid()) {
                 return@setOnClickListener
             }
 
@@ -75,13 +98,18 @@ class PostArticleFragment : BasePostFragment() {
         var isEdit = false
         var page = ""
         var searchPostItem: SearchPostItem? = null
+        var memberClubItem: MemberClubItem? = null
 
         arguments?.let {
             isEdit = it.getBoolean(EDIT, false)
             page = it.getString(PAGE, "")
             val data = it.getSerializable(KEY_DATA)
             if (data != null) {
-                searchPostItem = data as SearchPostItem
+                if (data is SearchPostItem) {
+                    searchPostItem = data
+                } else if (data is MemberClubItem){
+                    memberClubItem = data
+                }
             }
         }
 
@@ -90,15 +118,17 @@ class PostArticleFragment : BasePostFragment() {
         bundle.putString(TITLE, title)
         bundle.putString(REQUEST, request)
         bundle.putStringArrayList(TAG, getTags())
+        if(isEdit){
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        }
+        mainViewModel?.uploadData?.value = bundle
+
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postArticleFragment_to_myPostFragment, bundle)
-        } else if (isEdit && page == ADULT) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
-        } else if (isEdit && page == SEARCH) {
+        }  else if (isEdit && page == SEARCH) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)
             bundle.putSerializable(KEY_DATA, searchPostItem)
@@ -106,10 +136,24 @@ class PostArticleFragment : BasePostFragment() {
         } else if (isEdit && page == CLUB) {
             val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MEMBER_DATA, item)
-            bundle.putSerializable(KEY_DATA, searchPostItem)
-            findNavController().navigate(R.id.action_postArticleFragment_to_clubDetailFragment, bundle)
+            bundle.putSerializable(KEY_DATA, memberClubItem)
+            findNavController().navigate(R.id.action_postArticleFragment_to_topicDetailFragment, bundle)
+        } else if (isEdit && page == TAB) {
+            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
+        } else if (isEdit && page == TEXT) {
+//            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
+//            bundle.putSerializable(KEY_DATA, item)
+//            bundle.putSerializable(MEMBER_DATA, item)
+//            findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
+            findNavController().navigateUp()
+        } else if (isEdit && page == FAVORITE) {
+            findNavController().navigateUp()
+        } else if (isEdit && page == LIKE) {
+            findNavController().navigateUp()
         } else {
-            findNavController().navigate(R.id.action_postArticleFragment_to_adultHomeFragment, bundle)
+            findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
         }
     }
 }

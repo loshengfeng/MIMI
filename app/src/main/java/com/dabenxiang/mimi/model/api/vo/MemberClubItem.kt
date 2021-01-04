@@ -12,6 +12,9 @@ data class MemberClubItem(
     @SerializedName("avatarAttachmentId")
     val avatarAttachmentId: Long = 0,
 
+    @SerializedName("backgroundAttachmentId")
+    val backgroundAttachmentId: Long = 0,
+
     @SerializedName("title")
     val title: String = "",
 

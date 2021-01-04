@@ -1,23 +1,33 @@
 package com.dabenxiang.mimi.view.orderresult
 
+import android.content.Context
+import android.text.TextUtils
 import com.airbnb.epoxy.TypedEpoxyController
+import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
-import com.dabenxiang.mimi.view.orderresult.itemview.*
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultDetailSuccessItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultFailedItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultUrlSuccessItemView
+import com.dabenxiang.mimi.view.orderresult.itemview.orderResultWaitingItemView
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderResultEpoxyController(
-    private val failedListener: OrderResultFailedItemView.OrderResultFailedListener,
-    private val bankSuccessListener: OrderResultSuccessListener
+    val context: Context,
+    private val failedListener: OrderResultFailedListener,
+    private val successListener: OrderResultSuccessListener
 ) : TypedEpoxyController<OrderPayloadItem>() {
+
+    var count = OrderResultFragment.DELAY_TOP_UP_TIME
 
     override fun buildModels(item: OrderPayloadItem?) {
         if (item == null) {
             addOrderResultWaitingItemView()
+            count--
         } else {
+            count = OrderResultFragment.DELAY_TOP_UP_TIME
             if (item.isSuccessful) {
                 addOrderResultSuccessfulItemView(item)
             } else {
@@ -29,6 +39,7 @@ class OrderResultEpoxyController(
     private fun addOrderResultWaitingItemView() {
         orderResultWaitingItemView {
             id("order_result_waiting")
+            setupCountDown(count)
         }
     }
 
@@ -67,24 +78,76 @@ class OrderResultEpoxyController(
 
         when (item.paymentType) {
             PaymentType.BANK.value -> {
-                orderResultBankSuccessItemView {
-                    id("order_result_bank_success")
-                    setupTimeout(timeout)
-                    setupName(item.accountName)
-                    setupBank(bank)
-                    setupCity(city)
-                    setupAccount(item.accountNumber)
-                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupClickListener(bankSuccessListener)
+                if (TextUtils.isEmpty(item.paymentUrl)) {
+                    orderResultDetailSuccessItemView {
+                        id("order_result_detail_success")
+                        setupTimeout(timeout)
+                        setupName(item.accountName)
+                        setupBank(bank)
+                        setupCity(city)
+                        setupAccount(item.accountNumber)
+                        setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                        setupClickListener(successListener)
+                    }
+                } else {
+                    orderResultUrlSuccessItemView {
+                        id("order_result_url_bank_success")
+                        setupTimeout(timeout)
+                        setupPaymentImg(R.drawable.ico_bank_160_px)
+                        setupPaymentCountdown(item.countdown)
+                        setupPaymentCountdownColor(R.color.color_black_1)
+                        setupPaymentCountdownBackground(R.drawable.bg_black_1_radius_6)
+                        setupPaymentGoBackground(R.drawable.bg_black_2_radius_6)
+                        setupPaymentCountdownVisibility(item.isCountdownVisible)
+                        setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                        setupPaymentPageListener(item.paymentUrl)
+                        setupClickListener(successListener)
+                    }
                 }
             }
-            else -> {
-                orderResultAliSuccessItemView {
-                    id("order_result_ali_success")
+            PaymentType.ALI.value -> {
+                orderResultUrlSuccessItemView {
+                    id("order_result_url_ali_success")
                     setupTimeout(timeout)
-                    setupAccount(item.accountNumber)
+                    setupPaymentImg(R.drawable.ico_alipay_160_px)
+                    setupPaymentCountdown(item.countdown)
+                    setupPaymentCountdownColor(R.color.color_blue_3)
+                    setupPaymentCountdownBackground(R.drawable.bg_blue_1_radius_6)
+                    setupPaymentGoBackground(R.drawable.bg_blue_2_radius_6)
+                    setupPaymentCountdownVisibility(item.isCountdownVisible)
                     setupAmount(GeneralUtils.getAmountFormat(item.amount))
-                    setupClickListener(bankSuccessListener)
+                    setupPaymentPageListener(item.paymentUrl)
+                    setupClickListener(successListener)
+                }
+            }
+            PaymentType.WX.value -> {
+                orderResultUrlSuccessItemView {
+                    id("order_result_url_wx_success")
+                    setupTimeout(timeout)
+                    setupPaymentImg(R.drawable.ico_wechat_pay_160_px)
+                    setupPaymentCountdown(item.countdown)
+                    setupPaymentCountdownColor(R.color.color_green_2)
+                    setupPaymentCountdownBackground(R.drawable.bg_green_1_radius_6)
+                    setupPaymentGoBackground(R.drawable.bg_green_2_radius_6)
+                    setupPaymentCountdownVisibility(item.isCountdownVisible)
+                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                    setupPaymentPageListener(item.paymentUrl)
+                    setupClickListener(successListener)
+                }
+            }
+            PaymentType.TIK_TOK.value -> {
+                orderResultUrlSuccessItemView {
+                    id("order_result_url_tik_tok_success")
+                    setupTimeout(timeout)
+                    setupPaymentImg(R.drawable.ico_tiktokpay_160_px)
+                    setupPaymentCountdown(item.countdown)
+                    setupPaymentCountdownColor(R.color.color_black_1_50)
+                    setupPaymentCountdownBackground(R.drawable.bg_black_1_radius_6)
+                    setupPaymentGoBackground(R.drawable.bg_black_2_radius_6)
+                    setupPaymentCountdownVisibility(item.isCountdownVisible)
+                    setupAmount(GeneralUtils.getAmountFormat(item.amount))
+                    setupPaymentPageListener(item.paymentUrl)
+                    setupClickListener(successListener)
                 }
             }
         }

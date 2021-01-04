@@ -9,17 +9,17 @@ import java.util.*
 @Parcelize
 data class PostMemberRequest (
     @SerializedName("title")
-    val title: String = "",
+    var title: String = "",
 
     @SerializedName("content")
     var content: String = "",
 
     @SerializedName("type")
-    val type: Int = 0,
+    var type: Int = 0,
 
     @SerializedName("isAdult")
     val isAdult: Boolean = true,
 
     @SerializedName("tags")
-    val tags: ArrayList<String> = arrayListOf()
+    var tags: ArrayList<String> = arrayListOf()
 ): Serializable, Parcelable

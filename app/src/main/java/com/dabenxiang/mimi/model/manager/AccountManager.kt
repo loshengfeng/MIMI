@@ -34,13 +34,15 @@ class AccountManager(
 
     fun setupProfile(meItem: MeItem) {
         pref.profileItem = getProfile().copy(
-            userId = meItem.id ?: 0,
+            userId = meItem.id,
             avatarAttachmentId = meItem.avatarAttachmentId ?: 0,
             friendlyName = meItem.friendlyName ?: "",
             point = meItem.availablePoint ?: 0,
             isEmailConfirmed = meItem.isEmailConfirmed ?: false,
             videoCount = meItem.videoCount ?: 0,
-            videoOnDemandCount = meItem.videoOnDemandCount ?: 0
+            videoCountLimit = meItem.videoCountLimit ?: 0,
+            videoOnDemandCount = meItem.videoOnDemandCount ?: 0,
+            videoOnDemandCountLimit = meItem.videoOnDemandCountLimit ?: 0
         )
     }
 
@@ -53,8 +55,16 @@ class AccountManager(
         return tokenItem.accessToken.isNotEmpty() && tokenItem.refreshToken.isNotEmpty()
     }
 
+    fun isVip(): Boolean {
+        return getProfile().isSubscribed
+    }
+
     fun isLogin(): Boolean {
-        return getMemberTokenResult() == TokenResult.PASS
+        return when (getMemberTokenResult()) {
+            TokenResult.PASS -> true
+            TokenResult.EXPIRED -> getProfile().userId != 0L
+            else -> false
+        }
     }
 
     fun getMemberTokenResult(): TokenResult {
@@ -122,9 +132,9 @@ class AccountManager(
             .catch { e -> emit(ApiResult.error(e)) }
             .onCompletion { emit(ApiResult.loaded()) }
 
-    fun signIn(userName: String, password: String) =
+    fun signIn(userName: String, password: String, code: String) =
         flow {
-            val request = SignInRequest(userName, password)
+            val request = SignInRequest(userName = userName, password = password, code = code)
             val result = domainManager.getApiRepository().signIn(request)
             if (!result.isSuccessful) throw HttpException(result)
 
@@ -147,7 +157,7 @@ class AccountManager(
                         userId = meItem?.id ?: 0,
                         deviceId = GeneralUtils.getAndroidID(),
                         account = userName,
-                        password = password,
+                        password = "",
                         friendlyName = meItem?.friendlyName ?: "",
                         avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
                         isEmailConfirmed = meItem?.isEmailConfirmed ?: false,

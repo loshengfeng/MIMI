@@ -13,7 +13,8 @@ sealed class BaseVideoItem {
         val resolution: String?,
         val info: String?,
         val imgUrl: String?,
-        val isAdult: Boolean
+        val isAdult: Boolean,
+        val tags: List<String>?
     ) : BaseVideoItem()
 }
 
@@ -26,23 +27,25 @@ fun List<VideoItem>.searchItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.
             imgUrl = item.cover,
             isAdult = isAdult,
             resolution = "",
-            info = ""
+            info = "",
+            tags = item.tags as List<String>
         )
         result.add(holderItem)
     }
     return result
 }
 
-fun List<StatisticsItem>.statisticsItemToVideoItem(isAdult: Boolean): List<BaseVideoItem.Video> {
+fun List<StatisticsItem>.statisticsItemToVideoItem(): List<BaseVideoItem.Video> {
     val result = mutableListOf<BaseVideoItem.Video>()
     forEach { item ->
         val holderItem = BaseVideoItem.Video(
             id = item.id,
             title = item.title,
             imgUrl = item.cover,
-            isAdult = isAdult,
+            isAdult = true,
             resolution = "",
-            info = ""
+            info = "",
+            tags = (item.tags as List<String>)
         )
         result.add(holderItem)
     }
@@ -58,7 +61,8 @@ fun List<SimpleVideoItem>.simpleVideoItemToVideoItem(isAdult: Boolean): List<Bas
             imgUrl = item.cover,
             isAdult = isAdult,
             resolution = "",
-            info = ""
+            info = "",
+            tags = ArrayList<String>()
         )
         result.add(holderItem)
     }

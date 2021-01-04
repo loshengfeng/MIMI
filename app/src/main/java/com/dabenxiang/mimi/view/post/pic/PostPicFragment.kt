@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.PostPicItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
+import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
@@ -20,12 +21,14 @@ import com.dabenxiang.mimi.model.vo.PostAttachmentItem
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.model.vo.ViewerItem
 import com.dabenxiang.mimi.view.adapter.ScrollPicAdapter
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.viewer.PostViewerFragment.Companion.VIEWER_DATA
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.android.synthetic.main.fragment_post_article.edt_hashtag
 import kotlinx.android.synthetic.main.fragment_post_article.edt_title
@@ -61,19 +64,16 @@ class PostPicFragment : BasePostFragment() {
             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
-        tv_clean.isEnabled = true
-        val img = requireContext().getDrawable(R.drawable.btn_close_n)
-        tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
-
         edt_hashtag.imeOptions = EditorInfo.IME_ACTION_DONE
-
-        useAdultTheme(false)
+        btn_tag_confirm.setOnClickListener { hashTagConfirm() }
     }
 
     override fun setupListeners() {
         super.setupListeners()
 
         tv_clean.setOnClickListener {
+
+            GeneralUtils.hideKeyboard(requireActivity())
 
             if (checkFieldIsEmpty()) {
                 return@setOnClickListener
@@ -82,6 +82,10 @@ class PostPicFragment : BasePostFragment() {
             if (adapter.getData().isEmpty()) {
                 Toast.makeText(requireContext(), R.string.post_warning_pic, Toast.LENGTH_SHORT)
                     .show()
+                return@setOnClickListener
+            }
+
+            if (!checkTagCountIsValid()) {
                 return@setOnClickListener
             }
 
@@ -94,13 +98,18 @@ class PostPicFragment : BasePostFragment() {
         val title = edt_title.text.toString()
         var page = ""
         var searchPostItem: SearchPostItem? = null
+        var memberClubItem: MemberClubItem? =null
 
         arguments?.let {
             isEdit = it.getBoolean(MyPostFragment.EDIT, false)
             page = it.getString(PAGE, "")
             val data = it.getSerializable(SearchPostFragment.KEY_DATA)
             if (data != null) {
-                searchPostItem = data as SearchPostItem
+                if (data is SearchPostItem) {
+                    searchPostItem = data
+                } else if (data is MemberClubItem){
+                    memberClubItem = data
+                }
             }
         }
 
@@ -113,14 +122,16 @@ class PostPicFragment : BasePostFragment() {
         bundle.putStringArrayList(DELETE_ATTACHMENT, deletePicList)
         bundle.putLong(POST_ID, postId)
 
+        if(isEdit){
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        }
+        mainViewModel?.uploadData?.value = bundle
+
         if (isEdit && page == MY_POST) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postPicFragment_to_myPostFragment, bundle)
-        } else if (isEdit && page == ADULT) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
         } else if (isEdit && page == SEARCH) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
@@ -129,10 +140,24 @@ class PostPicFragment : BasePostFragment() {
         } else if (isEdit && page == CLUB) {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-            bundle.putSerializable(SearchPostFragment.KEY_DATA, searchPostItem)
-            findNavController().navigate(R.id.action_postPicFragment_to_clubDetailFragment, bundle)
+            bundle.putSerializable(SearchPostFragment.KEY_DATA, memberClubItem)
+            findNavController().navigate(R.id.action_postPicFragment_to_topicDetailFragment, bundle)
+        } else if (isEdit && page == TAB) {
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
+        } else if (isEdit && page == PIC) {
+//            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+//            bundle.putSerializable(ClubPicFragment.KEY_DATA, item)
+//            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item) //TODO fix key
+//            findNavController().navigate(R.id.action_postPicFragment_to_clubPicFragment, bundle)
+            findNavController().navigateUp()
+        } else if (isEdit && page == FAVORITE) {
+            findNavController().navigateUp()
+        } else if (isEdit && page == LIKE) {
+            findNavController().navigateUp()
         } else {
-            findNavController().navigate(R.id.action_postPicFragment_to_adultHomeFragment, bundle)
+            findNavController().navigate(R.id.action_postPicFragment_to_clubTabFragment, bundle)
         }
     }
 
@@ -151,7 +176,7 @@ class PostPicFragment : BasePostFragment() {
         )
     }
 
-    override fun setUI(item: MediaItem) {
+    override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
         for (pic in item.picParameter) {
             val postAttachmentItem = PostAttachmentItem()
             postAttachmentItem.attachmentId = pic.id
@@ -194,7 +219,7 @@ class PostPicFragment : BasePostFragment() {
     }
 
     private fun handleMultiPics(clipData: ClipData) {
-        val uriList = PostManager().getPicsUri(clipData, requireContext())
+        val uriList = PostManager().getPicsUri(clipData, requireContext(), adapter.getData().size)
         for (uri in uriList) {
             val uriDataList = adapter.getData()
             val postAttachmentItem = PostAttachmentItem(uri = uri)
@@ -209,7 +234,13 @@ class PostPicFragment : BasePostFragment() {
         val uri = PostManager().getPicUri(data, requireContext(), file)
 
         if (uri.path!!.isNotBlank()) {
-            postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
+            try {
+                postAttachmentItem.uri = UriUtils.getPath(requireContext(), uri)!!
+            } catch(e: Exception) {
+                GeneralUtils.showToast(requireContext(), "不支援此图片上传")
+                onApiError(e)
+                return
+            }
         }
 
         val uriDataList = adapter.getData()

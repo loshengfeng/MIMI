@@ -4,7 +4,8 @@
         android:left="50dp"
         android:right="50dp"
         android:width="30dp"
-        android:height="4dp">
+        android:height="4dp"
+        android:gravity="bottom|center">
         <shape>
             <corners
                 android:topLeftRadius="@dimen/dp_6"

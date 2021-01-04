@@ -17,7 +17,6 @@ import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.yulichswift.roundedview.widget.RoundedTextView
 import timber.log.Timber
-import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,14 +28,24 @@ class CommentAdapter(listener: PlayerInfoListener, type: CommentViewType) :
     }
 
     interface PlayerInfoListener {
-        fun sendComment(replyId: Long?, replyName: String?)
+        fun sendComment(
+            replyId: Long?,
+            replyName: String?,
+            parentNode: RootCommentNode
+        )
+
         fun expandReply(parentNode: RootCommentNode, succeededBlock: () -> Unit)
-        fun replyComment(replyId: Long?, replyName: String?)
+        fun replyComment(
+            replyId: Long?,
+            replyName: String?,
+            parentNode: RootCommentNode
+        )
+
         fun setCommentLikeType(replyId: Long?, isLike: Boolean, succeededBlock: () -> Unit)
         fun removeCommentLikeType(replyId: Long?, succeededBlock: () -> Unit)
         fun onMoreClick(item: MembersPostCommentItem)
         fun onAvatarClick(userId: Long, name: String)
-        fun loadAvatar(id:Long?, view:ImageView)
+        fun loadAvatar(id: Long?, view: ImageView)
     }
 
     init {
@@ -186,7 +195,11 @@ class RootCommentProvider(
                 }
             }
             R.id.btn_reply -> {
-                listener.sendComment(actualData.data.id, actualData.data.postName)
+                listener.sendComment(
+                    actualData.data.id,
+                    actualData.data.postName,
+                    actualData
+                )
             }
             R.id.btn_more -> {
                 val item = (actualData.data) as MembersPostCommentItem
@@ -260,10 +273,11 @@ class NestedCommentProvider(
                 val adapter = getAdapter() as? CommentAdapter
                 if (adapter != null) {
                     val parentNode = actualData.parentNodeRef.get()!!
-                    val parentPosition = adapter.findParentNode(data)
-                    if (parentPosition > -1) {
-                        listener.replyComment(parentNode.data.id, actualData.data.postName)
-                    }
+                    listener.replyComment(
+                        parentNode.data.id,
+                        actualData.data.postName,
+                        parentNode
+                    )
                 }
             }
             R.id.btn_more -> {
@@ -339,8 +353,17 @@ abstract class BaseCommentProvider(
         holder.setTextColorRes(R.id.tv_name, getTextColor())
         holder.setTextColorRes(R.id.tv_date, getTextColor())
 
-        holder.setText(R.id.tv_message, if(!TextUtils.isEmpty(data.postName)) "@${data.postName} ${data.content}"
-        else data.content)
+        val commentTextView = holder.getView<TextView>(R.id.tv_message)
+        commentTextView.text = data.content
+        commentTextView.viewTreeObserver.addOnGlobalLayoutListener {
+            val newText =
+                com.dabenxiang.mimi.widget.utility.TextUtils.autoSplitText(commentTextView)
+            if (!TextUtils.isEmpty(newText)) {
+                commentTextView.text = newText;
+            } else {
+                commentTextView.text = data.content
+            }
+        }
 
         holder.setTextColorRes(R.id.tv_message, getMessageTextColor())
         holder.setTextColorRes(R.id.tv_like, getMessageTextColor())

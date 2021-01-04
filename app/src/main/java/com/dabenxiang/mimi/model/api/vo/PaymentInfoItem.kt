@@ -34,5 +34,9 @@ data class PaymentInfoItem(
     val bankBranchAddress: String = "",
 
     @SerializedName("paymentType")
-    val paymentType: PaymentType = PaymentType.BANK
-): Serializable
+    val paymentType: PaymentType = PaymentType.BANK,
+
+    @SerializedName("paymentUrl")
+    val paymentUrl: String = ""
+
+) : Serializable

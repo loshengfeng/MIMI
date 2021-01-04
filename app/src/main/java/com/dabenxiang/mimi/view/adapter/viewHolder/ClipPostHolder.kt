@@ -22,8 +22,9 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import timber.log.Timber
 import java.util.*
 
 class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
@@ -40,12 +41,9 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
     private val tagChipGroup: ChipGroup = itemView.chip_group_tag
     private val likeImage: ImageView = itemView.iv_like
     private val likeCount: TextView = itemView.tv_like_count
-
-
+    private val tvTitleMore: TextView = itemView.tv_title_more
     private val favoriteImage: ImageView = itemView.iv_favorite
     private val favoriteCount: TextView = itemView.tv_favorite_count
-
-
     private val commentImage: ImageView = itemView.iv_comment
     private val commentCount: TextView = itemView.tv_comment_count
     private val moreImage: ImageView = itemView.iv_more
@@ -55,15 +53,25 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         itemList: List<MemberPostItem>?,
         position: Int,
         adultListener: AdultListener,
-        tag: String,
+        tag: String?,
         memberPostFuncItem: MemberPostFuncItem,
         isClipList: Boolean
     ) {
         name.text = item.postFriendlyName
         time.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         title.text = item.title
-        follow.visibility =
-            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+
+        tvTitleMore.visibility = if (title.text.length >= 45) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        // New Adjust: Follow is hidden when it is on the list page, and the follow function is only available on the detailed page
+//        follow.visibility =
+//            if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
+        follow.visibility =  View.GONE
+
         updateLikeAndFollowItem(item, itemList, memberPostFuncItem)
 
         memberPostFuncItem.getBitmap(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
@@ -72,7 +80,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            if (TextUtils.isEmpty(tag)) {
+            if (tag == null || TextUtils.isEmpty(tag)) {
                 chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             } else {
                 if (it == tag) {
@@ -116,7 +124,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         }
 
         moreImage.setOnClickListener {
-            itemList?.also { adultListener.onMoreClick(item, it) }
+            adultListener.onMoreClick(item, position)
         }
 
         ivPhoto.setOnClickListener {
@@ -140,6 +148,7 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
         favoriteCount.text = item.favoriteCount.toString()
         commentCount.text = item.commentCount.toString()
 
+        Timber.i("isFavorite favoriteCount=${item.favoriteCount}")
         if (item.isFollow) {
             follow.text = follow.context.getString(R.string.followed)
             follow.background = follow.context.getDrawable(R.drawable.bg_white_1_stroke_radius_16)
@@ -180,7 +189,9 @@ class ClipPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
         favoriteImage.setOnClickListener {
             val isFavorite = item.isFavorite
+            Timber.i("isFavorite =$isFavorite")
             memberPostFuncItem.onFavoriteClick(item, !isFavorite) { favorite, count ->
+                Timber.i("isFavorite updateFavorite=$isFavorite")
                 updateFavorite(favorite, count)
             }
         }

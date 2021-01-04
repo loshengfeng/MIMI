@@ -5,5 +5,5 @@ import com.google.gson.annotations.SerializedName
 
 data class LikeRequest(
     @SerializedName("type")
-    val likeType: LikeType = LikeType.DISLIKE
+    val likeType: LikeType? = LikeType.DISLIKE
 )

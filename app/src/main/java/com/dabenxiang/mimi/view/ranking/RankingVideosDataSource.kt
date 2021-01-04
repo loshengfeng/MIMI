@@ -2,9 +2,10 @@ package com.dabenxiang.mimi.view.ranking
 
 import androidx.paging.PageKeyedDataSource
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.api.vo.StatisticsItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsType
+import com.dabenxiang.mimi.model.manager.DomainManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -16,7 +17,8 @@ class RankingVideosDataSource constructor(
     private val viewModelScope: CoroutineScope,
     private val domainManager: DomainManager,
     private val pagingCallback: PagingCallback,
-    private val statisticsType: StatisticsType
+    private val startTime:String,
+    private val endTime:String
 ) : PageKeyedDataSource<Long, StatisticsItem>() {
 
     companion object {
@@ -33,7 +35,8 @@ class RankingVideosDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().statisticsHomeVideos(
-                    statisticsType=statisticsType,
+                    startTime = startTime,
+                    endTime = endTime,
                     isAdult = true,
                     offset = 0,
                     limit = PER_LIMIT_LONG.toInt()
@@ -54,6 +57,7 @@ class RankingVideosDataSource constructor(
 
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->
@@ -72,7 +76,6 @@ class RankingVideosDataSource constructor(
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().statisticsHomeVideos(
-                    statisticsType=statisticsType,
                     isAdult = true,
                     offset = 0,
                     limit = PER_LIMIT_LONG.toInt()
@@ -81,6 +84,7 @@ class RankingVideosDataSource constructor(
                 emit(result)
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { pagingCallback.onLoading() }
                 .catch { e -> pagingCallback.onThrowable(e) }
                 .onCompletion { pagingCallback.onLoaded() }
                 .collect { response ->

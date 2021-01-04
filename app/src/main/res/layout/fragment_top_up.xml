@@ -12,13 +12,25 @@
         android:layout_height="56dp"
         android:background="@color/color_gray_2"
         android:gravity="center"
-        android:text="@string/nav_topup"
+        android:text="@string/personal_topup_page"
         android:textColor="@color/color_black_1"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="20dp"
+        android:gravity="center_vertical"
+        app:drawableStartCompat="@drawable/btn_back_black_n"
+        app:drawableTint="@color/item_setting_bar_text_selector"
+        app:layout_constraintBottom_toBottomOf="@id/tv_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_title" />
 
     <TextView
         android:id="@+id/tv_record_top_up"
@@ -37,13 +49,13 @@
         android:id="@+id/iv_new_badge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        android:src="@drawable/ico_new"
         android:translationX="10dp"
         android:translationY="-10dp"
-        android:src="@drawable/ico_new"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/tv_record_top_up"
-        app:layout_constraintTop_toTopOf="@id/tv_record_top_up"
-        android:contentDescription="@null" />
+        app:layout_constraintTop_toTopOf="@id/tv_record_top_up" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/item_is_Login"
@@ -84,15 +96,14 @@
                 android:id="@+id/tv_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="8dp"
                 android:textColor="@color/color_white_1"
                 android:textSize="14sp"
+                app:layout_constraintBottom_toTopOf="@+id/tv_expiry_date"
                 app:layout_constraintStart_toEndOf="@id/iv_photo"
                 app:layout_constraintTop_toTopOf="@id/iv_photo"
-                app:layout_constraintBottom_toTopOf="@+id/tv_expiry_date"
                 app:layout_goneMarginTop="20dp"
                 tools:text="好大一棵洋梨" />
-
 
             <TextView
                 android:id="@+id/tv_expiry_date"
@@ -103,9 +114,9 @@
                 android:textColor="@color/color_white_1"
                 android:textSize="12sp"
                 android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_photo"
                 app:layout_constraintStart_toStartOf="@+id/tv_name"
                 app:layout_constraintTop_toBottomOf="@id/tv_name"
-                app:layout_constraintBottom_toBottomOf="@+id/iv_photo"
                 tools:text="VIP 於 2020-02-10 到期" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -201,7 +212,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="30dp"
-            android:visibility="gone"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -275,7 +286,7 @@
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintStart_toStartOf="@id/tl_type"
-                    app:layout_constraintTop_toTopOf="@id/tl_type" >
+                    app:layout_constraintTop_toTopOf="@id/tl_type">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -313,7 +324,7 @@
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintStart_toEndOf="@id/iv_bank"
-                    app:layout_constraintTop_toTopOf="@id/tl_type" >
+                    app:layout_constraintTop_toTopOf="@id/tl_type">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -351,7 +362,7 @@
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintStart_toEndOf="@id/iv_ali"
-                    app:layout_constraintTop_toTopOf="@id/tl_type" >
+                    app:layout_constraintTop_toTopOf="@id/tl_type">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -427,8 +438,8 @@
                     android:textColor="@color/color_black_1"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintRight_toRightOf="@+id/guideline_verification_end"
                     app:layout_constraintLeft_toRightOf="@+id/iv_verification"
+                    app:layout_constraintRight_toRightOf="@+id/guideline_verification_end"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="尚有N笔充值作业未完成，请稍后再试" />
 
@@ -458,19 +469,20 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_next"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="50dp"
                 android:background="@color/color_gray_2"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/guideline_bottom">
+                app:layout_constraintStart_toStartOf="parent">
 
                 <Button
                     android:id="@+id/btn_next"
                     android:layout_width="wrap_content"
                     android:layout_height="33dp"
-                    android:layout_marginEnd="9dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
                     android:background="@drawable/bg_red_1_radius_6"
                     android:text="@string/topup_next"
                     android:textColor="@color/color_white_1"

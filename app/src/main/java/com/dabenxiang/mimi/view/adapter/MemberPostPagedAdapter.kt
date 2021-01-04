@@ -14,11 +14,12 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import timber.log.Timber
 
 class MemberPostPagedAdapter(
     val context: Context,
     private val adultListener: AdultListener,
-    private var mTag: String = "",
+    private var mTag: String?= null,
     private val memberPostFuncItem: MemberPostFuncItem = MemberPostFuncItem(),
     private val isClipList: Boolean = false
 ) : PagedListAdapter<MemberPostItem, BaseViewHolder>(diffCallback) {
@@ -26,6 +27,7 @@ class MemberPostPagedAdapter(
     companion object {
         const val PAYLOAD_UPDATE_LIKE = 0
         const val PAYLOAD_UPDATE_FOLLOW = 1
+        const val PAYLOAD_UPDATE_FAVORITE= 2
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
@@ -109,6 +111,8 @@ class MemberPostPagedAdapter(
     ) {
         viewHolderMap[position] = holder
         val item = getItem(position)
+
+        Timber.i("MemberPostPagedAdapter item=$item")
         when (holder) {
             is AdHolder -> {
                 Glide.with(context).load(item?.adItem?.href).into(holder.adImg)
@@ -118,54 +122,54 @@ class MemberPostPagedAdapter(
             }
             is ClipPostHolder -> {
                 item?.also {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
-                        }
-                    } ?: run {
-                        holder.onBind(
-                            item,
-                            currentList,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem,
-                            isClipList
-                        )
-                    }
+//                    payloads.takeIf { it.isNotEmpty() }?.also {
+//                        when (it[0] as Int) {
+//                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+//                        }
+//                    } ?: run {
+//                        holder.onBind(
+//                            item,
+//                            currentList,
+//                            position,
+//                            adultListener,
+//                            mTag,
+//                            memberPostFuncItem,
+//                            isClipList
+//                        )
+//                    }
                 }
             }
-            is PicturePostHolder -> {
-                item?.also {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
-                            PAYLOAD_UPDATE_LIKE -> holder.updateLikeAndFollowItem(
-                                item,
-                                currentList,
-                                memberPostFuncItem
-                            )
-                        }
-                    } ?: run {
-                        holder.pictureRecycler.tag = position
-                        holder.onBind(
-                            item,
-                            currentList,
-                            position,
-                            adultListener,
-                            mTag,
-                            memberPostFuncItem
-                        )
-                    }
-                }
-            }
+//            is PicturePostHolder -> {
+//                item?.also {
+//                    payloads.takeIf { it.isNotEmpty() }?.also {
+//                        when (it[0] as Int) {
+//                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+//                            PAYLOAD_UPDATE_LIKE -> holder.updateLikeAndFollowItem(
+//                                item,
+//                                currentList,
+//                                memberPostFuncItem
+//                            )
+//                        }
+//                    } ?: run {
+//                        holder.pictureRecycler.tag = position
+//                        holder.onBind(
+//                            item,
+//                            currentList,
+//                            position,
+//                            adultListener,
+//                            mTag,
+//                            memberPostFuncItem
+//                        )
+//                    }
+//                }
+//            }
             is TextPostHolder -> {
                 item?.also {
-                    payloads.takeIf { it.isNotEmpty() }?.also {
-                        when (it[0] as Int) {
-                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
-                        }
-                    } ?: run {
+//                    payloads.takeIf { it.isNotEmpty() }?.also {
+//                        when (it[0] as Int) {
+//                            PAYLOAD_UPDATE_FOLLOW -> holder.updateFollow(item.isFollow)
+//                        }
+//                    } ?: run {
                         holder.onBind(
                             it,
                             currentList,
@@ -174,7 +178,7 @@ class MemberPostPagedAdapter(
                             mTag,
                             memberPostFuncItem
                         )
-                    }
+//                    }
                 }
             }
         }
@@ -183,15 +187,4 @@ class MemberPostPagedAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
     }
 
-    fun updateInternalItem(holder: BaseViewHolder) {
-        when (holder) {
-            is PicturePostHolder -> {
-                holder.pictureRecycler.adapter?.notifyDataSetChanged()
-            }
-        }
-    }
-
-    fun setupTag(tag: String) {
-        mTag = tag
-    }
 }

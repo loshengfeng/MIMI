@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.order
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -21,6 +22,8 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment
+import com.dabenxiang.mimi.view.topup.TopUpFragment
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
@@ -47,14 +50,50 @@ class OrderFragment : BaseFragment() {
         OrderPagerAdapter(
             OrderFuncItem(
                 getOrderByPaging3 = { update -> getOrderByPaging3(update) },
-                getOrderByPaging2 = { type, update, updateNoData -> viewModel.getOrderByPaging2(type, update, updateNoData) },
-                getChatList = { update, updateNoData -> viewModel.getChatList(update, updateNoData) },
-                getChatAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
+                getOrderByPaging2 = { type, update, updateNoData ->
+                    viewModel.getOrderByPaging2(
+                        type,
+                        update,
+                        updateNoData
+                    )
+                },
+                getChatList = { update, updateNoData ->
+                    viewModel.getChatList(
+                        update,
+                        updateNoData
+                    )
+                },
+                getChatAttachment = { id, view ->
+                    viewModel.loadImage(
+                        id,
+                        view,
+                        LoadImageType.AVATAR_CS
+                    )
+                },
                 onChatItemClick = { item -> onChatItemClick(item) },
-                getOrderProxyAttachment = { id, view -> viewModel.loadImage(id, view, LoadImageType.AVATAR_CS) },
-                onContactClick = { chatListItem, orderItem, updateChatId -> onContactClick(chatListItem, orderItem, updateChatId) },
+                getOrderProxyAttachment = { id, view ->
+                    viewModel.loadImage(
+                        id,
+                        view,
+                        LoadImageType.AVATAR_CS
+                    )
+                },
+                onContactClick = { chatListItem, orderItem, updateChatId ->
+                    onContactClick(
+                        chatListItem,
+                        orderItem,
+                        updateChatId
+                    )
+                },
                 getProxyUnread = { update -> getProxyUnread(update) },
-                onTopUpClick = { onTopUpClick() },
+                onTopUpClick = {
+                    navigateTo(
+                            NavigateItem.Destination(
+                                    R.id.action_orderFragment_to_topupFragment,
+                                    TopUpFragment.createBundle(this::class.java.simpleName)
+                            )
+                    )
+                },
                 onPaymentInfoClick = { orderItem -> onPaymentInfoClick(orderItem) },
                 updateTab = { updateTab() }
             ))
@@ -65,7 +104,15 @@ class OrderFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initSettings()
+
+        layout_payment_prompt.visibility = View.VISIBLE
+
+        iv_payment_prompt_close.setOnClickListener {
+            layout_payment_prompt.visibility = View.GONE
+        }
+
+        viewModel.getUnread()
+        updateProxyTab?.also { getProxyUnread(it) }
     }
 
     override fun getLayoutId(): Int {
@@ -73,7 +120,7 @@ class OrderFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.balanceResult.observe(viewLifecycleOwner, Observer {
+        viewModel.balanceResult.observe(viewLifecycleOwner, {
             for (i in 0 until tl_type.tabCount) {
                 val title = tabTitle[i]
                 tl_type.getTabAt(i)?.also { tab ->
@@ -86,8 +133,8 @@ class OrderFragment : BaseFragment() {
             }
         })
 
-        viewModel.unreadResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+        viewModel.unreadResult.observe(viewLifecycleOwner, {
+            when (it) {
                 is ApiResult.Success -> {
                     viewModel.unreadCount = it.result
                     tl_type.getTabAt(2)?.also { tab ->
@@ -100,8 +147,8 @@ class OrderFragment : BaseFragment() {
             viewModel.getUnReadOrderCount()
         })
 
-        viewModel.unreadOrderResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+        viewModel.unreadOrderResult.observe(viewLifecycleOwner, {
+            when (it) {
                 is ApiResult.Success -> {
                     viewModel.unreadOrderCount = it.result
                     tl_type.getTabAt(1)?.also { tab ->
@@ -119,8 +166,8 @@ class OrderFragment : BaseFragment() {
             }
         })
 
-        viewModel.createOrderChatResult.observe(viewLifecycleOwner, Observer {
-            when(it) {
+        viewModel.createOrderChatResult.observe(viewLifecycleOwner, {
+            when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Success -> {
                     val createOrderChatItem = it.result.first
@@ -161,15 +208,37 @@ class OrderFragment : BaseFragment() {
 
         TabLayoutMediator(tl_type, viewPager) { tab, position ->
             tab.setCustomView(R.layout.badged_tab)
-            tab.customView?.findViewById<TextView>(R.id.tv_title)?.text = tabTitle[position]
-            viewPager.setCurrentItem(tab.position, true)
+            val textView = tab.customView?.findViewById<TextView>(R.id.tv_title)
+            textView?.text = tabTitle[position]
+            textView?.takeIf { position == 0 }?.run { setTextViewSelected(true, this) }
         }.attach()
+
+        tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
+                setTextViewSelected(true, textView)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                val textView = tab?.customView?.findViewById(R.id.tv_title) as TextView
+                setTextViewSelected(false, textView)
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
     }
 
-    override fun initSettings() {
-        super.initSettings()
-        viewModel.getUnread()
-        updateProxyTab?.also { getProxyUnread(it) }
+    private fun setTextViewSelected(selected: Boolean, textView: TextView) {
+        when (selected) {
+            true -> {
+                textView.setTypeface(null, Typeface.BOLD)
+                textView.setTextColor(requireContext().getColor(R.color.color_black_1))
+            }
+            else -> {
+                textView.setTypeface(null, Typeface.NORMAL)
+                textView.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            }
+        }
     }
 
     private var getOrderJob: Job? = null
@@ -186,13 +255,21 @@ class OrderFragment : BaseFragment() {
         navigateTo(
             NavigateItem.Destination(
                 R.id.action_orderFragment_to_chatContentFragment,
-                ChatContentFragment.createBundle(item, orderItem.traceLogId, orderItem.type == OrderType.USER2ONLINE)
+                ChatContentFragment.createBundle(
+                    item,
+                    orderItem.traceLogId,
+                    orderItem.type == OrderType.USER2ONLINE
+                )
             )
         )
     }
 
-    private fun onContactClick(chatListItem: ChatListItem, orderItem: OrderItem, updateChatId: ((CreateOrderChatItem) -> Unit)) {
-        when(orderItem.type) {
+    private fun onContactClick(
+        chatListItem: ChatListItem,
+        orderItem: OrderItem,
+        updateChatId: ((CreateOrderChatItem) -> Unit)
+    ) {
+        when (orderItem.type) {
             OrderType.USER2ONLINE -> {
                 if (orderItem.chatId != 0L && orderItem.traceLogId != 0L) {
                     onChatItemClick(chatListItem, orderItem)
@@ -218,7 +295,6 @@ class OrderFragment : BaseFragment() {
 
     private fun onTopUpClick() {
         findNavController().navigateUp()
-        mainViewModel?.changeNavigationPosition?.value = R.id.navigation_topup
     }
 
     private fun onPaymentInfoClick(orderItem: OrderItem = OrderItem()) {
@@ -233,10 +309,6 @@ class OrderFragment : BaseFragment() {
     private fun updateTab() {
         viewModel.getUnread()
         viewModel.getBalanceItem()
-    }
-
-    infix fun <T, Q, R> ((T) -> Q).pipe(anotherFun: (Q) -> R): (T) -> R {
-        return { x: T -> anotherFun(this(x)) }
     }
 }
 

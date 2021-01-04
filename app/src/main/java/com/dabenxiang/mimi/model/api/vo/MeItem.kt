@@ -5,7 +5,7 @@ import java.util.*
 
 data class MeItem(
     @SerializedName("id")
-    val id: Long?,
+    val id: Long,
 
     @SerializedName("friendlyName")
     val friendlyName: String? = null,
@@ -34,6 +34,12 @@ data class MeItem(
     @SerializedName("videoCount")
     val videoCount: Int? = null,
 
+    @SerializedName("videoCountLimit")
+    val videoCountLimit: Int? = null,
+
+    @SerializedName("videoOnDemandCountLimit")
+    val videoOnDemandCountLimit: Int? = null,
+
     @SerializedName("videoOnDemandCount")
     val videoOnDemandCount: Int? = null,
 
@@ -42,4 +48,14 @@ data class MeItem(
 
     @SerializedName("isDailyCheckIn")
     val isDailyCheckIn: Boolean,
+
+    @SerializedName("follows")
+    val follows: Int? = null,
+
+    @SerializedName("likes")
+    val likes: Int? = null,
+
+    @SerializedName("fans")
+    val fans: Int? = null,
 )
+

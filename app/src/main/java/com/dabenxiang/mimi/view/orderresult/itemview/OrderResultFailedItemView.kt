@@ -6,6 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.view.orderresult.OrderResultFailedListener
 import kotlinx.android.synthetic.main.item_order_result_failed.view.*
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_MATCH_HEIGHT)
@@ -20,9 +21,5 @@ class OrderResultFailedItemView(context: Context) : ConstraintLayout(context) {
         btn_confirm.setOnClickListener {
             listener?.onConfirm()
         }
-    }
-
-    interface OrderResultFailedListener {
-        fun onConfirm()
     }
 }

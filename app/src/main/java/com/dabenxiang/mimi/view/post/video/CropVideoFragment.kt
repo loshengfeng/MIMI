@@ -4,9 +4,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
+import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.EditVideoListener
 import com.dabenxiang.mimi.view.base.BaseFragment
+import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.video.trimmer.interfaces.OnCropVideoListener
 import kotlinx.android.synthetic.main.fragment_crop_video.*
 import java.io.File
@@ -42,10 +45,12 @@ class CropVideoFragment : BaseFragment(), OnCropVideoListener {
 
         val uri = arguments?.getString(BUNDLE_URI)
 
+        FileUtil.getTakePhoto("")
+
         videoCropper.setVideoURI(Uri.parse(uri))
             .setOnCropVideoListener(this)
             .setMinMaxRatios(0.3f, 3f)
-            .setDestinationPath(Environment.getExternalStorageDirectory().toString() + File.separator + "temp" + File.separator + "Videos" + File.separator)
+            .setDestinationPath("${FileUtil.getAppPath(App.applicationContext())}/pic")
     }
 
     fun save() {
@@ -74,6 +79,10 @@ class CropVideoFragment : BaseFragment(), OnCropVideoListener {
     }
 
     override fun onError(message: String) {
+        GeneralUtils.showToast(
+            requireContext(),
+            getString(R.string.device_not_support)
+        )
     }
 
     override fun onProgress(progress: Float) {

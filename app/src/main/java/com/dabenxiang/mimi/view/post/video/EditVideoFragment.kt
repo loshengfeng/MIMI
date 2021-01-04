@@ -119,16 +119,12 @@ class EditVideoFragment : BaseFragment() {
             page = it.getString(BasePostFragment.PAGE, "")
         }
 
-        if (page == BasePostFragment.MY_POST) {
-            Navigation.findNavController(requireView()).popBackStack(R.id.myPostFragment, false)
-        } else if (page == BasePostFragment.ADULT) {
-            Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
-        } else if (page == BasePostFragment.SEARCH) {
-            Navigation.findNavController(requireView()).popBackStack(R.id.searchPostFragment, false)
-        } else if (page == BasePostFragment.CLUB) {
-            Navigation.findNavController(requireView()).popBackStack(R.id.clubDetailFragment, false)
-        } else {
-            Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
+        when (page) {
+            BasePostFragment.MY_POST -> Navigation.findNavController(requireView()).popBackStack(R.id.myPostFragment, false)
+            BasePostFragment.ADULT -> Navigation.findNavController(requireView()).popBackStack(R.id.adultHomeFragment, false)
+            BasePostFragment.SEARCH -> Navigation.findNavController(requireView()).popBackStack(R.id.searchPostFragment, false)
+            BasePostFragment.CLUB -> Navigation.findNavController(requireView()).popBackStack(R.id.topicDetailFragment, false)
+            else -> Navigation.findNavController(requireView()).popBackStack(R.id.clubTabFragment, false)
         }
     }
 
@@ -137,7 +133,7 @@ class EditVideoFragment : BaseFragment() {
 
         tv_title.text = getString(R.string.post_title)
         tv_clean.visibility = View.VISIBLE
-        tv_clean.text = getString(R.string.btn_send)
+        tv_clean.text = getString(R.string.btn_complete)
 
         val img = requireContext().getDrawable(R.drawable.btn_close_n)
         tv_back.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)

@@ -34,7 +34,7 @@ class ChangePasswordFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.currentError.observe(viewLifecycleOwner, Observer {
+        viewModel.currentError.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_current.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_current_error.visibility = View.INVISIBLE
@@ -45,7 +45,7 @@ class ChangePasswordFragment : BaseFragment() {
             }
         })
 
-        viewModel.newError.observe(viewLifecycleOwner, Observer {
+        viewModel.newError.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_new.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_new_error.visibility = View.INVISIBLE
@@ -56,7 +56,7 @@ class ChangePasswordFragment : BaseFragment() {
             }
         })
 
-        viewModel.confirmError.observe(viewLifecycleOwner, Observer {
+        viewModel.confirmError.observe(viewLifecycleOwner, {
             if (it == "") {
                 edit_confirm.setBackgroundResource(R.drawable.edit_text_rectangle)
                 tv_confirm_error.visibility = View.INVISIBLE
@@ -67,12 +67,10 @@ class ChangePasswordFragment : BaseFragment() {
             }
         })
 
-        viewModel.changeResult.observe(viewLifecycleOwner, Observer {
+        viewModel.changeResult.observe(viewLifecycleOwner, {
             when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
-                    progressHUD?.dismiss()
+                    progressHUD.dismiss()
                     navigateTo(NavigateItem.Up)
                 }
                 is Error -> onApiError(it.throwable)

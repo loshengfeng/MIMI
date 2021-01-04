@@ -2,7 +2,6 @@ package com.dabenxiang.mimi.view.invitevip
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -33,7 +32,7 @@ class InviteVipFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.promotionItem.observe(viewLifecycleOwner, Observer {
+        viewModel.promotionItem.observe(viewLifecycleOwner, {
             when (it) {
                 is ApiResult.Loading -> progressHUD?.show()
                 is ApiResult.Loaded -> progressHUD?.dismiss()
@@ -64,9 +63,9 @@ class InviteVipFragment : BaseFragment() {
                         null
                     )
                 )
-                R.id.bt_invite_copy -> {
+                R.id.cl_copy_invite_code -> {
                     copyToClipboard(requireContext(), tv_invite_code.text.toString())
-                    mainViewModel?.setShowPopHint(getString(R.string.invite_vip_invite_copy_hint))
+                    mainViewModel?.setShowPopHint(getString(R.string.invite_vip_invite_copy_code_hint))
                 }
                 R.id.tv_login -> navigateTo(
                     NavigateItem.Destination(
@@ -80,12 +79,17 @@ class InviteVipFragment : BaseFragment() {
                         LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
                     )
                 )
+                R.id.cl_copylink -> {
+                    copyToClipboard(requireContext(), viewModel.promotionData?.promotion_url?:viewModel.getWebsiteDomain())
+                    mainViewModel?.setShowPopHint(getString(R.string.invite_vip_invite_copy_link_hint))
+                }
             }
         }.also {
             iv_invite_vip_back.setOnClickListener(it)
             iv_not_login_back.setOnClickListener(it)
             tv_to_invite_vip_record.setOnClickListener(it)
-            bt_invite_copy.setOnClickListener(it)
+            cl_copy_invite_code.setOnClickListener(it)
+            cl_copylink.setOnClickListener(it)
             tv_login.setOnClickListener(it)
             tv_register.setOnClickListener(it)
         }

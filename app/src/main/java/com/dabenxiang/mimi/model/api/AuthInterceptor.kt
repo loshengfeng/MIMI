@@ -15,8 +15,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -33,10 +33,12 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
         var response: Response? = null
         val request = chain.request()
         val url = request.url
-
+        Timber.d("URL: $url")
         if (checkTokenUrl(url.toString())) {
             return chain.proceed(chain.request())
         }
+
+        val requestBody = request.body
 
         val hasMemberToken = checkHasMemberToken(url.toString())
         if (hasMemberToken) {
@@ -55,8 +57,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
         try {
             response = chain.proceed(newRequest)
-            Timber.d("Response code: ${response.code}")
-
+            Timber.d("Response Code: ${response.code}")
             return when (response.code) {
                 HttpURLConnection.HTTP_UNAUTHORIZED -> {
                     response.close()
@@ -115,7 +116,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             else -> pref.publicToken.accessToken
         }
 
-        if (!url.toString().contains("/v1/Business")) {
+        if (!url.toString().contains("/v1/Business") && !url.toString().contains("/v1/business")) {
             val auth = StringBuilder(ApiRepository.BEARER).append(accessToken).toString()
             requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
         }

@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.AdItem
@@ -17,12 +16,10 @@ import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.model.vo.CarouselHolderItem
 import com.dabenxiang.mimi.view.adapter.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.view.club.ClubFuncItem
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
 import com.dabenxiang.mimi.view.home.HomeTemplate
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.view.ViewPagerIndicator
 import com.to.aboomy.pager2banner.Banner
-import kotlinx.android.synthetic.main.item_banner.view.*
 import kotlinx.android.synthetic.main.item_carousel.view.*
 import kotlinx.android.synthetic.main.item_header.view.*
 import kotlinx.android.synthetic.main.item_home_clip.view.*
@@ -86,7 +83,7 @@ class HeaderViewHolder(
 
 class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, isAdult: Boolean) :
     HomeViewHolder<HomeTemplate.Banner>(itemView, listener, isAdult) {
-    private val ivPoster: ImageView = itemView.iv_poster
+//    private val ivPoster: ImageView = itemView.iv_poster
 
     override fun updated() {
         data?.also {
@@ -95,12 +92,12 @@ class HomeBannerViewHolder(itemView: View, listener: HomeAdapter.EventListener, 
     }
 
     fun updateItem(item: AdItem) {
-        Glide.with(itemView.context)
-            .load(item.href)
-            .into(ivPoster)
-        ivPoster.setOnClickListener { view ->
-            GeneralUtils.openWebView(view.context, item.target)
-        }
+//        Glide.with(itemView.context)
+//            .load(item.href)
+//            .into(ivPoster)
+//        ivPoster.setOnClickListener { view ->
+//            GeneralUtils.openWebView(view.context, item.target)
+//        }
     }
 }
 

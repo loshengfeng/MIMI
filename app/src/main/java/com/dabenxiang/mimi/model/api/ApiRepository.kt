@@ -2,16 +2,12 @@ package com.dabenxiang.mimi.model.api
 
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.api.vo.error.TOKEN_NOT_FOUND
-import com.dabenxiang.mimi.model.enums.OrderType
-import com.dabenxiang.mimi.model.enums.PaymentType
-import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.enums.StatisticsType
-import com.dabenxiang.mimi.view.home.HomeTemplate
+import com.dabenxiang.mimi.model.enums.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import retrofit2.http.Query
+import timber.log.Timber
 import java.io.File
 
 class ApiRepository(private val apiService: ApiService) {
@@ -24,11 +20,11 @@ class ApiRepository(private val apiService: ApiService) {
         const val FILE = "file"
         const val MEDIA_TYPE_IMAGE = "image/*"
         const val X_REQUESTED_FROM = "X-Requested-From"
+        const val NETWORK_PAGE_SIZE = 20
+        const val ERROR_CODE_ACCOUNT_OVERDUE = 402
         fun isRefreshTokenFailed(code: String?): Boolean {
             return code == TOKEN_NOT_FOUND
         }
-
-        const val NETWORK_PAGE_SIZE = 20
     }
 
     /**********************************************************
@@ -228,6 +224,7 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.resendEmail(body)
 
     suspend fun followPost(userId: Long): Response<Void> {
+        Timber.i("userId=$userId")
         return apiService.followPost(userId)
     }
 
@@ -240,7 +237,7 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getMemberVideoReport(
         videoId: Long,
         type: Int,
-        unhealthy:Boolean =true
+        unhealthy: Boolean = true
     ) = apiService.getMemberVideoReport(videoId, type, unhealthy)
 
     /**********************************************************
@@ -248,6 +245,33 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Post
      *
      ***********************************************************/
+    suspend fun searchPostAll(
+        type: PostType,
+        keyword: String? = null,
+        tag: String? = null,
+        orderBy: StatisticsOrderType = StatisticsOrderType.LATEST,
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(
+            type = type.value,
+            keyword = keyword,
+            tag = tag,
+            orderBy = orderBy.value,
+            offset = offset,
+            limit = limit
+        )
+    }
+
+    suspend fun getMembersPost(
+        type: PostType,
+        orderBy: OrderBy,
+        offset: Int,
+        limit: Int
+    ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
+        return apiService.getMembersPost(type.value, offset, limit, orderBy = orderBy.value)
+    }
+
     suspend fun getMembersPost(
         type: PostType,
         offset: Int,
@@ -309,15 +333,19 @@ class ApiRepository(private val apiService: ApiService) {
      *                  Members/Club
      *
      ***********************************************************/
+
     suspend fun getMembersClub(
-        tag: String
+        tag: String,
+        offset: Int?=null,
+        limit: Int?=null
     ): Response<ApiBasePagingItem<ArrayList<MemberClubItem>>> {
-        return apiService.getMembersClub(tag)
+        Timber.i("ClubTabFragment getMembersClub")
+        return apiService.getMembersClub(tag, offset, limit)
     }
 
     suspend fun getMembersClub(
         clubId: Long
-    ): Response<ApiBasePagingItem<MemberClubItem>> {
+    ): Response<ApiBaseItem<MemberClubItem>> {
         return apiService.getMembersClub(clubId)
     }
 
@@ -375,6 +403,11 @@ class ApiRepository(private val apiService: ApiService) {
      */
     suspend fun fetchHomeCategories() = apiService.fetchHomeCategories()
 
+    /**
+     * 取得影片次類別清單
+     */
+    suspend fun fetchCategories() = apiService.fetchHomeCategories(202)
+
     /**********************************************************
      *
      *                   Members/Home/Videos
@@ -388,11 +421,56 @@ class ApiRepository(private val apiService: ApiService) {
         q: String? = null,
         country: String? = null,
         years: String? = null,
-        isAdult: Boolean,
+        isAdult: Boolean = true,
         offset: String,
         limit: String,
-        tag: String = ""
-    ) = apiService.searchHomeVideos(category, q, country, years, isAdult, offset, limit, tag)
+        tag: String? = null,
+        type: VideoType? = null
+    ) = apiService.searchHomeVideos(
+        category,
+        q,
+        country,
+        years,
+        isAdult,
+        offset,
+        limit,
+        tag,
+        type?.value
+    )
+
+    /**
+     * 取得小视频影片(需Client Credentials|需登入帳號)
+     */
+    suspend fun searchShortVideo(
+        q: String? = null,
+        orderByType: StatisticsOrderType = StatisticsOrderType.LATEST,
+        offset: String,
+        limit: String
+    ) = apiService.searchShortVideo(
+        q = q,
+        orderByType = orderByType.value,
+        offset = offset,
+        limit = limit
+    )
+
+    /**
+     * 取得小视频影片with時間區間(需Client Credentials|需登入帳號)
+     */
+    suspend fun searchShortVideo(
+        q: String? = null,
+        startTime: String? = null,
+        endTime: String? = null,
+        orderByType: StatisticsOrderType = StatisticsOrderType.LATEST,
+        offset: String,
+        limit: String
+    ) = apiService.searchShortVideo(
+        q = q,
+        startTime = startTime,
+        endTime = endTime,
+        orderByType = orderByType.value,
+        offset = offset,
+        limit = limit
+    )
 
     /**
      * 取得類別影片
@@ -408,17 +486,31 @@ class ApiRepository(private val apiService: ApiService) {
      * 取得熱門影片
      */
     suspend fun statisticsHomeVideos(
-        statisticsType: StatisticsType = StatisticsType.MONTH,
+        startTime: String? = null,
+        endTime: String? = null,
+        orderByType: Int = StatisticsOrderType.HOTTEST.value,
         category: String? = null,
-        isAdult: Boolean,
-        offset: Int,
-        limit: Int
+        tags: String? = null,
+        isAdult: Boolean = true,
+        isRandom: Boolean? = null,
+        offset: Int? = null,
+        limit: Int? = null,
+        lastId: Long = 0L,
+        excludeId: String? = null,
+        type: PostType = PostType.VIDEO_ON_DEMAND
     ) = apiService.statisticsHomeVideos(
-        statisticsType = statisticsType.value,
+        startTime = startTime,
+        endTime = endTime,
+        orderByType = orderByType,
         category = category,
+        tags = tags,
         isAdult = isAdult,
+        isRandom = isRandom,
         offset = offset,
-        limit = limit
+        limit = limit,
+        lastId = lastId,
+        excludeId = excludeId,
+        type = type.value
     )
 
     /**
@@ -444,6 +536,31 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.sendVideoReport(
         body
     )
+
+    /**********************************************************
+     *
+     *                   Members/Home/Actors
+     *
+     ***********************************************************/
+    /**
+     * 取得女優頁面
+     */
+    suspend fun getActors() = apiService.getActors()
+
+    /**
+     * 取得女優分頁資料
+     */
+    suspend fun getActorsList(
+        offset: Int,
+        limit: Int
+    ) = apiService.getActorsList(offset, limit)
+
+    /**
+     * 取得女優分頁資料
+     */
+    suspend fun getActorsList(
+        id: Long
+    ) = apiService.getActorsList(id)
 
     /**********************************************************
      *
@@ -474,7 +591,7 @@ class ApiRepository(private val apiService: ApiService) {
      * 移除我關注的圈子
      */
     suspend fun cancelMyClubFollow(
-        clubId: Long
+        clubId: String
     ) = apiService.cancelMyClubFollow(clubId)
 
     /**
@@ -489,8 +606,16 @@ class ApiRepository(private val apiService: ApiService) {
      * 移除我關注的人
      */
     suspend fun cancelMyMemberFollow(
-        userId: Long
+        userId: String
     ) = apiService.cancelMyMemberFollow(userId)
+
+    /**
+     * 取得我的粉絲列表
+     */
+    suspend fun getMyFans(
+        offset: Int,
+        limit: Int
+    ) = apiService.getMyFans(offset, limit)
 
     /**
      * 取得聊天室列表
@@ -537,17 +662,19 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getPlaylist(
         playlistType: Int,
         isAdult: Boolean,
+        isShortVideo: Boolean,
         offset: String,
         limit: String
-    ) = apiService.getPlaylist(playlistType, isAdult, offset, limit)
+    ) = apiService.getPlaylist(playlistType, isAdult, isShortVideo, offset, limit)
 
     /**
-     * 取得我的帖子收藏
+     * 取得我的帖子收藏 1:postText, 2:postPic , 3:PostShortVideo , 7:postOther, 8:postLongVideoSmallVideo
      */
     suspend fun getPostFavorite(
-        offset: String,
-        limit: String
-    ) = apiService.getPostFavorite(offset, limit)
+        offset: Long,
+        limit: Int,
+        postType: Int = 1,
+    ) = apiService.getPostFavorite(offset, limit, postType)
 
     /**
      * 移除我的帖子收藏
@@ -562,7 +689,17 @@ class ApiRepository(private val apiService: ApiService) {
     suspend fun getPostFollow(
         offset: Int,
         limit: Int
-    ) = apiService.getPostFollow(offset, limit)
+    ) = apiService.getPostFollow(offset = offset, limit = limit)
+
+    /**
+     * 搜尋我關注的所有帖子
+     */
+    suspend fun searchPostFollow(
+        keyword: String? = null,
+        tag: String? = null,
+        offset: Int,
+        limit: Int
+    ) = apiService.getPostFollow(keyword = keyword, tag = tag, offset = offset, limit = limit)
 
     /**
      * 取得使用者資訊明細
@@ -593,6 +730,17 @@ class ApiRepository(private val apiService: ApiService) {
         limit: String
     ): Response<ApiBasePagingItem<ArrayList<ReferrerHistoryItem>>> {
         return apiService.getReferrerHistory(offset, limit)
+    }
+
+    /**
+     * 我喜歡列表
+     */
+    suspend fun getPostLike(
+        offset: Long,
+        limit: Int,
+        type: Int
+    ): Response<ApiBasePagingItem<List<PostFavoriteItem>>> {
+        return apiService.getPostLike(offset, limit, type)
     }
 
     /**********************************************************
@@ -637,6 +785,20 @@ class ApiRepository(private val apiService: ApiService) {
         postId: Long,
         body: LikeRequest
     ) = apiService.like(postId, body)
+
+    /**
+     * 帖子移除喜歡/不喜歡
+     */
+    suspend fun deleteLike(
+        postId: Long
+    ) = apiService.deleteLike(postId)
+
+    /**
+     * 帖子移除全部喜歡
+     */
+    suspend fun deleteAllLike(
+        postId: String
+    ) = apiService.deleteAllLike(postId)
 
     /**
      * 帖子問題回報
@@ -848,7 +1010,29 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 取得訪客資訊
      */
-    suspend fun getGuestInfo(
-    ) = apiService.getGuestInfo()
+    suspend fun getGuestInfo() = apiService.getGuestInfo()
+
+    /**
+     * 取得Menu清單
+     */
+    suspend fun getMenu() = apiService.getMenu()
+
+    /**
+     * 取得影片清單
+     */
+    suspend fun getHomeList(
+        offset: String,
+        limit: String
+    ) = apiService.getHomeList(offset, limit)
+
+    /**
+     * 取得各來源解碼key
+     */
+    suspend fun getDecryptSetting() = apiService.getDecryptSetting()
+
+    /**
+     * 取得公告設定值
+     */
+    suspend fun getAnnounceConfigs() = apiService.getAnnounceConfigs()
 }
 

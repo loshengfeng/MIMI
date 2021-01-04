@@ -6,9 +6,12 @@
     app:startDestination="@id/personalFragment">
 
     <include app:graph="@navigation/navigation_login" />
-    <include app:graph="@navigation/navigation_detail_club" />
+    <include app:graph="@navigation/navigation_club_topic" />
     <include app:graph="@navigation/navigation_my_post" />
     <include app:graph="@navigation/navigation_setting" />
+    <include app:graph="@navigation/navigation_topup" />
+    <include app:graph="@navigation/navigation_clip_player" />
+    <include app:graph="@navigation/navigation_player" />
 
     <fragment
         android:id="@+id/personalFragment"
@@ -18,6 +21,14 @@
         <action
             android:id="@+id/action_personalFragment_to_loginFragment"
             app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+
+        <action
+            android:id="@+id/action_personalFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment" />
 
         <action
             android:id="@+id/action_personalFragment_to_myFollowFragment"
@@ -37,19 +48,22 @@
         <action
             android:id="@+id/action_to_settingFragment"
             app:destination="@id/navigation_setting" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/myFollowFragment"
-        android:name="com.dabenxiang.mimi.view.myfollow.MyFollowFragment"
-        tools:layout="@layout/fragment_my_follow">
 
         <action
-            android:id="@+id/action_myFollowFragment_to_clubDetailFragment"
-            app:destination="@id/navigation_detail_club" />
+            android:id="@+id/action_personalFragment_to_topupFragment"
+            app:destination="@id/navigation_topup" />
+
         <action
-            android:id="@+id/action_myFollowFragment_to_navigation_my_post"
-            app:destination="@id/navigation_my_post" />
+            android:id="@+id/action_to_fanslistFragment"
+            app:destination="@id/fansListFragment" />
+
+        <action
+            android:id="@+id/action_to_likelistFragment"
+            app:destination="@id/likesListFragment" />
+
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
     </fragment>
 
     <fragment
@@ -62,6 +76,9 @@
         <action
             android:id="@+id/action_orderFragment_to_paymentInfoFragment"
             app:destination="@id/paymentInfoFragment" />
+        <action
+            android:id="@+id/action_orderFragment_to_topupFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -82,5 +99,369 @@
         android:id="@+id/paymentInfoFragment"
         android:name="com.dabenxiang.mimi.view.paymentInfo.PaymentInfoFragment"
         android:label="PaymentInfoFragment" />
+
+    <fragment
+        android:id="@+id/fansListFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.pages.fans.FansListFragment"
+        android:label="FansListFragment" >
+        <action
+            android:id="@+id/action_fansListFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/likesListFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.like.LikeFragment"
+        tools:layout="@layout/fragment_my"
+        android:label="LikeFragment" >
+
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
+        <action
+            android:id="@+id/action_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
+        <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/navigation_clip_player" />
+        <action
+            android:id="@+id/action_to_playerV2Fragment"
+            app:destination="@id/navigation_player" />
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@+id/postVideoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/topUpFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
+        android:label="TopUpFragment" >
+        <action
+            android:id="@+id/action_topupFragment_to_orderFragment"
+            app:destination="@id/orderFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
+        <action
+            android:id="@+id/action_topupFragment_to_chatContentFragment"
+            app:destination="@id/chatContentFragment" />
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderInfoFragment"
+        android:name="com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment"
+        android:label="OrderInfoFragment">
+        <action
+            android:id="@+id/action_orderInfoFragment_to_orderResultFragment"
+            app:destination="@id/orderResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderResultFragment"
+        android:name="com.dabenxiang.mimi.view.orderresult.OrderResultFragment"
+        android:label="OrderResultFragment">
+
+        <action
+            android:id="@+id/action_orderResultFragment_to_orderFragment"
+            app:destination="@id/orderFragment"
+            app:popUpTo="@id/topUpFragment" />
+
+        <action
+            android:id="@+id/action_orderResultFragment_to_topupFragment"
+            app:destination="@id/topUpFragment"
+            app:popUpTo="@id/topUpFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/myFollowFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.follow.MyFollowFragment"
+        android:label="MyFollowFragment" >
+        <action
+            android:id="@+id/action_myFollowFragment_to_navigation_my_post"
+            app:destination="@id/navigation_my_post" />
+
+        <action
+            android:id="@+id/action_to_topicDetailFragment"
+            app:destination="@id/navigation_club_topic" />
+    </fragment>
+    <fragment
+        android:id="@+id/myCollectionFragment"
+        android:name="com.dabenxiang.mimi.view.my_pages.collection.MyCollectionFragment"
+        android:label="MyCollectionFragment">
+
+        <action
+            android:id="@+id/action_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
+        <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/navigation_clip_player" />
+
+        <action
+            android:id="@+id/action_to_playerV2Fragment"
+            app:destination="@id/navigation_player" />
+        <action
+            android:id="@+id/action_to_searchVideoFragment"
+            app:destination="@id/searchVideoFragment" />
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
+        <action
+            android:id="@+id/action_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@+id/postVideoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchPostFragment"
+        android:name="com.dabenxiang.mimi.view.search.post.SearchPostFragment"
+        android:label="SearchPostFragment">
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_clubPicFragment"
+            app:destination="@id/clubPicFragment" />
+        <action
+            android:id="@+id/action_to_clubTextFragment"
+            app:destination="@id/clubTextFragment" />
+        <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_searchPostFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postArticleFragment"
+        android:name="com.dabenxiang.mimi.view.post.article.PostArticleFragment"
+        tools:layout="@layout/fragment_post_article">
+
+        <action
+            android:id="@+id/action_postArticleFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_postArticleFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment"
+            app:popUpTo="@+id/myCollectionFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postPicFragment"
+        android:name="com.dabenxiang.mimi.view.post.pic.PostPicFragment"
+        android:label="PostPicFragment"
+        tools:layout="@layout/fragment_post_pic">
+        <action
+            android:id="@+id/action_postPicFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+        <action
+            android:id="@+id/action_postPicFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postPicFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment"
+            app:popUpTo="@+id/myCollectionFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.video.PostVideoFragment"
+        android:label="PostVideoFragment"
+        tools:layout="@layout/fragment_post_video">
+        <action
+            android:id="@+id/action_postVideoFragment_self"
+            app:destination="@id/postVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_myPostFragment"
+            app:destination="@id/myPostFragment"
+            app:popUpTo="@+id/myPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_editVideoFragment"
+            app:destination="@id/editVideoFragment" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_searchPostFragment"
+            app:destination="@id/searchPostFragment"
+            app:popUpTo="@+id/searchPostFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_postVideoFragment_to_clipPlayerFragment"
+            app:destination="@id/clipPlayerFragment" />
+
+        <action
+            android:id="@+id/action_postVideoFragment_to_myCollectionFragment"
+            app:destination="@id/myCollectionFragment"
+            app:popUpTo="@+id/myCollectionFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clubTextFragment"
+        android:name="com.dabenxiang.mimi.view.club.text.ClubTextFragment"
+        tools:layout="@layout/fragment_club_text">
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postArticleFragment"
+            app:destination="@id/postArticleFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/clubPicFragment"
+        android:name="com.dabenxiang.mimi.view.club.pic.ClubPicFragment"
+        tools:layout="@layout/fragment_club_pic" >
+        <action
+            android:id="@+id/action_clubPicFragment_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_pictureFragment"
+            app:destination="@id/pictureFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_postPicFragment"
+            app:destination="@id/postPicFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pictureFragment"
+        android:name="com.dabenxiang.mimi.view.fullpicture.FullPictureFragment"
+        tools:layout="@layout/fragment_full_picture" />
+
+    <fragment
+        android:id="@+id/clipPlayerFragment"
+        android:name="com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment"
+        android:label="ClipPlayerFragment">
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_searchPostFragment"
+            app:destination="@id/searchPostFragment" />
+        <action
+            android:id="@+id/action_to_postVideoFragment"
+            app:destination="@+id/postVideoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchVideoFragment"
+        android:name="com.dabenxiang.mimi.view.search.video.SearchVideoFragment"
+        tools:layout="@layout/fragment_search_video">
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_navigation_player"
+            app:destination="@id/navigation_player" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_clipSingleFragment"
+            app:destination="@id/clipSingleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/inviteVipRecordFragment"
+        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
+        android:label="InviteVipRecordFragment" />
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment">
+        <action
+            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
+            app:destination="@id/inviteVipRecordFragment" />
+        <action
+            android:id="@+id/action_inviteVipFragment_to_navigation_login"
+            app:destination="@id/navigation_login" />
+    </fragment>
+    <fragment
+        android:id="@+id/clipSingleFragment"
+        android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
+        android:label="ClipSingleFragment">
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_to_topup"
+            app:destination="@id/navigation_topup" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
+        tools:layout="@layout/fragment_post_viewer" />
 
 </navigation>

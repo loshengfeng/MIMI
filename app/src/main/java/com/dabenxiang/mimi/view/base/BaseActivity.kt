@@ -1,10 +1,12 @@
 package com.dabenxiang.mimi.view.base
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import android.net.NetworkRequest
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import androidx.appcompat.app.AppCompatActivity
@@ -33,14 +35,24 @@ abstract class BaseActivity : AppCompatActivity() {
         return -1
     }
 
-    override fun getResources(): Resources {
-        val overrideConfiguration = baseContext.resources.configuration
-        if (overrideConfiguration.fontScale != 1f) {
-            overrideConfiguration.fontScale = 1f
-            val context = createConfigurationContext(overrideConfiguration)
-            return context.resources
+    @TargetApi(Build.VERSION_CODES.N)
+    private fun updateResources(context: Context): Context {
+        val resources = context.resources
+        val configuration = resources.configuration
+        if(configuration.fontScale != 1.0f) {
+            configuration.fontScale = 1.0f
         }
-        return super.getResources()
+
+        return context.createConfigurationContext(configuration)
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        val context = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 8.0需要使用createConfigurationContext處理
+            updateResources(newBase!!)
+        } else {
+            newBase
+        }
+        super.attachBaseContext(context)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

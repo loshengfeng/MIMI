@@ -5,7 +5,6 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
@@ -13,11 +12,13 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentViewType
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentLoadMoreView
+import com.dabenxiang.mimi.view.player.NestedCommentNode
 import com.dabenxiang.mimi.view.player.RootCommentNode
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import jp.wasabeef.glide.transformations.BlurTransformation
@@ -27,14 +28,14 @@ import kotlinx.android.synthetic.main.fragment_dialog_comment.*
 class CommentDialogFragment : BaseDialogFragment() {
 
     private val viewModel: CommentDialogViewModel by viewModels()
-    private var data: MemberPostItem? = null
+    private var data: VideoItem? = null
 
     companion object {
         private const val KEY_DATA = "KEY_DATA"
         private var commentListener: CommentListener? = null
 
         fun newInstance(
-            item: MemberPostItem,
+            item: VideoItem,
             listener: CommentListener
         ): CommentDialogFragment {
             val fragment = CommentDialogFragment()
@@ -54,12 +55,14 @@ class CommentDialogFragment : BaseDialogFragment() {
     private var loadReplyCommentBlock: (() -> Unit)? = null
     private var loadCommentLikeBlock: (() -> Unit)? = null
 
+    var replyRootNode: RootCommentNode? = null
+
     var moreDialog: MoreDialogFragment? = null
 
     private val onMoreDialogListener = object : MoreDialogFragment.OnMoreDialogListener {
         override fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean) {
             moreDialog?.dismiss()
-            (requireActivity() as MainActivity).showReportDialog(item, data, isComment)
+            showReportDialog(item, isComment)
         }
 
         override fun onCancel() {
@@ -67,9 +70,26 @@ class CommentDialogFragment : BaseDialogFragment() {
         }
     }
 
+    fun showReportDialog(item: BaseMemberPostItem, isComment: Boolean) {
+        (requireActivity() as MainActivity).showReportDialog(
+            item,
+            MemberPostItem(
+                id = data?.id ?: 0,
+                type = PostType.VIDEO,
+                reported = data?.reported ?: false
+            ),
+            isComment
+        )
+    }
+
     private val playerInfoAdapter by lazy {
         CommentAdapter(object : CommentAdapter.PlayerInfoListener {
-            override fun sendComment(replyId: Long?, replyName: String?) {
+            override fun sendComment(
+                replyId: Long?,
+                replyName: String?,
+                parentNode: RootCommentNode
+            ) {
+                replyRootNode = parentNode
                 GeneralUtils.showKeyboard(requireContext())
                 et_message.requestFocus()
                 et_message.tag = replyId
@@ -90,8 +110,13 @@ class CommentDialogFragment : BaseDialogFragment() {
                 }
             }
 
-            override fun replyComment(replyId: Long?, replyName: String?) {
+            override fun replyComment(
+                replyId: Long?,
+                replyName: String?,
+                parentNode: RootCommentNode
+            ) {
                 takeUnless { replyId == null }?.also {
+                    replyRootNode = parentNode
                     GeneralUtils.showKeyboard(requireContext())
                     et_message.requestFocus()
                     et_message.tag = replyId
@@ -173,7 +198,7 @@ class CommentDialogFragment : BaseDialogFragment() {
             .transform(BlurTransformation(15, 5))
             .into(iv_blur)
 
-        (arguments?.getSerializable(KEY_DATA) as MemberPostItem).also { memberPostItem ->
+        (arguments?.getSerializable(KEY_DATA) as VideoItem).also { memberPostItem ->
             data = memberPostItem
             tv_comment_count.text = String.format(
                 requireContext().getString(R.string.clip_comment_count),
@@ -185,7 +210,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                 viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
             }
 
-            takeIf { memberPostItem.commentCount == 0 }?.also {
+            takeIf { memberPostItem.commentCount == 0L }?.also {
                 tv_no_data.visibility = View.VISIBLE
             }
         }
@@ -202,7 +227,8 @@ class CommentDialogFragment : BaseDialogFragment() {
                     Pair(id, comment)
                 }?.also { (id, comment) ->
                     val replyId = et_message.tag?.let { rid -> rid as Long }
-                    viewModel.postComment(id, PostCommentRequest(replyId, comment))
+                    val replyName = tv_replay_name.text.toString()
+                    viewModel.postComment(id, PostCommentRequest(replyId, "$replyName $comment"))
                 }
             }
         }
@@ -210,27 +236,26 @@ class CommentDialogFragment : BaseDialogFragment() {
 
     override fun setupObservers() {
         super.setupObservers()
-        viewModel.apiLoadReplyCommentResult.observe(this, Observer { event ->
+        viewModel.apiLoadReplyCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also { apiResult ->
                 when (apiResult) {
                     is Loading -> {
-//                        progressHUD.show()
                     }
-                    is Empty -> {
-                        loadReplyCommentBlock?.also { it() }
-                    }
-                    is Loaded -> {
-                        loadReplyCommentBlock = null
+                    is Empty -> loadReplyCommentBlock?.also { it() }
+                    is Loaded -> loadReplyCommentBlock = null
+                    else -> {
                     }
                 }
             }
         })
 
-        viewModel.apiPostCommentResult.observe(this, Observer { event ->
+        viewModel.apiPostCommentResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
-                    is Empty -> {
-                        GeneralUtils.hideKeyboard(requireActivity())
+                    is Success -> {
+                        val isParent = et_message.tag == null
+
+                        GeneralUtils.hideKeyboard(this)
                         et_message.text = null
                         et_message.tag = null
                         tv_replay_name.text = null
@@ -244,17 +269,53 @@ class CommentDialogFragment : BaseDialogFragment() {
                             data?.commentCount
                         )
 
-                        data?.also { memberPostItem ->
-                            viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
+                        if (isParent) {
+                            data?.also { memberPostItem ->
+                                viewModel.setupCommentDataSource(
+                                    memberPostItem.id,
+                                    playerInfoAdapter
+                                )
+                                rv_comment.scrollToPosition(1)
+                            }
+                        } else {
+                            replyRootNode?.also { parentNode ->
+                                val parentIndex = playerInfoAdapter.getItemPosition(parentNode)
+                                if (parentNode.isExpanded) {
+                                    playerInfoAdapter.addData(
+                                        parentIndex + 1,
+                                        NestedCommentNode(
+                                            parentNode as RootCommentNode,
+                                            it.result
+                                        )
+                                    )
+                                } else {
+                                    loadReplyCommentBlock = {
+                                        playerInfoAdapter.expand(
+                                            position = parentIndex,
+                                            animate = false,
+                                            notify = true,
+                                            parentPayload = CommentAdapter.EXPAND_COLLAPSE_PAYLOAD
+                                        )
+                                    }
+                                    viewModel.loadReplyComment(
+                                        data?.id ?: 0,
+                                        parentNode,
+                                        parentNode.data.id ?: 0
+                                    )
+                                }
+                            }
                         }
-                        commentListener?.onUpdateCommentCount(data?.commentCount ?: 0)
+
+                        commentListener?.onUpdateCommentCount(data?.commentCount?.toInt() ?: 0)
                     }
                     is Error -> onApiError(it.throwable)
+                    else -> {
+                    }
                 }
             }
         })
 
-        viewModel.apiCommentLikeResult.observe(this, Observer { event ->
+        viewModel.apiCommentLikeResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
@@ -264,11 +325,13 @@ class CommentDialogFragment : BaseDialogFragment() {
                         }
                     }
                     is Error -> onApiError(it.throwable)
+                    else -> {
+                    }
                 }
             }
         })
 
-        viewModel.apiDeleteCommentLikeResult.observe(this, Observer { event ->
+        viewModel.apiDeleteCommentLikeResult.observe(this, { event ->
             event.getContentIfNotHandled()?.also {
                 when (it) {
                     is Empty -> {
@@ -278,6 +341,8 @@ class CommentDialogFragment : BaseDialogFragment() {
                         }
                     }
                     is Error -> onApiError(it.throwable)
+                    else -> {
+                    }
                 }
             }
         })

@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.model.manager
 
+import antiblock.Antiblock
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.BuildConfig
+import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.model.api.AdRepository
 import com.dabenxiang.mimi.model.api.AdService
 import com.dabenxiang.mimi.model.api.ApiRepository
@@ -15,6 +17,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
+import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClient) {
 
@@ -109,6 +112,33 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
+    fun getMqttDomain(): String {
+        return when {
+            BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV) -> {
+                BuildConfig.MQTT_HOST
+            }
+            BuildConfig.BUILD_TYPE.contains(BUILDTYPE_SIT) -> {
+                BuildConfig.MQTT_HOST
+            }
+            else -> {
+                StringBuilder("wss://mqtt.").append(getDomain()).toString()
+            }
+        }
+    }
+
+    fun getStorageDomain(): String {
+        return if (BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV)) {
+            BuildConfig.STORAGE_HOST
+        } else {
+            val domains = getDomain()
+            if (domains.isEmpty()) {
+                BuildConfig.STORAGE_HOST
+            } else {
+                StringBuilder("https://storage.").append(getDomain()).toString()
+            }
+        }
+    }
+
     fun getOldDriverUrl(): String {
         return getWebDomain() + "/chat"
     }
@@ -137,16 +167,23 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
     private fun fetchDomainItem(): DomainOutputListItem {
         val domainInputItem =
             DomainInputItem(
+                if(BuildConfig.DEBUG) 1 else 7,
                 MIMI_PROJECT_ID,
                 App.applicationContext().filesDir.path,
                 GeneralUtils.getLibEnv()
             )
 
         val input = gson.toJson(domainInputItem)
-        Timber.d("input: $input")
+        Timber.i("mimi getDomains input: $input")
 
-        val output = libs.Libs.getDomains(input)
-        Timber.d("output: $output")
+        val output = try {
+            Antiblock.getDomains(input)
+        }catch (e:Exception){
+            Timber.i("getDomains Exception: $e")
+            SendLogManager.e( PROJECT_NAME, "getDomains Exception: $e")
+            null
+        }
+        Timber.i("mimi getDomains output: $output")
 
         return if (output.isNullOrEmpty()) {
             DomainOutputListItem()

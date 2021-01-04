@@ -9,14 +9,12 @@ import com.dabenxiang.mimi.model.api.AuthInterceptor
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.factory.EnumTypeAdapterFactory
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 val apiModule = module {
@@ -33,12 +31,10 @@ fun provideAuthInterceptor(pref: Pref): AuthInterceptor {
 }
 
 fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
-    val httpLoggingInterceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
-        override fun log(message: String) {
-            if (!message.contains("�")) Timber.d(message)
-            else Timber.d("base64 image")
-        }
-    })
+    val httpLoggingInterceptor = HttpLoggingInterceptor {
+        if (!it.contains("�")) HttpLoggingInterceptor.Logger.DEFAULT.log(it)
+        else HttpLoggingInterceptor.Logger.DEFAULT.log("base64 image")
+    }
     httpLoggingInterceptor.level = when (BuildConfig.DEBUG) {
         true -> HttpLoggingInterceptor.Level.BODY
         else -> HttpLoggingInterceptor.Level.NONE

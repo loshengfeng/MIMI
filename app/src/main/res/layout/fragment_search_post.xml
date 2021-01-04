@@ -38,7 +38,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/edit_search"
+            android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="28dp"
             android:layout_marginStart="6dp"
@@ -46,11 +46,10 @@
             android:hint="@string/search_text"
             android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/iv_clean"
+            app:layout_constraintEnd_toStartOf="@id/iv_clear_search_bar"
             app:layout_constraintStart_toEndOf="@id/iv_search"
             app:layout_constraintTop_toTopOf="parent"
-            android:imeOptions="actionSearch"
-            tools:text="冰"/>
+            android:imeOptions="actionSearch"/>
 
         <ImageView
             android:id="@+id/iv_search"
@@ -63,10 +62,11 @@
             app:layout_constraintTop_toTopOf="@id/iv_search_bar" />
 
         <ImageButton
-            android:id="@+id/iv_clean"
+            android:id="@+id/iv_clear_search_bar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
+            android:layout_height="0dp"
+            android:paddingEnd="10dp"
+            android:paddingStart="5dp"
             android:background="@null"
             android:src="@drawable/btn_close_1_n"
             app:layout_constraintBottom_toBottomOf="@id/iv_search_bar"
@@ -114,7 +114,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/iv_clear_search_text"
+                android:id="@+id/iv_clear_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
@@ -131,7 +131,7 @@
                 android:layout_marginEnd="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_clear_search_text" />
+                app:layout_constraintTop_toBottomOf="@id/iv_clear_history" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -179,7 +179,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_search" />
+        app:layout_constraintTop_toBottomOf="@id/layout_search"
+        android:paddingBottom="20dp"/>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/snackBarLayout"

@@ -6,6 +6,11 @@
     <dimen name="dp_24">24dp</dimen>
     <dimen name="margin_bottom_8">8dp</dimen>
     <dimen name="margin_top_75">75dp</dimen>
-    <dimen name="app_bar_height">56dp</dimen>
+    <dimen name="app_bar_height">55dp</dimen>
     <dimen name="search_bar_height">66dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="huge_margin">20dp</dimen>
+    <dimen name="zero">0dp</dimen>
+    <dimen name="big_margin">34dp</dimen>
+    <dimen name="dialog_padding">5dp</dimen>
 </resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_clip"
+    app:startDestination="@id/clipFragment">
+
+    <include app:graph="@navigation/navigation_login" />
+    <include app:graph="@navigation/navigation_topup" />
+    <include app:graph="@navigation/navigation_my_post" />
+
+    <fragment
+        android:id="@+id/clipFragment"
+        android:name="com.dabenxiang.mimi.view.clip.ClipFragment"
+        tools:layout="@layout/fragment_clip">
+        <action
+            android:id="@+id/action_to_myPostFragment"
+            app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_to_topup"
+            app:destination="@id/navigation_topup" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/inviteVipFragment"
+        android:name="com.dabenxiang.mimi.view.invitevip.InviteVipFragment"
+        android:label="InviteVipFragment">
+        <action
+            android:id="@+id/action_inviteVipFragment_to_inviteVipRecordFragment"
+            app:destination="@id/inviteVipRecordFragment" />
+        <action
+            android:id="@+id/action_inviteVipFragment_to_navigation_login"
+            app:destination="@id/navigation_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/inviteVipRecordFragment"
+        android:name="com.dabenxiang.mimi.view.inviteviprecord.InviteVipRecordFragment"
+        android:label="InviteVipRecordFragment" />
+</navigation>

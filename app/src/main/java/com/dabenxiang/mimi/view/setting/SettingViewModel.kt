@@ -16,7 +16,8 @@ import com.dabenxiang.mimi.widget.utility.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import retrofit2.HttpException
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.VersionManager
@@ -128,6 +129,19 @@ class SettingViewModel : BaseViewModel() {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _postResult.value = it }
+        }
+    }
+
+    fun deleteAttachment(id: String) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().deleteAttachment(id)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(null))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { }
         }
     }
 

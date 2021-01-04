@@ -7,18 +7,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.APK_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.api.vo.StatisticsRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import retrofit2.HttpException
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.VersionManager
@@ -45,16 +44,16 @@ class SplashViewModel : BaseViewModel() {
         _apiError.postValue(true)
     }
 
-
     fun autoLogin() {
         if (accountManager.hasMemberToken()) {
             viewModelScope.launch {
                 val profile = accountManager.getProfile()
-                if (TextUtils.isEmpty(profile.account) || TextUtils.isEmpty(profile.password)) {
+                if (TextUtils.isEmpty(profile.account) || TextUtils.isEmpty(pref.memberToken.refreshToken)) {
                     accountManager.logoutLocal()
                     _autoLoginResult.value = ApiResult.success(null)
                 } else {
-                    signIn(profile.account, profile.password)
+                    doRefreshToken()
+//                    signIn(profile.account, profile.password)
                 }
             }
         } else {
@@ -62,9 +61,14 @@ class SplashViewModel : BaseViewModel() {
         }
     }
 
-    private suspend fun signIn(account: String, password: String) {
-        accountManager.signIn(account, password)
-            .collect { _autoLoginResult.value = it }
+//    private suspend fun signIn(account: String, password: String) {
+//        accountManager.signIn(account, password)
+//            .collect { _autoLoginResult.value = it }
+//    }
+
+    private suspend fun doRefreshToken() {
+        accountManager.refreshToken()
+                .collect { _autoLoginResult.value = it }
     }
 
     fun checkVersion() {
@@ -76,7 +80,7 @@ class SplashViewModel : BaseViewModel() {
                 emit(versionStatus)
             }.flowOn(Dispatchers.IO).collect {
                 Timber.i("checkVersion = $it")
-                _versionStatus.value = it
+                _versionStatus.value =it
             }
         }
     }
@@ -106,6 +110,7 @@ class SplashViewModel : BaseViewModel() {
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
+//            (SplashViewModel.kt:110): [main Thread] firstTimeStatistics error: retrofit2.HttpException: HTTP 400 Bad Request
                 .catch { e -> Timber.e("firstTimeStatistics error: $e") }
                 .collect { FileUtil.createSecreteFile(context) }
         }
@@ -115,4 +120,23 @@ class SplashViewModel : BaseViewModel() {
         versionManager.setupRecordTimestamp()
     }
 
+    fun getDecryptSettingResult() {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getApiRepository().getDecryptSetting()
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> Timber.e("getDecryptSettingResult error: $e") }
+                .collect {
+                    when(it) {
+                        is ApiResult.Success -> {
+                            pref.decryptSettingArray = ArrayList(it.result.content ?: arrayListOf())
+                        }
+                        else -> {}
+                    }
+                }
+        }
+    }
 }

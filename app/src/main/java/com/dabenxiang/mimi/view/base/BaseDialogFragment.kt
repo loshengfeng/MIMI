@@ -10,21 +10,22 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 abstract class BaseDialogFragment : DialogFragment() {
 
-    open var mainViewModel: MainViewModel? = null
+    open val mainViewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.let {
-            mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java)
-        }
+//        activity?.let {
+//            mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java)
+//        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

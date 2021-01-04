@@ -8,8 +8,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.view.home.viewholder.FilterTabHolder
 
 class FilterTabAdapter(
-    private val listener: FilterTabAdapterListener,
-    private val isAdult: Boolean
+    private val listener: FilterTabAdapterListener
 ) :
     BaseTabAdapter<String, FilterTabHolder>() {
 
@@ -47,8 +46,7 @@ class FilterTabAdapter(
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_filter, parent, false)
         return FilterTabHolder(
             view,
-            holderListener,
-            isAdult
+            holderListener
         )
     }
 

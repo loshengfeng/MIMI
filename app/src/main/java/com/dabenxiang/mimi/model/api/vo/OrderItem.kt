@@ -86,4 +86,5 @@ data class OrderItem(
 
     @SerializedName("failureReason")
     val failureReason: String = ""
-): Serializable
+
+) : Serializable

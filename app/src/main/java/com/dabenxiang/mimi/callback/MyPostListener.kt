@@ -6,7 +6,7 @@ import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
 
 interface MyPostListener {
-    fun onMoreClick(item: MemberPostItem)
+    fun onMoreClick(item: MemberPostItem, position: Int)
     fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean)
     fun onClipCommentClick(item: List<MemberPostItem>, position: Int)
     fun onClipItemClick(item: List<MemberPostItem>, position: Int)
@@ -21,4 +21,7 @@ interface MyPostListener {
     )
 
     fun onFollowClick(items: List<MemberPostItem>, position: Int, isFollow: Boolean)
+    fun onAvatarClick(userId: Long, name: String)
+    fun onLoginClick()
+    fun onRegisterClick()
 }

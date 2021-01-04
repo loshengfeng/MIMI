@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/normal_color_background"
+    tools:context=".view.main.MainActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:toolbarId="@id/toolbar">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tool_bar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/normal_color_status_bar"
+                android:layout_gravity="center"
+                app:menu="@menu/menu_back_clear"
+                app:navigationIcon="@drawable/btn_back_black_n">
+
+                <TextView
+                    android:id="@+id/toolbar_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:textColor="@color/color_black_1"
+                    android:layout_marginEnd="10dp"
+                    tools:text="Title" />
+
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/normal_color_status_bar"
+            app:tabIndicator="@drawable/bg_tab_my_follow"
+            app:tabIndicatorColor="@color/color_red_1"
+            app:tabRippleColor="@color/transparent"
+            app:tabSelectedTextColor="@color/color_black_1"
+            app:tabTextAppearance="@style/favorite_tab_item_text"
+            app:tabTextColor="@color/color_black_1_50" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="2dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/snackBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        app:layout_anchor="@id/view_pager"
+        app:layout_anchorGravity="bottom" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

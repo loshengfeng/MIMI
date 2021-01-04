@@ -34,7 +34,6 @@ class SplashFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("onCreate")
         setVersionObserve()
     }
 
@@ -44,7 +43,6 @@ class SplashFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.i("onViewCreated")
         val requestList = getNotGrantedPermissions(externalPermissions)
         if (requestList.size > 0) {
             requestPermissions(
@@ -60,20 +58,21 @@ class SplashFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
+    override val isStatusBarDark: Boolean
+        get() = true
+
     override fun setupObservers() {
 
-        viewModel.apiError.observe(viewLifecycleOwner, Observer { isError ->
+        viewModel.apiError.observe(viewLifecycleOwner, { isError ->
             if (isError) {
                 initSettings()
             }
         })
     }
 
-
     private fun setVersionObserve() =
         viewModel.versionStatus.observe(this, Observer {
-
-            Timber.i("versionStatus=$it   isVersionChecked=${mainViewModel?.isVersionChecked}")
+            Timber.i("versionStatus=$it isVersionChecked=${mainViewModel?.isVersionChecked}")
             if (mainViewModel?.isVersionChecked == true) return@Observer
             when (it) {
                 VersionStatus.UPDATE -> {
@@ -91,19 +90,6 @@ class SplashFragment : BaseFragment() {
                 }
             }
         })
-
-
-    override fun setupListeners() {}
-
-//    private fun requestPermissions() {
-//        val requestList = getNotGrantedPermissions(externalPermissions)
-//
-//        if (requestList.size > 0) {
-//            requestPermissions(requestList.toTypedArray(), PERMISSION_EXTERNAL_REQUEST_CODE)
-//        } else {
-//            checkVersion()
-//        }
-//    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -128,7 +114,7 @@ class SplashFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.autoLoginResult.observe(viewLifecycleOwner, Observer {
+        viewModel.autoLoginResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
                     mainViewModel?.startMQTT()
@@ -142,6 +128,8 @@ class SplashFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.getDecryptSettingResult()
         viewModel.autoLogin()
     }
 
@@ -149,7 +137,7 @@ class SplashFragment : BaseFragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             delay(1000)
             withContext(Dispatchers.Main) {
-                navigateTo(NavigateItem.Destination(R.id.action_splashFragment_to_homeFragment))
+                navigateTo(NavigateItem.Destination(R.id.action_splashFragment_to_mimiFragment))
             }
         }
     }
@@ -228,8 +216,7 @@ class SplashFragment : BaseFragment() {
 
     private fun firstTimeCheck() {
         getPromoteCode().takeIf {
-//            !FileUtil.isSecreteFileExist(requireContext()) && !TextUtils.isEmpty(it)
-            !FileUtil.isSecreteFileExist(requireContext())
+            !FileUtil.isSecreteFileExist(requireContext()) && !TextUtils.isEmpty(it)
         }?.run {
             viewModel.firstTimeStatistics(requireContext(), this)
         }

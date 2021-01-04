@@ -1,39 +1,37 @@
 package com.dabenxiang.mimi.view.adapter.viewHolder
 
-import android.content.res.ColorStateList
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AttachmentListener
+import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.LoadImageType
-import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.getSpanString
+import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_clip_post.view.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
 
 class MyPostClipPostHolder(
-    itemView: View,
-    private val isAdultTheme: Boolean
+    itemView: View
 ) : BaseViewHolder(itemView), KoinComponent {
 
     private val accountManager: AccountManager by inject()
@@ -43,6 +41,7 @@ class MyPostClipPostHolder(
     private val tvName: TextView = itemView.tv_name
     private val tvTime: TextView = itemView.tv_time
     private val tvTitle: TextView = itemView.tv_title
+    private val tvTitleMore: TextView = itemView.tv_title_more
     private val tvFollow: TextView = itemView.tv_follow
     private val ivPhoto: ImageView = itemView.iv_photo
     private val tvLength: TextView = itemView.tv_length
@@ -58,45 +57,58 @@ class MyPostClipPostHolder(
     private val vSeparator: View = itemView.v_separator
 
     fun onBind(
-        item: MemberPostItem,
-        itemList: List<MemberPostItem>?,
-        position: Int,
-        myPostListener: MyPostListener,
-        attachmentListener: AttachmentListener
+            item: MemberPostItem,
+            position: Int,
+            myPostListener: MyPostListener,
+            viewModelScope: CoroutineScope,
+            searchStr: String = "",
+            searchTag: String = ""
     ) {
-        val isMe = accountManager.getProfile().userId == item.creatorId
-
-        clClipPost.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_black_4 else R.color.color_white_1))
-        tvName.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        tvTime.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_50 else R.color.color_black_1_50))
-        tvTitle.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        tvLikeCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        tvFavoriteCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        tvCommentCount.setTextColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1 else R.color.color_black_1))
-        ivComment.setImageResource(if (isAdultTheme) R.drawable.ico_messege_adult else R.drawable.ico_messege_adult_gray)
-        ivMore.setImageResource(if (isAdultTheme) R.drawable.btn_more_white_n else R.drawable.btn_more_gray_n)
-        vSeparator.setBackgroundColor(App.self.getColor(if (isAdultTheme) R.color.color_white_1_30 else R.color.color_black_1_05))
+        clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
+        tvName.setTextColor(App.self.getColor(R.color.color_black_1))
+        tvTime.setTextColor(App.self.getColor(R.color.color_black_1_50))
+        tvTitle.setTextColor(App.self.getColor(R.color.color_black_1))
+        tvLikeCount.setTextColor(App.self.getColor(R.color.color_black_1))
+        tvFavoriteCount.setTextColor(App.self.getColor(R.color.color_black_1))
+        tvCommentCount.setTextColor(App.self.getColor(R.color.color_black_1))
+        ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
+        ivMore.setImageResource(R.drawable.btn_more_gray_n)
+        vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
-        tvTitle.text = item.title
+        item.title.let {
+            val title = if (searchStr.isNotBlank()) getSpanString(
+                    tvTitle.context,
+                    item.title,
+                    searchStr).toString() else item.title
+            tvTitle.text = title
+
+            Timber.i("title size=${tvTitle.text.length}")
+            tvTitleMore.visibility = if(tvTitle.text.length >=45){
+                View.VISIBLE
+            }else{
+                View.GONE
+            }
+        }
+
         tvFollow.visibility =
             if (accountManager.getProfile().userId == item.creatorId) View.GONE else View.VISIBLE
 
-        attachmentListener.onGetAttachment(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
+        viewModelScope.launch {
+            LoadImageUtils.loadImage(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
+        }
+        ivAvatar.setOnClickListener {
+            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+        }
 
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            chip.setTextColor(tagChipGroup.context.getColor(if (isAdultTheme) R.color.color_white_1_50 else R.color.color_black_1_50))
-            chip.chipBackgroundColor = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    tagChipGroup.context,
-                    if (isAdultTheme) R.color.color_black_6 else R.color.color_black_1_05
-                )
-            )
+            if (it == searchTag || it == searchStr) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
+            else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
                 myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
             }
@@ -110,27 +122,21 @@ class MyPostClipPostHolder(
             Timber.i("images $images")
             if (!TextUtils.isEmpty(images[0].url)) {
                 Glide.with(ivPhoto.context)
-                    .load(images[0].url).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+                    .load(images[0].url).into(ivPhoto)
             } else {
-                attachmentListener.onGetAttachment(
-                    images[0].id.toLongOrNull(),
-                    ivPhoto,
-                    LoadImageType.PICTURE_THUMBNAIL
-                )
+                viewModelScope.launch {
+                    LoadImageUtils.loadImage(
+                            images[0].id.toLongOrNull(),
+                            ivPhoto,
+                            LoadImageType.PICTURE_EMPTY)
+                }
             }
         }
 
-        if (isMe) {
-            tvFollow.visibility = View.GONE
-        } else {
-            tvFollow.visibility = View.VISIBLE
-            updateFollow(item)
-            tvFollow.setOnClickListener {
-                itemList?.also { myPostListener.onFollowClick(it, position, !item.isFollow) }
-            }
-        }
+        tvFollow.visibility =  View.GONE
+
         ivMore.setOnClickListener {
-            myPostListener.onMoreClick(item)
+            myPostListener.onMoreClick(item, position)
         }
 
         updateFavorite(item)
@@ -150,7 +156,7 @@ class MyPostClipPostHolder(
 
         updateLike(item)
         val onLikeClickListener = View.OnClickListener {
-            item.likeType = if (item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE
+            item.likeType = if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
             item.likeCount =
                 if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
             myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
@@ -160,13 +166,16 @@ class MyPostClipPostHolder(
 
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
-            itemList?.also { myPostListener.onClipCommentClick(it, position) }
+            item.also { myPostListener.onCommentClick(it, AdultTabType.CLIP) }
         }
         ivComment.setOnClickListener(onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
-            itemList?.also { myPostListener.onClipItemClick(it, position) }
+            myPostListener.onItemClick(item, AdultTabType.CLIP)
+        }
+        tvTitleMore.setOnClickListener {
+            myPostListener.onItemClick(item, AdultTabType.CLIP)
         }
 
     }
@@ -177,7 +186,7 @@ class MyPostClipPostHolder(
         if (item.likeType == LikeType.LIKE) {
             ivLike.setImageResource(R.drawable.ico_nice_s)
         } else {
-            ivLike.setImageResource(if (isAdultTheme) R.drawable.ico_nice else R.drawable.ico_nice_gray)
+            ivLike.setImageResource(R.drawable.ico_nice_gray)
         }
     }
 
@@ -193,7 +202,7 @@ class MyPostClipPostHolder(
         if (item.isFavorite) {
             ivFavorite.setImageResource(R.drawable.btn_favorite_white_s)
         } else {
-            ivFavorite.setImageResource(if (isAdultTheme) R.drawable.btn_favorite_white_n else R.drawable.btn_favorite_n)
+            ivFavorite.setImageResource(R.drawable.btn_favorite_n)
         }
     }
 

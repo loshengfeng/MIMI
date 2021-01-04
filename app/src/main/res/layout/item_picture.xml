@@ -15,10 +15,22 @@
     app:layout_constraintTop_toTopOf="parent">
 
     <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:src="@drawable/img_nopic_02"
+        android:scaleType="fitCenter" />
+
+    <ImageView
         android:id="@+id/iv_picture"
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:background="@color/color_black_1_20"
         android:scaleType="centerCrop" />
+
+    <include
+        android:id="@+id/item_is_not_login"
+        layout="@layout/item_picture_is_not_login"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </androidx.cardview.widget.CardView>

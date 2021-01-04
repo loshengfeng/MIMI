@@ -9,7 +9,6 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
@@ -29,7 +28,6 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.*
 import com.dabenxiang.mimi.view.adapter.HomeAdapter
-import com.dabenxiang.mimi.view.adapter.HomeVideoListAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
 import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter.Companion.PAYLOAD_UPDATE_FOLLOW
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -37,20 +35,17 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.BaseIndexViewHolder
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.club.ClubFuncItem
-import com.dabenxiang.mimi.view.club.ClubMemberAdapter
-import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
-import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
+import com.dabenxiang.mimi.view.club.adapter.ClubFuncItem
+import com.dabenxiang.mimi.view.club.member.ClubMemberAdapter
+import com.dabenxiang.mimi.view.club.member.MiMiLinearLayoutManager
+import com.dabenxiang.mimi.view.club.topic_detail.TopicTabFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.OnChooseUploadMethodDialogListener
 import com.dabenxiang.mimi.view.dialog.login_request.LoginRequestDialog
-import com.dabenxiang.mimi.view.home.category.CategoriesFragment
 import com.dabenxiang.mimi.view.home.viewholder.*
 import com.dabenxiang.mimi.view.listener.OnLoginRequestDialogListener
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.ADULT
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.BUNDLE_PIC_URI
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
@@ -58,7 +53,6 @@ import com.dabenxiang.mimi.view.post.utility.PostManager
 import com.dabenxiang.mimi.view.post.video.EditVideoFragment.Companion.BUNDLE_VIDEO_URI
 import com.dabenxiang.mimi.view.ranking.RankingFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
-import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
@@ -108,7 +102,7 @@ class AdultHomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        handleBackStackData()
+        handlePostClub()
         useAdultTheme(false)
     }
 
@@ -130,8 +124,8 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
         setupUI()
 
         if (mainViewModel?.adult == null) {
@@ -143,7 +137,7 @@ class AdultHomeFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mainViewModel?.categoriesData?.observe(this, Observer {
+        mainViewModel?.categoriesData?.observe(this, {
             when (it) {
                 is Loading -> refresh.isRefreshing = true
                 is Loaded -> refresh.isRefreshing = false
@@ -179,7 +173,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.getAdHomeResult?.observe(this, Observer {
+        mainViewModel?.getAdHomeResult?.observe(this, {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeBannerViewHolderMap[it.first]
@@ -189,16 +183,16 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.showProgress.observe(this, Observer { showProgress ->
+        viewModel.showProgress.observe(this, { showProgress ->
             showProgress?.takeUnless { it }?.also { refresh.isRefreshing = it }
         })
 
-        viewModel.videoList.observe(this, Observer {
-            videoListAdapter.submitList(it)
+        viewModel.videoList.observe(this, {
+//            videoListAdapter.submitList(it)
 //            videoListAdapter.notifyDataSetChanged()
         })
 
-        viewModel.carouselResult.observe(this, Observer {
+        viewModel.carouselResult.observe(this, {
             when (val response = it.second) {
                 is Success -> {
                     val viewHolder = homeCarouselViewHolderMap[it.first]
@@ -212,7 +206,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.videosResult.observe(this, Observer {
+        viewModel.videosResult.observe(this, {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
@@ -222,14 +216,14 @@ class AdultHomeFragment : BaseFragment() {
                     val viewHolder = homeStatisticsViewHolderMap[it.first]
                     val statistics = statisticsMap[it.first]
                     val videoHolderItems =
-                        response.result.content?.statisticsItemToVideoItem(statistics!!.isAdult)
+                        response.result.content?.statisticsItemToVideoItem()
                     viewHolder?.submitList(videoHolderItems)
                 }
                 is Error -> onApiError(response.throwable)
             }
         })
 
-        viewModel.clipsResult.observe(this, Observer {
+        viewModel.clipsResult.observe(this, {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeClipViewHolderMap[it.first]
@@ -244,7 +238,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.pictureResult.observe(this, Observer {
+        viewModel.pictureResult.observe(this, {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homePictureViewHolderMap[it.first]
@@ -259,7 +253,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.clubResult.observe(this, Observer {
+        viewModel.clubResult.observe(this, {
             when (val response = it.second) {
                 is Loaded -> {
                     val viewHolder = homeClubViewHolderMap[it.first]
@@ -274,27 +268,27 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.postFollowItemListResult.observe(this, Observer {
+        viewModel.postFollowItemListResult.observe(this, {
             followPostPagedAdapter.submitList(it)
         })
 
-        viewModel.clipPostItemListResult.observe(this, Observer {
+        viewModel.clipPostItemListResult.observe(this, {
             clipPostPagedAdapter.submitList(it)
         })
 
-        viewModel.picturePostItemListResult.observe(this, Observer {
+        viewModel.picturePostItemListResult.observe(this, {
             picturePostPagedAdapter.submitList(it)
         })
 
-        viewModel.textPostItemListResult.observe(this, Observer {
+        viewModel.textPostItemListResult.observe(this, {
             textPostPagedAdapter.submitList(it)
         })
 
-        viewModel.clubItemListResult.observe(this, Observer {
+        viewModel.clubItemListResult.observe(this, {
             clubMemberAdapter.submitList(it)
         })
 
-        viewModel.totalCountResult.observe(this, Observer {
+        viewModel.totalCountResult.observe(this, {
             it?.also {
                 val type = it.first
                 val totalCount = it.second
@@ -310,7 +304,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.followResult.observe(this, Observer {
+        viewModel.followResult.observe(this, {
             when (it) {
                 is Empty -> {
                     getCurrentAdapter()?.notifyItemRangeChanged(
@@ -323,7 +317,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        mainViewModel?.deletePostResult?.observe(this, Observer {
+        mainViewModel?.deletePostResult?.observe(this, {
             when (categoryTypeList[lastPosition]) {
                 CategoryType.FOLLOW, CategoryType.VIDEO, CategoryType.IMAGE, CategoryType.TEXT -> {
                     when (it) {
@@ -338,7 +332,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.cleanRemovedPosList.observe(this, Observer {
+        viewModel.cleanRemovedPosList.observe(this, {
             when (categoryTypeList[lastPosition]) {
                 CategoryType.FOLLOW, CategoryType.VIDEO, CategoryType.IMAGE, CategoryType.TEXT -> {
                     val adapter = getCurrentAdapter() as MemberPostPagedAdapter
@@ -347,7 +341,7 @@ class AdultHomeFragment : BaseFragment() {
             }
         })
 
-        viewModel.inviteVipShake.observe(this, Observer {
+        viewModel.inviteVipShake.observe(this, {
             if (layout_invitevip.visibility != View.GONE) {
                 if (it == true)
                     iv_invitevip.startAnimation(
@@ -373,31 +367,31 @@ class AdultHomeFragment : BaseFragment() {
         }
     }
 
-    private fun navigationToText(bundle: Bundle) {
-        navigateTo(
-            NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_textDetailFragment,
-                bundle
-            )
-        )
+    override fun navigationToText(bundle: Bundle) {
+//        navigateTo(
+//            NavigateItem.Destination(
+//                R.id.action_adultHomeFragment_to_textDetailFragment,
+//                bundle
+//            )
+//        )
     }
 
-    private fun navigationToPicture(bundle: Bundle) {
-        navigateTo(
-            NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                bundle
-            )
-        )
+    override fun navigationToPicture(bundle: Bundle) {
+//        navigateTo(
+//            NavigateItem.Destination(
+//                R.id.action_adultHomeFragment_to_pictureDetailFragment,
+//                bundle
+//            )
+//        )
     }
 
-    private fun navigationToClip(bundle: Bundle) {
-        navigateTo(
-            NavigateItem.Destination(
-                R.id.action_adultHomeFragment_to_clipFragment,
-                bundle
-            )
-        )
+    override fun navigationToClip(bundle: Bundle) {
+//        navigateTo(
+//            NavigateItem.Destination(
+//                R.id.action_adultHomeFragment_to_clipFragment,
+//                bundle
+//            )
+//        )
     }
 
     override fun setupListeners() {
@@ -405,7 +399,7 @@ class AdultHomeFragment : BaseFragment() {
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = {
-                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
+//                mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
             }
         )
 
@@ -417,21 +411,21 @@ class AdultHomeFragment : BaseFragment() {
 
         iv_bg_search.setOnClickListener {
             val item: SearchPostItem = when (categoryTypeList[lastPosition]) {
-                CategoryType.HOME -> SearchPostItem(type = PostType.HYBRID)
+                CategoryType.HOME -> SearchPostItem(type = PostType.SMALL_CLIP)
                 CategoryType.VIDEO_ON_DEMAND -> SearchPostItem(type = PostType.VIDEO_ON_DEMAND)
-                CategoryType.FOLLOW -> SearchPostItem(isPostFollow = true)
+                CategoryType.FOLLOW -> SearchPostItem(type = PostType.FOLLOWED)
                 CategoryType.VIDEO -> SearchPostItem(type = PostType.VIDEO)
                 CategoryType.IMAGE -> SearchPostItem(type = PostType.IMAGE)
                 CategoryType.TEXT -> SearchPostItem(type = PostType.TEXT)
-                else -> SearchPostItem(isClub = true)
+                else -> SearchPostItem()
             }
             val bundle = SearchPostFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_homeFragment_to_searchPostFragment,
-                    bundle
-                )
-            )
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_homeFragment_to_searchPostFragment,
+//                    bundle
+//                )
+//            )
         }
 
         iv_post.setOnClickListener {
@@ -467,25 +461,25 @@ class AdultHomeFragment : BaseFragment() {
 
         btn_ranking.setOnClickListener {
             val bundle = RankingFragment.createBundle()
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_rankingFragment,
-                    bundle
-                )
-            )
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_rankingFragment,
+//                    bundle
+//                )
+//            )
         }
 
         btn_filter.setOnClickListener {
             val category =
                 mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
             category?.also {
-                val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_homeFragment_to_categoriesFragment,
-                        bundle
-                    )
-                )
+//                val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
+//                navigateTo(
+//                    NavigateItem.Destination(
+//                        R.id.action_homeFragment_to_categoriesFragment,
+//                        bundle
+//                    )
+//                )
             }
         }
 
@@ -571,7 +565,7 @@ class AdultHomeFragment : BaseFragment() {
                 takeIf { rv_video.adapter == null }?.also {
                     refresh.isRefreshing = true
                     rv_video.layoutManager = GridLayoutManager(requireContext(), 2)
-                    rv_video.adapter = videoListAdapter
+//                    rv_video.adapter = videoListAdapter
                 }
                 viewModel.getVideos(null, true)
             }
@@ -741,7 +735,7 @@ class AdultHomeFragment : BaseFragment() {
     }
 
     private val videoListAdapter by lazy {
-        HomeVideoListAdapter(adapterListener)
+        //CategoryVideoListAdapter(adapterListener)
     }
 
     private val adultListener = object : AdultListener {
@@ -756,14 +750,14 @@ class AdultHomeFragment : BaseFragment() {
         override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
             checkStatus {
                 when (adultTabType) {
-                    AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 2)
-                        navigationToPicture(bundle)
-                    }
-                    AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 2)
-                        navigationToText(bundle)
-                    }
+//                    AdultTabType.PICTURE -> {
+//                        val bundle = PictureDetailFragment.createBundle(item, 2)
+//                        navigationToPicture(bundle)
+//                    }
+//                    AdultTabType.TEXT -> {
+//                        val bundle = TextDetailFragment.createBundle(item, 2)
+//                        navigationToText(bundle)
+//                    }
                     AdultTabType.CLIP -> {
                         val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
                         navigationToClip(bundle)
@@ -772,51 +766,48 @@ class AdultHomeFragment : BaseFragment() {
             }
         }
 
-        override fun onMoreClick(item: MemberPostItem, items: List<MemberPostItem>) {
-            onMoreClick(
-                item,
-                ArrayList(items),
-                onEdit = {
-                    val bundle = Bundle()
-                    bundle.putBoolean(MyPostFragment.EDIT, true)
-                    bundle.putString(PAGE, ADULT)
-                    bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+        override fun onMoreClick(item: MemberPostItem, position:Int) {
+            onMoreClick(item, position
+            ) {
+                val bundle = Bundle()
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(PAGE, ADULT)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
 
-                    it as MemberPostItem
-                    when (item.type) {
-                        PostType.TEXT -> {
-                            findNavController().navigate(
-                                R.id.action_adultHomeFragment_to_postArticleFragment,
-                                bundle
-                            )
-                        }
-                        PostType.IMAGE -> {
-                            findNavController().navigate(
-                                R.id.action_adultHomeFragment_to_postPicFragment,
-                                bundle
-                            )
-                        }
-                        PostType.VIDEO -> {
-                            findNavController().navigate(
-                                R.id.action_adultHomeFragment_to_postVideoFragment,
-                                bundle
-                            )
-                        }
-                    }
-                }
-            )
+                it as MemberPostItem
+//                when (item.type) {
+//                    PostType.TEXT -> {
+//                        findNavController().navigate(
+//                                R.id.action_adultHomeFragment_to_postArticleFragment,
+//                                bundle
+//                        )
+//                    }
+//                    PostType.IMAGE -> {
+//                        findNavController().navigate(
+//                                R.id.action_adultHomeFragment_to_postPicFragment,
+//                                bundle
+//                        )
+//                    }
+//                    PostType.VIDEO -> {
+//                        findNavController().navigate(
+//                                R.id.action_adultHomeFragment_to_postVideoFragment,
+//                                bundle
+//                        )
+//                    }
+//                }
+            }
         }
 
         override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
             when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
-                    navigationToPicture(bundle)
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
-                    navigationToText(bundle)
-                }
+//                AdultTabType.PICTURE -> {
+//                    val bundle = PictureDetailFragment.createBundle(item, 0)
+//                    navigationToPicture(bundle)
+//                }
+//                AdultTabType.TEXT -> {
+//                    val bundle = TextDetailFragment.createBundle(item, 0)
+//                    navigationToText(bundle)
+//                }
                 AdultTabType.CLIP -> {
                     val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
                     navigationToClip(bundle)
@@ -829,39 +820,39 @@ class AdultHomeFragment : BaseFragment() {
         override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
             val bundle =
                 ClipFragment.createBundle(ArrayList(item.subList(1, item.size)), position - 1)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_clipFragment,
-                    bundle
-                )
-            )
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_clipFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
             checkStatus {
                 val bundle = ClipFragment.createBundle(ArrayList(item), position, true)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_adultHomeFragment_to_clipFragment,
-                        bundle
-                    )
-                )
+//                navigateTo(
+//                    NavigateItem.Destination(
+//                        R.id.action_adultHomeFragment_to_clipFragment,
+//                        bundle
+//                    )
+//                )
             }
         }
 
         override fun onChipClick(type: PostType, tag: String) {
-            val item = when (categoryTypeList[lastPosition]) {
-                CategoryType.FOLLOW -> SearchPostItem(type, tag, true)
-                else -> SearchPostItem(type, tag)
-            }
-
-            val bundle = SearchPostFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_searchPostFragment,
-                    bundle
-                )
-            )
+//            val item = when (categoryTypeList[lastPosition]) {
+//                CategoryType.FOLLOW -> SearchPostItem(type, tag, true)
+//                else -> SearchPostItem(type, tag)
+//            }
+//
+//            val bundle = SearchPostFragment.createBundle(item)
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_searchPostFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
@@ -872,6 +863,8 @@ class AdultHomeFragment : BaseFragment() {
             )
             navigateTo(NavigateItem.Destination(R.id.action_to_myPostFragment, bundle))
         }
+
+        override fun onFavoriteClick(item: MemberPostItem, position: Int, isFavorite: Boolean) {}
     }
 
     private val adapterListener = object : HomeAdapter.EventListener {
@@ -890,13 +883,13 @@ class AdultHomeFragment : BaseFragment() {
                     val category =
                         mainViewModel?.adult?.categories?.find { it.name == getString(R.string.home_tab_video) }
                     category?.also {
-                        val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_homeFragment_to_categoriesFragment,
-                                bundle
-                            )
-                        )
+//                        val bundle = CategoriesFragment.createBundle(it.name, it.name, category)
+//                        navigateTo(
+//                            NavigateItem.Destination(
+//                                R.id.action_homeFragment_to_categoriesFragment,
+//                                bundle
+//                            )
+//                        )
                     }
                 } else
                     setTab(categoryTypeList.indexOf(it))
@@ -904,33 +897,33 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onVideoClick(view: View, item: PlayerItem) {
-            val bundle = PlayerFragment.createBundle(item)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_navigation_player,
-                    bundle
-                )
-            )
+//            val bundle = PlayerFragment.createBundle(item)
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_navigation_player,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onClipClick(view: View, item: List<MemberPostItem>, position: Int) {
             val bundle = ClipFragment.createBundle(ArrayList(item), position)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_clipFragment,
-                    bundle
-                )
-            )
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_clipFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onPictureClick(view: View, item: MemberPostItem) {
-            val bundle = PictureDetailFragment.createBundle(item, 0)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
-                    bundle
-                )
-            )
+//            val bundle = PictureDetailFragment.createBundle(item, 0)
+//            navigateTo(
+//                NavigateItem.Destination(
+//                    R.id.action_adultHomeFragment_to_pictureDetailFragment,
+//                    bundle
+//                )
+//            )
         }
 
         override fun onClubClick(view: View, item: MemberClubItem) {
@@ -1011,7 +1004,7 @@ class AdultHomeFragment : BaseFragment() {
         }
 
         override fun onUploadArticle() {
-            findNavController().navigate(R.id.action_adultHomeFragment_to_postArticleFragment)
+//            findNavController().navigate(R.id.action_adultHomeFragment_to_postArticleFragment)
         }
     }
 
@@ -1032,10 +1025,10 @@ class AdultHomeFragment : BaseFragment() {
                     if (PostManager().isVideoTimeValid(myUri, requireContext())) {
                         val bundle = Bundle()
                         bundle.putString(BUNDLE_VIDEO_URI, myUri.toString())
-                        findNavController().navigate(
-                            R.id.action_adultHomeFragment_to_editVideoFragment,
-                            bundle
-                        )
+//                        findNavController().navigate(
+//                            R.id.action_adultHomeFragment_to_editVideoFragment,
+//                            bundle
+//                        )
                     } else {
                         Toast.makeText(
                             requireContext(),
@@ -1071,15 +1064,15 @@ class AdultHomeFragment : BaseFragment() {
         val bundle = Bundle()
         bundle.putStringArrayList(BUNDLE_PIC_URI, pciUri)
 
-        findNavController().navigate(
-            R.id.action_adultHomeFragment_to_postPicFragment,
-            bundle
-        )
+//        findNavController().navigate(
+//            R.id.action_adultHomeFragment_to_postPicFragment,
+//            bundle
+//        )
     }
 
     private fun onItemClick(item: MemberClubItem) {
-        val bundle = ClubDetailFragment.createBundle(item)
-        findNavController().navigate(R.id.action_adultHomeFragment_to_clubDetailFragment, bundle)
+        val bundle = TopicTabFragment.createBundle(item)
+//        findNavController().navigate(R.id.action_adultHomeFragment_to_topicDetailFragment, bundle)
     }
 
     private fun followMember(

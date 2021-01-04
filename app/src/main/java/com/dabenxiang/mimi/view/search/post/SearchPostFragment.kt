@@ -1,6 +1,5 @@
 package com.dabenxiang.mimi.view.search.post
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -9,48 +8,43 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.ConcatAdapter
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.AdultListener
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
-import com.dabenxiang.mimi.model.api.ApiResult.*
-import com.dabenxiang.mimi.model.api.vo.MemberClubItem
+import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
-import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.vo.PlayerItem
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
-import com.dabenxiang.mimi.view.adapter.MemberPostPagedAdapter
-import com.dabenxiang.mimi.view.adapter.SearchVideoAdapter
-import com.dabenxiang.mimi.view.adapter.viewHolder.ClipPostHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.PicturePostHolder
-import com.dabenxiang.mimi.view.adapter.viewHolder.TextPostHolder
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.clip.ClipFragment
-import com.dabenxiang.mimi.view.club.ClubFuncItem
-import com.dabenxiang.mimi.view.club.ClubMemberAdapter
-import com.dabenxiang.mimi.view.club.MiMiLinearLayoutManager
-import com.dabenxiang.mimi.view.clubdetail.ClubDetailFragment
+import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.club.text.ClubTextFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
+import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
+import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
+import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
-import com.dabenxiang.mimi.view.textdetail.TextDetailFragment
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_FAVORITE
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SearchPostFragment : BaseFragment() {
 
@@ -65,383 +59,407 @@ class SearchPostFragment : BaseFragment() {
 
     private val viewModel: SearchPostViewModel by viewModels()
 
-    private var currentPostType: PostType = PostType.TEXT
-    private var mTag: String = ""
-    private var searchText: String = ""
-    private var searchKeyword: String = ""
-
-    private var isPostFollow: Boolean = false
-    private var isClub: Boolean = false
-
-    private var concatAdapter: ConcatAdapter? = null
-    private var memberPostAdapter: MemberPostPagedAdapter? = null
-    private var videoListAdapter: SearchVideoAdapter? = null
-    private var hybridItemsCount: Long = -1L
-
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun getLayoutId() = R.layout.fragment_search_post
+
+    private var searchType: PostType = PostType.TEXT_IMAGE_VIDEO
+    private var searchTag: String? = null
+    private var searchText: String? = null
+    private var searchOrderBy: StatisticsOrderType = StatisticsOrderType.LATEST
+    private var searchKeyword: String = ""
+
+    private val adapter: SearchPostAdapter by lazy {
+        SearchPostAdapter(
+            requireActivity(),
+            postListener,
+            viewModel.viewModelScope,
+            { searchText ?: "" },
+            { searchTag ?: "" })
+    }
+
+    private val postListener = object : MyPostListener {
+
+        override fun onLoginClick() {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                )
+            )
+        }
+
+        override fun onRegisterClick() {
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_loginFragment,
+                    LoginFragment.createBundle(LoginFragment.TYPE_REGISTER)
+                )
+            )
+        }
+
+        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
+            checkStatus { viewModel.likePost(item, position, isLike) }
+        }
+
+        override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            checkStatus {
+                when (item.type) {
+                    PostType.IMAGE -> {
+                        val bundle = ClubPicFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clubPicFragment,
+                                bundle
+                            )
+                        )
+                    }
+                    PostType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clubTextFragment,
+                                bundle
+                            )
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id, 1)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
+                            )
+                        )
+                    }
+                    else -> {
+                    }
+                }
+            }
+        }
+
+        override fun onFavoriteClick(
+            item: MemberPostItem,
+            position: Int,
+            isFavorite: Boolean,
+            type: AttachmentType
+        ) {
+            checkStatus { viewModel.favoritePost(item, position, isFavorite) }
+        }
+
+        override fun onFollowClick(
+            items: List<MemberPostItem>,
+            position: Int,
+            isFollow: Boolean
+        ) {
+        }
+
+        override fun onAvatarClick(userId: Long, name: String) {
+            val bundle = MyPostFragment.createBundle(
+                userId, name,
+                isAdult = true,
+                isAdultTheme = true
+            )
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_myPostFragment,
+                    bundle
+                )
+            )
+        }
+
+        override fun onMoreClick(item: MemberPostItem, position: Int) {
+            onMoreClick(item, position) {
+                it as MemberPostItem
+
+                val searchPostItem = SearchPostItem(searchType, searchOrderBy, searchTag, searchKeyword)
+                val bundle = Bundle()
+                item.id
+                bundle.putBoolean(MyPostFragment.EDIT, true)
+                bundle.putString(BasePostFragment.PAGE, BasePostFragment.SEARCH)
+                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                bundle.putSerializable(KEY_DATA, searchPostItem)
+
+                when(it.type) {
+                    PostType.TEXT -> {
+                        findNavController().navigate(
+                            R.id.action_searchPostFragment_to_postArticleFragment,
+                            bundle
+                        )
+                    }
+                    PostType.IMAGE -> {
+                        findNavController().navigate(
+                            R.id.action_searchPostFragment_to_postPicFragment,
+                            bundle
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        findNavController().navigate(
+                            R.id.action_searchPostFragment_to_postVideoFragment,
+                            bundle
+                        )
+                    }
+                }
+            }
+        }
+
+        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
+            checkStatus {
+                when (item.type) {
+                    PostType.IMAGE -> {
+                        val bundle = ClubPicFragment.createBundle(item)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clubPicFragment,
+                                bundle
+                            )
+                        )
+                    }
+                    PostType.TEXT -> {
+                        val bundle = ClubTextFragment.createBundle(item)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clubTextFragment,
+                                bundle
+                            )
+                        )
+                    }
+                    PostType.VIDEO -> {
+                        val bundle = ClipPlayerFragment.createBundle(item.id)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_clipPlayerFragment,
+                                bundle
+                            )
+                        )
+                    }
+                    else -> {
+                    }
+                }
+            }
+        }
+
+        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {}
+
+        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {}
+
+        override fun onChipClick(type: PostType, tag: String) {
+            search_bar.setText(tag)
+            search(tag = tag)
+            GeneralUtils.hideKeyboard(requireActivity())
+            search_bar.clearFocus()
+        }
+    }
+
+    override fun setupFirstTime() {
         (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
-            currentPostType = it.type
-            isPostFollow = it.isPostFollow
-            mTag = it.tag
-            searchText = it.searchText
-            isClub = it.isClub
+            searchType = it.type
+            searchTag = it.tag
+            searchText = it.keyword
+            searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
         }
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        viewModel.adWidth =
+            GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
-        useAdultTheme(false)
-
-        viewModel.adWidth = ((GeneralUtils.getScreenSize(requireActivity()).first) * 0.333).toInt()
-        viewModel.adHeight = (viewModel.adWidth * 0.142).toInt()
-
-        if (TextUtils.isEmpty(mTag) && TextUtils.isEmpty(searchText)) {
-            layout_search_history.visibility = View.VISIBLE
-            layout_search_text.visibility = View.GONE
-            getSearchHistory()
+        if (!TextUtils.isEmpty(searchTag)) {
+            search_bar.setText(searchTag)
+            search(tag = searchTag)
+            search_bar.post {
+                search_bar.clearFocus()
+            }
         } else {
-            layout_search_history.visibility = View.GONE
-            layout_search_text.visibility = View.VISIBLE
+            layout_search_text.visibility = View.GONE
+            iv_clear_search_bar.visibility = View.GONE
+            getSearchHistory()
+            search_bar.post {
+                GeneralUtils.showKeyboard(search_bar.context)
+                search_bar.requestFocus()
+            }
         }
 
-        memberPostAdapter = MemberPostPagedAdapter(
-            requireContext(), adultListener, mTag, memberPostFuncItem, true
-        )
-
-        videoListAdapter = SearchVideoAdapter(requireContext(), videoAdapterListener)
+        adapter.addLoadStateListener(loadStateListener)
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
-
-        concatAdapter = ConcatAdapter(memberPostAdapter, videoListAdapter)
-
-        takeIf { isClub }?.also {
-            recycler_search_result.layoutManager = MiMiLinearLayoutManager(requireContext())
-            recycler_search_result.adapter = clubMemberAdapter
-        }
-            ?: run { recycler_search_result.adapter = concatAdapter }
-
-        if (!TextUtils.isEmpty(mTag)) {
-            updateTag(mTag)
-            viewModel.getSearchPostsByTag(currentPostType, mTag, isPostFollow)
-        }
-
-        if (!TextUtils.isEmpty(searchText)) {
-            viewModel.getSearchPostsByKeyword(currentPostType, searchText, isPostFollow)
-        }
-    }
-
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_search_post
+        recycler_search_result.adapter = adapter.withMimiLoadStateFooter { adapter.retry() }
     }
 
     override fun setupObservers() {
-        viewModel.showProgress.observe(viewLifecycleOwner, Observer { showProgress ->
-            showProgress?.takeUnless { it }?.also { progressHUD?.dismiss() }
+        viewModel.searchTotalCount.observe(viewLifecycleOwner, { count ->
+            if(search_bar.text.isNotBlank()) setSearchResultText(count)
         })
 
-        viewModel.followPostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.likePostResult.observe(this, {
             when (it) {
-                is Success -> {
-                    when ((concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).viewHolderMap?.get(it.result)) {
-                        is ClipPostHolder,
-                        is PicturePostHolder,
-                        is TextPostHolder -> {
-                            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).notifyItemChanged(
-                                it.result,
-                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE
-                            )
-                        }
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_LIKE)
                     }
                 }
-                is Error -> onApiError(it.throwable)
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.likePostResult.observe(viewLifecycleOwner, Observer {
+        viewModel.favoriteResult.observe(this, {
             when (it) {
-                is Success -> {
-                    when ((concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).viewHolderMap?.get(it.result)) {
-                        is ClipPostHolder,
-                        is PicturePostHolder,
-                        is TextPostHolder -> {
-                            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).notifyItemChanged(
-                                it.result,
-                                MemberPostPagedAdapter.PAYLOAD_UPDATE_LIKE
-                            )
-                        }
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
                     }
                 }
-                is Error -> onApiError(it.throwable)
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.searchPostItemByTagListResult.observe(viewLifecycleOwner, Observer {
-            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).submitList(it)
-        })
-
-        viewModel.searchPostItemByKeywordListResult.observe(viewLifecycleOwner, Observer {
-            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).submitList(it)
-        })
-
-        viewModel.searchTotalCount.observe(viewLifecycleOwner, Observer { count ->
-            if(currentPostType == PostType.HYBRID) {
-                if(hybridItemsCount == -1L)
-                    hybridItemsCount = count
-                else {
-                    tv_search_text.text = getSearchText(currentPostType, searchKeyword, hybridItemsCount + count, isPostFollow)
-                    hybridItemsCount = -1L
+        mainViewModel?.deletePostResult?.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    adapter.removedPosList.add(it.result)
+                    adapter.notifyItemChanged(it.result)
                 }
-            } else
-                tv_search_text.text = getSearchText(currentPostType, searchKeyword, count, isPostFollow)
-        })
-
-        viewModel.clubItemListResult.observe(viewLifecycleOwner, Observer {
-            clubMemberAdapter.submitList(it)
-        })
-
-        viewModel.followResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Empty -> {
-                    recycler_search_result.adapter?.notifyItemRangeChanged(
-                        0,
-                        viewModel.totalCount,
-                        MemberPostPagedAdapter.PAYLOAD_UPDATE_FOLLOW
-                    )
-                }
-                is Error -> onApiError(it.throwable)
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
-        viewModel.searchingListResult.observe(viewLifecycleOwner, Observer {
-            (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).submitList(it)
-        })
-
-        viewModel.likeVideoResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
-                is Success -> (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).notifyDataSetChanged()
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.favoriteVideoResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Loading -> progressHUD?.show()
-                is Loaded -> progressHUD?.dismiss()
-                is Success -> (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).notifyDataSetChanged()
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is Success -> {
-                    memberPostAdapter?.also { adapter ->
-                        adapter.removedPosList.add(it.result)
-                        adapter.notifyItemChanged(it.result)
-                    }
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.cleanRemovedPosList.observe(viewLifecycleOwner, Observer{
-            memberPostAdapter?.removedPosList?.clear()
-        })
     }
 
     override fun setupListeners() {
         ib_back.setOnClickListener {
+            GeneralUtils.hideKeyboard(requireActivity())
             findNavController().navigateUp()
         }
 
-        iv_clean.setOnClickListener {
-            edit_search.setText("")
+        iv_clear_search_bar.setOnClickListener {
+            search_bar.setText("")
+            GeneralUtils.hideKeyboard(requireActivity())
+            GeneralUtils.showKeyboard(requireContext())
+            search_bar.requestFocus()
         }
 
-        iv_clear_search_text.setOnClickListener {
+        iv_clear_history.setOnClickListener {
             chip_group_search_text.removeAllViews()
             viewModel.clearSearchHistory()
         }
 
         tv_search.setOnClickListener {
-            search()
+            search(text = search_bar.text.toString())
         }
 
-        edit_search.setOnEditorActionListener { v, actionId, event ->
+        search_bar.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {
-                    search()
+                    search(text = search_bar.text.toString())
                     true
                 }
                 else -> false
             }
         }
 
-        edit_search.addTextChangedListener {
-            if (it.toString() == "" && !TextUtils.isEmpty(mTag)) {
-                layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.VISIBLE
-            } else if (it.toString() == "") {
-                layout_search_history.visibility = View.VISIBLE
+        search_bar.addTextChangedListener {
+            if (it.toString() == "") {
+                iv_clear_search_bar.visibility = View.GONE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
-                (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).submitList(null)
-                clubMemberAdapter.submitList(null)
-                (concatAdapter?.adapters?.get(1) as SearchVideoAdapter).submitList(null)
+                lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
+            } else {
+                iv_clear_search_bar.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun search() {
-        GeneralUtils.hideKeyboard(requireActivity())
-        if (viewModel.isSearchTextEmpty(edit_search.text.toString())) {
+    private val loadStateListener = { loadStatus: CombinedLoadStates ->
+        when (loadStatus.refresh) {
+            is LoadState.Error -> {
+                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                progressHUD.dismiss()
+                onApiError((loadStatus.refresh as LoadState.Error).error)
+            }
+            is LoadState.Loading -> {
+                progressHUD.show()
+            }
+            is LoadState.NotLoading -> {
+                progressHUD.dismiss()
+            }
+        }
+
+        when (loadStatus.append) {
+            is LoadState.Error -> {
+                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
+                onApiError((loadStatus.refresh as LoadState.Error).error)
+            }
+            is LoadState.Loading -> {
+                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
+            }
+            is LoadState.NotLoading -> {
+                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
+            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun search(text: String? = null, tag: String? = null) {
+        if (TextUtils.isEmpty(text) && TextUtils.isEmpty(tag)) {
             GeneralUtils.showToast(
                 requireContext(),
-                getString(R.string.search_input_empty_toast)
+                getString(R.string.search_video_input_empty_toast)
             )
+            search_bar.requestFocus()
             return
         }
+        layout_search_text.visibility = View.GONE
         layout_search_history.visibility = View.GONE
-        layout_search_text.visibility = View.VISIBLE
-        updateTag("")
+        text?.let {
+            viewModel.updateSearchHistory(text)
+            searchKeyword = text
+            searchText = text
+            searchTag = ""
+        }
+        tag?.let {
+            searchKeyword = tag
+            searchText = ""
+            searchTag = tag
+        }
 
-        viewModel.updateSearchHistory(edit_search.text.toString())
-
-        if (isClub) {
-            viewModel.getClubs(edit_search.text.toString())
-            progressHUD?.show()
-        } else {
-            when (currentPostType) {
-                PostType.VIDEO_ON_DEMAND -> viewModel.getSearchVideoList("", edit_search.text.toString())
-                PostType.HYBRID -> {
-                    viewModel.getSearchVideoList("", edit_search.text.toString())
-                    viewModel.getSearchPostsByKeyword(
-                            currentPostType,
-                            edit_search.text.toString(),
-                            isPostFollow
-                    )
-                }
-                else -> {
-                    viewModel.getSearchPostsByKeyword(
-                            currentPostType,
-                            edit_search.text.toString(),
-                            isPostFollow
-                    )
-                }
+        when (searchType) {
+            PostType.FOLLOWED -> searchPostFollow(text, tag)
+            PostType.TEXT_IMAGE_VIDEO,
+            PostType.TEXT,
+            PostType.IMAGE,
+            PostType.VIDEO -> searchPostAll(text, tag)
+            else -> {
             }
         }
+        GeneralUtils.hideKeyboard(requireActivity())
+        search_bar.clearFocus()
     }
 
-    private val videoAdapterListener = object : SearchVideoAdapter.EventListener {
-        override fun onVideoClick(item: VideoItem) {
-            val playerData = PlayerItem(item.id ?: 0)
-            val bundle = PlayerFragment.createBundle(playerData)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_searchPostFragment_to_navigation_player,
-                    bundle
-                )
-            )
-        }
-
-        override fun onFunctionClick(type: FunctionType, view: View, item: VideoItem) {
-            when (type) {
-                FunctionType.LIKE -> {
-                    // 點擊更改喜歡,
-                    checkStatus {
-                        viewModel.currentVideoItem = item
-                        item.id?.let {
-                            viewModel.modifyVideoLike(it)
-                        }
-                    }
-                }
-
-                FunctionType.FAVORITE -> {
-                    // 點擊後加入收藏,
-                    checkStatus {
-                        viewModel.currentVideoItem = item
-                        item.id?.let {
-                            viewModel.modifyVideoFavorite(it)
-                        }
-                    }
-                }
-
-                FunctionType.SHARE -> {
-                    /* 點擊後複製網址 */
-                    checkStatus {
-                        if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
-                            GeneralUtils.showToast(requireContext(), "copy url error")
-                        } else {
-                            GeneralUtils.copyToClipboard(
-                                    requireContext(),
-                                    viewModel.getShareUrl(item.tags, item.id)
-                            )
-                            GeneralUtils.showToast(
-                                    requireContext(),
-                                    requireContext().getString(R.string.copy_url)
-                            )
-                        }
-                    }
-                }
-
-                FunctionType.MSG -> {
-                    // 點擊評論，進入播放頁面滾動到最下面
-                    val playerData = PlayerItem(item.id ?: 0)
-                    val bundle = PlayerFragment.createBundle(playerData)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_navigation_player,
-                            bundle
-                        )
-                    )
-                }
-
-                FunctionType.MORE -> {
-                }
-                else -> {
-                }
-            }
-        }
-        override fun onChipClick(text: String){
-            viewModel.getSearchVideoList(text, "")
-            GeneralUtils.hideKeyboard(requireActivity())
-        }
-        override fun onAvatarDownload(view: ImageView, id: String){}
-    }
-
-    private fun getSearchText(
-        type: PostType,
-        keyword: String,
-        count: Long = 0,
-        isPostFollow: Boolean
-    ): SpannableStringBuilder {
-
+    private fun setSearchResultText(
+        count: Long = 0
+    ) {
         val word = SpannableStringBuilder()
             .append(getString(R.string.search_keyword_1))
-            .append(keyword)
+            .append(searchKeyword)
             .append(getString(R.string.search_keyword_2))
             .append(" ")
             .append(count.toString())
             .append(" ")
             .append(getString(R.string.search_keyword_3))
 
-        if (isClub) word.append(getString(R.string.search_type_club))
-
-        if (!isPostFollow && !isClub) {
-            val typeText = when (type) {
-                PostType.TEXT -> getString(R.string.search_type_text)
-                PostType.IMAGE -> getString(R.string.search_type_picture)
-                PostType.VIDEO, PostType.VIDEO_ON_DEMAND -> getString(R.string.search_type_clip)
-                else -> ""
-            }
-            word.append(typeText)
+        val typeText = when (searchType) {
+            PostType.TEXT -> getString(R.string.club_tab_novel)
+            PostType.IMAGE -> getString(R.string.club_tab_picture)
+            PostType.VIDEO -> getString(R.string.club_tab_clip)
+            else -> ""
         }
+        word.append(typeText)
 
         word.setSpan(
             ForegroundColorSpan(
@@ -466,230 +484,9 @@ class SearchPostFragment : BaseFragment() {
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
-        return word
+        tv_search_text.text = word
+        layout_search_text.visibility = View.VISIBLE
     }
-
-    private val clubMemberAdapter by lazy {
-        ClubMemberAdapter(
-            requireContext(),
-            clubFuncItem
-        )
-    }
-
-    private val clubFuncItem by lazy {
-        ClubFuncItem(
-            { item -> onItemClick(item) },
-            { id, view, type -> viewModel.loadImage(id, view, type) },
-            { item, isFollow, function -> clubFollow(item, isFollow, function) })
-    }
-
-    private val memberPostFuncItem by lazy {
-        MemberPostFuncItem(
-            {},
-            { id, view, type -> viewModel.loadImage(id, view, type) },
-            { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
-            { item, isLike, func -> likePost(item, isLike, func) },
-            { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
-        )
-    }
-
-    private val adultListener = object : AdultListener {
-        override fun onFollowPostClick(item: MemberPostItem, position: Int, isFollow: Boolean) {
-            checkStatus { viewModel.followPost(item, position, isFollow) }
-        }
-
-        override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
-            checkStatus { viewModel.likePost(item, position, isLike) }
-        }
-
-        override fun onCommentClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            checkStatus {
-                when (adultTabType) {
-                    AdultTabType.PICTURE -> {
-                        val bundle = PictureDetailFragment.createBundle(item, 1)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_searchPostFragment_to_pictureDetailFragment,
-                                bundle
-                            )
-                        )
-                    }
-                    AdultTabType.TEXT -> {
-                        val bundle = TextDetailFragment.createBundle(item, 1)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_searchPostFragment_to_textDetailFragment,
-                                bundle
-                            )
-                        )
-                    }
-                    AdultTabType.CLIP -> {
-                        val bundle = ClipFragment.createBundle(arrayListOf(item), 0, true)
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_searchPostFragment_to_clipFragment,
-                                bundle
-                            )
-                        )
-                    }
-                    else -> {
-                    }
-                }
-            }
-        }
-
-        override fun onMoreClick(item: MemberPostItem, items:List<MemberPostItem>) {
-            val searchPostItem = arguments?.getSerializable(KEY_DATA) as SearchPostItem
-
-            memberPostAdapter?.also {
-                onMoreClick(
-                    item,
-                    ArrayList(items),
-                    onEdit = {
-                        val bundle = Bundle()
-                        bundle.putBoolean(MyPostFragment.EDIT, true)
-                        bundle.putString(BasePostFragment.PAGE, BasePostFragment.SEARCH)
-                        bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-                        bundle.putSerializable(KEY_DATA, searchPostItem)
-
-                        it as MemberPostItem
-                        when (item.type) {
-                            PostType.TEXT -> {
-                                findNavController().navigate(
-                                    R.id.action_searchPostFragment_to_postArticleFragment,
-                                    bundle
-                                )
-                            }
-                            PostType.IMAGE -> {
-                                findNavController().navigate(
-                                    R.id.action_searchPostFragment_to_postPicFragment,
-                                    bundle
-                                )
-                            }
-                            PostType.VIDEO -> {
-                                findNavController().navigate(
-                                    R.id.action_searchPostFragment_to_postVideoFragment,
-                                    bundle
-                                )
-                            }
-                        }
-                    }
-                )
-            }
-        }
-
-        override fun onItemClick(item: MemberPostItem, adultTabType: AdultTabType) {
-            when (adultTabType) {
-                AdultTabType.PICTURE -> {
-                    val bundle = PictureDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_pictureDetailFragment,
-                            bundle
-                        )
-                    )
-                }
-                AdultTabType.TEXT -> {
-                    val bundle = TextDetailFragment.createBundle(item, 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_textDetailFragment,
-                            bundle
-                        )
-                    )
-                }
-                AdultTabType.CLIP -> {
-                    val bundle = ClipFragment.createBundle(arrayListOf(item), 0)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_searchPostFragment_to_clipFragment,
-                            bundle
-                        )
-                    )
-                }
-                else -> {
-                }
-            }
-        }
-
-        override fun onClipItemClick(item: List<MemberPostItem>, position: Int) {
-            val iterator = item.iterator()
-            val memberPostItemList = arrayListOf<MemberPostItem>()
-            while (iterator.hasNext()) {
-                val data = iterator.next()
-                if (data.type != PostType.AD) memberPostItemList.add(data)
-            }
-            val mappingPosition = position - (position / 3)
-            val bundle = ClipFragment.createBundle(ArrayList(memberPostItemList), mappingPosition)
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_searchPostFragment_to_clipFragment,
-                    bundle
-                )
-            )
-        }
-
-        override fun onClipCommentClick(item: List<MemberPostItem>, position: Int) {
-            checkStatus {
-                val bundle = ClipFragment.createBundle(ArrayList(item), position)
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_searchPostFragment_to_clipFragment,
-                        bundle
-                    )
-                )
-            }
-        }
-
-        override fun onChipClick(type: PostType, tag: String) {
-            updateTag(tag)
-            viewModel.getSearchPostsByTag(type, tag, isPostFollow)
-        }
-
-        override fun onAvatarClick(userId: Long, name: String) {
-            val bundle = MyPostFragment.createBundle(
-                userId, name,
-                isAdult = true,
-                isAdultTheme = true
-            )
-
-            navigateTo(
-                NavigateItem.Destination(
-                    R.id.action_to_myPostFragment,
-                    bundle
-                )
-            )
-        }
-    }
-
-    private fun updateTag(tag: String) {
-        if (TextUtils.isEmpty(tag)) {
-            searchText = edit_search.text.toString()
-            mTag = tag
-            searchKeyword = edit_search.text.toString()
-            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).setupTag(tag)
-        } else {
-            searchText = ""
-            mTag = tag
-            searchKeyword = tag
-            (concatAdapter?.adapters?.get(0) as MemberPostPagedAdapter).setupTag(tag)
-            edit_search.setText("")
-        }
-    }
-
-    private fun clubFollow(
-        memberClubItem: MemberClubItem,
-        isFollow: Boolean,
-        update: (Boolean) -> Unit
-    ) {
-        checkStatus { viewModel.clubFollow(memberClubItem, isFollow, update) }
-    }
-
-    private fun onItemClick(item: MemberClubItem) {
-        val bundle = ClubDetailFragment.createBundle(item)
-        findNavController().navigate(R.id.action_searchPostFragment_to_clubDetailFragment, bundle)
-    }
-
 
     private fun getSearchHistory() {
         chip_group_search_text.removeAllViews()
@@ -701,62 +498,67 @@ class SearchPostFragment : BaseFragment() {
             chip.ellipsize = TextUtils.TruncateAt.END
             chip.setTextColor(requireContext().getColor(R.color.color_black_1_50))
             chip.setOnClickListener {
-                edit_search.setText(text)
-                layout_search_history.visibility = View.GONE
-                layout_search_text.visibility = View.VISIBLE
-                updateTag("")
-                if (isClub) {
-                    viewModel.getClubs(edit_search.text.toString())
-                    progressHUD?.show()
-                } else {
-                    when (currentPostType) {
-                        PostType.VIDEO_ON_DEMAND -> {
-                            viewModel.getSearchVideoList("", edit_search.text.toString())
-                        }
-                        PostType.HYBRID -> {
-                            viewModel.getSearchVideoList("", edit_search.text.toString())
-                            viewModel.getSearchPostsByKeyword(
-                                    currentPostType,
-                                    edit_search.text.toString(),
-                                    isPostFollow
-                            )
-                        }
-                        else -> {
-                            viewModel.getSearchPostsByKeyword(
-                                    currentPostType,
-                                    edit_search.text.toString(),
-                                    isPostFollow
-                            )
-                        }
-                    }
-                }
+                search_bar.setText(text)
+                search(text = text)
+                GeneralUtils.hideKeyboard(requireActivity())
+                search_bar.clearFocus()
             }
             chip_group_search_text.addView(chip)
         }
+
+        layout_search_history.visibility = View.VISIBLE
     }
 
-    private fun followMember(
-        memberPostItem: MemberPostItem,
-        items: List<MemberPostItem>,
-        isFollow: Boolean,
-        update: (Boolean) -> Unit
+    private fun searchPostFollow(
+        keyword: String? = null,
+        tag: String? = null
     ) {
-        checkStatus { viewModel.followMember(memberPostItem, ArrayList(items), isFollow, update) }
+        lifecycleScope.launch {
+            adapter.submitData(PagingData.empty())
+            viewModel.getSearchPostFollowResult(keyword, tag)
+                .collectLatest { adapter.submitData(it) }
+        }
     }
 
-    private fun likePost(
-        memberPostItem: MemberPostItem,
-        isLike: Boolean,
-        update: (Boolean, Int) -> Unit
+    private fun searchPostAll(
+        keyword: String? = null,
+        tag: String? = null
     ) {
-        checkStatus { viewModel.likePost(memberPostItem, isLike, update) }
+        lifecycleScope.launch {
+            adapter.submitData(PagingData.empty())
+            viewModel.getSearchPostAllResult(searchType, keyword, tag, searchOrderBy)
+                .collectLatest { adapter.submitData(it) }
+        }
     }
 
-    private fun favoritePost(
-        memberPostItem: MemberPostItem,
-        isFavorite: Boolean,
-        update: (Boolean, Int) -> Unit
-    ) {
-        checkStatus { viewModel.favoritePost(memberPostItem, isFavorite, update) }
+    override fun navigationToText(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_clubTextFragment,
+                bundle
+            )
+        )
     }
+
+    override fun navigationToPicture(bundle: Bundle) {
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_clubPicFragment,
+                bundle
+            )
+        )
+    }
+
+    override fun navigationToClip(b: Bundle) {
+        val item = arguments?.get(MEMBER_DATA) as MemberPostItem
+        val bundle = ClipPlayerFragment.createBundle(item.id)
+
+        navigateTo(
+            NavigateItem.Destination(
+                R.id.action_to_clipPlayerFragment,
+                bundle
+            )
+        )
+    }
+
 }

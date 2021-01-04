@@ -6,6 +6,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -14,9 +16,7 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Error
 import com.dabenxiang.mimi.model.api.ApiResult.Success
@@ -33,11 +33,11 @@ import com.dabenxiang.mimi.view.dialog.chooseclub.ChooseClubDialogListener
 import com.dabenxiang.mimi.view.dialog.chooseuploadmethod.ChooseUploadMethodDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 
 open class BasePostFragment : BaseFragment() {
 
@@ -49,7 +49,7 @@ open class BasePostFragment : BaseFragment() {
 
     companion object {
         const val CONTENT_LIMIT = 2000
-        const val PHOTO_LIMIT = 20
+        const val PHOTO_LIMIT = 10
         const val RECORD_LIMIT_TIME = 15
 
         const val INTENT_SELECT_IMG = 10001
@@ -79,6 +79,12 @@ open class BasePostFragment : BaseFragment() {
         const val MY_POST = "my_post"
         const val SEARCH = "search"
         const val CLUB = "club"
+        const val TAB = "tab"
+        const val VIDEO = "video"
+        const val TEXT = "text"
+        const val PIC = "pic"
+        const val FAVORITE = "favorite"
+        const val LIKE = "like"
     }
 
     override val bottomNavigationVisibility: Int
@@ -93,7 +99,7 @@ open class BasePostFragment : BaseFragment() {
     override fun getLayoutId() = 0
 
     override fun setupObservers() {
-        viewModel.clubItemResult.observe(viewLifecycleOwner, Observer {
+        viewModel.clubItemResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     txt_clubName.text = it.result.first().title
@@ -121,33 +127,9 @@ open class BasePostFragment : BaseFragment() {
             onBackPressed = { handleBackEvent() }
         )
 
-        edt_hashtag.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > HASHTAG_TEXT_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_hashtag.setText(content)
-                        edt_hashtag.setSelection(content.length)
-                    }
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-        })
-
         edt_title.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.length > TITLE_LIMIT) {
-                        val content = it.toString().dropLast(1)
-                        edt_title.setText(content)
 
-                    }
-                }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -178,27 +160,34 @@ open class BasePostFragment : BaseFragment() {
 
         edt_hashtag.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (chipGroup.size == HASHTAG_LIMIT) {
-                    Toast.makeText(
-                        requireContext(),
-                        R.string.post_warning_tag_limit,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    val tag = edt_hashtag.text.toString()
-                    if (isTagExist(tag)) {
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.post_tag_already_have,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        addTag(tag)
-                        edt_hashtag.text.clear()
-                    }
-                }
+                hashTagConfirm()
             }
             false
+        }
+    }
+
+    fun hashTagConfirm(){
+        if (chipGroup.size >= HASHTAG_LIMIT) {
+            Toast.makeText(
+                    requireContext(),
+                    R.string.post_warning_tag_limit,
+                    Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            val tag = edt_hashtag.text.toString()
+            if (tag.isBlank()) {
+                return 
+            }
+            if (isTagExist(tag)) {
+                Toast.makeText(
+                        requireContext(),
+                        R.string.post_tag_already_have,
+                        Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                addTag(tag)
+                edt_hashtag.text.clear()
+            }
         }
     }
 
@@ -259,10 +248,11 @@ open class BasePostFragment : BaseFragment() {
 
         haveMainTag = true
 
-        setUI(contentItem)
+        setUI(contentItem, item)
+        enableHastEditText()
     }
 
-    open fun setUI(item: MediaItem) {
+    open fun setUI(item: MediaItem, memberPostItem: MemberPostItem ) {
 
     }
 
@@ -283,6 +273,8 @@ open class BasePostFragment : BaseFragment() {
             chip.setCloseIconSizeResource(R.dimen.dp_24)
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
+                setTagCount()
+                enableHastEditText()
             }
         } else {
             viewModel.getClub(tag)
@@ -295,6 +287,12 @@ open class BasePostFragment : BaseFragment() {
     private fun setTagCount() {
         txt_hashtagCount.text =
             String.format(getString(R.string.typing_count, chipGroup.size, HASHTAG_LIMIT))
+
+        if (chipGroup.size >= HASHTAG_LIMIT) {
+            btn_tag_confirm.visibility = GONE
+        } else {
+            btn_tag_confirm.visibility = VISIBLE
+        }
     }
 
     private fun addTag(tag: String, isMainTag: Boolean = false) {
@@ -340,9 +338,24 @@ open class BasePostFragment : BaseFragment() {
             chip.setOnCloseIconClickListener {
                 chipGroup.removeView(it)
                 setTagCount()
+                enableHastEditText()
             }
             chipGroup.addView(chip)
             setTagCount()
+        }
+
+        enableHastEditText()
+    }
+
+    private fun enableHastEditText() {
+        if (chipGroup.size >= HASHTAG_LIMIT) {
+            edt_hashtag.isEnabled = false
+            edt_hashtag.hint = getString(R.string.post_tag_full)
+            hashTagLayout.background  = ContextCompat.getDrawable(requireContext(), R.drawable.post_text_rectangle_tag_full)
+        } else {
+            edt_hashtag.isEnabled = true
+            edt_hashtag.hint = getString(R.string.post_hint_tag)
+            hashTagLayout.background  = ContextCompat.getDrawable(requireContext(), R.drawable.post_text_rectangle)
         }
     }
 
@@ -366,24 +379,12 @@ open class BasePostFragment : BaseFragment() {
             txt_clubName.text = item.title
             txt_hashtagName.text = item.tag
 
-            val bitmap = LruCacheUtils.getLruCache(item.avatarAttachmentId.toString())
-            Glide.with(requireContext())
-                .load(bitmap)
-                .circleCrop()
-                .into(iv_avatar)
+            viewModel.loadImage(item.avatarAttachmentId, iv_avatar, LoadImageType.CLUB)
 
-            if (chipGroup.size == HASHTAG_LIMIT) {
-                Toast.makeText(
-                    requireContext(),
-                    R.string.post_warning_tag_limit,
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                addTag(item.tag, true)
-                txt_placeholder.visibility = View.GONE
-                txt_clubName.visibility = View.VISIBLE
-                txt_hashtagName.visibility = View.VISIBLE
-            }
+            addTag(item.tag, true)
+            txt_placeholder.visibility = View.GONE
+            txt_clubName.visibility = View.VISIBLE
+            txt_hashtagName.visibility = View.VISIBLE
         }
     }
 
@@ -431,5 +432,25 @@ open class BasePostFragment : BaseFragment() {
             type = type,
             tags = getTags()
         )
+    }
+
+    fun checkTagCountIsValid(): Boolean {
+        return if (chipGroup.size > HASHTAG_LIMIT) {
+            Toast.makeText(
+                requireContext(),
+                R.string.post_warning_tag_limit,
+                Toast.LENGTH_SHORT
+            ).show()
+            false
+        } else if (!haveMainTag) {
+            Toast.makeText(
+                requireContext(),
+                R.string.post_warning_tag,
+                Toast.LENGTH_SHORT
+            ).show()
+            false
+        } else {
+            true
+        }
     }
 }

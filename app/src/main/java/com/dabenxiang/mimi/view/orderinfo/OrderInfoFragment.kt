@@ -2,10 +2,8 @@ package com.dabenxiang.mimi.view.orderinfo
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult.Empty
@@ -15,7 +13,6 @@ import com.dabenxiang.mimi.model.enums.PaymentType
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.orderresult.OrderResultFragment
-import com.dabenxiang.mimi.view.picturedetail.PictureDetailFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_order_info.*
 import kotlinx.android.synthetic.main.fragment_text_detail.toolbarContainer
@@ -55,7 +52,7 @@ class OrderInfoFragment : BaseFragment() {
             findNavController().navigateUp()
         }
 
-        orderingPackageItem = arguments?.getSerializable(PictureDetailFragment.KEY_DATA) as OrderingPackageItem
+        orderingPackageItem = arguments?.getSerializable(KEY_DATA) as OrderingPackageItem
 
         val productName = getString(
             R.string.order_detail_content, orderingPackageItem.name,
@@ -91,7 +88,7 @@ class OrderInfoFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.createOrderResult.observe(viewLifecycleOwner, Observer {
+        viewModel.createOrderResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Empty -> {
                     navigateTo(NavigateItem.Destination(R.id.action_orderInfoFragment_to_orderResultFragment))

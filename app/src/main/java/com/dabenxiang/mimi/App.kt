@@ -32,6 +32,8 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        System.loadLibrary("native-lib")
+
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugLogTree())
             Stetho.initializeWithDefaults(this)
@@ -58,8 +60,6 @@ class App : Application() {
 
         val configData = ConfigData(
             BuildConfig.API_HOST,
-//            BuildConfig.FLAVOR,
-            BuildConfig.BUILD_TYPE,
             BuildConfig.BUILD_TYPE,
             BuildConfig.DEBUG,
             BuildConfig.APPLICATION_ID,

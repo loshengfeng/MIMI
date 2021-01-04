@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/imgLike"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/ico_nice_gray"
+        app:layout_constraintEnd_toStartOf="@+id/imgDislike"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/imgMore"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/btn_more_gray_p"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/imgShare"
+        app:layout_constraintTop_toTopOf="@+id/imgShare" />
+
+    <ImageView
+        android:id="@+id/imgDislike"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/ico_bad_gray"
+        app:layout_constraintEnd_toStartOf="@+id/imgFavorite"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/imgLike"
+        app:layout_constraintTop_toTopOf="@+id/imgLike" />
+
+    <ImageView
+        android:id="@+id/imgFavorite"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/btn_favorite_n"
+        app:layout_constraintEnd_toStartOf="@+id/imgShare"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/imgDislike"
+        app:layout_constraintTop_toTopOf="@+id/imgDislike" />
+
+    <ImageView
+        android:id="@+id/imgShare"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/btn_share_gray_n2"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/imgMore"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/imgFavorite"
+        app:layout_constraintTop_toTopOf="@+id/imgFavorite" />
+
+    <TextView
+        android:id="@+id/txtLikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/imgLike"
+        app:layout_constraintStart_toStartOf="@+id/imgLike"
+        app:layout_constraintTop_toBottomOf="@+id/imgLike"
+        tools:text="赞99" />
+
+    <TextView
+        android:id="@+id/txtDisLikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/imgDislike"
+        app:layout_constraintStart_toStartOf="@+id/imgDislike"
+        app:layout_constraintTop_toTopOf="@+id/txtLikeCount"
+        tools:text="踩99" />
+
+    <TextView
+        android:id="@+id/txtFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/imgFavorite"
+        app:layout_constraintStart_toStartOf="@+id/imgFavorite"
+        app:layout_constraintTop_toTopOf="@+id/txtDisLikeCount"
+        android:text="@string/club_favorite" />
+
+    <TextView
+        android:id="@+id/text4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/imgShare"
+        app:layout_constraintStart_toStartOf="@+id/imgShare"
+        app:layout_constraintTop_toTopOf="@+id/txtFavorite"
+        android:text="@string/club_share" />
+
+    <TextView
+        android:id="@+id/txtMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/imgMore"
+        app:layout_constraintStart_toStartOf="@+id/imgMore"
+        app:layout_constraintTop_toTopOf="@+id/text4"
+        android:text="@string/text_more" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

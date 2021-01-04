@@ -41,6 +41,7 @@ android {
         }
     }
 
+    ndkVersion "21.3.6528147"
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
 
@@ -89,12 +90,15 @@ android {
         buildConfigField "String", "API_HOST", '"http://api.vsense.dev-121.silkrode.io"'
         buildConfigField "String", "AD_API_HOST", '"http://api.promotion.dev-121.silkrode.io"'
         buildConfigField "String", "WEB_HOST", '"https://sit-video-web.ymmsp.com"'
+        buildConfigField "String", "STORAGE_HOST", '"https://storage.h5seen.com"'
         buildConfigField "String", "LOCAL_SOCKET_HOST", "\"${getLocalIPv4()}\""
         buildConfigField "int", "LOCAL_SOCKET_PORT", "8080"
         archivesBaseName = "$applicationName-v$versionName"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86"
         }
+
+//        testInstrumentationRunner "com.dabenxiang.mimi.KoinTestRunner"
     }
 
     buildTypes {
@@ -195,10 +199,19 @@ android {
         exclude 'META-INF/kotlinx-io.kotlin_module'
         exclude 'META-INF/kotlinx-coroutines-io.kotlin_module'
         exclude 'META-INF/kotlinx-coroutines-core.kotlin_module'
+//        pickFirst 'lib/armeabi-v7a/libgojni.so'
+//        pickFirst 'lib/arm64-v8a/libgojni.so'
+//        pickFirst 'lib/x86_64/libgojni.so'
+//        pickFirst 'lib/x86/libgojni.so'
 //        pickFirst 'lib/x86/libc++_shared.so'
 //        pickFirst 'lib/x86_64/libc++_shared.so'
 //        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
 //        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+    }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
     }
 }
 
@@ -214,6 +227,8 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     // AndroidX
     implementation "androidx.appcompat:appcompat:$appcompat_version"
@@ -252,21 +267,21 @@ dependencies {
 
     // Room
     implementation "androidx.room:room-runtime:$room_version"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
     // Koin
     implementation "org.koin:koin-core:$koin_version"
     implementation "org.koin:koin-core-ext:$koin_version"
-    implementation "org.koin:koin-java:$koin_version"
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-android-scope:$koin_version"
     implementation "org.koin:koin-android-viewmodel:$koin_version"
     implementation "org.koin:koin-android-ext:$koin_version"
+    implementation "org.koin:koin-androidx-fragment:$koin_version"
     implementation "org.koin:koin-androidx-scope:$koin_version"
     implementation "org.koin:koin-androidx-viewmodel:$koin_version"
     implementation "org.koin:koin-androidx-ext:$koin_version"
+    implementation "org.koin:koin-androidx-compose:$koin_version"
 
     // Paging
     implementation "androidx.paging:paging-runtime:$paging_version"
@@ -294,6 +309,8 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$glide_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
 
+    implementation "com.github.bumptech.glide:okhttp3-integration:$glide_version"
+
     // Glide Transformations
     implementation "jp.wasabeef:glide-transformations:$glide_transformations_version"
 
@@ -314,7 +331,7 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
     // Ktor
-    implementation "io.ktor:ktor-client-android:1.2.5"
+    implementation "io.ktor:ktor-client-android:$ktor_version"
 
     // Epoxy
     implementation "com.airbnb.android:epoxy:$epoxy_version"
@@ -350,7 +367,7 @@ dependencies {
 
     // AndroidUtilCode
     implementation "com.blankj:utilcodex:$utilcodex_version"
-    
+
     // Conscrypt
     implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
 
@@ -358,16 +375,19 @@ dependencies {
     implementation("org.cks.utils:BaseManager:$cks_manager")
     implementation "org.cks.utils:DeviceInfoProvider:$cks_provider"
     implementation "org.cks.utils:logmanager:$cks_log_version"
+    implementation "org.cks.utils:updatemanager:$cks_update_version"
     implementation "org.cks.utils:utils_device:$cks_utils"
     implementation "org.cks.utils:utils_api_result:$cks_utils"
-    implementation "org.cks.utils:utils_general:$cks_utils"
-    implementation "org.cks.utils:utils_loglevel:$cks_utils"
-    implementation "org.cks.utils:utils_gson_factory:$cks_utils"
-    implementation "org.cks.utils:updatemanager:$cks_update_version"
+    implementation "org.cks.utils:utils_general:$cks_utils_general"
+    implementation "org.cks.utils:utils_loglevel:$cks_utils_loglevel"
+    implementation "org.cks.utils:utils_gson_factory:$cks_utils_gson_factory"
+
 
     // Domain GoLib
-    implementation project(path: ':domain_libs')
+//    implementation project(path: ':domain_libs')
 
+    implementation 'com.silkrode.android:nbk_lib:1.3.13'
+    
     // Video Editor
     implementation "org.cks.ffmpeg:FFmpegAndroid:$video_ffmpeg"
     implementation "org.cks.utils.video:video-editor:$video_editor"
@@ -375,15 +395,28 @@ dependencies {
     //Video compressor
     implementation "org.cks.utils.video:videocompressor:$video_compressor"
 
+    implementation "tm.charlie.androidlib:expandable-textview:$expandable_textview_version"
+    implementation "me.codeboy.android:align-text-view:$align_textview_version"
+
     // Test
     testImplementation "io.mockk:mockk:$mokk_version"
     testImplementation "junit:junit:$junit_version"
-    testImplementation "org.koin:koin-test:$koin_version"
+
     testImplementation "androidx.room:room-testing:$room_version"
     testImplementation "androidx.paging:paging-common:$paging_version"
     testImplementation "androidx.arch.core:core-testing:$core_testing"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     testImplementation "com.squareup.okhttp3:mockwebserver:$mock_webserver_version"
+
+    //koin test
+    testImplementation "org.koin:koin-test:$koin_version"
+    testImplementation "org.mockito:mockito-inline:$mockito_inline"
+    testImplementation "org.mockito:mockito-core:$mockito_inline"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+    testImplementation 'android.arch.core:core-testing:2.1.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.2'
+
+    debugImplementation "androidx.fragment:fragment-testing:$fragment_ktx_version"
     androidTestImplementation "androidx.test:runner:$runner_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
     androidTestImplementation "io.mockk:mockk-android:$mokk_version"

@@ -7,8 +7,14 @@ import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import java.io.File
+import java.security.InvalidKeyException
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
 
 object CryptUtils {
+    external fun cEncrypt(str: String?): String?
+    external fun cDecrypt(str: String?): String?
+    external fun cIsVerify(): Boolean
 
     private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 
@@ -72,6 +78,22 @@ object CryptUtils {
     private fun deleteFile(filesDir: String, fileName: String) {
         val file = File(filesDir, fileName)
         if (file.exists()) file.delete()
+    }
+
+    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: ByteArray): ByteArray {
+        val cipher: Cipher = Cipher.getInstance("AES/ECB/NoPadding")
+        return try {
+            val secretKey = SecretKeySpec(key, "AES")
+            cipher.init(Cipher.DECRYPT_MODE, secretKey)
+
+            cipher.doFinal(byteArray)
+        } catch (e: InvalidKeyException) {
+            byteArray
+        }
+    }
+
+    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: String): ByteArray {
+        return decryptWithCEBNoPadding(byteArray, key.toByteArray())
     }
 
 }

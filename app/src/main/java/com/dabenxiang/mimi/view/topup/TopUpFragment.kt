@@ -8,10 +8,10 @@ import android.os.Bundle
 import android.text.Html
 import android.view.View
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.BuildConfig
@@ -30,10 +30,8 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.chatcontent.ChatContentFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_top_up.*
 import kotlinx.android.synthetic.main.item_personal_is_not_login.*
 import timber.log.Timber
@@ -55,6 +53,9 @@ class TopUpFragment : BaseFragment() {
 
     private var views: ArrayList<ConstraintLayout> = arrayListOf()
 
+    override val bottomNavigationVisibility: Int
+        get() = View.GONE
+
     companion object {
         const val TAG_FRAGMENT = "TAG_FRAGMENT"
         fun createBundle(tagName: String?): Bundle {
@@ -66,7 +67,7 @@ class TopUpFragment : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        viewModel.agentListIsEmpty.observe(this, Observer {
+        viewModel.agentListIsEmpty.observe(this, {
             if (it) {
                 tv_proxy_empty.visibility = View.VISIBLE
             } else {
@@ -78,11 +79,6 @@ class TopUpFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
-
-        requireActivity().bottom_navigation?.visibility = when (tag) {
-            PlayerFragment::class.java.simpleName -> View.GONE
-            else -> View.VISIBLE
-        }
 
         Timber.e("TAG_FRAGMENT: $tag")
 
@@ -99,7 +95,7 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.meItem.observe(viewLifecycleOwner, Observer {
+        viewModel.meItem.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     tv_name.text = it.result.friendlyName
@@ -124,7 +120,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.createChatRoomResult.observe(viewLifecycleOwner, Observer {
+        viewModel.createChatRoomResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     ChatListItem(
@@ -145,7 +141,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.isEmailConfirmed.observe(viewLifecycleOwner, Observer {
+        viewModel.isEmailConfirmed.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     if (!it.result) {
@@ -158,7 +154,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.orderPackageResult.observe(viewLifecycleOwner, Observer {
+        viewModel.orderPackageResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Loaded -> tv_proxy_empty.visibility = View.GONE
                 is Success -> {
@@ -172,7 +168,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.pendingOrderResult.observe(viewLifecycleOwner, Observer {
+        viewModel.pendingOrderResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     val item = it.result
@@ -201,11 +197,11 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.agentList.observe(viewLifecycleOwner, Observer {
+        viewModel.agentList.observe(viewLifecycleOwner, {
             agentAdapter.submitList(it)
         })
 
-        viewModel.totalUnreadResult.observe(viewLifecycleOwner, Observer {
+        viewModel.totalUnreadResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     iv_new_badge.visibility = if (it.result == 0) View.INVISIBLE else View.VISIBLE
@@ -215,7 +211,7 @@ class TopUpFragment : BaseFragment() {
             }
         })
 
-        viewModel.packageStatusResult.observe(viewLifecycleOwner, Observer {
+        viewModel.packageStatusResult.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
                     if (it.result.onlinePayDisabled) {
@@ -301,16 +297,7 @@ class TopUpFragment : BaseFragment() {
     }
 
     override fun setupListeners() {
-        val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
-        requireActivity().onBackPressedDispatcher.addCallback(
-            owner = viewLifecycleOwner,
-            onBackPressed = {
-                when (tag) {
-                    PlayerFragment::class.java.simpleName -> navigateTo(NavigateItem.Up)
-                    else -> mainViewModel?.changeNavigationPosition?.value = R.id.navigation_adult
-                }
-            }
-        )
+        tv_back.setOnClickListener { findNavController().navigateUp() }
 
         tv_record_top_up.setOnClickListener {
             navigateTo(NavigateItem.Destination(R.id.action_topupFragment_to_orderFragment))

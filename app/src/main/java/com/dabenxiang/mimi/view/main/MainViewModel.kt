@@ -1,12 +1,14 @@
 package com.dabenxiang.mimi.view.main
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.MQTT_HOST_URL
+import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.NotifyType
@@ -23,6 +25,7 @@ import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.home.HomeViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
+import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +39,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
+import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 import java.io.File
 import java.net.URLEncoder
 import java.util.*
@@ -70,11 +74,14 @@ class MainViewModel : BaseViewModel() {
     private val _dailyCheckInItem = MutableLiveData<DailyCheckInItem>()
     val dailyCheckInItem: LiveData<DailyCheckInItem> = _dailyCheckInItem
 
-    private val _uploadPicItem = MutableLiveData<PicParameter>()
-    val uploadPicItem: LiveData<PicParameter> = _uploadPicItem
+    private val _uploadPicItemResult = MutableLiveData<PicParameter>()
+    val uploadPicItemResult: LiveData<PicParameter> = _uploadPicItemResult
 
     private val _uploadCoverItem = MutableLiveData<PicParameter>()
     val uploadCoverItem: LiveData<PicParameter> = _uploadCoverItem
+
+    private val _uploadVideoParameter = MutableLiveData<String>()
+    val uploadVideoParameter: LiveData<String> = _uploadVideoParameter
 
     private val _postPicResult = MutableLiveData<ApiResult<Long>>()
     val postPicResult: LiveData<ApiResult<Long>> = _postPicResult
@@ -84,6 +91,9 @@ class MainViewModel : BaseViewModel() {
 
     private val _postVideoResult = MutableLiveData<ApiResult<Long>>()
     val postVideoResult: LiveData<ApiResult<Long>> = _postVideoResult
+
+    private val _postPicMemberResult = MutableLiveData<ApiResult<Long>>()
+    val postPicMemberResult: LiveData<ApiResult<Long>> = _postPicMemberResult
 
     private val _postVideoMemberResult = MutableLiveData<ApiResult<Long>>()
     val postVideoMemberResult: LiveData<ApiResult<Long>> = _postVideoMemberResult
@@ -99,6 +109,15 @@ class MainViewModel : BaseViewModel() {
 
     private val _totalUnreadResult = MutableLiveData<ApiResult<Int>>()
     val totalUnreadResult: LiveData<ApiResult<Int>> = _totalUnreadResult
+
+    private val _isNavTransparent = MutableLiveData<Boolean>()
+    val isNavTransparent: LiveData<Boolean> = _isNavTransparent
+
+    private val _isStatusBardDark = MutableLiveData<Boolean>()
+    val isStatusBardDark: LiveData<Boolean> = _isStatusBardDark
+
+    private val _isShowSnackBar = MutableLiveData<Boolean>()
+    val isShowSnackBar: LiveData<Boolean> = _isShowSnackBar
 
     private var _normal: CategoriesItem? = null
     val normal
@@ -116,6 +135,8 @@ class MainViewModel : BaseViewModel() {
     val switchBottomTap = MutableLiveData<Int>()
     val changeNavigationPosition = MutableLiveData<Int>()
     val refreshBottomNavigationBadge = MutableLiveData<Int>()
+
+    val uploadData = MutableLiveData<Bundle>()
 
     private var job = Job()
 
@@ -163,6 +184,21 @@ class MainViewModel : BaseViewModel() {
                 val resp = domainManager.getAdRepository().getAD(width, height)
                 if (!resp.isSuccessful) throw HttpException(resp)
                 emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _getAdResult.value = it }
+        }
+    }
+
+    fun getAd(code: String, width: Int, height: Int, count: Int) {
+        viewModelScope.launch {
+            flow {
+                val resp = domainManager.getAdRepository().getAD(code, width, height, count)
+                if (!resp.isSuccessful) emit(ApiResult.success(AdItem()))
+                else emit(ApiResult.success(resp.body()?.content?.get(0)?.ad?.first()))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
@@ -266,8 +302,8 @@ class MainViewModel : BaseViewModel() {
 
     fun startMQTT() {
         if (!isMqttConnect()) {
-            // test serverUrl use: tcp://172.x.x.x:1883
-            mqttManager.init(MQTT_HOST_URL, clientId, extendedCallback)
+            // test serverUrl use: tcp://172.x.x.x:1883 // mqttManager.init("tcp://172.x.x.x:1883", clientId, extendedCallback)
+            mqttManager.init(domainManager.getMqttDomain(), clientId, extendedCallback)
             mqttManager.connect(connectCallback)
         }
     }
@@ -304,26 +340,44 @@ class MainViewModel : BaseViewModel() {
     private val extendedCallback = object : ExtendedCallback {
         override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
             Timber.d("Reconnect: $reconnect, ServerURI: $serverURI")
+            SendLogManager.v(
+                PROJECT_NAME,
+                "MQTT - Reconnect: $reconnect, ServerURI: $serverURI"
+            )
         }
 
         override fun onMessageArrived(topic: String, message: MqttMessage) {
-            Timber.d("Incoming topic:: $topic")
-            Timber.d("Incoming message:: ${String(message.payload)}")
+            Timber.d("Incoming topic: $topic")
+            Timber.d("Incoming message: ${String(message.payload)}")
+
+            SendLogManager.v(
+                PROJECT_NAME,
+                "MQTT - Topic: $topic, Message: ${String(message.payload)}"
+            )
             messageListenerMap[topic]?.onMsgReceive(message)
         }
 
         override fun onConnectionLost(cause: Throwable?) {
             Timber.e("The Connection was lost: $cause")
+            SendLogManager.e(
+                PROJECT_NAME,
+                "MQTT - The Connection was lost: $cause"
+            )
         }
 
         override fun onDeliveryComplete(token: IMqttDeliveryToken) {
-            Timber.d("DeliveryComplete message:: ${String(token.message.payload)}")
+            Timber.d("DeliveryComplete message: ${String(token.message.payload)}")
+            SendLogManager.e(
+                PROJECT_NAME,
+                "MQTT - DeliveryComplete message:: ${String(token.message.payload)}"
+            )
         }
     }
 
     private val connectCallback = object : ConnectCallback {
         override fun onSuccess(asyncActionToken: IMqttToken) {
             Timber.d("Connection onSuccess")
+            SendLogManager.v(PROJECT_NAME, "MQTT - Connection onSuccess")
             val topic = getNotificationTopic()
             messageListenerMap[topic] = messageListener
             subscribeToTopic(topic)
@@ -331,12 +385,13 @@ class MainViewModel : BaseViewModel() {
 
         override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
             Timber.e("Connection onFailure: $exception")
+            SendLogManager.e(PROJECT_NAME, "MQTT - Connection onFailure: $exception")
         }
     }
 
     private val messageListener = object : MessageListener {
         override fun onMsgReceive(message: MqttMessage) {
-            Timber.d("@@Dave onMsgReceive: ${String(message.payload)}")
+            Timber.d("onMsgReceive: ${String(message.payload)}")
             val data = JSONObject(String(message.payload))
             val payload = data.optJSONObject("payload")
             when (payload.optInt("type", 0)) {
@@ -350,8 +405,7 @@ class MainViewModel : BaseViewModel() {
                     accountManager.setupProfile(profileItem)
                     _dailyCheckInItem.postValue(data)
                 }
-                NotifyType.CREATE_ORDER.value,
-                NotifyType.TX_SUCCESS.value -> {
+                NotifyType.CREATE_ORDER.value -> {
                     val data = gson.fromJson(String(message.payload), OrderItem::class.java)
                     _orderItem.postValue(data)
                 }
@@ -390,7 +444,7 @@ class MainViewModel : BaseViewModel() {
     fun postAttachment(pic: String, context: Context, type: String) {
         viewModelScope.launch(context = job) {
             flow {
-                val realPath = when (type) {
+                var realPath = when (type) {
                     HomeViewModel.TYPE_VIDEO -> pic
                     HomeViewModel.TYPE_PIC -> pic
                     else -> UriUtils.getPath(context, Uri.parse(pic))
@@ -401,27 +455,43 @@ class MainViewModel : BaseViewModel() {
                 val ext = "." + extSplit?.last()
                 var mime: String? = null
 
-                if (type == HomeViewModel.TYPE_PIC) {
-                    val picParameter = PicParameter(ext = ext)
-                    _uploadPicItem.postValue(picParameter)
-                } else if (type == HomeViewModel.TYPE_COVER) {
-                    val picParameter = PicParameter(ext = ext)
-                    _uploadCoverItem.postValue(picParameter)
-                } else if (type == HomeViewModel.TYPE_VIDEO) {
-                    val mmr = MediaMetadataRetriever()
-                    mmr.setDataSource(realPath)
-                    mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
+                when (type) {
+                    HomeViewModel.TYPE_PIC -> {
+                        val picParameter = PicParameter(ext = ext) //Set extension
+                        _uploadPicItemResult.postValue(picParameter)
+                    }
+                    HomeViewModel.TYPE_COVER -> {
+                        val picParameter = PicParameter(ext = ext) //Set extension
+                        _uploadCoverItem.postValue(picParameter)
+                    }
+                    HomeViewModel.TYPE_VIDEO -> {
+                        _uploadVideoParameter.postValue(ext)
+                        val mmr = MediaMetadataRetriever()
+                        mmr.setDataSource(realPath)
+                        mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+                    }
+                }
+
+                val file = File(realPath)
+
+                if (type == HomeViewModel.TYPE_PIC && file.length() >= 5242880) {
+                    val tempFile = FileUtil.getTakePhoto( "temp.jpg")
+                    file.copyTo(tempFile, true)
+                    val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
+                    FileUtil.saveBitmapToJpegFile(bitmap, bitmap.width, bitmap.height, destPath = tempFile.absolutePath)
+
+                    realPath = tempFile.absolutePath
                 }
 
                 Timber.d("Upload photo path : $realPath")
                 Timber.d("Upload photo ext : $ext")
 
-                val result = if (mime == null) {
+                val result = if (mime == null) { //Post pic type
                     domainManager.getApiRepository().postAttachment(
                         File(realPath!!),
                         fileName = URLEncoder.encode(fileName, "UTF-8")
                     )
-                } else {
+                } else { //Post video type
                     domainManager.getApiRepository().postAttachment(
                         File(realPath!!),
                         fileName = URLEncoder.encode(fileName, "UTF-8"),
@@ -444,7 +514,7 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun postPic(id: Long = 0, request: PostMemberRequest, content: String) {
+    fun postPicOrVideo(id: Long = 0, request: PostMemberRequest, content: String, type: String) {
         viewModelScope.launch(context = job) {
             flow {
                 request.content = content
@@ -464,7 +534,14 @@ class MainViewModel : BaseViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _postVideoMemberResult.value = it }
+                .collect {
+                    if (type == HomeViewModel.TYPE_VIDEO) {
+                        _postVideoMemberResult.value = it
+                    } else {
+                        _postPicMemberResult.value = it
+
+                    }
+                }
         }
     }
 
@@ -505,8 +582,14 @@ class MainViewModel : BaseViewModel() {
         _postPicResult.value = null
         _postCoverResult.value = null
         _postVideoResult.value = null
-        _uploadPicItem.value = null
+        _uploadPicItemResult.value = null
         _uploadCoverItem.value = null
+        _postVideoMemberResult.value = null
+        _postPicMemberResult.value = null
+    }
+
+    fun clearPicResultValue() {
+        _postPicResult.value = null
     }
 
     fun cancelJob() {
@@ -542,7 +625,21 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
+    fun checkIsLogin() = accountManager.isLogin()
+
     fun clearOrderItem() {
         _orderItem.postValue(null)
+    }
+
+    fun setNavTransparent(isNavTransparent: Boolean = false) {
+        _isNavTransparent.value = isNavTransparent
+    }
+
+    fun setStatusBarMode(isDark: Boolean = false) {
+        _isStatusBardDark.value = isDark
+    }
+
+    fun setIsShowSnackBar(isShow: Boolean) {
+        _isShowSnackBar.value = isShow
     }
 }

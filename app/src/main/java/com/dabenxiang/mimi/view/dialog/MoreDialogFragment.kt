@@ -16,12 +16,16 @@ class MoreDialogFragment : BaseDialogFragment() {
         fun newInstance(
             item: BaseMemberPostItem,
             listener: OnMoreDialogListener,
-            isComment: Boolean? = false
+            isComment: Boolean? = false,
+            isLogin: Boolean = false,
+            isFromPostPage: Boolean = false
         ): MoreDialogFragment {
             val fragment = MoreDialogFragment()
             fragment.item = item
             fragment.listener = listener
             fragment.isComment = isComment
+            fragment.isLogin = isLogin
+            fragment.isFromPostPage = isFromPostPage
             return fragment
         }
     }
@@ -29,6 +33,8 @@ class MoreDialogFragment : BaseDialogFragment() {
     var item: BaseMemberPostItem? = null
     var isComment: Boolean? = false
     var listener: OnMoreDialogListener? = null
+    var isLogin: Boolean = false
+    var isFromPostPage: Boolean = false
 
     override fun isFullLayout(): Boolean {
         return true
@@ -45,14 +51,33 @@ class MoreDialogFragment : BaseDialogFragment() {
             is MemberPostItem -> (item as MemberPostItem).reported
             else -> (item as MembersPostCommentItem).reported
         } ?: false
-
-        if (isReport) {
-            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+        
+        val deducted = if ((item is MemberPostItem)) {
+            (item as MemberPostItem).deducted
         } else {
-            tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
-            tv_problem_report.setOnClickListener {
-                Timber.i(" isReport=$isReport")
-                listener?.onProblemReport(item!!, isComment!!)
+            true
+        }
+
+        Timber.i("isReported: $isReport")
+        Timber.i("deducted: $deducted")
+
+        if (isFromPostPage) {
+            if (!isLogin || isReport || !deducted) {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            } else {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
+                tv_problem_report.setOnClickListener {
+                    listener?.onProblemReport(item!!, isComment!!)
+                }
+            }
+        } else {
+            if (isReport || !deducted) {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1_50))
+            } else {
+                tv_problem_report.setTextColor(requireContext().getColor(R.color.color_black_1))
+                tv_problem_report.setOnClickListener {
+                    listener?.onProblemReport(item!!, isComment!!)
+                }
             }
         }
 
@@ -66,7 +91,7 @@ class MoreDialogFragment : BaseDialogFragment() {
     }
 
     interface OnMoreDialogListener {
-        fun onProblemReport(item: BaseMemberPostItem, isComment:Boolean)
+        fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean)
         fun onCancel()
     }
 }

@@ -19,6 +19,7 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.bumptech.glide.Glide
+import com.chad.library.adapter.base.entity.node.BaseNode
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.addKeyboardToggleListener
@@ -29,6 +30,7 @@ import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.*
+import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.adapter.TopTabAdapter
@@ -104,7 +106,6 @@ class PlayerFragment : BaseFragment() {
     private var isFirstInit = true
     private var isKeyboardShown = false
     private var oldPlayerItem: PlayerItem = PlayerItem(-1)
-    override val bottomNavigationVisibility = GONE
 
     private val sourceListAdapter by lazy {
         TopTabAdapter(object : BaseIndexViewHolder.IndexViewHolderListener {
@@ -137,7 +138,7 @@ class PlayerFragment : BaseFragment() {
     private val playerInfoAdapter by lazy {
         Timber.i("playerInfoAdapter")
         CommentAdapter(object : CommentAdapter.PlayerInfoListener {
-            override fun sendComment(replyId: Long?, replyName: String?) {
+            override fun sendComment(replyId: Long?, replyName: String?, parentNode: RootCommentNode) {
                 viewModel.checkStatus {
                     Timber.i("playerInfoAdapter sendComment")
                     currentReplyId = null
@@ -158,7 +159,7 @@ class PlayerFragment : BaseFragment() {
                 }
             }
 
-            override fun replyComment(replyId: Long?, replyName: String?) {
+            override fun replyComment(replyId: Long?, replyName: String?, parentNode: RootCommentNode) {
                 Timber.i("playerInfoAdapter replyComment")
                 currentReplyId = null
                 currentreplyName = null
@@ -211,7 +212,7 @@ class PlayerFragment : BaseFragment() {
                 bundle.putBoolean(KEY_IS_FROM_PLAYER, true)
                 navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_playerFragment_to_myPostFragment,
+                        R.id.action_to_myPostFragment,
                         bundle
                     )
                 )
@@ -228,6 +229,9 @@ class PlayerFragment : BaseFragment() {
             }
         }
     }
+
+    override val bottomNavigationVisibility: Int
+        get() = GONE
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_player
@@ -402,7 +406,7 @@ class PlayerFragment : BaseFragment() {
                 is Empty -> loadVideo()
                 is Error -> {
                     when (it.throwable) {
-                        is PlayerViewModel.NotDeductedException -> {
+                        is NotDeductedException -> {
                             showRechargeReminder(true)
                             scrollToBottom()
                         }
@@ -1277,6 +1281,7 @@ class PlayerFragment : BaseFragment() {
                 ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE"
                 ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING"
                 ExoPlayer.STATE_READY -> {
+                    viewModel.sendVideoReport(false)
                     viewModel.activateLoading(false)
                     player_view.visibility = VISIBLE
                     "ExoPlayer.STATE_READY"
@@ -1331,7 +1336,7 @@ class PlayerFragment : BaseFragment() {
                     //showErrorDialog("UNKNOWN")
                 }
             }
-            viewModel.sendVideoReport()
+            viewModel.sendVideoReport(true)
         }
     }
 
@@ -1560,13 +1565,13 @@ class PlayerFragment : BaseFragment() {
                 secondBtn = getString(R.string.verify_immediately),
                 secondBlock = {
                     val bundle = Bundle().also { it.putBoolean(KEY_IS_FROM_PLAYER, true) }
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_playerFragment_to_settingFragment,
-                            bundle
-                        )
-
-                    )
+//                    navigateTo(
+//                        NavigateItem.Destination(
+//                            R.id.action_playerFragment_to_settingFragment,
+//                            bundle
+//                        )
+//
+//                    )
                 }
             )
         ).show(requireActivity().supportFragmentManager)

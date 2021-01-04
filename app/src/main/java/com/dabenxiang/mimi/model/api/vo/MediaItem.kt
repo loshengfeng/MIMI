@@ -26,11 +26,14 @@ data class PicParameter(
 
 data class VideoParameter(
     @SerializedName("id")
-    val id: String = "",
+    var id: String = "",
 
     @SerializedName("url")
-    val url: String = "",
+    var url: String = "",
 
     @SerializedName("length")
-    val length: String = ""
+    var length: String = "",
+
+    @SerializedName("ext")
+    var ext: String = "",
 )

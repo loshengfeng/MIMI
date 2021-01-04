@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/img_avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/default_profile_picture"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="14dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/color_black_1"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/tv_follow"
+        app:layout_constraintStart_toEndOf="@+id/img_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="名称名称" />
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/color_black_1_50"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toRightOf="@+id/img_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/tv_name"
+        tools:text="1小时前" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="16dp"
+        android:ellipsize="end"
+        android:textColor="@color/color_black_1"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/img_avatar"
+        tools:text="Title" />
+
+    <TextView
+        android:id="@+id/tv_follow"
+        android:layout_width="54dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_red_1_stroke_radius_16"
+        android:gravity="center"
+        android:textColor="@color/color_red_1"
+        android:textSize="12sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="+关注" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_photo"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+
+    <com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView
+        android:id="@+id/hsv_tags"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/v_separator">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent" />
+    </com.dabenxiang.mimi.view.customview.NestedHorizontalScrollView>
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/item_comment_interactive"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_photo" />
+
+    <View
+        android:id="@+id/v_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="31dp"
+        android:background="@color/color_black_1_05"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="25dp"
+        android:background="@color/color_black_1_05"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hsv_tags" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

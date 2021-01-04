@@ -2,20 +2,18 @@ package com.dabenxiang.mimi.view.search.video
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.EditTextLiveData
-import com.dabenxiang.mimi.widget.utility.EditTextMutableLiveData
+import com.dabenxiang.mimi.view.search.video.paging.SearchVideoDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,47 +24,18 @@ class SearchVideoViewModel : BaseViewModel() {
     var category = ""
     var searchingTag = ""
     var searchingStr = ""
-//    var isAdult = false
-
-    var adWidth = 0
-    var adHeight = 0
+    var videoType: VideoType? = null
 
     var currentItem: VideoItem? = null
-
-    private val _searchTextLiveData = EditTextMutableLiveData()
-    val searchTextLiveData: EditTextLiveData = _searchTextLiveData
-
-    private val _searchingListResult = MutableLiveData<PagedList<VideoItem>>()
-    val searchingListResult: LiveData<PagedList<VideoItem>> = _searchingListResult
 
     private val _searchingTotalCount = MutableLiveData<Long>()
     val searchingTotalCount: LiveData<Long> = _searchingTotalCount
 
-    private val _likeResult = MutableLiveData<ApiResult<Long>>()
-    val likeResult: LiveData<ApiResult<Long>> = _likeResult
+    private val _likeResult = MutableLiveData<ApiResult<Int>>()
+    val likeResult: LiveData<ApiResult<Int>> = _likeResult
 
-    private val _favoriteResult = MutableLiveData<ApiResult<Long>>()
-    val favoriteResult: LiveData<ApiResult<Long>> = _favoriteResult
-
-    private fun getVideoPagingItems(isAdult: Boolean): LiveData<PagedList<VideoItem>> {
-        val searchVideoDataSource =
-            SearchVideoListDataSource(
-                viewModelScope,
-                domainManager,
-                pagingCallback,
-                isAdult,
-                category,
-                searchingTag,
-                searchingStr,
-                adWidth,
-                adHeight
-            )
-        val videoFactory = SearchVideoFactory(searchVideoDataSource)
-        val config = PagedList.Config.Builder()
-            .setPrefetchDistance(4)
-            .build()
-        return LivePagedListBuilder(videoFactory, config).build()
-    }
+    private val _favoriteResult = MutableLiveData<ApiResult<Int>>()
+    val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
     private val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
@@ -85,44 +54,61 @@ class SearchVideoViewModel : BaseViewModel() {
         }
     }
 
-    fun cleanSearchText() {
-        _searchTextLiveData.value = ""
+    fun getSearchVideoResult(
+        keyword: String? = null,
+        tag: String? = null,
+        videoType: VideoType? =null
+    ): Flow<PagingData<VideoItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = SearchVideoDataSource.PER_LIMIT),
+            pagingSourceFactory = {
+                SearchVideoDataSource(
+                    domainManager,
+                    pagingCallback,
+                    category,
+                    tag,
+                    keyword,
+                    adWidth,
+                    adHeight,
+                    videoType
+                )
+            }
+        )
+            .flow
+            .cachedIn(viewModelScope)
     }
 
-    fun getSearchList() {
-        viewModelScope.launch {
-            getVideoPagingItems(true).asFlow()
-                .collect {
-                    _searchingListResult.value = it
-                }
-        }
-    }
-
-    fun modifyLike(videoID: Long) {
-        val likeType = if (currentItem?.like == true) LikeType.DISLIKE else LikeType.LIKE
-        val likeRequest = LikeRequest(likeType)
+    fun modifyLike(position: Int) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository()
-                    .like(videoID, likeRequest)
-                if (!result.isSuccessful) {
-                    throw HttpException(result)
+                currentItem?.also { item ->
+                    val apiRepository = domainManager.getApiRepository()
+                    val likeType = when (item.like) {
+                        true -> null
+                        else -> LikeType.LIKE
+                    }
+                    val request =  LikeRequest(likeType)
+                    val result = when (item.like) {
+                        true -> apiRepository.deleteLike(item.id)
+                        else -> apiRepository.like(item.id, request)
+                    }
+                    if (!result.isSuccessful) throw HttpException(result)
+                    when (item.like) {
+                        true -> item.likeCount -= 1
+                        else -> item.likeCount += 1
+                    }
+                    item.likeType = likeType
+                    item.like = item.like != true
+                    emit(ApiResult.success(position))
                 }
-                currentItem?.run {
-                    like = like != true
-                    likeCount = if (like == true) (likeCount ?: 0) + 1 else (likeCount ?: 0) - 1
-                }
-                emit(ApiResult.success(videoID))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _likeResult.value = it }
         }
     }
 
-    fun modifyFavorite(videoID: Long) {
+    fun modifyFavorite(videoID: Long, position: Int) {
         viewModelScope.launch {
             flow {
                 val result = if (currentItem?.favorite == false) {
@@ -136,15 +122,14 @@ class SearchVideoViewModel : BaseViewModel() {
                 }
                 currentItem?.run {
                     favorite = favorite != true
-                    favoriteCount = if (favorite == true) (favoriteCount
-                        ?: 0) + 1 else (favoriteCount ?: 0) - 1
+                    favoriteCount =
+                        if (favorite) (favoriteCount ?: 0) + 1
+                        else (favoriteCount ?: 0) - 1
                 }
-                emit(ApiResult.success(videoID))
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
                 .collect { _favoriteResult.value = it }
         }
     }
