@@ -45,6 +45,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
+import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
@@ -237,5 +238,17 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                     }
                 }
         }
+    }
+
+    fun clearDBData(){
+        viewModelScope.launch {
+            mimiDB.apply {
+                withTransaction {
+                    postDBItemDao().deleteAll()
+                    postDBItemDao().deleteAllMemberPostItems()
+                }
+            }
+        }
+
     }
 }

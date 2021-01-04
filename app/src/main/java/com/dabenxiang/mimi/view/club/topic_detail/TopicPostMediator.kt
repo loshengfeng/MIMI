@@ -1,20 +1,21 @@
 package com.dabenxiang.mimi.view.club.topic_detail
 
-import androidx.paging.*
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadType
+import androidx.paging.PagingState
+import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.db.*
+import com.dabenxiang.mimi.model.db.DBRemoteKey
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
+import com.dabenxiang.mimi.model.db.MiMiDB
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.OrderBy
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.dabenxiang.mimi.view.club.pages.ClubItemMediator
 import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_CODE
-import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_GAP
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
-import kotlin.math.ceil
 
 @OptIn(ExperimentalPagingApi::class)
 class TopicPostMediator(
@@ -29,9 +30,9 @@ class TopicPostMediator(
 ) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
-        const val PER_LIMIT = 20
+        const val PER_LIMIT = 5
     }
-
+    val apiRepository = domainManager.getApiRepository()
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, MemberPostWithPostDBItem>
@@ -56,9 +57,10 @@ class TopicPostMediator(
             }?.toInt() ?: 0
 
             Timber.w("TopicPostMediator pageCode=$pageCode offset=$offset tag=$tag orderBy=$orderBy")
-            val result = domainManager.getApiRepository().getMembersPost(
+            val result = apiRepository.getMembersPost(
                     offset, PER_LIMIT, tag, orderBy.value
             )
+            Timber.w("TopicPostMediator pageCode=$pageCode result=$result ")
             if (!result.isSuccessful) throw HttpException(result)
             val body = result.body()
             val memberPostItems = body?.content
@@ -71,13 +73,13 @@ class TopicPostMediator(
             )
 
             Timber.w("hasNext =$hasNext")
-            val nextKey = if (hasNext) offset + ClubItemMediator.PER_LIMIT else null
+            val nextKey = if (hasNext) offset + PER_LIMIT else null
 
-            val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / AD_GAP).toInt()
-            val adItems = domainManager.getAdRepository().getAD(AD_CODE, adWidth, adHeight, adCount)
-                .body()?.content?.get(0)?.ad?.map {
-                    MemberPostItem(id= (1..2147483647).random().toLong(), type = PostType.AD, adItem = it)
-                }?: arrayListOf()
+//            val adCount = ceil((memberPostItems?.size ?: 0).toFloat() / AD_GAP).toInt()
+//            val adItems = domainManager.getAdRepository().getAD(AD_CODE, adWidth, adHeight, adCount)
+//                .body()?.content?.get(0)?.ad?.map {
+//                    MemberPostItem(id= (1..2147483647).random().toLong(), type = PostType.AD, adItem = it)
+//                }?: arrayListOf()
 
             pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
 
@@ -91,6 +93,8 @@ class TopicPostMediator(
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
                 memberPostItems?.let {
+                    database.postDBItemDao().insertMemberPostItemAll(it)
+
                     val postDBItems = it.mapIndexed { index, item ->
                         val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
                         when(oldItem) {
@@ -110,28 +114,28 @@ class TopicPostMediator(
                             }
                         }
                     }
-                    database.postDBItemDao().insertMemberPostItemAll(it)
                     database.postDBItemDao().insertAll(postDBItems)
                 }
             }
 
-            adItems?.let {
-                val adDBItems = it.mapIndexed { index, item ->
-                    PostDBItem(
-                        postDBId = item.id,
-                        postType = item.type,
-                        pageCode= AD_CODE,
-                        timestamp = System.nanoTime(),
-                        index = index
-                    )
-                }
-                database.postDBItemDao().insertMemberPostItemAll(it)
-                database.postDBItemDao().insertAll(adDBItems)
-            }
-            return MediatorResult.Success(endOfPaginationReached = hasNext)
+//            adItems?.let {
+//                val adDBItems = it.mapIndexed { index, item ->
+//                    PostDBItem(
+//                        postDBId = item.id,
+//                        postType = item.type,
+//                        pageCode= AD_CODE,
+//                        timestamp = System.nanoTime(),
+//                        index = index
+//                    )
+//                }
+//                database.postDBItemDao().insertMemberPostItemAll(it)
+//                database.postDBItemDao().insertAll(adDBItems)
+//            }
+            return MediatorResult.Success(endOfPaginationReached = !hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {
+            Timber.i("TopicPostMediator pageCode=$pageCode HttpException =$e")
             return MediatorResult.Error(e)
         }
     }

@@ -23,30 +23,29 @@ class ClubItemViewModel : ClubViewModel() {
     private val clearListCh = Channel<Unit>(Channel.CONFLATED)
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(type: ClubTabItemType) = flowOf(
+    fun posts(pageCode:String, type: ClubTabItemType) = flowOf(
             clearListCh.receiveAsFlow().map { PagingData.empty() },
-            postItems(type)
+            postItems(pageCode, type)
 
     ).flattenMerge(2).cachedIn(viewModelScope)
 
-    private fun postItems(type: ClubTabItemType) = Pager(
+    private fun postItems(pageCode:String, type: ClubTabItemType) = Pager(
             config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
-            remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight,
+            remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight, pageCode,
                     type, getAdCode(type), pagingCallback)
     ) {
         mimiDB.postDBItemDao()
-            .pagingSourceByPageCode(ClubItemMediator::class.simpleName + type.toString())
-    }.flow/*.map { pagingData ->
+            .pagingSourceByPageCode(pageCode)
+    }.flow.map { pagingData ->
         pagingData.map {
-            it
-        }.insertSeparators { before, after ->
-            if (before != null && before.postDBItem.index.rem(AD_GAP) == AD_GAP - 1) {
-                getAdItem(arrayListOf(), before)
-            } else {
-                null
-            }
+           it.memberPostItem
         }
-    }*/
+//            .insertSeparators { before, after ->
+//            if (before != null && before.postDBItem.index.rem(AD_GAP) == AD_GAP - 1) {
+//                getAdItem(arrayListOf(), before)
+//            } else {
+//                null
+            }
 
     fun getAdCode(type: ClubTabItemType): String {
         return when (type) {

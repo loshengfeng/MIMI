@@ -29,11 +29,11 @@ class PostItemAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
         private val viewModelScope: CoroutineScope
-) : PagingDataAdapter<MemberPostWithPostDBItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)?.postDBItem
-        return when (item?.postType) {
+        val item = getItem(position)
+        return when (item?.type) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
             PostType.IMAGE -> VIEW_TYPE_PICTURE
             PostType.AD -> VIEW_TYPE_AD
@@ -79,7 +79,7 @@ class PostItemAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
 
-        val item = getItem(position)?.memberPostItem
+        val item = getItem(position)
         item?.also {memberPostItem->
             Timber.i("PostItemAdapter position=$position  holder=$holder")
             when (holder) {

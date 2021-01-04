@@ -135,7 +135,7 @@ class MyFavoritesFragment(
         }
 
         myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
-            viewModel.deleteFavorites(adapter.snapshot().items.map { it.memberPostItem })
+            viewModel.deleteFavorites(adapter.snapshot().items)
         })
 
         viewModel.postCount.observe(viewLifecycleOwner, {

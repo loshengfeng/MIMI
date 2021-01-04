@@ -43,10 +43,12 @@ class MyPostViewModel : ClubViewModel() {
             config = PagingConfig(pageSize = MyPostMediator.PER_LIMIT),
             remoteMediator = MyPostMediator(mimiDB, domainManager, userId)
     ) {
-        mimiDB.postDBItemDao().pagingSourceByPageCode( MyPostMediator::class.simpleName+ userId.toString())
+        mimiDB.postDBItemDao().pagingSourceByPageCode(MyPostMediator::class.simpleName + userId.toString())
 
 
-    }.flow
+    }.flow.map {
+        it.map { it.memberPostItem }
+    }
 
 //    fun getMyPostPagingItems(
 //        userId: Long

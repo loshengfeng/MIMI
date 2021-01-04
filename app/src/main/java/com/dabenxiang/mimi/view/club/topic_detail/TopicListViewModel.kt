@@ -27,7 +27,6 @@ class TopicListViewModel : ClubViewModel() {
     private val _deleteFavorites = MutableLiveData<Int>()
     val deleteFavorites: LiveData<Int> = _deleteFavorites
 
-
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun posts(pageCode: String, tag: String, orderBy: OrderBy) = postItems(pageCode, tag, orderBy).cachedIn(viewModelScope)
 
@@ -48,14 +47,15 @@ class TopicListViewModel : ClubViewModel() {
     }.flow.map { pagingData ->
         val adItems = (mimiDB.postDBItemDao().getPostDBItemsByTime(AD_CODE) as ArrayList<MemberPostWithPostDBItem>)
         pagingData.map {
-            it
-        }.insertSeparators{ before, after->
-            if(before!=null && before.postDBItem.index >0 && before.postDBItem.index.rem(AD_GAP) == 0 ){
-                getAdItem(adItems, before)
-            }else {
-                null
-            }
+            it.memberPostItem
         }
+//            .insertSeparators{ before, after->
+//            if(before!=null && before.postDBItem.index >0 && before.postDBItem.index.rem(AD_GAP) == 0 ){
+//                getAdItem(adItems, before)
+//            }else {
+//                null
+//            }
+//        }
     }
     
 }
