@@ -6,17 +6,11 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-
-import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
-
-import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -77,10 +71,8 @@ class PostItemAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
-
         val item = getItem(position)
-        item?.also {memberPostItem->
+        item?.also { memberPostItem ->
             Timber.i("PostItemAdapter position=$position  holder=$holder")
             when (holder) {
                 is AdHolder -> {
@@ -98,7 +90,6 @@ class PostItemAdapter(
                 }
 
                 is MyPostPicturePostHolder -> {
-
                     holder.pictureRecycler.tag = position
                     holder.onBind(
                             memberPostItem,
@@ -106,8 +97,6 @@ class PostItemAdapter(
                             myPostListener,
                             viewModelScope
                     )
-
-
                 }
                 is MyPostTextPostHolder -> {
                     holder.onBind(
@@ -116,7 +105,6 @@ class PostItemAdapter(
                             myPostListener,
                             viewModelScope
                     )
-
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
@@ -125,7 +113,6 @@ class PostItemAdapter(
                             myPostListener,
                             viewModelScope
                     )
-
                 }
             }
         }

@@ -10,7 +10,6 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.DeletedItemViewHolder
@@ -61,7 +60,7 @@ class LikeMimiVideoAdapter(
 
         return if (item?.playlistType?.toInt() == PostType.AD.value) {
             VIEW_TYPE_AD
-        } else if (itemType == MyPagesType.MIMI_VIDEO || itemType == MyPagesType.LIKE_MIMI) {
+        } else if (itemType == MyPagesType.LIKE_MIMI) {
             MIMI_VIDEO
         } else {
             SHORT_VIDEO

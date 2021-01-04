@@ -61,12 +61,10 @@ class MyPagesPostMediator(
                     when(myPagesType) {
                         MyPagesType.LIKE_POST -> domainManager.getApiRepository().getPostLike(offset.toLong(), PER_LIMIT, 7)
                         MyPagesType.LIKE_MIMI -> domainManager.getApiRepository().getPostLike(offset.toLong(), PER_LIMIT,8 )
-                        MyPagesType.MIMI_VIDEO -> domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value,
+                        MyPagesType.FAVORITE_MIMI_VIDEO -> domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value,
                                 true, isShortVideo = false, offset = offset.toString(), limit = PER_LIMIT.toString())
-
-                        MyPagesType.SHORT_VIDEO -> domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value,
+                        MyPagesType.FAVORITE_SHORT_VIDEO -> domainManager.getApiRepository().getPlaylist(PlayListType.FAVORITE.value,
                                 true, isShortVideo = true, offset = offset.toString(), limit = PER_LIMIT.toString())
-
                         else -> domainManager.getApiRepository().getPostFavorite( offset.toLong(), PER_LIMIT, 7)
                     }
             if (!result.isSuccessful) throw HttpException(result)

@@ -9,31 +9,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CenterInside
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.PROJECT_NAME
-import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.decryptSource
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.model.db.MiMiDB
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.gson.Gson
@@ -45,8 +36,8 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
-import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
+import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
@@ -250,5 +241,40 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             }
         }
 
+    }
+
+    suspend fun changeFavoriteInDb(id: Long, type: MyPagesType) {
+        mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
+                val isFavorite = !memberPostItem.isFavorite
+                val dbItem = memberPostItem.apply {
+                    this.isFavorite = isFavorite
+                    this.favoriteCount = when (isFavorite) {
+                        true -> this.favoriteCount + 1
+                        else -> this.favoriteCount - 1
+                    }
+                }
+                mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+                val pageCode =
+                    MyPagesPostMediator::class.simpleName + type.toString()
+                if (!isFavorite) {
+                    mimiDB.postDBItemDao().deleteItemByPageCode(pageCode, id)
+                } else {
+                    mimiDB.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                    val timestamp =
+                        mimiDB.postDBItemDao().getFirstPostDBItem(pageCode)?.timestamp?.minus(1)
+                            ?: System.nanoTime()
+                    mimiDB.postDBItemDao().insertItem(
+                        PostDBItem(
+                            postDBId = id,
+                            postType = dbItem.type,
+                            pageCode = pageCode,
+                            timestamp = timestamp,
+                            index = 0
+                        )
+                    )
+                }
+            }
+        }
     }
 }

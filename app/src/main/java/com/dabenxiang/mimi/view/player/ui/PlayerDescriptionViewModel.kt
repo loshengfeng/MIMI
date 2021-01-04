@@ -103,7 +103,6 @@ class PlayerDescriptionViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _videoChangedResult.value = it
                     _favoriteResult.value = it
                 }
         }
@@ -142,7 +141,6 @@ class PlayerDescriptionViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _videoChangedResult.value = it
                     _likeResult.value = it
                 }
         }

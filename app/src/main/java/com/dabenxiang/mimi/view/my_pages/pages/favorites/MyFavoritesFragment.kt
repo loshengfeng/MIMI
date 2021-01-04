@@ -53,7 +53,6 @@ class MyFavoritesFragment(
 
     private val viewModel: MyFavoritesViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
-    private val accountManager: AccountManager by inject()
 
     private val adapter: PostItemAdapter by lazy {
         PostItemAdapter(requireActivity(), postListener, viewModel.viewModelScope)
@@ -73,8 +72,8 @@ class MyFavoritesFragment(
 
         viewModel.cleanResult.observe(this, {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Empty -> {
 //                    viewModel.getData(adapter, isLike)
                     adapter.refresh()
@@ -89,14 +88,14 @@ class MyFavoritesFragment(
 
     override fun setupObservers() {
         super.setupObservers()
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    adapter.notifyItemChanged(it.result)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
+//        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
+//            when (it) {
+//                is ApiResult.Success -> {
+//                    adapter.notifyItemChanged(it.result)
+//                }
+//                is ApiResult.Error -> onApiError(it.throwable)
+//            }
+//        })
     }
 
     override fun onResume() {
@@ -169,6 +168,10 @@ class MyFavoritesFragment(
             layout_refresh.isRefreshing = false
         })
 
+        viewModel.showProgress.observe(viewLifecycleOwner,{
+            layout_refresh.isRefreshing = it
+        })
+
         text_page_empty.text =
             if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
         img_page_empty.setImageDrawable(
@@ -235,7 +238,7 @@ class MyFavoritesFragment(
         ) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    checkStatus { viewModel.favoritePost(item, position, isFavorite, myPagesType) }
+                    checkStatus { viewModel.favoritePost(item, position, isFavorite) }
                 }
             })
 

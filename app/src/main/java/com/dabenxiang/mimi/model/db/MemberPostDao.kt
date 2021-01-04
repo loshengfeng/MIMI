@@ -31,6 +31,9 @@ interface PostDBItemDao {
     @Query("SELECT * FROM PostDBItems WHERE pageCode = :pageCode and postDBId = :postDBId limit 1")
     fun getPostDBItem(pageCode:String, postDBId:Long): PostDBItem?
 
+    @Query("SELECT * FROM PostDBItems WHERE pageCode = :pageCode limit 1")
+    fun getFirstPostDBItem(pageCode:String): PostDBItem?
+
     @Query("SELECT * FROM PostDBItems WHERE postDBId = :postDBId")
     fun getPostDBItems(postDBId:Long): List<PostDBItem>?
 
@@ -47,7 +50,7 @@ interface PostDBItemDao {
     fun getMemberPostItemByVideoId(videoId:Long): MemberPostItem?
 
     @Transaction
-    @Query("SELECT * FROM PostDBItems WHERE pageCode= :pageCode ORDER BY `index`")
+    @Query("SELECT * FROM PostDBItems WHERE pageCode= :pageCode ORDER BY timestamp")
     fun pagingSourceByPageCode(pageCode: String): PagingSource<Int, MemberPostWithPostDBItem>
 
     @Query("DELETE FROM PostDBItems WHERE pageCode = :pageCode")
