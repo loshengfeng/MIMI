@@ -117,8 +117,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-
+//        viewModel.viewModelScope.launch {
+        lifecycleScope.launchWhenResumed {
             viewModel.posts(type).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
@@ -160,7 +160,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
 
     }
-
 
     private fun loginPageToggle(isLogin: Boolean) {
         Timber.i("loginPageToggle= $isLogin")

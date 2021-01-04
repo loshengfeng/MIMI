@@ -154,7 +154,7 @@ class ClubTabFragment : BaseFragment() {
     ): View? {
         val view = inflater.inflate(getLayoutId(), container, false)
         view.club_view_pager.adapter = ClubTabAdapter(tabFragmentsCreators, childFragmentManager, lifecycle)
-        view.club_view_pager.offscreenPageLimit = 1
+//        view.club_view_pager.offscreenPageLimit = 1
         val tabs = resources.getStringArray(R.array.club_tabs)
         tabLayoutMediator = TabLayoutMediator(view.club_tabs,  view.club_view_pager) { tab, position ->
             val tabView = View.inflate(requireContext(), R.layout.custom_tab, null)

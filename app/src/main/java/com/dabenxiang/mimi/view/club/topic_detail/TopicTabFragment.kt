@@ -100,7 +100,7 @@ class TopicTabFragment : BaseFragment() {
                 childFragmentManager,
                 lifecycle
         )
-        view.view_pager.offscreenPageLimit = 1
+//        view.view_pager.offscreenPageLimit = 1
         val tabTitles = resources.getStringArray(R.array.club_hot_topic_tabs)
         tabLayoutMediator = TabLayoutMediator(view.tabs, view.view_pager) { tab, position ->
             tab.text = tabTitles[position]
