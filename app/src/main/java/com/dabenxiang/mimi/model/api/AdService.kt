@@ -31,7 +31,7 @@ interface AdService {
      *
      ***********************************************************/
     @Headers("Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzNDY0ODUxMTU5ODAwMDAwIiwidHQiOiIxIiwicnQiOiIwIiwidW5pcXVlX25hbWUiOiIzNzc1MjQ2MTU1OTM2NDMyMTI4Iiwic2NvcGUiOiIxMDAwMDAxIiwibmJmIjoxNTg3OTg2OTY3LCJleHAiOjE5MDMzNDY5NjcsImlzcyI6IlNpbGtyb2RlIiwiYXVkIjoiU2lsa3JvZGUifQ.eRnlQD8Ri8agJMuEanW1kq2ODCVRX1Xig5O9F4bg4qE")
-    @POST("/v1/Business/Statistics")
+    @POST("/statistics/v1/Business/Statistics")
     suspend fun statistics(@Body request: StatisticsRequest): Response<ApiBaseItem<Void>>
 
 }
