@@ -76,6 +76,7 @@ class MyFavoritesFragment(
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Empty -> {
 //                    viewModel.getData(adapter, isLike)
+                    timeout = 0
                     adapter.refresh()
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -84,18 +85,6 @@ class MyFavoritesFragment(
 
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
-    }
-
-    override fun setupObservers() {
-        super.setupObservers()
-//        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    adapter.notifyItemChanged(it.result)
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
     }
 
     override fun onResume() {
@@ -109,11 +98,7 @@ class MyFavoritesFragment(
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                if(adapter.snapshot().items.isEmpty() && timeout >0){
-                    layout_refresh?.isRefreshing = true
-                }else{
-                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
-                }
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
         }
 
@@ -132,7 +117,7 @@ class MyFavoritesFragment(
                 .filter { it.refresh is LoadState.NotLoading }
                 .onEach { delay(1000) }
                 .collect {
-                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
+                    if(adapter.snapshot().items.isEmpty() && timeout > 0) {
                         timeout--
                         adapter.refresh()
                     }
@@ -157,15 +142,21 @@ class MyFavoritesFragment(
         })
 
         viewModel.postCount.observe(viewLifecycleOwner, {
-            if (it == 0) {
-                id_empty_group.visibility = View.VISIBLE
-                recycler_view.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                recycler_view.visibility = View.VISIBLE
+            emptyPageToggle(it<=0)
+        })
+
+        viewModel.favoriteResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
+                    timeout = 0
+                    adapter.refresh()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
             }
-            myPagesViewModel.changeDataCount(tab, it)
-            layout_refresh.isRefreshing = false
+
         })
 
         viewModel.showProgress.observe(viewLifecycleOwner,{
@@ -179,6 +170,21 @@ class MyFavoritesFragment(
                 requireContext(), R.drawable.img_love_empty
             )
         )
+
+    }
+
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+            timeout = 0
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = getText(R.string.empty_post)
+            posts_list?.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            posts_list?.visibility = View.VISIBLE
+
+        }
+        layout_refresh.isRefreshing = false
 
     }
 

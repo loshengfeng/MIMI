@@ -88,6 +88,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
 
     private fun emptyPageToggle(isHide:Boolean){
         if (isHide) {
+            timeout = 0
             id_empty_group.visibility = View.VISIBLE
             text_page_empty.text = getText(R.string.empty_post)
             posts_list.visibility = View.INVISIBLE
