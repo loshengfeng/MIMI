@@ -31,13 +31,15 @@ import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
 import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.id_empty_group
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.img_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.layout_refresh
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.text_page_empty
 import kotlinx.android.synthetic.main.item_ad.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFragment() {
@@ -159,7 +161,11 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                if(adapter.snapshot().items.isEmpty() && timeout >0){
+                    layout_refresh?.isRefreshing = true
+                }else{
+                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                }
             }
         }
 
@@ -169,6 +175,21 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
             viewModel.posts(type).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
+                        timeout--
+                        adapter.refresh()
+                    }
+                }
         }
 
         return super.onCreateView(inflater, container, savedInstanceState)

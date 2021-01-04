@@ -35,15 +35,13 @@ import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MY_POST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import kotlinx.android.synthetic.main.fragment_club_item.*
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.fragment_my_post.*
 import kotlinx.android.synthetic.main.fragment_my_post.layout_refresh
 import kotlinx.android.synthetic.main.item_follow_no_data.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -100,7 +98,11 @@ class MyPostFragment : BaseFragment() {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                if(adapter.snapshot().items.isEmpty() && timeout >0){
+                    layout_refresh?.isRefreshing = true
+                }else{
+                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                }
             }
         }
 
@@ -110,6 +112,22 @@ class MyPostFragment : BaseFragment() {
                 adapter.submitData(it)
             }
         }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
+                        timeout--
+                        adapter.refresh()
+                    }
+                }
+        }
+
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }

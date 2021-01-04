@@ -126,7 +126,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 .filter { it.refresh is LoadState.NotLoading }
                 .onEach { delay(1000) }
                 .collect {
-                    if(adapter.snapshot().items.isEmpty()) {
+                    if(adapter.snapshot().items.isEmpty() && timeout >0) {
                         timeout--
                         adapter.refresh()
                     }
@@ -188,8 +188,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             else true
         )
         if (adapter.snapshot().items.isEmpty()) {
-            Timber.i("ClubItemFragment type onResume")
             adapter.refresh()
+        }else{
+            adapter.notifyDataSetChanged()
         }
     }
 
