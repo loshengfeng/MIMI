@@ -66,6 +66,10 @@ class MyFavoritesFragment(
             layout_refresh.isRefreshing = it
         })
 
+        myPagesViewModel.deleteAll.observe(this, {
+            viewModel.deleteFavorites(adapter.snapshot().items)
+        })
+
         viewModel.cleanResult.observe(this, {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
@@ -77,6 +81,20 @@ class MyFavoritesFragment(
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
+        })
+
+        viewModel.favoriteResult.observe(this, {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
+                    timeout = 0
+                    adapter.refresh()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+
         })
 
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
@@ -133,26 +151,8 @@ class MyFavoritesFragment(
             adapter.refresh()
         }
 
-        myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
-            viewModel.deleteFavorites(adapter.snapshot().items)
-        })
-
         viewModel.postCount.observe(viewLifecycleOwner, {
             emptyPageToggle(it<=0)
-        })
-
-        viewModel.favoriteResult.observe(viewLifecycleOwner, {
-            when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
-                is ApiResult.Success -> {
-                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
-                    timeout = 0
-                    adapter.refresh()
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-
         })
 
         viewModel.showProgress.observe(viewLifecycleOwner,{

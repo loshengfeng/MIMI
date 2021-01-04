@@ -61,83 +61,6 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         }
     }
 
-    private val listener = object : MyCollectionVideoListener {
-        override fun onMoreClick(item: PlayItem, position: Int) {
-
-        }
-
-        override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
-            checkStatus {
-                viewModel.videoLike(VideoItem(
-                        id = item.videoId?:0,
-                        favorite = item.favorite ?: false,
-                        favoriteCount = item.favoriteCount?:0,
-                        like = item.like,
-                        likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
-                        likeCount = item.likeCount?:0
-
-                ), LikeType.LIKE)
-            }
-        }
-
-        override fun onClipCommentClick(item: List<PlayItem>, position: Int) {
-
-        }
-
-        override fun onChipClick(type: VideoType, tag: String) {
-            Timber.d("onChipClick")
-            val bundle = SearchVideoFragment.createBundle(tag = tag, videoType = type)
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_searchVideoFragment,
-                            bundle
-                    )
-            )
-        }
-
-        override fun onItemClick(item: PlayItem, type: MyPagesType) {
-            if (this@MyCollectionMimiVideoFragment.type == MyPagesType.FAVORITE_MIMI_VIDEO) {
-                val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_to_playerV2Fragment,
-                        bundle
-                    ))
-            } else {
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_to_clipSingleFragment,
-                        ClipSingleFragment.createBundle(item)
-                    ))
-            }
-        }
-
-        override fun onCommentClick(item: PlayItem, type: MyPagesType) {
-            Timber.d("onCommentClick, item = ${item}")
-            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0), true)
-            navigateTo(
-                    NavigateItem.Destination(
-                            R.id.action_to_playerV2Fragment,
-                            bundle
-                    ))
-        }
-
-        override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyPagesType) {
-            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
-                override fun onClean() {
-                    checkStatus { viewModel.deleteVideoFavorite(type, item.videoId.toString()) }
-                }
-            })
-
-            dialog.setMsg(getString(R.string.follow_delete_favorite_message))
-            dialog.show(
-                        requireActivity().supportFragmentManager,
-                        CleanDialogFragment::class.java.simpleName
-                )
-
-        }
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
@@ -147,12 +70,78 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
             layout_refresh.isRefreshing = it
         }
 
-        viewModel.likePostResult.observe(this, Observer {
+        viewModel.likePostResult.observe(this) {
             when (it) {
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
-        })
+        }
 
+        myPagesViewModel.deleteAll.observe(this){
+            if(tab == it){
+                viewModel.deleteVideos(adapter.snapshot().items)
+            }
+        }
+
+        viewModel.cleanResult.observe(this) {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Empty -> {
+                    timeout = 0
+                    adapter.refresh()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+
+        }
+
+        viewModel.videoFavoriteResult.observe(this) {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
+                    timeout = 0
+                    adapter.refresh()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
+        viewModel.deleteFavoriteResult.observe(this) {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
+                    timeout = 0
+                    adapter.refresh()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        posts_list.adapter = adapter
+
+        viewModel.postCount.observe(viewLifecycleOwner) {
+            Timber.i("postCount= $it")
+            emptyPageToggle(it==0)
+            myPagesViewModel.changeDataCount(tab, it)
+            layout_refresh.isRefreshing = false
+        }
+
+
+        layout_refresh.setOnRefreshListener {
+            layout_refresh.isRefreshing = false
+            adapter.refresh()
+        }
+
+        img_page_empty.setImageDrawable(ContextCompat.getDrawable(requireContext(),
+            R.drawable.img_love_empty
+        ))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -193,36 +182,6 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        posts_list.adapter = adapter
-
-        viewModel.postCount.observe(viewLifecycleOwner) {
-            Timber.i("postCount= $it")
-
-            emptyPageToggle(it==0)
-            myPagesViewModel.changeDataCount(tab, it)
-            layout_refresh.isRefreshing = false
-        }
-
-        myPagesViewModel.deleteAll.observe(viewLifecycleOwner,  {
-            if(tab == it){
-                viewModel.deleteVideos(adapter.snapshot().items)
-            }
-        })
-
-
-        layout_refresh.setOnRefreshListener {
-            layout_refresh.isRefreshing = false
-            adapter.refresh()
-        }
-
-        img_page_empty.setImageDrawable(ContextCompat.getDrawable(requireContext(),
-                R.drawable.img_love_empty
-        ))
-    }
-
     override fun onResume() {
         super.onResume()
         if(adapter.snapshot().items.isEmpty()) adapter.refresh()
@@ -236,6 +195,83 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         } else {
             id_empty_group.visibility = View.GONE
             posts_list.visibility = View.VISIBLE
+
+        }
+    }
+
+    private val listener = object : MyCollectionVideoListener {
+        override fun onMoreClick(item: PlayItem, position: Int) {
+
+        }
+
+        override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
+            checkStatus {
+                viewModel.videoLike(VideoItem(
+                    id = item.videoId?:0,
+                    favorite = item.favorite ?: false,
+                    favoriteCount = item.favoriteCount?:0,
+                    like = item.like,
+                    likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
+                    likeCount = item.likeCount?:0
+
+                ), LikeType.LIKE)
+            }
+        }
+
+        override fun onClipCommentClick(item: List<PlayItem>, position: Int) {
+
+        }
+
+        override fun onChipClick(type: VideoType, tag: String) {
+            Timber.d("onChipClick")
+            val bundle = SearchVideoFragment.createBundle(tag = tag, videoType = type)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_searchVideoFragment,
+                    bundle
+                )
+            )
+        }
+
+        override fun onItemClick(item: PlayItem, type: MyPagesType) {
+            if (this@MyCollectionMimiVideoFragment.type == MyPagesType.FAVORITE_MIMI_VIDEO) {
+                val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_playerV2Fragment,
+                        bundle
+                    ))
+            } else {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_clipSingleFragment,
+                        ClipSingleFragment.createBundle(item)
+                    ))
+            }
+        }
+
+        override fun onCommentClick(item: PlayItem, type: MyPagesType) {
+            Timber.d("onCommentClick, item = ${item}")
+            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0), true)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_playerV2Fragment,
+                    bundle
+                ))
+        }
+
+        override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyPagesType) {
+            val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
+                override fun onClean() {
+                    checkStatus { viewModel.deleteVideoFavorite(type, item.videoId.toString()) }
+                }
+            })
+
+            dialog.setMsg(getString(R.string.follow_delete_favorite_message))
+            dialog.show(
+                requireActivity().supportFragmentManager,
+                CleanDialogFragment::class.java.simpleName
+            )
 
         }
     }
