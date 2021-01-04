@@ -33,6 +33,10 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -170,10 +174,10 @@ class MyFavoritesFragment(
             timeout = 0
             id_empty_group.visibility = View.VISIBLE
             text_page_empty.text = getText(R.string.empty_post)
-            posts_list?.visibility = View.INVISIBLE
+            recycler_view?.visibility = View.INVISIBLE
         } else {
             id_empty_group.visibility = View.GONE
-            posts_list?.visibility = View.VISIBLE
+            recycler_view?.visibility = View.VISIBLE
 
         }
         layout_refresh.isRefreshing = false
