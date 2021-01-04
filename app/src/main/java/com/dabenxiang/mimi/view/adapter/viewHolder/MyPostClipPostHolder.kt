@@ -54,6 +54,7 @@ class MyPostClipPostHolder(
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
     private val layoutClip: ConstraintLayout = itemView.layout_clip
     private val vSeparator: View = itemView.v_separator
+    private val ivAd:ImageView = itemView.iv_ad
 
     fun onBind(
             item: MemberPostItem,
@@ -73,7 +74,7 @@ class MyPostClipPostHolder(
         ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
         ivMore.setImageResource(R.drawable.btn_more_gray_n)
         vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
-
+        ivAd.visibility = if(item.adItem!=null)View.VISIBLE else View.GONE
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         item.title.let {

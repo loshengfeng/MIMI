@@ -241,4 +241,14 @@
         android:background="@color/color_black_1_05"
         app:layout_constraintTop_toBottomOf="@+id/iv_like" />
 
+    <ImageView
+        android:id="@+id/iv_ad"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/img_ad"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/v_separator" />
 </androidx.constraintlayout.widget.ConstraintLayout>

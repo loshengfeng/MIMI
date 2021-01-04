@@ -56,8 +56,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     }
 
     private val adapter: PostItemAdapter by lazy {
-       PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
+        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
     }
+
     override fun getLayoutId() = R.layout.fragment_club_item
 
     companion object {
@@ -69,10 +70,10 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
     }
 
-    private fun emptyPageToggle(isHide:Boolean){
+    private fun emptyPageToggle(isHide: Boolean) {
         if (isHide) {
-             id_empty_group.visibility = View.VISIBLE
-                    text_page_empty.text = when (type) {
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = when (type) {
                 ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
                 else -> getText(R.string.empty_post)
             }
@@ -88,7 +89,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        viewModel.getTopAd(viewModel.getAdCode(type)+"_top")
+        viewModel.getTopAd(viewModel.getAdCode(type) + "_top")
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
@@ -98,7 +99,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         viewModel.postCount.observe(this) {
             Timber.i("type=$type postCount= $it")
-            emptyPageToggle(it <=0)
+            emptyPageToggle(it <= 0)
         }
 
         viewModel.adResult.observe(this) {
@@ -107,7 +108,11 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         Timber.i("ClubItemFragment $type onCreateView")
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
@@ -119,9 +124,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
 
-            viewModel.posts(type).flowOn(Dispatchers.IO).collectLatest {
-                adapter.submitData(it)
-            }
+                viewModel.posts(type).flowOn(Dispatchers.IO).collectLatest {
+                    adapter.submitData(it)
+                }
         }
 
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -179,10 +184,9 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             if (type == ClubTabItemType.FOLLOW) accountManager.isLogin()
             else true
         )
-        if(adapter.snapshot().items.isEmpty()){
+        if (adapter.snapshot().items.isEmpty()) {
             adapter.refresh()
         }
-
     }
 
 
@@ -386,7 +390,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
     }
 
-    fun setAD(adImg: ImageView, adItem: AdItem){
+    fun setAD(adImg: ImageView, adItem: AdItem) {
         val options = RequestOptions()
             .priority(Priority.NORMAL)
             .error(R.drawable.img_ad)
@@ -398,5 +402,4 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             GeneralUtils.openWebView(requireContext(), adItem?.target ?: "")
         }
     }
-
 }
