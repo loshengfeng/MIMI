@@ -18,7 +18,23 @@ import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.item_clip_post.view.*
 import kotlinx.android.synthetic.main.item_text_post.view.*
+import kotlinx.android.synthetic.main.item_text_post.view.chip_group_tag
+import kotlinx.android.synthetic.main.item_text_post.view.img_avatar
+import kotlinx.android.synthetic.main.item_text_post.view.iv_ad
+import kotlinx.android.synthetic.main.item_text_post.view.iv_comment
+import kotlinx.android.synthetic.main.item_text_post.view.iv_favorite
+import kotlinx.android.synthetic.main.item_text_post.view.iv_like
+import kotlinx.android.synthetic.main.item_text_post.view.iv_more
+import kotlinx.android.synthetic.main.item_text_post.view.tv_comment_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_favorite_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_follow
+import kotlinx.android.synthetic.main.item_text_post.view.tv_like_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_name
+import kotlinx.android.synthetic.main.item_text_post.view.tv_time
+import kotlinx.android.synthetic.main.item_text_post.view.tv_title
+import kotlinx.android.synthetic.main.item_text_post.view.v_separator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -46,6 +62,7 @@ class MyPostTextPostHolder(
     private val textLayout: ConstraintLayout = itemView.layout_text
     private val ivFavorite: ImageView = itemView.iv_favorite
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
+    private val ivAd:ImageView = itemView.iv_ad
 
     fun onBind(
             item: MemberPostItem,
@@ -59,6 +76,8 @@ class MyPostTextPostHolder(
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = if (searchStr.isNotBlank()) getSpanString(tvTitle.context, item.title, searchStr) else item.title
+
+        ivAd.visibility = if(item.adItem!=null)View.VISIBLE else View.GONE
 
         try {
             val contentItem = Gson().fromJson(item.postContent, TextContentItem::class.java)

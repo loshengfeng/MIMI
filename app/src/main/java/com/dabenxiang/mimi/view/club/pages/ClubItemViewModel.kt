@@ -34,23 +34,21 @@ class ClubItemViewModel : ClubViewModel() {
             remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight,
                     type, getAdCode(type), pagingCallback)
     ) {
-        mimiDB.postDBItemDao().pagingSourceByPageCode( ClubItemMediator::class.simpleName+ type.toString())
-
-
-    }.flow.map { pagingData->
-        val adItems = (mimiDB.postDBItemDao().getPostDBItemsByTime(getAdCode(type)) as ArrayList<MemberPostWithPostDBItem>)
+        mimiDB.postDBItemDao()
+            .pagingSourceByPageCode(ClubItemMediator::class.simpleName + type.toString())
+    }.flow/*.map { pagingData ->
         pagingData.map {
             it
-        }.insertSeparators{ before, after->
-            if(before!=null && before.postDBItem.index >0 && before.postDBItem.index.rem(AD_GAP) == AD_GAP-1 ){
-                getAdItem(adItems, before)
-            }else {
+        }.insertSeparators { before, after ->
+            if (before != null && before.postDBItem.index.rem(AD_GAP) == AD_GAP - 1) {
+                getAdItem(arrayListOf(), before)
+            } else {
                 null
             }
         }
-    }
+    }*/
 
-   fun getAdCode(type: ClubTabItemType): String {
+    fun getAdCode(type: ClubTabItemType): String {
         return when (type) {
             ClubTabItemType.FOLLOW -> "subscribe"
             ClubTabItemType.HOTTEST -> "recommend"

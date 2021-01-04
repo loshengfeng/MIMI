@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 
-abstract class ClubViewModel : BaseViewModel(){
+abstract class ClubViewModel : BaseViewModel() {
 
     private val _postCount = MutableLiveData<Int>()
     val postCount: LiveData<Int> = _postCount
@@ -40,6 +40,8 @@ abstract class ClubViewModel : BaseViewModel(){
 
     private val _adResult = MutableLiveData<AdItem>()
     val adResult: LiveData<AdItem> = _adResult
+
+    private val adIndex = 0L
 
     fun followMember(
         item: MemberPostItem,
@@ -113,36 +115,38 @@ abstract class ClubViewModel : BaseViewModel(){
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
                     mimiDB.withTransaction {
-                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
-                            val item = memberPostItem.apply {
-                                this.isFavorite = isFavorite
-                                this.favoriteCount = when(isFavorite) {
-                                    true -> this.favoriteCount+1
-                                    else -> this.favoriteCount-1
+                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)
+                            ?.let { memberPostItem ->
+                                val item = memberPostItem.apply {
+                                    this.isFavorite = isFavorite
+                                    this.favoriteCount = when (isFavorite) {
+                                        true -> this.favoriteCount + 1
+                                        else -> this.favoriteCount - 1
+                                    }
                                 }
+                                mimiDB.postDBItemDao().insertMemberPostItem(item)
                             }
-                            mimiDB.postDBItemDao().insertMemberPostItem(item)
-                        }
                     }
 
-                 }
+                }
                 .collect { _favoriteResult.value = it }
         }
     }
 
     open fun likePost(
-            item: MemberPostItem,
-            position: Int,
-            isLike: Boolean) {
+        item: MemberPostItem,
+        position: Int,
+        isLike: Boolean
+    ) {
         viewModelScope.launch {
             Timber.i("likePost item=$item")
             flow {
                 val apiRepository = domainManager.getApiRepository()
 
                 val likeType: LikeType = when {
-                isLike -> LikeType.LIKE
-                else -> LikeType.DISLIKE
-            }
+                    isLike -> LikeType.LIKE
+                    else -> LikeType.DISLIKE
+                }
                 val request = LikeRequest(likeType)
                 val result = when {
                     isLike -> apiRepository.like(item.id, request)
@@ -158,26 +162,28 @@ abstract class ClubViewModel : BaseViewModel(){
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
                     mimiDB.withTransaction {
-                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
-                            val item = memberPostItem.apply {
-                                when {
-                                    isLike -> {
-                                        this.likeType = LikeType.LIKE
-                                        this.likeCount += 1
-                                    }
-                                    else-> {
-                                        this.likeType = LikeType.DISLIKE
-                                        this.likeCount -= 1
+                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)
+                            ?.let { memberPostItem ->
+                                val item = memberPostItem.apply {
+                                    when {
+                                        isLike -> {
+                                            this.likeType = LikeType.LIKE
+                                            this.likeCount += 1
+                                        }
+                                        else -> {
+                                            this.likeType = LikeType.DISLIKE
+                                            this.likeCount -= 1
+                                        }
                                     }
                                 }
+                                mimiDB.postDBItemDao().insertMemberPostItem(item)
                             }
-                            mimiDB.postDBItemDao().insertMemberPostItem(item)
-                        }
                     }
 
                 }
                 .collect {
-                    _likePostResult.value = it }
+                    _likePostResult.value = it
+                }
         }
     }
 
@@ -190,28 +196,29 @@ abstract class ClubViewModel : BaseViewModel(){
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(item))
             }
-                    .flowOn(Dispatchers.IO)
-                    .onStart { emit(ApiResult.loading()) }
-                    .onCompletion {
-                        mimiDB.withTransaction {
-                            mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion {
+                    mimiDB.withTransaction {
+                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)
+                            ?.let { memberPostItem ->
                                 val item = memberPostItem.apply {
                                     this.likeType = type
-                                    when(type) {
+                                    when (type) {
                                         LikeType.LIKE -> {
                                             this.likeCount += 1
                                         }
-                                        else-> {
+                                        else -> {
                                             this.likeCount -= 1
                                         }
                                     }
                                 }
                                 mimiDB.postDBItemDao().insertMemberPostItem(item)
                             }
-                        }
                     }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .collect { _videoLikeResult.value = it }
+                }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _videoLikeResult.value = it }
         }
     }
 
@@ -223,12 +230,12 @@ abstract class ClubViewModel : BaseViewModel(){
                 emit(adResult.body()?.content)
             }
                 .flowOn(Dispatchers.IO)
-                .collect { _adResult.value = it}
+                .collect { _adResult.value = it }
         }
 
     }
 
-    fun getTopAd(code:String) {
+    fun getTopAd(code: String) {
         viewModelScope.launch {
             flow {
                 val topAdItem =
@@ -247,24 +254,46 @@ abstract class ClubViewModel : BaseViewModel(){
         }
     }
 
-    fun getAdItem(adItems: ArrayList<MemberPostWithPostDBItem>, before: MemberPostWithPostDBItem): MemberPostWithPostDBItem? {
+    fun getAdItem(
+        adItems: ArrayList<MemberPostWithPostDBItem>,
+        before: MemberPostWithPostDBItem
+    ): MemberPostWithPostDBItem? {
         return if (adItems.isEmpty()) {
-            val adItem = MemberPostItem(id= (1..2147483647).random().toLong(),
+            val adItem = MemberPostItem(
+                id = (1..2147483647).random().toLong(),
                 type = PostType.AD, adItem = AdItem()
             )
 
             val postDBItem = PostDBItem(
-                id= adItem.id,
-                postDBId =  adItem.id,
+                id = adItem.id,
+                postDBId = adItem.id,
                 postType = PostType.AD,
-                timestamp = before.postDBItem.timestamp ,
+                timestamp = before.postDBItem.timestamp,
                 pageCode = before.postDBItem.pageCode,
-                index = before.postDBItem.index-1
+                index = before.postDBItem.index - 1
             )
             MemberPostWithPostDBItem(postDBItem, adItem)
 
-        }
-        else adItems.removeFirst()
+        } else adItems.removeFirst()
     }
 
+    suspend fun getAdItem(adCode: String, before: MemberPostWithPostDBItem): MemberPostWithPostDBItem {
+        val adItem = domainManager.getAdRepository().getAD(adCode, adWidth, adHeight)
+            .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+        val adId = (1..2147483647).random().toLong()
+        val memberPostItem = MemberPostItem(
+            id = adId,
+            type = PostType.AD,
+            adItem = adItem
+        )
+        val postDBItem = PostDBItem(
+            id = adId,
+            postDBId = adId,
+            postType = PostType.AD,
+            timestamp = System.nanoTime(),
+            pageCode = before.postDBItem.pageCode,
+            index = 0
+        )
+        return MemberPostWithPostDBItem(postDBItem, memberPostItem)
+    }
 }

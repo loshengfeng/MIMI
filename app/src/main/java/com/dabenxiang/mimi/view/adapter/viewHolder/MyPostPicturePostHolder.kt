@@ -24,7 +24,24 @@ import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.item_clip_post.view.*
 import kotlinx.android.synthetic.main.item_picture_post.view.*
+import kotlinx.android.synthetic.main.item_picture_post.view.chip_group_tag
+import kotlinx.android.synthetic.main.item_picture_post.view.img_avatar
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_ad
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_comment
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_favorite
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_like
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_more
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_comment_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_favorite_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_follow
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_like_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_name
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_time
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_title
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_title_more
+import kotlinx.android.synthetic.main.item_picture_post.view.v_separator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -56,6 +73,7 @@ class MyPostPicturePostHolder(
     private val vSeparator: View = itemView.v_separator
     private val ivFavorite: ImageView = itemView.iv_favorite
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
+    private val ivAd:ImageView = itemView.iv_ad
 
     fun onBind(
             item: MemberPostItem,
@@ -75,6 +93,7 @@ class MyPostPicturePostHolder(
         ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
         ivMore.setImageResource(R.drawable.btn_more_gray_n)
         vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
+        ivAd.visibility = if(item.adItem!=null)View.VISIBLE else View.GONE
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
