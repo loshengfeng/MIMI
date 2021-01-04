@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
@@ -14,7 +13,6 @@ import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
-import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
 import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -97,7 +95,7 @@ class MyCollectionMIMIVideoViewHolder(
                     item,
                     position,
                     item.favorite ?: false,
-                    MyPagesType.MIMI_VIDEO
+                    MyPagesType.FAVORITE_MIMI_VIDEO
             )
         }
         ivFavorite.setOnClickListener(onFavoriteClickListener)
@@ -115,14 +113,14 @@ class MyCollectionMIMIVideoViewHolder(
 
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
-            listener.onCommentClick(item, MyPagesType.MIMI_VIDEO)
+            listener.onCommentClick(item, MyPagesType.FAVORITE_MIMI_VIDEO)
         }
 
         ivComment.setOnClickListener(onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
-            listener.onItemClick(item, MyPagesType.MIMI_VIDEO)
+            listener.onItemClick(item, MyPagesType.FAVORITE_MIMI_VIDEO)
         }
 
     }

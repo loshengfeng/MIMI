@@ -3,20 +3,18 @@ package com.dabenxiang.mimi.view.player.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.dabenxiang.mimi.event.SingleLiveEvent
 import com.dabenxiang.mimi.extension.throttleFirst
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.ReportRequest
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class ClipPlayerDescriptionViewModel : BaseViewModel() {
 
@@ -66,6 +64,7 @@ class ClipPlayerDescriptionViewModel : BaseViewModel() {
                 item.isFavorite = !originFavorite
                 item.favoriteCount = if (originFavorite) originFavoriteCnt - 1
                 else originFavoriteCnt + 1
+                changeFavoriteInDb(item.id, MyPagesType.FAVORITE_POST)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
@@ -73,7 +72,6 @@ class ClipPlayerDescriptionViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     _favoriteResult.value = it
                 }
         }
@@ -103,6 +101,7 @@ class ClipPlayerDescriptionViewModel : BaseViewModel() {
                     if (type == LikeType.LIKE) item.likeCount -= 1
                     else item.dislikeCount -= 1
                 }
+                mimiDB.postDBItemDao().insertMemberPostItem(item)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
@@ -110,7 +109,6 @@ class ClipPlayerDescriptionViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     _likeResult.value = it
                 }
         }

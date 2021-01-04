@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -40,37 +41,6 @@ abstract class ClubViewModel : BaseViewModel() {
 
     private val _adResult = MutableLiveData<AdItem>()
     val adResult: LiveData<AdItem> = _adResult
-
-    private val adIndex = 0L
-
-    fun followMember(
-        item: MemberPostItem,
-        items: ArrayList<MemberPostItem>,
-        isFollow: Boolean,
-        update: (Boolean) -> Unit
-    ) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = when {
-                    isFollow -> apiRepository.followPost(item.creatorId)
-                    else -> apiRepository.cancelFollowPost(item.creatorId)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                items.forEach {
-                    if (it.creatorId == item.creatorId) {
-                        it.isFollow = isFollow
-                    }
-                }
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _followResult.value = it }
-        }
-    }
 
     fun followPost(items: ArrayList<MemberPostItem>, position: Int, isFollow: Boolean) {
         viewModelScope.launch {
@@ -98,7 +68,6 @@ abstract class ClubViewModel : BaseViewModel() {
         position: Int,
         isFavorite: Boolean
     ) {
-
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -107,28 +76,13 @@ abstract class ClubViewModel : BaseViewModel() {
                     else -> apiRepository.deleteFavorite(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                item.isFavorite = isFavorite
-                _postChangedResult.postValue(ApiResult.success(item))
+                changeFavoriteInDb(item.id, MyPagesType.FAVORITE_POST)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { setShowProgress(true) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion {
-                    mimiDB.withTransaction {
-                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)
-                            ?.let { memberPostItem ->
-                                val item = memberPostItem.apply {
-                                    this.isFavorite = isFavorite
-                                    this.favoriteCount = when (isFavorite) {
-                                        true -> this.favoriteCount + 1
-                                        else -> this.favoriteCount - 1
-                                    }
-                                }
-                                mimiDB.postDBItemDao().insertMemberPostItem(item)
-                            }
-                    }
-
-                }
+                .onCompletion { setShowProgress(false) }
                 .collect { _favoriteResult.value = it }
         }
     }
@@ -155,32 +109,31 @@ abstract class ClubViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 item.likeType = if (isLike) LikeType.LIKE else LikeType.DISLIKE
                 item.likeCount = item.likeCount
-                _postChangedResult.postValue(ApiResult.success(item))
+
+                mimiDB.withTransaction {
+                    mimiDB.postDBItemDao().getMemberPostItemById(item.id)
+                        ?.let { memberPostItem ->
+                            val dbItem = memberPostItem.apply {
+                                when {
+                                    isLike -> {
+                                        this.likeType = LikeType.LIKE
+                                        this.likeCount += 1
+                                    }
+                                    else -> {
+                                        this.likeType = LikeType.DISLIKE
+                                        this.likeCount -= 1
+                                    }
+                                }
+                            }
+                            mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+                        }
+                }
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { setShowProgress(true) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion {
-                    mimiDB.withTransaction {
-                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)
-                            ?.let { memberPostItem ->
-                                val item = memberPostItem.apply {
-                                    when {
-                                        isLike -> {
-                                            this.likeType = LikeType.LIKE
-                                            this.likeCount += 1
-                                        }
-                                        else -> {
-                                            this.likeType = LikeType.DISLIKE
-                                            this.likeCount -= 1
-                                        }
-                                    }
-                                }
-                                mimiDB.postDBItemDao().insertMemberPostItem(item)
-                            }
-                    }
-
-                }
+                .onCompletion { setShowProgress(false) }
                 .collect {
                     _likePostResult.value = it
                 }
@@ -194,29 +147,30 @@ abstract class ClubViewModel : BaseViewModel() {
                 val request = LikeRequest(type)
                 val result = apiRepository.like(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
+
+                mimiDB.withTransaction {
+                    mimiDB.postDBItemDao().getMemberPostItemById(item.id)
+                        ?.let { memberPostItem ->
+                            val dbItem = memberPostItem.apply {
+                                this.likeType = type
+                                when (type) {
+                                    LikeType.LIKE -> {
+                                        this.likeCount += 1
+                                    }
+                                    else -> {
+                                        this.likeCount -= 1
+                                    }
+                                }
+                            }
+                            mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+                        }
+                }
+
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
-                .onCompletion {
-                    mimiDB.withTransaction {
-                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)
-                            ?.let { memberPostItem ->
-                                val item = memberPostItem.apply {
-                                    this.likeType = type
-                                    when (type) {
-                                        LikeType.LIKE -> {
-                                            this.likeCount += 1
-                                        }
-                                        else -> {
-                                            this.likeCount -= 1
-                                        }
-                                    }
-                                }
-                                mimiDB.postDBItemDao().insertMemberPostItem(item)
-                            }
-                    }
-                }
+                .onCompletion {}
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _videoLikeResult.value = it }
         }

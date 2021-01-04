@@ -94,7 +94,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         }
 
         override fun onItemClick(item: PlayItem, type: MyPagesType) {
-            if (this@MyCollectionMimiVideoFragment.type == MyPagesType.MIMI_VIDEO) {
+            if (this@MyCollectionMimiVideoFragment.type == MyPagesType.FAVORITE_MIMI_VIDEO) {
                 val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
                 navigateTo(
                     NavigateItem.Destination(
@@ -123,7 +123,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyPagesType) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    checkStatus { viewModel.deleteMIMIVideoFavorite(type, item.videoId.toString()) }
+                    checkStatus { viewModel.deleteVideoFavorite(type, item.videoId.toString()) }
                 }
             })
 
@@ -147,8 +147,6 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
 
         viewModel.likePostResult.observe(this, Observer {
             when (it) {
-                is ApiResult.Success -> {
-                }
                 is ApiResult.Error -> Timber.e(it.throwable)
             }
         })

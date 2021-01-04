@@ -24,9 +24,9 @@ class MyCollectionFragment: BaseMyPagesTabFragment() {
     override val viewModel: MyPagesViewModel by viewModels()
 
     override val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(TAB_MiMI_VIDEO, MyPagesType.MIMI_VIDEO) },
-            TAB_SHORT_VIDEO to { MyCollectionMimiVideoFragment(TAB_SHORT_VIDEO, MyPagesType.SHORT_VIDEO) },
-            TAB_FAVORITES to {  MyFavoritesFragment(TAB_FAVORITES, MyPagesType.FAVORITES)  }
+            TAB_MiMI_VIDEO to { MyCollectionMimiVideoFragment(TAB_MiMI_VIDEO, MyPagesType.FAVORITE_MIMI_VIDEO) },
+            TAB_SHORT_VIDEO to { MyCollectionMimiVideoFragment(TAB_SHORT_VIDEO, MyPagesType.FAVORITE_SHORT_VIDEO) },
+            TAB_FAVORITES to { MyFavoritesFragment(TAB_FAVORITES, MyPagesType.FAVORITE_POST)  }
     )
 
     override fun setFragmentTitle() {
