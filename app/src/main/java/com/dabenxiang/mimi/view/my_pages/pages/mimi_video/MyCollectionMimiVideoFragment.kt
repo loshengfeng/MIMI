@@ -78,7 +78,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
 
         myPagesViewModel.deleteAll.observe(this){
             if(tab == it){
-                viewModel.deleteVideos(adapter.snapshot().items)
+                viewModel.deleteVideos(type, adapter.snapshot().items)
             }
         }
 
@@ -148,17 +148,12 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                if(adapter.snapshot().items.isEmpty() && timeout >0){
-                    layout_refresh?.isRefreshing = true
-                }else{
-                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
-                }
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-
             viewModel.posts(type).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
