@@ -65,16 +65,6 @@ class ClubPicDetailFragment : BaseFragment() {
 
     override fun setupObservers() {
 
-        viewModel.postChangedResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success<*> -> {
-                    it.result as MemberPostItem
-                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
-                }
-                is ApiResult.Error<*> -> onApiError(it.throwable)
-            }
-        })
-
         mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer{
             when (it) {
                 is ApiResult.Success -> {

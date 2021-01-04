@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
@@ -18,7 +17,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -34,15 +32,9 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class MyFavoritesFragment(

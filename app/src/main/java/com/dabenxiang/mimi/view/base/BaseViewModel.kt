@@ -243,7 +243,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     }
 
-    suspend fun changeFavoriteInDb(id: Long, type: MyPagesType) {
+    suspend fun changeFavoritePostInDb(id: Long){ changeFavoriteInDb(id, MyPagesType.FAVORITE_POST) }
+    suspend fun changeFavoriteMimiVideoInDb(id: Long){ changeFavoriteInDb(id, MyPagesType.FAVORITE_MIMI_VIDEO) }
+    suspend fun changeFavoriteSmallVideoInDb(id: Long){ changeFavoriteInDb(id, MyPagesType.FAVORITE_SHORT_VIDEO) }
+    private suspend fun changeFavoriteInDb(id: Long, type: MyPagesType) {
         mimiDB.withTransaction {
             mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
                 val isFavorite = !memberPostItem.isFavorite

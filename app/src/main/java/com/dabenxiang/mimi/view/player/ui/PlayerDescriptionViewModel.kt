@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.player.GuessLikeDataSource
 import com.dabenxiang.mimi.view.player.GuessLikeFactory
 import kotlinx.coroutines.Dispatchers
@@ -96,6 +97,7 @@ class PlayerDescriptionViewModel : BaseViewModel() {
                 item.favorite = !originFavorite
                 item.favoriteCount = if (originFavorite) originFavoriteCnt - 1
                 else originFavoriteCnt + 1
+                changeFavoriteMimiVideoInDb(item.id)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)

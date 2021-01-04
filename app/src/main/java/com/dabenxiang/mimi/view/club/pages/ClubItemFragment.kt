@@ -56,7 +56,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     }
 
     private val adapter: PostItemAdapter by lazy {
-        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
+        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope, 5)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item

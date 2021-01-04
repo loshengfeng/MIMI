@@ -157,8 +157,7 @@ class ClubItemMediator(
                             oldItem
                         }
                     }
-
-                    if (index % 5 == 4) item.adItem = getAdItem(adItems) else item.adItem = null
+                    item.adItem = getAdItem(adItems)
 
                     database.postDBItemDao().insertMemberPostItem(item)
                     database.postDBItemDao().insertItem(postItem)

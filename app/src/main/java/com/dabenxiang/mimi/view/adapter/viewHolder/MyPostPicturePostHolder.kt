@@ -8,6 +8,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
@@ -82,7 +85,7 @@ class MyPostPicturePostHolder(
             viewModelScope: CoroutineScope,
             searchStr: String = "",
             searchTag: String = "",
-
+            adGap:Int? = null
     ) {
         picturePostItemLayout.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(R.color.color_black_1))
@@ -93,7 +96,22 @@ class MyPostPicturePostHolder(
         ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
         ivMore.setImageResource(R.drawable.btn_more_gray_n)
         vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
-        ivAd.visibility = if(item.adItem!=null)View.VISIBLE else View.GONE
+        if (adGap != null && position % adGap == adGap - 1) {
+            ivAd.visibility = View.VISIBLE
+            val options = RequestOptions()
+                .priority(Priority.NORMAL)
+                .placeholder(R.drawable.img_ad)
+                .error(R.drawable.img_ad)
+            Glide.with(ivAd.context)
+                .load(item.adItem?.href)
+                .apply(options)
+                .into(ivAd)
+            ivAd.setOnClickListener {
+                GeneralUtils.openWebView(ivAd.context, item.adItem?.target ?: "")
+            }
+        } else {
+            ivAd.visibility = View.GONE
+        }
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())

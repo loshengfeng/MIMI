@@ -76,7 +76,7 @@ abstract class ClubViewModel : BaseViewModel() {
                     else -> apiRepository.deleteFavorite(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                changeFavoriteInDb(item.id, MyPagesType.FAVORITE_POST)
+                changeFavoritePostInDb(item.id)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
