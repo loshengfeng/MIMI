@@ -101,7 +101,7 @@ class ClipPlayerDescriptionViewModel : BaseViewModel() {
                     if (type == LikeType.LIKE) item.likeCount -= 1
                     else item.dislikeCount -= 1
                 }
-                mimiDB.postDBItemDao().insertMemberPostItem(item)
+                changeLikePostInDb(item.id, type)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)

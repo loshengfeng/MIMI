@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.*
@@ -21,22 +22,13 @@ import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 import timber.log.Timber
 
-class LikeMimiVideoViewModel : BaseViewModel() {
-
-    private val _postCount = MutableLiveData<Int>()
-    val postCount: LiveData<Int> = _postCount
+class LikeMimiVideoViewModel : ClubViewModel() {
 
     private val _deleteFavoriteResult = MutableLiveData<ApiResult<Boolean>>()
     val deleteFavoriteResult: LiveData<ApiResult<Boolean>> = _deleteFavoriteResult
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
-
-    private var _likeResult = MutableLiveData<ApiResult<VideoItem>>()
-    val likeResult: LiveData<ApiResult<VideoItem>> = _likeResult
-
-    private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
-    val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
     var totalCount: Int = 0
 
@@ -62,7 +54,6 @@ class LikeMimiVideoViewModel : BaseViewModel() {
         }
     }
 
-
     fun deleteMIMIVideoFavorite(videoId: String) {
         viewModelScope.launch {
             flow {
@@ -77,20 +68,14 @@ class LikeMimiVideoViewModel : BaseViewModel() {
         }
     }
 
-    private val pagingCallback = object : PagingCallback {
-        override fun onTotalCount(count: Long) {
-            _postCount.postValue(count.toInt())
-        }
-    }
-
-    fun favorite(item: PlayItem, position: Int, type:MyPagesType) {
+    fun favorite(item: PlayItem, position: Int, type:MyPagesType, isFavorite:Boolean) {
         viewModelScope.launch {
             flow {
                 val originFavorite = item.favorite ?: false
                 val originFavoriteCnt = item.favoriteCount ?: 0
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
-                    !originFavorite -> apiRepository.postMePlaylist(
+                    isFavorite -> apiRepository.postMePlaylist(
                         PlayListRequest(
                             item.videoId,
                             1
@@ -103,54 +88,17 @@ class LikeMimiVideoViewModel : BaseViewModel() {
                 item.favoriteCount =
                     if (originFavorite) originFavoriteCnt - 1
                     else originFavoriteCnt + 1
-                changeFavoriteMimiVideoInDb(item.videoId?:0)
+                when(type){
+                    MyPagesType.LIKE_MIMI -> changeFavoriteMimiVideoInDb(item.videoId?:0)
+                    MyPagesType.LIKE_SHORT_VIDEO -> changeFavoriteSmallVideoInDb(item.videoId?:0)
+                }
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion {emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
-        }
-    }
-
-    fun like(item: VideoItem, likeType: LikeType, type:MyPagesType) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val request = LikeRequest(likeType)
-                val result = apiRepository.like(item.id, request)
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(item))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .onCompletion {
-                    item.id?.let { id->
-                        mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem->
-                            val item = memberPostItem.apply {
-                                Timber.i("$type like item= $this")
-                                when(likeType) {
-                                    LikeType.LIKE -> {
-                                        this.likeType = LikeType.LIKE
-                                        this.likeCount += 1
-                                    }
-                                    else-> {
-                                        this.likeType = LikeType.DISLIKE
-                                        this.likeCount -= 1
-                                    }
-                                }
-                            }
-                            mimiDB.postDBItemDao().insertMemberPostItem(item)
-                            mimiDB.postDBItemDao().deleteItemByPageCode(
-                                    pageCode= MyPagesPostMediator::class.simpleName + type.toString(),
-                                    postDBId = memberPostItem.id
-                            )
-                        }
-                    }
-                }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likeResult.value = it }
+                .collect { }
         }
     }
 

@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
@@ -231,7 +232,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun clearDBData(){
+    fun clearDBData() {
         viewModelScope.launch {
             mimiDB.apply {
                 withTransaction {
@@ -243,9 +244,18 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     }
 
-    suspend fun changeFavoritePostInDb(id: Long){ changeFavoriteInDb(id, MyPagesType.FAVORITE_POST) }
-    suspend fun changeFavoriteMimiVideoInDb(id: Long){ changeFavoriteInDb(id, MyPagesType.FAVORITE_MIMI_VIDEO) }
-    suspend fun changeFavoriteSmallVideoInDb(id: Long){ changeFavoriteInDb(id, MyPagesType.FAVORITE_SHORT_VIDEO) }
+    suspend fun changeFavoritePostInDb(id: Long) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_POST)
+    }
+
+    suspend fun changeFavoriteMimiVideoInDb(id: Long) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_MIMI_VIDEO)
+    }
+
+    suspend fun changeFavoriteSmallVideoInDb(id: Long) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_SHORT_VIDEO)
+    }
+
     private suspend fun changeFavoriteInDb(id: Long, type: MyPagesType) {
         mimiDB.withTransaction {
             mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
@@ -276,6 +286,59 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                             index = 0
                         )
                     )
+                }
+            }
+        }
+    }
+
+    suspend fun changeLikePostInDb(id: Long, likeType: LikeType?) {
+        changeLikeInDb(id, MyPagesType.LIKE_POST, likeType)
+    }
+
+    suspend fun changeLikeMimiVideoInDb(id: Long, likeType: LikeType?) {
+        changeLikeInDb(id, MyPagesType.LIKE_MIMI, likeType)
+    }
+
+    suspend fun changeLikeSmallVideoInDb(id: Long, likeType: LikeType?) {
+        changeLikeInDb(id, MyPagesType.LIKE_SHORT_VIDEO, likeType)
+    }
+
+    private suspend fun changeLikeInDb(id: Long, type: MyPagesType, likeType: LikeType?) {
+        mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
+                val dbItem = memberPostItem.apply {
+                    this.likeType = likeType
+                    when (likeType) {
+                        LikeType.LIKE -> {
+                            this.likeCount += 1
+                        }
+                        else -> {
+                            this.likeCount -= 1
+                        }
+                    }
+                }
+                mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+
+                if (type == MyPagesType.LIKE_POST || type == MyPagesType.LIKE_MIMI) {
+                    val pageCode =
+                        MyPagesPostMediator::class.simpleName + type.toString()
+                    if (likeType != LikeType.LIKE) {
+                        mimiDB.postDBItemDao().deleteItemByPageCode(pageCode, id)
+                    } else {
+                        mimiDB.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                        val timestamp =
+                            mimiDB.postDBItemDao().getFirstPostDBItem(pageCode)?.timestamp?.minus(1)
+                                ?: System.nanoTime()
+                        mimiDB.postDBItemDao().insertItem(
+                            PostDBItem(
+                                postDBId = id,
+                                postType = dbItem.type,
+                                pageCode = pageCode,
+                                timestamp = timestamp,
+                                index = 0
+                            )
+                        )
+                    }
                 }
             }
         }

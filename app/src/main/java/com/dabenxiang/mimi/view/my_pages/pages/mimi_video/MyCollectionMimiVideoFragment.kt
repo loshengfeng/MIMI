@@ -73,10 +73,10 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
                         favorite = item.favorite ?: false,
                         favoriteCount = item.favoriteCount?:0,
                         like = item.like,
-                        likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
+                        likeType = item.likeType,
                         likeCount = item.likeCount?:0
 
-                ), LikeType.LIKE)
+                ), if(item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE, type)
             }
         }
 

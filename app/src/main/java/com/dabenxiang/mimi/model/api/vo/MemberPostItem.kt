@@ -141,6 +141,7 @@ data class MemberPostItem(
                 tags = tags,
                 like =  likeType?.value == 0,
                 cover = cover,
+            likeType = likeType
         )
     }
     }

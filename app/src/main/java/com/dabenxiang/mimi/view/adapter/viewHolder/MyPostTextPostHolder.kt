@@ -84,7 +84,7 @@ class MyPostTextPostHolder(
             ivAd.visibility = View.VISIBLE
             val options = RequestOptions()
                 .priority(Priority.NORMAL)
-                .placeholder(R.drawable.img_ad)
+                .placeholder(R.drawable.img_ad_df)
                 .error(R.drawable.img_ad)
             Glide.with(ivAd.context)
                 .load(item.adItem?.href)
