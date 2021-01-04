@@ -20,9 +20,10 @@ import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 class PostItemAdapter(
-        val context: Context,
-        private val myPostListener: MyPostListener,
-        private val viewModelScope: CoroutineScope
+    val context: Context,
+    private val myPostListener: MyPostListener,
+    private val viewModelScope: CoroutineScope,
+    private val adGap: Int? = null
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun getItemViewType(position: Int): Int {
@@ -39,32 +40,32 @@ class PostItemAdapter(
         return when (viewType) {
             VIEW_TYPE_AD -> {
                 AdHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_ad, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_ad, parent, false)
                 )
             }
             VIEW_TYPE_CLIP -> {
                 MyPostClipPostHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_clip_post, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_clip_post, parent, false)
                 )
             }
             VIEW_TYPE_PICTURE -> {
                 MyPostPicturePostHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_picture_post, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_picture_post, parent, false)
                 )
             }
             VIEW_TYPE_TEXT -> {
                 MyPostTextPostHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_text_post, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_text_post, parent, false)
                 )
             }
             else -> {
                 DeletedItemViewHolder(
-                        LayoutInflater.from(parent.context)
-                                .inflate(R.layout.item_deleted, parent, false)
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_deleted, parent, false)
                 )
             }
         }
@@ -78,7 +79,7 @@ class PostItemAdapter(
                 is AdHolder -> {
                     val options = RequestOptions()
                         .priority(Priority.NORMAL)
-                         .placeholder(R.drawable.img_ad)
+                        .placeholder(R.drawable.img_ad)
                         .error(R.drawable.img_ad)
                     Glide.with(context)
                         .load(item.adItem?.href)
@@ -92,26 +93,29 @@ class PostItemAdapter(
                 is MyPostPicturePostHolder -> {
                     holder.pictureRecycler.tag = position
                     holder.onBind(
-                            memberPostItem,
-                            position,
-                            myPostListener,
-                            viewModelScope
+                        memberPostItem,
+                        position,
+                        myPostListener,
+                        viewModelScope,
+                        adGap = adGap
                     )
                 }
                 is MyPostTextPostHolder -> {
                     holder.onBind(
-                            memberPostItem,
-                            position,
-                            myPostListener,
-                            viewModelScope
+                        memberPostItem,
+                        position,
+                        myPostListener,
+                        viewModelScope,
+                        adGap = adGap
                     )
                 }
                 is MyPostClipPostHolder -> {
                     holder.onBind(
-                            memberPostItem,
-                            position,
-                            myPostListener,
-                            viewModelScope
+                        memberPostItem,
+                        position,
+                        myPostListener,
+                        viewModelScope,
+                        adGap = adGap
                     )
                 }
             }

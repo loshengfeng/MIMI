@@ -103,35 +103,12 @@ class LikeMimiVideoViewModel : BaseViewModel() {
                 item.favoriteCount =
                     if (originFavorite) originFavoriteCnt - 1
                     else originFavoriteCnt + 1
-                _videoChangedResult.postValue(
-                    ApiResult.success(
-                        VideoItem(
-                            id = item.videoId?:0,
-                            favorite = item.favorite ?: false,
-                            favoriteCount = item.favoriteCount?:0,
-                            like = item.like,
-                            likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
-                            likeCount = item.likeCount?:0
-                        )
-                    )
-                )
+                changeFavoriteMimiVideoInDb(item.videoId?:0)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
-                .onCompletion {
-                    item.videoId?.let { videoId->
-                        mimiDB.postDBItemDao().getMemberPostItemByVideoId(videoId)?.let { memberPostItem->
-                            val item = memberPostItem.apply {
-                                Timber.i("$type favorite item= $this")
-                                this.isFavorite = false
-                                this.favoriteCount = this.favoriteCount-1
-                            }
-                            mimiDB.postDBItemDao().insertMemberPostItem(item)
-                        }
-                    }
-
-                }
+                .onCompletion {emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _favoriteResult.value = it }
         }

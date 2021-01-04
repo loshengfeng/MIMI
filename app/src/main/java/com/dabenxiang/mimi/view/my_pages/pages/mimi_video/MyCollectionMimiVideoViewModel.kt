@@ -62,7 +62,10 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                 val result = apiRepository.deleteMePlaylist(videoId)
                 Timber.i("$type deleteMIMIVideoFavorite result= $result")
                 if (!result.isSuccessful) throw HttpException(result)
-                changeFavoriteInDb(videoId.toLong(), type)
+                when(type){
+                    MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId.toLong())
+                    MyPagesType.FAVORITE_SHORT_VIDEO -> changeFavoriteSmallVideoInDb(videoId.toLong())
+                }
                 emit(ApiResult.success(result.isSuccessful))
             }
                 .flowOn(Dispatchers.IO)

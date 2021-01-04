@@ -102,6 +102,7 @@ class MyFavoritesFragment(
     override fun onResume() {
         super.onResume()
         if(adapter.snapshot().items.isEmpty()) adapter.refresh()
+        else adapter.notifyDataSetChanged()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

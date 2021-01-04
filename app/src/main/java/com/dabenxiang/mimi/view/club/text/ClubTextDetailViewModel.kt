@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
@@ -121,6 +122,7 @@ class ClubTextDetailViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 item.isFavorite = isFavorite
                 if (isFavorite) item.favoriteCount++ else item.favoriteCount--
+                changeFavoritePostInDb(item.id)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)

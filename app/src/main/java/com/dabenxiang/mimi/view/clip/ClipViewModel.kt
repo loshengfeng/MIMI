@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -147,8 +148,8 @@ class ClipViewModel : BaseViewModel() {
                 }
                 if (!resp.isSuccessful) throw HttpException(resp)
                 item.favorite = isFavorite
-                item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
-                _videoChangedResult.postValue(ApiResult.success(item))
+                item.favoriteCount = item.favoriteCount.let { if (isFavorite) it + 1 else it - 1 }
+                changeFavoriteSmallVideoInDb(item.id)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)

@@ -64,7 +64,7 @@ class ClipPlayerDescriptionViewModel : BaseViewModel() {
                 item.isFavorite = !originFavorite
                 item.favoriteCount = if (originFavorite) originFavoriteCnt - 1
                 else originFavoriteCnt + 1
-                changeFavoriteInDb(item.id, MyPagesType.FAVORITE_POST)
+                changeFavoritePostInDb(item.id)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
