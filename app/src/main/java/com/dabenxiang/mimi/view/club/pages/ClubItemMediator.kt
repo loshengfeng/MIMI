@@ -26,6 +26,7 @@ class ClubItemMediator(
     private val domainManager: DomainManager,
     private val adWidth: Int,
     private val adHeight: Int,
+    private val pageCode: String,
     private val type: ClubTabItemType,
     private val adCode: String,
     private val pagingCallback: PagingCallback,
@@ -36,7 +37,7 @@ class ClubItemMediator(
         const val AD_GAP: Int = 5
     }
 
-    private val pageCode = ClubItemMediator::class.simpleName + type.toString()
+
     private var adIndex = 0
 
     override suspend fun load(
@@ -139,6 +140,7 @@ class ClubItemMediator(
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
                 memberPostApiItems?.forEachIndexed { index, item ->
+                    if(type == ClubTabItemType.FOLLOW ) item.deducted = true
                     val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
 
                     val postItem = when (oldItem) {
@@ -179,7 +181,7 @@ class ClubItemMediator(
 //                }
             }
 
-            return MediatorResult.Success(endOfPaginationReached = hasNext)
+            return MediatorResult.Success(endOfPaginationReached = !hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {

@@ -8,6 +8,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_dialog_more.*
+import timber.log.Timber
 
 class MoreDialogFragment : BaseDialogFragment() {
 
@@ -56,6 +57,9 @@ class MoreDialogFragment : BaseDialogFragment() {
         } else {
             true
         }
+
+        Timber.i("isReported: $isReport")
+        Timber.i("deducted: $deducted")
 
         if (isFromPostPage) {
             if (!isLogin || isReport || !deducted) {

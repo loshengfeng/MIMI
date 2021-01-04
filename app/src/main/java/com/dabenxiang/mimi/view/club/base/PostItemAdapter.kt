@@ -6,17 +6,11 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-
-import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
-
-import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
@@ -29,11 +23,11 @@ class PostItemAdapter(
         val context: Context,
         private val myPostListener: MyPostListener,
         private val viewModelScope: CoroutineScope
-) : PagingDataAdapter<MemberPostWithPostDBItem, RecyclerView.ViewHolder>(diffCallback) {
+) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)?.postDBItem
-        return when (item?.postType) {
+        val item = getItem(position)
+        return when (item?.type) {
             PostType.VIDEO -> VIEW_TYPE_CLIP
             PostType.IMAGE -> VIEW_TYPE_PICTURE
             PostType.AD -> VIEW_TYPE_AD
@@ -77,8 +71,8 @@ class PostItemAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)?.memberPostItem
-        item?.also { memberPostItem->
+        val item = getItem(position)
+        item?.also { memberPostItem ->
             Timber.i("PostItemAdapter position=$position  holder=$holder")
             when (holder) {
                 is AdHolder -> {

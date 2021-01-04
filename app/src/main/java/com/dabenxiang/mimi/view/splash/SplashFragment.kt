@@ -51,6 +51,7 @@ class SplashFragment : BaseFragment() {
             )
         } else {
             firstTimeCheck()
+            viewModel.clearDBData()
             checkVersion()
         }
     }

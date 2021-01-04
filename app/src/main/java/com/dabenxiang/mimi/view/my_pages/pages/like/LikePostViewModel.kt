@@ -3,10 +3,7 @@ package com.dabenxiang.mimi.view.my_pages.pages.like
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -46,7 +43,9 @@ class LikePostViewModel : ClubViewModel() {
         mimiDB.postDBItemDao().pagingSourceByPageCode( MyPagesPostMediator::class.simpleName+ type.toString())
 
 
-    }.flow
+    }.flow.map {
+        it.map { it.memberPostItem }
+    }
 
     fun like(
             item: MemberPostItem,

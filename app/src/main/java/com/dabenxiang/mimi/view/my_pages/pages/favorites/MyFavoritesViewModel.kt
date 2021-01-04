@@ -3,19 +3,18 @@ package com.dabenxiang.mimi.view.my_pages.pages.favorites
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 class MyFavoritesViewModel : ClubViewModel() {
@@ -30,8 +29,8 @@ class MyFavoritesViewModel : ClubViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun posts(type: MyPagesType) = flowOf(
-        clearListCh.receiveAsFlow().map { PagingData.empty() },
-        postItems(type)
+            clearListCh.receiveAsFlow().map { PagingData.empty() },
+            postItems(type)
 
     ).flattenMerge(2).cachedIn(viewModelScope)
 
@@ -41,9 +40,11 @@ class MyFavoritesViewModel : ClubViewModel() {
     ) {
         mimiDB.postDBItemDao()
             .pagingSourceByPageCode(MyPagesPostMediator::class.simpleName + type.toString())
-
-
-    }.flow
+    }.flow.map {
+        it.map {
+            it.memberPostItem
+        }
+    }
 
     fun deleteFavorites(items: List<MemberPostItem>) {
         if (items.isEmpty()) return

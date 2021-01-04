@@ -67,6 +67,9 @@ interface PostDBItemDao {
 
     @Query("DELETE FROM PostDBItems")
     suspend fun deleteAll()
+
+    @Query("DELETE FROM MemberPostItems")
+    suspend fun deleteAllMemberPostItems()
 }
 
 

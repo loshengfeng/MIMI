@@ -1,27 +1,25 @@
 package com.dabenxiang.mimi.view.club.base
 
 import androidx.recyclerview.widget.DiffUtil
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 
 object PostDBDiffCallback{
-    val diffCallback = object : DiffUtil.ItemCallback<MemberPostWithPostDBItem>() {
+    val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
         override fun areItemsTheSame(
-                oldItem: MemberPostWithPostDBItem,
-                newItem: MemberPostWithPostDBItem
+            oldItem: MemberPostItem,
+            newItem: MemberPostItem
         ): Boolean {
-            return oldItem.postDBItem.id== newItem.postDBItem.id
+            return oldItem.id== newItem.id
         }
 
         override fun areContentsTheSame(
-                oldItem: MemberPostWithPostDBItem,
-                newItem: MemberPostWithPostDBItem
+                oldItem: MemberPostItem,
+                newItem: MemberPostItem
         ): Boolean {
             return oldItem == newItem
         }
 
-        override fun getChangePayload(oldItem: MemberPostWithPostDBItem, newItem: MemberPostWithPostDBItem): Any? {
-            return oldItem.copy(memberPostItem = newItem.memberPostItem) == newItem
-        }
     }
 }
 

@@ -70,25 +70,11 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         }
     }
 
-    private fun emptyPageToggle(isHide: Boolean) {
-        if (isHide) {
-            id_empty_group.visibility = View.VISIBLE
-            text_page_empty.text = when (type) {
-                ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
-                else -> getText(R.string.empty_post)
-            }
-            posts_list.visibility = View.INVISIBLE
-        } else {
-            id_empty_group.visibility = View.GONE
-            posts_list.visibility = View.VISIBLE
-
-        }
-        layout_refresh.isRefreshing = false
-
-    }
+    val pageCode = ClubItemMediator::class.simpleName + type.toString()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+
         viewModel.getTopAd(viewModel.getAdCode(type) + "_top")
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
@@ -117,15 +103,33 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                if(adapter.snapshot().items.isEmpty() && timeout >0){
+                    layout_refresh?.isRefreshing = true
+                }else{
+                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                }
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        lifecycleScope.launchWhenResumed {
+            viewModel.posts(pageCode, type).flowOn(Dispatchers.IO).collectLatest {
+                adapter.submitData(it)
             }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-
-                viewModel.posts(type).flowOn(Dispatchers.IO).collectLatest {
-                    adapter.submitData(it)
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if(adapter.snapshot().items.isEmpty()) {
+                        timeout--
+                        adapter.refresh()
+                    }
                 }
         }
 
@@ -166,7 +170,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     }
 
-
     private fun loginPageToggle(isLogin: Boolean) {
         Timber.i("loginPageToggle= $isLogin")
         if (isLogin) {
@@ -185,6 +188,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             else true
         )
         if (adapter.snapshot().items.isEmpty()) {
+            Timber.i("ClubItemFragment type onResume")
             adapter.refresh()
         }
     }
@@ -388,6 +392,23 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
                 )
             )
         }
+    }
+
+    private fun emptyPageToggle(isHide: Boolean) {
+        if (isHide) {
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = when (type) {
+                ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
+                else -> getText(R.string.empty_post)
+            }
+            posts_list.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            posts_list.visibility = View.VISIBLE
+
+        }
+        layout_refresh.isRefreshing = false
+
     }
 
     fun setAD(adImg: ImageView, adItem: AdItem) {

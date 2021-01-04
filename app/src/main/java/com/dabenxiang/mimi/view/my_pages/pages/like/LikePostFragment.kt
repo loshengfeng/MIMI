@@ -100,7 +100,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
         myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
             if (it == tab) {
                 layout_refresh.isRefreshing = false
-                viewModel.deleteAllLike(myPagesType, adapter.snapshot().items.map { it.memberPostItem })
+                viewModel.deleteAllLike(myPagesType, adapter.snapshot().items)
             }
         })
 

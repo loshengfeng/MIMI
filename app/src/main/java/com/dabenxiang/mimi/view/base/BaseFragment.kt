@@ -106,6 +106,7 @@ abstract class BaseFragment : Fragment() {
 
     private var postId: Long = 0
 
+    var timeout= 5
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.let { mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java) }

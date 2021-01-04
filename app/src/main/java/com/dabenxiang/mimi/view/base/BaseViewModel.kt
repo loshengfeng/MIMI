@@ -9,20 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CenterInside
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.PROJECT_NAME
-import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.decryptSource
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
@@ -37,7 +25,6 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.gson.Gson
@@ -49,8 +36,8 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
-import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
+import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
@@ -242,6 +229,18 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                     }
                 }
         }
+    }
+
+    fun clearDBData(){
+        viewModelScope.launch {
+            mimiDB.apply {
+                withTransaction {
+                    postDBItemDao().deleteAll()
+                    postDBItemDao().deleteAllMemberPostItems()
+                }
+            }
+        }
+
     }
 
     suspend fun changeFavoriteInDb(id: Long, type: MyPagesType) {
