@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
@@ -18,7 +17,6 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -35,15 +33,8 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
-import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class MyFavoritesFragment(
@@ -102,6 +93,7 @@ class MyFavoritesFragment(
     override fun onResume() {
         super.onResume()
         if(adapter.snapshot().items.isEmpty()) adapter.refresh()
+
         else adapter.notifyDataSetChanged()
     }
 
@@ -109,16 +101,34 @@ class MyFavoritesFragment(
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                if(adapter.snapshot().items.isEmpty() && timeout >0){
+                    layout_refresh?.isRefreshing = true
+                }else{
+                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                }
             }
         }
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-
             viewModel.posts(myPagesType).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
+                        timeout--
+                        adapter.refresh()
+                    }
+                }
         }
 
         return super.onCreateView(inflater, container, savedInstanceState)

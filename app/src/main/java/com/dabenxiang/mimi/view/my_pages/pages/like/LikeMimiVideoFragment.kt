@@ -34,11 +34,8 @@ import kotlinx.android.synthetic.main.fragment_my_collection_videos.id_empty_gro
 import kotlinx.android.synthetic.main.fragment_my_collection_videos.img_page_empty
 import kotlinx.android.synthetic.main.fragment_my_collection_videos.layout_refresh
 import kotlinx.android.synthetic.main.fragment_my_collection_videos.text_page_empty
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragment() {
@@ -146,7 +143,11 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                if(adapter.snapshot().items.isEmpty() && timeout >0){
+                    layout_refresh?.isRefreshing = true
+                }else{
+                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                }
             }
         }
 
@@ -155,6 +156,21 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
             viewModel.posts(myPagesType).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
+                        timeout--
+                        adapter.refresh()
+                    }
+                }
         }
 
         return super.onCreateView(inflater, container, savedInstanceState)

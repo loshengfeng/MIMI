@@ -127,7 +127,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
                 .filter { it.refresh is LoadState.NotLoading }
                 .onEach { delay(1000) }
                 .collect {
-                    if(adapter.snapshot().items.isEmpty()) {
+                    if(adapter.snapshot().items.isEmpty() && timeout >0) {
                         timeout--
                         adapter.refresh()
                     }
