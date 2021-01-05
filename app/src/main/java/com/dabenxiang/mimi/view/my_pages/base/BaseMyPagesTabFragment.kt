@@ -100,6 +100,9 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
                 viewModel.setDeleteNotify(it.selectedTabPosition)
             }
         }
+
+        override fun onCancel() {
+        }
     }
 
     open val onTabSelectedListener: TabLayout.OnTabSelectedListener? = null

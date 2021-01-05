@@ -91,7 +91,9 @@ class SearchPostMediator(
             val adItems = domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
                 .body()?.content?.get(0)?.ad ?: arrayListOf()
 
-            pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
+            if (loadType == LoadType.REFRESH) {
+                pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
+            }
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {

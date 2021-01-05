@@ -81,24 +81,6 @@ class SearchPostViewModel : BaseViewModel() {
         override fun onTotalCount(count: Long) {
             _searchTotalCount.postValue(count)
         }
-
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
-        override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-            setShowProgress(false)
-        }
-
-        override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
-            totalCount = if (isInitial) count.toInt()
-            else totalCount.plus(count.toInt())
-            if (isInitial) cleanRemovedPosList()
-        }
     }
 
     fun getSearchHistory(): ArrayList<String> {

@@ -162,7 +162,7 @@ class PostManager {
         return snackBar
     }
 
-    fun dismissSnackBar(snackBar: Snackbar, postId: Long, memberPostItem: MemberPostItem, viewModel: MainViewModel?, listener: SnackBarListener) {
+    fun dismissSnackBar(snackBar: Snackbar, listener: SnackBarListener) {
         val snackBarLayout: Snackbar.SnackbarLayout = snackBar.view as Snackbar.SnackbarLayout
         val progressBar =
             snackBarLayout.findViewById(R.id.contentLoadingProgressBar) as ContentLoadingProgressBar
@@ -188,20 +188,12 @@ class PostManager {
         imgPost.visibility = View.VISIBLE
         txtPost.visibility = View.VISIBLE
 
-        memberPostItem.id = postId
-
-        if (viewModel != null) {
-            memberPostItem.creatorId = viewModel.pref.profileItem.userId
-            memberPostItem.postFriendlyName = viewModel.pref.profileItem.friendlyName
-            memberPostItem.avatarAttachmentId = viewModel.pref.profileItem.avatarAttachmentId
-        }
-
         imgPost.setOnClickListener {
-            listener.onClick(memberPostItem)
+            listener.onClick()
         }
 
         txtPost.setOnClickListener {
-            listener.onClick(memberPostItem)
+            listener.onClick()
         }
 
         Handler().postDelayed({
@@ -246,7 +238,7 @@ class PostManager {
     }
 
     interface SnackBarListener {
-        fun onClick(memberPostItem: MemberPostItem)
+        fun onClick()
     }
 
     interface VideoCompressListener {

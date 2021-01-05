@@ -127,8 +127,6 @@ class TopicTabFragment : BaseFragment() {
                 }
             }
         }
-
-        viewModel.getMembersClub(topicItem.id)
     }
 
     private fun setupUI(item:MemberClubItem) {
@@ -161,6 +159,11 @@ class TopicTabFragment : BaseFragment() {
         }
 
         cl_no_data.visibility = GONE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getMembersClub(topicItem.id)
     }
 
     override fun onDestroy() {
