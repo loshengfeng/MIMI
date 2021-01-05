@@ -130,9 +130,13 @@ class ClubTextDetailFragment : BaseFragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter
-        viewModel.getPostDetail(memberPostItem!!)
         val adCode = arguments?.getString(KEY_AD_CODE)?:""
         mainViewModel?.getAd(adCode, adWidth, adHeight, 1)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getPostDetail(memberPostItem!!)
     }
 
     private val onTextDetailListener = object : ClubTextDetailAdapter.OnTextDetailListener {

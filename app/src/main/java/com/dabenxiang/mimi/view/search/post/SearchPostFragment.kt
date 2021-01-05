@@ -249,36 +249,22 @@ class SearchPostFragment : BaseFragment() {
             search(tag = tag)
             GeneralUtils.hideKeyboard(requireActivity())
             search_bar.clearFocus()
+
+            val searchPostItem = SearchPostItem(
+                searchType,
+                searchOrderBy,
+                tag,
+                searchText,
+            )
+
+            arguments?.putSerializable(KEY_DATA, searchPostItem)
         }
     }
 
     override fun setupFirstTime() {
-        (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
-            searchType = it.type
-            searchTag = it.tag
-            searchText = it.keyword
-            searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
-        }
-
         viewModel.adWidth =
             GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
-
-        if (!TextUtils.isEmpty(searchTag)) {
-            search_bar.setText(searchTag)
-            search(tag = searchTag)
-            search_bar.post {
-                search_bar.clearFocus()
-            }
-        } else {
-            layout_search_text.visibility = View.GONE
-            iv_clear_search_bar.visibility = View.GONE
-            getSearchHistory()
-            search_bar.post {
-                GeneralUtils.showKeyboard(search_bar.context)
-                search_bar.requestFocus()
-            }
-        }
 
         adapter.addLoadStateListener(loadStateListener)
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
@@ -344,12 +330,31 @@ class SearchPostFragment : BaseFragment() {
 
         tv_search.setOnClickListener {
             search(text = search_bar.text.toString())
+
+            val searchPostItem = SearchPostItem(
+                searchType,
+                searchOrderBy,
+                searchTag,
+                search_bar.text.toString(),
+            )
+
+            arguments?.putSerializable(KEY_DATA, searchPostItem)
         }
 
         search_bar.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {
                     search(text = search_bar.text.toString())
+
+                    val searchPostItem = SearchPostItem(
+                        searchType,
+                        searchOrderBy,
+                        searchTag,
+                        search_bar.text.toString(),
+                    )
+
+                    arguments?.putSerializable(KEY_DATA, searchPostItem)
+
                     true
                 }
                 else -> false
@@ -399,6 +404,36 @@ class SearchPostFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
+
+        (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
+            searchType = it.type
+            searchTag = it.tag
+            searchText = it.keyword
+            searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
+        }
+
+        if (!TextUtils.isEmpty(searchText)) {
+            search_bar.setText(searchText)
+            search(text = searchText)
+            search_bar.post {
+                search_bar.clearFocus()
+            }
+        } else if (!TextUtils.isEmpty(searchTag)) {
+            search_bar.setText(searchTag)
+            search(tag = searchTag)
+            search_bar.post {
+                search_bar.clearFocus()
+            }
+        } else {
+            layout_search_text.visibility = View.GONE
+            iv_clear_search_bar.visibility = View.GONE
+            getSearchHistory()
+            search_bar.post {
+                GeneralUtils.showKeyboard(search_bar.context)
+                search_bar.requestFocus()
+            }
+        }
+
         if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
             adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
             adapter.notifyDataSetChanged()
@@ -502,6 +537,15 @@ class SearchPostFragment : BaseFragment() {
                 search(text = text)
                 GeneralUtils.hideKeyboard(requireActivity())
                 search_bar.clearFocus()
+
+                val searchPostItem = SearchPostItem(
+                    searchType,
+                    searchOrderBy,
+                    searchTag,
+                    text,
+                )
+
+                arguments?.putSerializable(KEY_DATA, searchPostItem)
             }
             chip_group_search_text.addView(chip)
         }

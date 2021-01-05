@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.callback.PostVideoItemListener
 import com.dabenxiang.mimi.model.api.vo.MediaItem
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.api.vo.PostClubItem
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.PostVideoAttachment
@@ -120,6 +121,7 @@ class PostVideoFragment : BasePostFragment() {
         val title = edt_title.text.toString()
         var searchPostItem: SearchPostItem? = null
         var memberClubItem: MemberClubItem? =null
+        var memberPostItem: MemberPostItem? = null
 
         arguments?.let {
             isEdit = it.getBoolean(MyPostFragment.EDIT, false)
@@ -132,18 +134,19 @@ class PostVideoFragment : BasePostFragment() {
                     memberClubItem = data
                 }
             }
-        }
 
-        val request = getRequest(title, PostType.VIDEO.value)
+            if (it.containsKey(MyPostFragment.MEMBER_DATA)) {
+                memberPostItem = it.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
+            }
+        }
 
         setVideoTime()
 
+        val postClubItem = PostClubItem(type = PostType.VIDEO.value, title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList, memberPostItem = memberPostItem)
+
         val bundle = Bundle()
-        bundle.putBoolean(UPLOAD_VIDEO, true)
-        bundle.putParcelable(MEMBER_REQUEST, request)
-        bundle.putParcelableArrayList(VIDEO_DATA, videoAttachmentList)
-        bundle.putParcelableArrayList(DELETE_ATTACHMENT, deleteVideoList)
-        bundle.putLong(POST_ID, postId)
+        bundle.putSerializable(POST_DATA, postClubItem)
+
         if(isEdit){
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
@@ -181,8 +184,6 @@ class PostVideoFragment : BasePostFragment() {
 //            )
             findNavController().navigateUp()
         } else if (isEdit && page == TAB) {
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
 
         } else if (isEdit && page == FAVORITE) {
@@ -210,7 +211,7 @@ class PostVideoFragment : BasePostFragment() {
                 videoAttachmentId = item.videoParameter.id,
                 length = item.videoParameter.length,
                 picAttachmentId = item.picParameter[0].id,
-                ext = item.picParameter[0].ext
+                picExt = item.picParameter[0].ext
             )
             videoAttachmentList.add(postVideoAttachment)
 

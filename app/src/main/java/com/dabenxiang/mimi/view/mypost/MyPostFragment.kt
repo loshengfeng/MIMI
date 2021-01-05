@@ -86,9 +86,7 @@ class MyPostFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (adapter.snapshot().items.isEmpty()) {
-            getMyPost(userId)
-        }
+        getMyPost(userId)
     }
 
     override fun getLayoutId(): Int {

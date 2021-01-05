@@ -340,6 +340,7 @@ interface ApiService {
         @Query("q") q: String?,
         @Query("startTime") startTime: String? = null,
         @Query("endTime") endTime: String? = null,
+        @Query("isRandom") isRandom: Boolean? = true,
         @Query("orderByType") orderByType: Int?,
         @Query("offset") offset: String?,
         @Query("limit") limit: String?,
