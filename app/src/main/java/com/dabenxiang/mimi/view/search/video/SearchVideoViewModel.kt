@@ -134,6 +134,7 @@ class SearchVideoViewModel : BaseViewModel() {
     ) = clearResult()
         .flatMapConcat { postItems(keyword, tag, videoType) }.cachedIn(viewModelScope)
 
+    @OptIn(ExperimentalPagingApi::class)
     private fun postItems(
         keyword: String?,
         tag: String?,

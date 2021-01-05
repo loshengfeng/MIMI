@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
+import androidx.room.withTransaction
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
@@ -26,18 +27,24 @@ class MyFavoritesViewModel : ClubViewModel() {
     val deleteFavorites: LiveData<Int> = _deleteFavorites
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(type: MyPagesType) =  postItems(type).cachedIn(viewModelScope)
+    fun posts(pageCode:String, type: MyPagesType) =  postItems(pageCode, type).cachedIn(viewModelScope)
 
     @OptIn(ExperimentalPagingApi::class)
-    private fun postItems(type: MyPagesType) = Pager(
+    private fun postItems(pageCode:String, type: MyPagesType) = Pager(
         config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
-        remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pagingCallback)
+        remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pageCode, pagingCallback)
     ) {
         mimiDB.postDBItemDao()
-            .pagingSourceByPageCode(MyPagesPostMediator::class.simpleName + type.toString())
+            .pagingSourceByPageCode(pageCode)
     }.flow.map {
         it.map {
             it.memberPostItem
+        }
+    }
+
+    suspend fun checkoutItemsSize(pageCode:String):Int{
+        return mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getPostDBItems(pageCode)?.size ?: 0
         }
     }
 
@@ -50,6 +57,9 @@ class MyFavoritesViewModel : ClubViewModel() {
                         items.map { it.postId }.joinToString(separator = ",")
                     )
                 if (!result.isSuccessful) throw HttpException(result)
+                items.forEach {
+                    changeFavoritePostInDb(it.id)
+                }
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)

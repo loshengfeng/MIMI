@@ -35,6 +35,9 @@ interface PostDBItemDao {
     @Query("SELECT * FROM PostDBItems WHERE pageCode = :pageCode limit 1")
     fun getFirstPostDBItem(pageCode: String): PostDBItem?
 
+    @Query("SELECT * FROM PostDBItems WHERE pageCode = :pageCode")
+    fun getPostDBItems(pageCode: String): List<PostDBItem>?
+
     @Query("SELECT * FROM PostDBItems WHERE postDBId = :postDBId")
     fun getPostDBItems(postDBId: Long): List<PostDBItem>?
 

@@ -25,6 +25,7 @@ import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
@@ -54,6 +55,8 @@ class MyFavoritesFragment(
         PostItemAdapter(requireActivity(), postListener, viewModel.viewModelScope)
     }
 
+    val pageCode = MyPagesPostMediator::class.simpleName + myPagesType.toString()
+
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
@@ -76,8 +79,8 @@ class MyFavoritesFragment(
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Empty -> {
 //                    viewModel.getData(adapter, isLike)
-                    timeout = 0
-                    adapter.refresh()
+                    Timber.i("cleanResult items:${adapter.snapshot().items.isEmpty()}")
+                    emptyPageToggle(true)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -88,9 +91,12 @@ class MyFavoritesFragment(
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
-                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
-                    timeout = 0
-                    adapter.refresh()
+                    if(adapter.snapshot().items.size <=1) {
+                        viewModel.viewModelScope.launch {
+                            val dbSize=viewModel.checkoutItemsSize(pageCode)
+                            if(dbSize<=0) emptyPageToggle(true)
+                        }
+                    }
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -118,7 +124,7 @@ class MyFavoritesFragment(
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            viewModel.posts(myPagesType).flowOn(Dispatchers.IO).collectLatest {
+            viewModel.posts(pageCode, myPagesType).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
         }

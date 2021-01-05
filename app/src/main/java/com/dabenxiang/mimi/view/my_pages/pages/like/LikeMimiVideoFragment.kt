@@ -23,6 +23,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
@@ -45,6 +46,8 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
     private val adapter: LikeMimiVideoAdapter by lazy {
         LikeMimiVideoAdapter(requireContext(), viewModel.viewModelScope, listener, myPagesType)
     }
+
+    val pageCode = MyPagesPostMediator::class.simpleName + myPagesType.toString()
 
     override fun getLayoutId() = R.layout.fragment_my_collection_videos
 
@@ -157,7 +160,7 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            viewModel.posts(myPagesType).flowOn(Dispatchers.IO).collectLatest {
+            viewModel.posts(pageCode, myPagesType).flowOn(Dispatchers.IO).collectLatest {
                 adapter.submitData(it)
             }
         }

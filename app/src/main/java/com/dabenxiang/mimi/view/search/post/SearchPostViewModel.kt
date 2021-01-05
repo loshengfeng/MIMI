@@ -3,10 +3,7 @@ package com.dabenxiang.mimi.view.search.post
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
-import androidx.paging.map
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
@@ -70,6 +67,7 @@ class SearchPostViewModel : ClubViewModel() {
                 orderBy
             )
         }.cachedIn(viewModelScope)
+
 
     @OptIn(ExperimentalPagingApi::class)
     private fun postItems(

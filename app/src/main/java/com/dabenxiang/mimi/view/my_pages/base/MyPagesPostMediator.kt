@@ -23,13 +23,13 @@ class MyPagesPostMediator(
         private val database: MiMiDB,
         private val domainManager: DomainManager,
         private val myPagesType: MyPagesType,
+        private val pageCode:String,
         private val pagingCallback: PagingCallback,
 ) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
         const val PER_LIMIT = 10
     }
-    private val pageCode = MyPagesPostMediator::class.simpleName + myPagesType.toString()
 
     override suspend fun load(
             loadType: LoadType,

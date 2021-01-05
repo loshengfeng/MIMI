@@ -28,14 +28,14 @@ class LikePostViewModel : ClubViewModel() {
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(type: MyPagesType) = postItems(type).cachedIn(viewModelScope)
+    fun posts(pageCode:String, type: MyPagesType) = postItems(pageCode, type).cachedIn(viewModelScope)
 
     @OptIn(ExperimentalPagingApi::class)
-    private fun postItems(type: MyPagesType) = Pager(
+    private fun postItems(pageCode:String, type: MyPagesType) = Pager(
             config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
-            remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pagingCallback)
+            remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pageCode, pagingCallback)
     ) {
-        mimiDB.postDBItemDao().pagingSourceByPageCode( MyPagesPostMediator::class.simpleName+ type.toString())
+        mimiDB.postDBItemDao().pagingSourceByPageCode(pageCode)
 
 
     }.flow.map {
