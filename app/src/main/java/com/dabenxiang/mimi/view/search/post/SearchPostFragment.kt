@@ -270,6 +270,38 @@ class SearchPostFragment : BaseFragment() {
             GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
+        (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
+            searchType = it.type
+            searchTag = it.tag
+            searchText = it.keyword
+            searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
+        }
+
+        if (!TextUtils.isEmpty(searchText)) {
+            recycler_search_result.visibility = View.VISIBLE
+            search_bar.setText(searchText)
+            search(text = searchText)
+            search_bar.post {
+                search_bar.clearFocus()
+            }
+        } else if (!TextUtils.isEmpty(searchTag)) {
+            recycler_search_result.visibility = View.VISIBLE
+            search_bar.setText(searchTag)
+            search(tag = searchTag)
+            search_bar.post {
+                search_bar.clearFocus()
+            }
+        } else {
+            recycler_search_result.visibility = View.INVISIBLE
+            layout_search_text.visibility = View.GONE
+            iv_clear_search_bar.visibility = View.GONE
+            getSearchHistory()
+            search_bar.post {
+                GeneralUtils.showKeyboard(search_bar.context)
+                search_bar.requestFocus()
+            }
+        }
+
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
         recycler_search_result.adapter = ConcatAdapter(adTop, adapter/*.withMimiLoadStateFooter { adapter.retry() }*/)
 
@@ -304,67 +336,9 @@ class SearchPostFragment : BaseFragment() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
-            searchType = it.type
-            searchTag = it.tag
-            searchText = it.keyword
-            searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
-        }
-
-        if (!TextUtils.isEmpty(searchText)) {
-            recycler_search_result.visibility = View.VISIBLE
-            search_bar.setText(searchText)
-            search(text = searchText)
-            search_bar.post {
-                search_bar.clearFocus()
-            }
-        } else if (!TextUtils.isEmpty(searchTag)) {
-            recycler_search_result.visibility = View.VISIBLE
-            search_bar.setText(searchTag)
-            search(tag = searchTag)
-            search_bar.post {
-                search_bar.clearFocus()
-            }
-        } else {
-            recycler_search_result.visibility = View.INVISIBLE
-            layout_search_text.visibility = View.GONE
-            iv_clear_search_bar.visibility = View.GONE
-            getSearchHistory()
-            search_bar.post {
-                GeneralUtils.showKeyboard(search_bar.context)
-                search_bar.requestFocus()
-            }
-        }
-    }
-
     override fun setupObservers() {
         viewModel.searchTotalCount.observe(viewLifecycleOwner, { count ->
             if (search_bar.text.isNotBlank()) setSearchResultText(count)
-        })
-
-        viewModel.likePostResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result.let { position ->
-                        adapter.notifyItemChanged(position, UPDATE_LIKE)
-                    }
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
-        viewModel.favoriteResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result.let { position ->
-                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
-                    }
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
         })
 
         mainViewModel?.deletePostResult?.observe(this, {
@@ -441,7 +415,7 @@ class SearchPostFragment : BaseFragment() {
                 iv_clear_search_bar.visibility = View.GONE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
-                recycler_search_result.visibility = View.INVISIBLE
+                recycler_search_result?.visibility = View.INVISIBLE
             } else {
                 iv_clear_search_bar.visibility = View.VISIBLE
             }
@@ -481,7 +455,7 @@ class SearchPostFragment : BaseFragment() {
                     .flowOn(Dispatchers.IO)
                     .collectLatest {
                         adapter.submitData(it)
-                        recycler_search_result.visibility = View.VISIBLE
+                        recycler_search_result?.visibility = View.VISIBLE
                     }
             }
             PostType.TEXT_IMAGE_VIDEO,
@@ -498,7 +472,7 @@ class SearchPostFragment : BaseFragment() {
                     .flowOn(Dispatchers.IO)
                     .collectLatest {
                         adapter.submitData(it)
-                        recycler_search_result.visibility = View.VISIBLE
+                        recycler_search_result?.visibility = View.VISIBLE
                     }
             }
             else -> {
