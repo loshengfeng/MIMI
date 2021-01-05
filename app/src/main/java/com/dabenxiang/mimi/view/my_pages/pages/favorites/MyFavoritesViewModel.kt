@@ -25,14 +25,8 @@ class MyFavoritesViewModel : ClubViewModel() {
     private val _deleteFavorites = MutableLiveData<Int>()
     val deleteFavorites: LiveData<Int> = _deleteFavorites
 
-    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
-
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(type: MyPagesType) = flowOf(
-            clearListCh.receiveAsFlow().map { PagingData.empty() },
-            postItems(type)
-
-    ).flattenMerge(2).cachedIn(viewModelScope)
+    fun posts(type: MyPagesType) =  postItems(type).cachedIn(viewModelScope)
 
     private fun postItems(type: MyPagesType) = Pager(
         config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),

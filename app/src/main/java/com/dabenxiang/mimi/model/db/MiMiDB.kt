@@ -14,7 +14,7 @@ import java.util.*
         DBRemoteKey::class,
         PostDBItem::class,
         MemberPostItem::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(
@@ -36,8 +36,8 @@ abstract class MiMiDB : RoomDatabase() {
                 Room.databaseBuilder(context, MiMiDB::class.java, "mimi_posts.db")
 
             return databaseBuilder
-                .fallbackToDestructiveMigration()
-                .build()
+                 .addMigrations(MIGRATION_1_2)
+                 .build()
         }
     }
 

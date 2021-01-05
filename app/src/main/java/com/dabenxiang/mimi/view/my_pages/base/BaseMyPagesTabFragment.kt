@@ -102,6 +102,7 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
         }
 
         override fun onCancel() {
+
         }
     }
 
