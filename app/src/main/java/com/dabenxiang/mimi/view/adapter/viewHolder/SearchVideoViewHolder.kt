@@ -10,35 +10,42 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.FunctionType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import kotlinx.android.synthetic.main.head_video_info.view.*
+import kotlinx.android.synthetic.main.item_favorite_common.view.*
+import kotlinx.android.synthetic.main.item_favorite_normal.view.*
 
 class SearchVideoViewHolder(
     itemView: View,
 ) : BaseViewHolder(itemView) {
 
-    private val tvTitle = itemView.findViewById(R.id.tv_title) as TextView
-    private val tvDesc = itemView.findViewById(R.id.tv_desc) as TextView
-    private val ivPhoto = itemView.findViewById(R.id.iv_photo) as ImageView
-    private val tvLength = itemView.findViewById(R.id.tv_length) as TextView
-    private val reflowGroup = itemView.findViewById(R.id.reflow_group) as ChipGroup
-    private val tvFavorite = itemView.findViewById(R.id.tv_favorite) as TextView
-    private val tvLike = itemView.findViewById(R.id.tv_like) as TextView
-    private val tvMsg = itemView.findViewById(R.id.tv_msg) as TextView
-    private val tvShare = itemView.findViewById(R.id.tv_share) as TextView
-    private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
+    private val tvTitle = itemView.tv_title
+    private val tvDesc = itemView.tv_desc
+    private val ivPhoto = itemView.iv_photo
+    private val tvLength = itemView.tv_length
+    private val reflowGroup = itemView.reflow_group
+    private val tvFavorite = itemView.tv_favorite
+    private val tvLike = itemView.tv_like
+    private val tvMsg = itemView.tv_msg
+    private val tvShare = itemView.tv_share
+    private val tvMore = itemView.tv_more
+    private val ivAd:ImageView = itemView.iv_ad
 
     fun onBind(
-        item: VideoItem,
+        item: MemberPostItem,
+        position:Int,
         listener: SearchVideoAdapter.EventListener,
         searchStr: String = "",
-        searchTag: String = ""
+        searchTag: String = "",
+        adGap:Int? = null
     ) {
         ivPhoto.setOnClickListener { listener.onVideoClick(item) }
         tvTitle.setOnClickListener { listener.onVideoClick(item) }
@@ -69,10 +76,27 @@ class SearchVideoViewHolder(
         }
 
         tvDesc.run {
-            text = item.description
+            text = item.videoDescription
         }
 
-        listener.getDecryptSetting(item.source ?: "")?.takeIf { it.isImageDecrypt }
+        if (adGap != null && position % adGap == adGap - 1) {
+            ivAd.visibility = View.VISIBLE
+            val options = RequestOptions()
+                .priority(Priority.NORMAL)
+                .placeholder(R.drawable.img_ad_df)
+                .error(R.drawable.img_ad)
+            Glide.with(ivAd.context)
+                .load(item.adItem?.href)
+                .apply(options)
+                .into(ivAd)
+            ivAd.setOnClickListener {
+                GeneralUtils.openWebView(ivAd.context, item.adItem?.target ?: "")
+            }
+        } else {
+            ivAd.visibility = View.GONE
+        }
+
+        listener.getDecryptSetting(item.videoSource ?: "")?.takeIf { it.isImageDecrypt }
             ?.let { decryptSettingItem ->
                 listener.decryptCover(item.cover ?: "", decryptSettingItem) {
                     Glide.with(ivPhoto.context)
@@ -86,13 +110,11 @@ class SearchVideoViewHolder(
         // todo: no length data...
         tvLength.visibility = View.INVISIBLE
 
-        if (item.tags is String && item.tags.isNotEmpty()) {
-            setupChipGroup(item.tags.split(","), searchStr, searchTag, listener)
-        }
+        setupChipGroup(item.tags, searchStr, searchTag, listener)
 
         tvFavorite.run {
             text = item.favoriteCount.toString()
-            val resFavorite = when (item.favorite) {
+            val resFavorite = when (item.isFavorite) {
                 true -> R.drawable.btn_favorite_white_s
                 else -> R.drawable.btn_favorite_n
             }
@@ -124,8 +146,8 @@ class SearchVideoViewHolder(
 
         tvLike.run {
             text = item.likeCount.toString()
-            val res = when (item.like) {
-                true -> R.drawable.ico_nice_s
+            val res = when (item.likeType) {
+                LikeType.LIKE -> R.drawable.ico_nice_s
                 else -> R.drawable.ico_nice_gray
             }
             setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
@@ -205,21 +227,21 @@ class SearchVideoViewHolder(
     }
 
 
-    fun updateLike(item: VideoItem) {
+    fun updateLike(item: MemberPostItem) {
         tvLike.run {
             text = item.likeCount.toString()
-            val res = when (item.like) {
-                true -> R.drawable.ico_nice_s
+            val res = when (item.likeType) {
+                LikeType.LIKE -> R.drawable.ico_nice_s
                 else -> R.drawable.ico_nice_gray
             }
             setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
         }
     }
 
-    fun updateFavorite(item: VideoItem) {
+    fun updateFavorite(item: MemberPostItem) {
         tvFavorite.run {
             text = item.favoriteCount.toString()
-            val resFavorite = when (item.favorite) {
+            val resFavorite = when (item.isFavorite) {
                 true -> R.drawable.btn_favorite_white_s
                 else -> R.drawable.btn_favorite_n
             }

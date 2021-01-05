@@ -359,4 +359,13 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun cleanDb() {
+        viewModelScope.launch {
+            mimiDB.withTransaction {
+                mimiDB.postDBItemDao().deleteAll()
+                mimiDB.postDBItemDao().deleteAllMemberPostItems()
+                mimiDB.remoteKeyDao().deleteAll()
+            }
+        }
+    }
 }

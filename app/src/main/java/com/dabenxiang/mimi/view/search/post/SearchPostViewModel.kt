@@ -78,7 +78,7 @@ class SearchPostViewModel : ClubViewModel() {
         tag: String? = null,
         orderBy: StatisticsOrderType? = null
     ) = Pager(
-        config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
+        config = PagingConfig(pageSize = SearchPostMediator.PER_LIMIT),
         remoteMediator = SearchPostMediator(
             mimiDB,
             domainManager,

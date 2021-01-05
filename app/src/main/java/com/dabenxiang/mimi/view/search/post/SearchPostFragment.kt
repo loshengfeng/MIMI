@@ -37,8 +37,6 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_FAVORITE
-import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
@@ -370,6 +368,7 @@ class SearchPostFragment : BaseFragment() {
             GeneralUtils.hideKeyboard(requireActivity())
             GeneralUtils.showKeyboard(requireContext())
             search_bar.requestFocus()
+            recycler_search_result.visibility = View.INVISIBLE
         }
 
         iv_clear_history.setOnClickListener {
@@ -415,7 +414,7 @@ class SearchPostFragment : BaseFragment() {
                 iv_clear_search_bar.visibility = View.GONE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
-                recycler_search_result?.visibility = View.INVISIBLE
+                recycler_search_result.visibility = View.INVISIBLE
             } else {
                 iv_clear_search_bar.visibility = View.VISIBLE
             }
