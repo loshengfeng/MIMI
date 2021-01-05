@@ -192,6 +192,7 @@ class LoginFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
+                    viewModel.cleanDb()
                     Timber.i("loginResult $it")
                     progressHUD?.dismiss()
                     mainViewModel?.startMQTT()

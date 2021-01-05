@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.personal
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.room.withTransaction
 import com.dabenxiang.mimi.APK_NAME
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MeItem
@@ -137,7 +138,7 @@ class PersonalViewModel : BaseViewModel() {
                 emit(versionStatus)
             }.flowOn(Dispatchers.IO).collect {
                 Timber.i("checkVersion = $it")
-                _versionStatus.value =it
+                _versionStatus.value = it
             }
         }
     }
@@ -150,4 +151,5 @@ class PersonalViewModel : BaseViewModel() {
             }.flowOn(Dispatchers.IO).collect { Timber.d("Update!") }
         }
     }
+
 }

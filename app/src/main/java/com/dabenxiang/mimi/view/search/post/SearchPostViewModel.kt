@@ -3,81 +3,30 @@ package com.dabenxiang.mimi.view.search.post
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.dabenxiang.mimi.callback.SearchPagingCallback
-import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
-import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import com.dabenxiang.mimi.view.club.pages.ClubItemMediator
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
-class SearchPostViewModel : BaseViewModel() {
+class SearchPostViewModel : ClubViewModel() {
 
     private val _searchTotalCount = MutableLiveData<Long>()
     val searchTotalCount: LiveData<Long> = _searchTotalCount
 
-    private var _likePostResult = MutableLiveData<ApiResult<Int>>()
-    val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
-
-    private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
-    val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
-
-    fun favoritePost(
-        item: MemberPostItem,
-        position: Int,
-        isFavorite: Boolean
-    ) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = when {
-                    isFavorite -> apiRepository.addFavorite(item.id)
-                    else -> apiRepository.deleteFavorite(item.id)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
-        }
-    }
-
-    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val likeType = when {
-                    isLike -> LikeType.LIKE
-                    else -> LikeType.DISLIKE
-                }
-                val request = LikeRequest(likeType)
-                val result = when {
-                    isLike -> apiRepository.like(item.id, request)
-                    else -> apiRepository.deleteLike(item.id)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likePostResult.value = it }
-        }
-    }
-
     var totalCount: Int = 0
-    private val pagingCallback = object : SearchPagingCallback {
+    override val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
             _searchTotalCount.postValue(count)
         }
@@ -130,7 +79,7 @@ class SearchPostViewModel : BaseViewModel() {
         tag: String? = null,
         orderBy: StatisticsOrderType? = null
     ) = Pager(
-        config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
+        config = PagingConfig(pageSize = SearchPostMediator.PER_LIMIT),
         remoteMediator = SearchPostMediator(
             mimiDB,
             domainManager,

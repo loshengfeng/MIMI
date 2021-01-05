@@ -6,6 +6,7 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
+import timber.log.Timber
 import java.io.Serializable
 import java.lang.reflect.Type
 import java.util.*
@@ -77,12 +78,14 @@ data class VideoItem(
     val performers: String = "",
 
     var type: PostType? = null,
-    val adItem: AdItem? = null
+    var adItem: AdItem? = null
 ) : Serializable {
     fun toMemberPostItem(): MemberPostItem {
         val tags = when (tags) {
             is List<*> -> tags as ArrayList<String>
-            is String -> tags.split(",") as ArrayList
+            is String -> {
+                tags.split(",").toList() as ArrayList<String>
+            }
             else -> arrayListOf()
         }
         return MemberPostItem(
@@ -106,7 +109,8 @@ data class VideoItem(
             isFavorite = favorite,
             favoriteCount = favoriteCount,
             commentCount = commentCount,
-            tags = tags
+            tags = tags,
+            adItem = adItem
         )
     }
 }
