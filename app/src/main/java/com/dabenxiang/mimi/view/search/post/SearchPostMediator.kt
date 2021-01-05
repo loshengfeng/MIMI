@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.view.club.pages
+package com.dabenxiang.mimi.view.search.post
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -7,34 +7,34 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.db.*
-import com.dabenxiang.mimi.model.enums.ClubTabItemType
-import com.dabenxiang.mimi.model.enums.OrderBy
+import com.dabenxiang.mimi.model.db.DBRemoteKey
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
+import com.dabenxiang.mimi.model.db.MiMiDB
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.manager.DomainManager
-import com.google.gson.Gson
-import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
-import timber.log.Timber
 import java.io.IOException
 import kotlin.math.ceil
 
 @OptIn(ExperimentalPagingApi::class)
-class ClubItemMediator(
+class SearchPostMediator(
     private val database: MiMiDB,
     private val domainManager: DomainManager,
     private val adWidth: Int,
     private val adHeight: Int,
     private val pageCode: String,
-    private val type: ClubTabItemType,
-    private val adCode: String,
     private val pagingCallback: PagingCallback,
+    private val type: PostType?,
+    private val keyword: String?,
+    private val tag: String?,
+    private val orderBy: StatisticsOrderType?,
 ) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
-        const val PER_LIMIT = 5
-        const val AD_GAP: Int = 5
+        const val PER_LIMIT = 10
+        const val AD_GAP = 5
     }
 
     private var adIndex = 0
@@ -59,48 +59,21 @@ class ClubItemMediator(
                         return MediatorResult.Success(endOfPaginationReached = true)
                     }
                     remoteKey.offset
-
                 }
             }?.toInt() ?: 0
 
-            Timber.i("ClubItemMediator pageName=$pageCode offset=$offset")
-
-            val result =
-                when (type) {
-                    ClubTabItemType.FOLLOW -> {
-                        domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
-                    }
-                    ClubTabItemType.HOTTEST -> {
-                        domainManager.getApiRepository().getMembersPost(
-                            PostType.TEXT_IMAGE_VIDEO,
-                            OrderBy.HOTTEST,
-                            offset,
-                            PER_LIMIT
-                        )
-                    }
-                    ClubTabItemType.LATEST -> {
-                        domainManager.getApiRepository().getMembersPost(
-                            PostType.TEXT_IMAGE_VIDEO,
-                            OrderBy.NEWEST,
-                            offset,
-                            PER_LIMIT
-                        )
-                    }
-                    ClubTabItemType.SHORT_VIDEO -> {
-                        domainManager.getApiRepository()
-                            .getMembersPost(PostType.VIDEO, OrderBy.NEWEST, offset, PER_LIMIT)
-                    }
-                    ClubTabItemType.PICTURE -> {
-                        domainManager.getApiRepository().getMembersPost(
-                            PostType.IMAGE, OrderBy.NEWEST,
-                            offset, PER_LIMIT
-                        )
-                    }
-                    ClubTabItemType.NOVEL -> {
-                        domainManager.getApiRepository()
-                            .getMembersPost(PostType.TEXT, OrderBy.NEWEST, offset, PER_LIMIT)
-                    }
-                }
+            val result = if (pageCode.contains("FOLLOW")) {
+                domainManager.getApiRepository().searchPostFollow(
+                    keyword, tag,
+                    offset,
+                    PER_LIMIT
+                )
+            } else {
+                domainManager.getApiRepository().searchPostAll(
+                    type!!, keyword, tag, orderBy!!, offset,
+                    PER_LIMIT
+                )
+            }
 
             if (!result.isSuccessful) throw HttpException(result)
 
@@ -113,10 +86,10 @@ class ClubItemMediator(
                 memberPostApiItems?.size ?: 0
             )
 
-            val adCount = ceil((memberPostApiItems?.size ?: 0).toFloat() / AD_GAP).toInt()
-            val adItems = domainManager.getAdRepository().getAD(adCode, adWidth, adHeight, adCount)
+            val adCount =
+                ceil((memberPostApiItems?.size ?: 0).toFloat() / AD_GAP).toInt()
+            val adItems = domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
                 .body()?.content?.get(0)?.ad ?: arrayListOf()
-            Timber.i("adItems = $adItems ")
 
             pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
 
@@ -129,20 +102,18 @@ class ClubItemMediator(
 
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
-                memberPostApiItems?.map { item->
-                    if(type == ClubTabItemType.FOLLOW ) item.deducted = true
+                memberPostApiItems?.map { item ->
                     item.adItem = getAdItem(adItems)
                     item
                 }?.let {
                     val postDBItems = it.mapIndexed { index, item ->
-                        val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
-                        when (oldItem) {
+                        when (val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)) {
                             null -> PostDBItem(
-                                    postDBId = item.id,
-                                    postType = item.type,
-                                    pageCode = pageCode,
-                                    timestamp = System.nanoTime(),
-                                    index = offset + index
+                                postDBId = item.id,
+                                postType = item.type,
+                                pageCode = pageCode,
+                                timestamp = System.nanoTime(),
+                                index = offset + index
                             )
                             else -> {
                                 oldItem.timestamp = System.nanoTime()
@@ -150,14 +121,10 @@ class ClubItemMediator(
                                 oldItem
                             }
                         }
-//
                     }
-
                     database.postDBItemDao().insertMemberPostItemAll(it)
                     database.postDBItemDao().insertAll(postDBItems)
-
                 }
-
             }
 
             return MediatorResult.Success(endOfPaginationReached = !hasNext)

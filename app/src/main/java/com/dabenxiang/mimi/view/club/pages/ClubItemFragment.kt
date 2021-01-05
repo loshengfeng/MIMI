@@ -88,7 +88,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             emptyPageToggle(it <= 0)
         }
 
-        viewModel.adResult.observe(this) {
+        viewModel.topAdResult.observe(this) {
             adTop.adItem = it
             adTop.notifyDataSetChanged()
         }

@@ -39,9 +39,6 @@ abstract class ClubViewModel : BaseViewModel() {
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
-    private val _adResult = MutableLiveData<AdItem>()
-    val adResult: LiveData<AdItem> = _adResult
-
     fun followPost(items: ArrayList<MemberPostItem>, position: Int, isFollow: Boolean) {
         viewModelScope.launch {
             flow {
@@ -145,78 +142,9 @@ abstract class ClubViewModel : BaseViewModel() {
         }
     }
 
-    fun getAd() {
-        viewModelScope.launch {
-            flow {
-                val adResult = domainManager.getAdRepository().getAD(adWidth, adHeight)
-                if (!adResult.isSuccessful) throw HttpException(adResult)
-                emit(adResult.body()?.content)
-            }
-                .flowOn(Dispatchers.IO)
-                .collect { _adResult.value = it }
-        }
-
-    }
-
-    fun getTopAd(code: String) {
-        viewModelScope.launch {
-            flow {
-                val topAdItem =
-                    domainManager.getAdRepository().getAD(code, adWidth, adHeight)
-                        .body()?.content?.get(0)?.ad?.first() ?: AdItem()
-                emit(topAdItem)
-            }
-                .flowOn(Dispatchers.IO)
-                .collect { _adResult.value = it }
-        }
-    }
-
     open val pagingCallback = object : PagingCallback {
         override fun onTotalCount(count: Long) {
             _postCount.postValue(count.toInt())
         }
-    }
-
-    fun getAdItem(
-        adItems: ArrayList<MemberPostWithPostDBItem>,
-        before: MemberPostWithPostDBItem
-    ): MemberPostWithPostDBItem? {
-        return if (adItems.isEmpty()) {
-            val adItem = MemberPostItem(
-                id = (1..2147483647).random().toLong(),
-                type = PostType.AD, adItem = AdItem()
-            )
-
-            val postDBItem = PostDBItem(
-                id = adItem.id,
-                postDBId = adItem.id,
-                postType = PostType.AD,
-                timestamp = before.postDBItem.timestamp,
-                pageCode = before.postDBItem.pageCode,
-                index = before.postDBItem.index - 1
-            )
-            MemberPostWithPostDBItem(postDBItem, adItem)
-
-        } else adItems.removeFirst()
-    }
-
-    suspend fun getAdItem(adCode: String, before: MemberPostWithPostDBItem): MemberPostWithPostDBItem {
-        val adItem = domainManager.getAdRepository().getAD(adCode, adWidth, adHeight)
-            .body()?.content?.get(0)?.ad?.first() ?: AdItem()
-        val adId = (1..2147483647).random().toLong()
-        val memberPostItem = MemberPostItem(
-            id = adId,
-            type = PostType.AD,
-            adItem = adItem
-        )
-        val postDBItem = PostDBItem(
-            id = adId,
-            postDBId = adId,
-            postType = PostType.AD,
-            timestamp = System.nanoTime(),
-            pageCode = before.postDBItem.pageCode,
-            index = 0
-        )
-        return MemberPostWithPostDBItem(postDBItem, memberPostItem)
     }
 }

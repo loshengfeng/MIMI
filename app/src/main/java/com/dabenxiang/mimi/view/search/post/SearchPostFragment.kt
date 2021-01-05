@@ -12,11 +12,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import androidx.paging.PagingData
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
@@ -29,12 +29,12 @@ import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
-import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_FAVORITE
@@ -42,9 +42,8 @@ import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_L
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class SearchPostFragment : BaseFragment() {
 
@@ -63,6 +62,10 @@ class SearchPostFragment : BaseFragment() {
         get() = View.GONE
 
     override fun getLayoutId() = R.layout.fragment_search_post
+
+    private val adTop: AdHeaderAdapter by lazy {
+        AdHeaderAdapter(requireContext())
+    }
 
     private var searchType: PostType = PostType.TEXT_IMAGE_VIDEO
     private var searchTag: String? = null
@@ -173,15 +176,16 @@ class SearchPostFragment : BaseFragment() {
             onMoreClick(item, position) {
                 it as MemberPostItem
 
-                val searchPostItem = SearchPostItem(searchType, searchOrderBy, searchTag, searchKeyword)
+                val searchPostItem =
+                    SearchPostItem(searchType, searchOrderBy, searchTag, searchKeyword)
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
                 bundle.putString(BasePostFragment.PAGE, BasePostFragment.SEARCH)
-                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                bundle.putSerializable(MEMBER_DATA, item)
                 bundle.putSerializable(KEY_DATA, searchPostItem)
 
-                when(it.type) {
+                when (it.type) {
                     PostType.TEXT -> {
                         findNavController().navigate(
                             R.id.action_searchPostFragment_to_postArticleFragment,
@@ -265,12 +269,14 @@ class SearchPostFragment : BaseFragment() {
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         if (!TextUtils.isEmpty(searchTag)) {
+            recycler_search_result.visibility = View.VISIBLE
             search_bar.setText(searchTag)
             search(tag = searchTag)
             search_bar.post {
                 search_bar.clearFocus()
             }
         } else {
+            recycler_search_result.visibility = View.INVISIBLE
             layout_search_text.visibility = View.GONE
             iv_clear_search_bar.visibility = View.GONE
             getSearchHistory()
@@ -280,14 +286,43 @@ class SearchPostFragment : BaseFragment() {
             }
         }
 
-        adapter.addLoadStateListener(loadStateListener)
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
-        recycler_search_result.adapter = adapter.withMimiLoadStateFooter { adapter.retry() }
+        recycler_search_result.adapter = ConcatAdapter(adTop, adapter/*.withMimiLoadStateFooter { adapter.retry() }*/)
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                when (loadStates.refresh) {
+                    is LoadState.NotLoading -> progressHUD.dismiss()
+                    is LoadState.Error -> {
+                        progressHUD.dismiss()
+                        onApiError((loadStates.refresh as LoadState.Error).error)
+                    }
+                    else -> progressHUD.show()
+                }
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if (adapter.snapshot().items.isEmpty() && timeout > 0) {
+                        timeout--
+                        adapter.refresh()
+                    }
+                }
+        }
+
     }
 
     override fun setupObservers() {
         viewModel.searchTotalCount.observe(viewLifecycleOwner, { count ->
-            if(search_bar.text.isNotBlank()) setSearchResultText(count)
+            if (search_bar.text.isNotBlank()) setSearchResultText(count)
         })
 
         viewModel.likePostResult.observe(this, {
@@ -322,6 +357,12 @@ class SearchPostFragment : BaseFragment() {
             }
         })
 
+        viewModel.topAdResult.observe(this) {
+            adTop.adItem = it
+            adTop.notifyDataSetChanged()
+        }
+
+        viewModel.getTopAd("search_top")
     }
 
     override fun setupListeners() {
@@ -361,47 +402,10 @@ class SearchPostFragment : BaseFragment() {
                 iv_clear_search_bar.visibility = View.GONE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
-                lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
+                recycler_search_result.visibility = View.INVISIBLE
             } else {
                 iv_clear_search_bar.visibility = View.VISIBLE
             }
-        }
-    }
-
-    private val loadStateListener = { loadStatus: CombinedLoadStates ->
-        when (loadStatus.refresh) {
-            is LoadState.Error -> {
-                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
-                progressHUD.dismiss()
-                onApiError((loadStatus.refresh as LoadState.Error).error)
-            }
-            is LoadState.Loading -> {
-                progressHUD.show()
-            }
-            is LoadState.NotLoading -> {
-                progressHUD.dismiss()
-            }
-        }
-
-        when (loadStatus.append) {
-            is LoadState.Error -> {
-                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
-                onApiError((loadStatus.refresh as LoadState.Error).error)
-            }
-            is LoadState.Loading -> {
-                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
-            }
-            is LoadState.NotLoading -> {
-                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
-            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
-            adapter.notifyDataSetChanged()
         }
     }
 
@@ -429,14 +433,39 @@ class SearchPostFragment : BaseFragment() {
         }
 
         when (searchType) {
-            PostType.FOLLOWED -> searchPostFollow(text, tag)
+            PostType.FOLLOWED -> lifecycleScope.launch {
+                viewModel.posts(
+                    pageCode = SearchPostFragment::class.simpleName + "FOLLOW",
+                    keyword = text,
+                    tag = tag
+                )
+                    .flowOn(Dispatchers.IO)
+                    .collectLatest {
+                        adapter.submitData(it)
+                        recycler_search_result.visibility = View.VISIBLE
+                    }
+            }
             PostType.TEXT_IMAGE_VIDEO,
             PostType.TEXT,
             PostType.IMAGE,
-            PostType.VIDEO -> searchPostAll(text, tag)
+            PostType.VIDEO -> lifecycleScope.launch {
+                viewModel.posts(
+                    SearchPostFragment::class.simpleName + "ALL",
+                    searchType,
+                    text,
+                    tag,
+                    searchOrderBy
+                )
+                    .flowOn(Dispatchers.IO)
+                    .collectLatest {
+                        adapter.submitData(it)
+                        recycler_search_result.visibility = View.VISIBLE
+                    }
+            }
             else -> {
             }
         }
+        recycler_search_result.visibility = View.INVISIBLE
         GeneralUtils.hideKeyboard(requireActivity())
         search_bar.clearFocus()
     }
@@ -507,28 +536,6 @@ class SearchPostFragment : BaseFragment() {
         }
 
         layout_search_history.visibility = View.VISIBLE
-    }
-
-    private fun searchPostFollow(
-        keyword: String? = null,
-        tag: String? = null
-    ) {
-        lifecycleScope.launch {
-            adapter.submitData(PagingData.empty())
-            viewModel.getSearchPostFollowResult(keyword, tag)
-                .collectLatest { adapter.submitData(it) }
-        }
-    }
-
-    private fun searchPostAll(
-        keyword: String? = null,
-        tag: String? = null
-    ) {
-        lifecycleScope.launch {
-            adapter.submitData(PagingData.empty())
-            viewModel.getSearchPostAllResult(searchType, keyword, tag, searchOrderBy)
-                .collectLatest { adapter.submitData(it) }
-        }
     }
 
     override fun navigationToText(bundle: Bundle) {

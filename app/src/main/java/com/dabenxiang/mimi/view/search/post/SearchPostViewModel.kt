@@ -3,10 +3,7 @@ package com.dabenxiang.mimi.view.search.post
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.LikeRequest
@@ -16,10 +13,12 @@ import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.search.post.paging.SearchPostAllDataSource
-import com.dabenxiang.mimi.view.search.post.paging.SearchPostFollowDataSource
+import com.dabenxiang.mimi.view.club.pages.ClubItemMediator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -63,7 +62,7 @@ class SearchPostViewModel : BaseViewModel() {
                     isLike -> LikeType.LIKE
                     else -> LikeType.DISLIKE
                 }
-                val request =  LikeRequest(likeType)
+                val request = LikeRequest(likeType)
                 val result = when {
                     isLike -> apiRepository.like(item.id, request)
                     else -> apiRepository.deleteLike(item.id)
@@ -123,53 +122,59 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
-    fun getSearchPostFollowResult(
-        keyword: String? = null,
-        tag: String? = null
-    ): Flow<PagingData<MemberPostItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = SearchPostFollowDataSource.PER_LIMIT.toInt()),
-            pagingSourceFactory = {
-                SearchPostFollowDataSource(
-                    domainManager,
-                    pagingCallback,
-                    keyword,
-                    tag,
-                    adWidth,
-                    adHeight
-
-                )
-            }
-        )
-            .flow
-            .cachedIn(viewModelScope)
-    }
-
-    fun getSearchPostAllResult(
-        type: PostType,
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(
+        pageCode: String,
+        type: PostType? = null,
         keyword: String? = null,
         tag: String? = null,
-        orderBy: StatisticsOrderType
-    ): Flow<PagingData<MemberPostItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = SearchPostAllDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                SearchPostAllDataSource(
-                    domainManager,
-                    pagingCallback,
-                    type,
-                    keyword,
-                    tag,
-                    orderBy,
-                    adWidth,
-                    adHeight
+        orderBy: StatisticsOrderType? = null
+    ) = clearResult(pageCode)
+        .flatMapConcat {
+            postItems(
+                pageCode,
+                type,
+                keyword,
+                tag,
+                orderBy
+            )
+        }.cachedIn(viewModelScope)
 
-                )
-            }
+    private fun postItems(
+        pageCode: String,
+        type: PostType? = null,
+        keyword: String? = null,
+        tag: String? = null,
+        orderBy: StatisticsOrderType? = null
+    ) = Pager(
+        config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
+        remoteMediator = SearchPostMediator(
+            mimiDB,
+            domainManager,
+            adWidth,
+            adHeight,
+            pageCode,
+            pagingCallback,
+            type,
+            keyword,
+            tag,
+            orderBy
         )
-            .flow
-            .cachedIn(viewModelScope)
+    ) {
+        mimiDB.postDBItemDao()
+            .pagingSourceByPageCode(pageCode)
+    }.flow.map { pagingData ->
+        pagingData.map {
+            it.memberPostItem
+        }
     }
 
+    private fun clearResult(pageCode: String): Flow<Nothing?> {
+        return flow {
+            mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
+            mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
+            emit(null)
+        }
+    }
 
 }

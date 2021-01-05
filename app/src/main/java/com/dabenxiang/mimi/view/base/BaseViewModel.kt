@@ -38,7 +38,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
-import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
 
@@ -64,6 +63,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     private val _showPopHint = MutableLiveData<String>()
     val showPopHint: LiveData<String> = _showPopHint
+
+    private val _topAdResult = MutableLiveData<AdItem>()
+    val topAdResult: LiveData<AdItem> = _topAdResult
 
     fun setShowProgress(show: Boolean) {
         _showProgress.value = show
@@ -343,4 +345,18 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             }
         }
     }
+
+    fun getTopAd(code: String) {
+        viewModelScope.launch {
+            flow {
+                val topAdItem =
+                    domainManager.getAdRepository().getAD(code, adWidth, adHeight)
+                        .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+                emit(topAdItem)
+            }
+                .flowOn(Dispatchers.IO)
+                .collect { _topAdResult.value = it }
+        }
+    }
+
 }

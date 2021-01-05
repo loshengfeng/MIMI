@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
@@ -80,7 +79,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
             emptyPageToggle(it <=0)
         }
 
-        viewModel.adResult.observe(this, {
+        viewModel.topAdResult.observe(this, {
             adTop.adItem = it
             adTop.notifyDataSetChanged()
         })
