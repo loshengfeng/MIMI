@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
@@ -750,7 +749,7 @@ class PlayerViewModel : BaseViewModel() {
                     false -> body
                     else -> (body as ArrayList<*>)[0]
                 }
-                countItem as CountItem
+                countItem as InteractiveHistoryItem
                 LruCacheUtils.putShortVideoDataCache(
                     videoId,
                     PlayItem(

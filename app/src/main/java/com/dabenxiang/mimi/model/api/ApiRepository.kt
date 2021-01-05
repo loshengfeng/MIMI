@@ -289,6 +289,10 @@ class ApiRepository(private val apiService: ApiService) {
         return apiService.getMembersPost(offset, limit, creatorId, isAdult)
     }
 
+    suspend fun getInteractiveHistory(id: String): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>> {
+        return apiService.getInteractiveHistory(id)
+    }
+
     suspend fun getMemberPostDetail(postId: Long): Response<ApiBaseItem<MemberPostItem>> {
         return apiService.getMemberPostDetail(postId)
     }

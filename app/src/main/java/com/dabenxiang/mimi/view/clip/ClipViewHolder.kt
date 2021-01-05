@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.ui.PlayerView
@@ -88,5 +89,14 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
             reminder.visibility = View.GONE
         }
+    }
+
+    fun updateCount(item: InteractiveHistoryItem) {
+        tvFavorite.text = item.favoriteCount.toString()
+        tvComment.text = item.commentCount.toString()
+
+        val favoriteRes = takeIf { item.isFavorite }?.let { R.drawable.btn_favorite_forvideo_s }
+            ?: let { R.drawable.btn_favorite_forvideo_n }
+        tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
     }
 }

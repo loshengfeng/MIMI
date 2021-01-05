@@ -14,12 +14,10 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class ClipViewModel : BaseViewModel() {
 
@@ -75,6 +73,19 @@ class ClipViewModel : BaseViewModel() {
                         update(position, it, -1)
                     }
                 }
+        }
+    }
+
+    fun getInteractiveHistory(item: VideoItem, position: Int, update: (Int, InteractiveHistoryItem) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getInteractiveHistory(item.id.toString())
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(result.body()?.content?.get(0))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> e.printStackTrace() }
+                .collect { it?.run { update(position, this) } }
         }
     }
 
@@ -153,7 +164,7 @@ class ClipViewModel : BaseViewModel() {
                     isFavorite -> body
                     else -> (body as ArrayList<*>)[0]
                 }
-                countItem as CountItem
+                countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
                 item.favoriteCount = countItem.favoriteCount
                 _videoChangedResult.postValue(ApiResult.success(item))

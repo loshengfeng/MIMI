@@ -106,7 +106,7 @@ class LikeMimiVideoViewModel : BaseViewModel() {
                     !originFavorite -> body
                     else -> (body as ArrayList<*>)[0]
                 }
-                countItem as CountItem
+                countItem as InteractiveHistoryItem
                 item.favorite = !originFavorite
                 item.favoriteCount = countItem.favoriteCount.toInt()
                 LruCacheUtils.putShortVideoDataCache(item.id, item)

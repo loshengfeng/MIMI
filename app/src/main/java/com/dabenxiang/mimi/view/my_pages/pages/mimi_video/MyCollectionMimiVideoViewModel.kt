@@ -9,7 +9,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.CountItem
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
@@ -104,7 +104,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                 val result = apiRepository.deleteMePlaylist(videoId)
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()?.content
-                val countItem = (body as ArrayList<*>)[0] as CountItem
+                val countItem = (body as ArrayList<*>)[0] as InteractiveHistoryItem
                 LruCacheUtils.putShortVideoDataCache(
                     videoId.toLong(),
                     PlayItem(
@@ -141,7 +141,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     isFavorite -> body
                     else -> (body as ArrayList<*>)[0]
                 }
-                countItem as CountItem
+                countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
                 item.favoriteCount = countItem.favoriteCount
                 LruCacheUtils.putShortVideoDataCache(

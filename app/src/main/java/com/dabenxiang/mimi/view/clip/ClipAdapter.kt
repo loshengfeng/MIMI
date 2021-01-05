@@ -9,6 +9,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.ERROR_CODE_ACCOUNT_OVERDUE
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -44,6 +45,7 @@ class ClipAdapter(
         const val PAYLOAD_UPDATE_UI = 0
         const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
         const val PAYLOAD_UPDATE_SCROLL_AWAY = 2
+        const val PAYLOAD_UPDATE_AFTER_HISTORY = 3
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -52,6 +54,7 @@ class ClipAdapter(
     private var lastWindowIndex = 0
     private var m3u8Url: String? = null
     private var isOverdue: Boolean = false
+    private var interactiveHistoryItem: InteractiveHistoryItem? = null
 
     fun getM3U8() {
         getItem(currentPosition)?.run {
@@ -59,10 +62,23 @@ class ClipAdapter(
         }
     }
 
+    fun getInteractiveHistory() {
+        getItem(currentPosition)?.run {
+            clipFuncItem.getInteractiveHistory(this, currentPosition, ::updateAfterHistory)
+        }
+    }
+
     private fun updateAfterM3U8(pos: Int, url: String, errorCode: Int) {
         currentPosition.takeIf { it == pos }?.run {
             setM3U8Result(url, errorCode)
             notifyItemChanged(this, PAYLOAD_UPDATE_AFTER_M3U8)
+        }
+    }
+
+    private fun updateAfterHistory(pos: Int, item: InteractiveHistoryItem) {
+        currentPosition.takeIf { it == pos }?.run {
+            interactiveHistoryItem = item
+            notifyItemChanged(this, PAYLOAD_UPDATE_AFTER_HISTORY)
         }
     }
 
@@ -148,6 +164,9 @@ class ClipAdapter(
                         processUpdateAfterM3U8Payload(holder, position)
                     }
                 }
+                PAYLOAD_UPDATE_AFTER_HISTORY -> {
+                    interactiveHistoryItem?.run { holder.updateCount(this) }
+                }
             }
         } ?: run {
             holder.onBind(item, clipFuncItem)
@@ -192,6 +211,7 @@ class ClipAdapter(
             holder.tvRetry.visibility = View.GONE
             holder.progress.visibility = View.VISIBLE
             getM3U8()
+            getInteractiveHistory()
         }
         processClip(holder.playerView, m3u8Url, position)
     }

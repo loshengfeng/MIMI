@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
@@ -132,6 +133,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         viewModel.rechargeVipResult.observe(owner = viewLifecycleOwner) {
             if (viewModel.isVip()) {
                 clipAdapter.getM3U8()
+                clipAdapter.getInteractiveHistory()
             }
         }
     }
@@ -229,6 +231,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     private fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
         viewModel.getM3U8(item, position, update)
+    }
+
+    private fun getInteractiveHistory(item: VideoItem, position: Int, update: (Int, InteractiveHistoryItem) -> Unit) {
+        viewModel.getInteractiveHistory(item, position, update)
     }
 
     private fun scrollToNext(nextPosition: Int) {
@@ -332,6 +338,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             { onVipClick() },
             { onPromoteClick() },
             { item, pos, update -> getM3U8(item, pos, update) },
+            { item, pos, update -> getInteractiveHistory(item, pos, update) },
             { pos -> scrollToNext(pos) },
             { source -> viewModel.getDecryptSetting(source) },
             { videoItem, decryptSettingItem, function ->
@@ -402,6 +409,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                             clipAdapter.updateCurrentPosition(currentPos)
                             clipAdapter.notifyItemChanged(lastPos)
                             clipAdapter.getM3U8()
+                            clipAdapter.getInteractiveHistory()
                         }
                     }
                 }

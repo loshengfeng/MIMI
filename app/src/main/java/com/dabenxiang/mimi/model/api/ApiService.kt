@@ -206,6 +206,9 @@ interface ApiService {
         @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
+    @GET("/v1/Members/Post/InteractiveHistory/{id}")
+    suspend fun getInteractiveHistory(@Path("id") id: String): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
+
     @GET("/v1/Members/Post/{id}")
     suspend fun getMemberPostDetail(@Path("id") postId: Long): Response<ApiBaseItem<MemberPostItem>>
 
@@ -467,12 +470,12 @@ interface ApiService {
     @POST("/v1/Members/Me/Playlist")
     suspend fun addMePlaylist(
         @Body request: PlayListRequest
-    ): Response<ApiBaseItem<CountItem>>
+    ): Response<ApiBaseItem<InteractiveHistoryItem>>
 
     @DELETE("/v1/Members/Me/Playlist/{videoId}")
     suspend fun deletePlaylist(
         @Path("videoId") videoId: String
-    ): Response<ApiBaseItem<ArrayList<CountItem>>>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @GET("/v1/Members/Me/Playlist/{playlistType}")
     suspend fun getPlaylist(

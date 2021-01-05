@@ -124,7 +124,7 @@ class SearchVideoViewModel : BaseViewModel() {
                     false -> body
                     else -> (body as ArrayList<*>)[0]
                 }
-                countItem as CountItem
+                countItem as InteractiveHistoryItem
 
                 currentItem?.run {
                     favorite = favorite != true
