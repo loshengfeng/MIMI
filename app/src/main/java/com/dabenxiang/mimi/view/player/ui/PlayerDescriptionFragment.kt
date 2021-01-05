@@ -340,10 +340,12 @@ class PlayerDescriptionFragment : BaseFragment() {
         val performers = videoItem.performers
 
         var tags = ""
-        (videoItem.tags as List<String>).indices.mapNotNull {
-            (videoItem.tags as List<String>)[it]
-        }.forEach {
-            tags = tags.plus(it).plus(",")
+        videoItem.tags?.let { list ->
+            (list as List<String>).indices.mapNotNull {
+                (list as List<String>)[it]
+            }.forEach {
+                tags = tags.plus(it).plus(",")
+            }
         }
         Timber.d("videoItem.tags ${videoItem.tags}, tag $tags")
         if(viewModel.videoContentId != descriptionViewModel.videoContentId) {
