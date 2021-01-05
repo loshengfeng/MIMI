@@ -28,6 +28,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
+import timber.log.Timber
 
 class ClubPicDetailFragment : BaseFragment() {
 
@@ -112,6 +113,8 @@ class ClubPicDetailFragment : BaseFragment() {
         adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
+
+        Timber.i("ClubPicDetailFragment memberPostItem =$memberPostItem")
 
         pictureDetailAdapter =
             ClubPicDetailAdapter(

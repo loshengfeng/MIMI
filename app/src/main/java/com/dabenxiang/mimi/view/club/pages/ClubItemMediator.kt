@@ -106,7 +106,7 @@ class ClubItemMediator(
 
             val body = result.body()
             val memberPostApiItems = body?.content
-
+            Timber.i("ClubItemMediator memberPostApiItems i=$memberPostApiItems ")
             val hasNext = hasNextPage(
                 result.body()?.paging?.count ?: 0,
                 result.body()?.paging?.offset ?: 0,
