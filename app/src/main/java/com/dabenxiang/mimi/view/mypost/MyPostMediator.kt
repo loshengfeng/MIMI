@@ -53,9 +53,9 @@ class MyPostMediator(
             Timber.i("MyPagesPostMediator pageName=$pageCode offset=$offset")
 
             val result =
-                    if (userId == MyPostViewModel.USER_ID_ME) domainManager.getApiRepository().getMyPost(offset = 0, limit = PER_LIMIT)
+                    if (userId == MyPostViewModel.USER_ID_ME) domainManager.getApiRepository().getMyPost(offset = offset, limit = PER_LIMIT)
                     else domainManager.getApiRepository().getMembersPost(
-                            offset = 0,
+                            offset = offset,
                             limit = PER_LIMIT,
                             creatorId = userId,
                             isAdult = true
