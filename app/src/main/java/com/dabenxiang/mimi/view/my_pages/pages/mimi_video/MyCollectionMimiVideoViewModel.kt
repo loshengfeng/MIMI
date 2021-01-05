@@ -78,7 +78,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
         }
     }
 
-    fun deleteVideos(items: List<PlayItem>) {
+    fun deleteVideos(type: MyPagesType, items: List<PlayItem>) {
         if (items.isEmpty()) return
         viewModelScope.launch {
             flow {
@@ -87,6 +87,14 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                         items.map { it.videoId }.joinToString(separator = ",")
                     )
                 if (!result.isSuccessful) throw HttpException(result)
+
+                items.map { it.videoId }.filterNotNull().forEach { videoId->
+                    when(type){
+                        MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId )
+                        MyPagesType.FAVORITE_SHORT_VIDEO -> changeFavoriteSmallVideoInDb(videoId)
+                    }
+                }
+
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)

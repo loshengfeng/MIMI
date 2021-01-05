@@ -33,6 +33,10 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -62,32 +66,39 @@ class MyFavoritesFragment(
             layout_refresh.isRefreshing = it
         })
 
+        myPagesViewModel.deleteAll.observe(this, {
+            viewModel.deleteFavorites(adapter.snapshot().items)
+        })
+
         viewModel.cleanResult.observe(this, {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Empty -> {
 //                    viewModel.getData(adapter, isLike)
+                    timeout = 0
                     adapter.refresh()
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
+        viewModel.favoriteResult.observe(this, {
+            when (it) {
+                is ApiResult.Loading -> progressHUD.show()
+                is ApiResult.Loaded -> progressHUD.dismiss()
+                is ApiResult.Success -> {
+                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
+                    timeout = 0
+                    adapter.refresh()
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+
+        })
+
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
-    }
-
-    override fun setupObservers() {
-        super.setupObservers()
-//        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    adapter.notifyItemChanged(it.result)
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
     }
 
     override fun onResume() {
@@ -101,11 +112,7 @@ class MyFavoritesFragment(
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                if(adapter.snapshot().items.isEmpty() && timeout >0){
-                    layout_refresh?.isRefreshing = true
-                }else{
-                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
-                }
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
         }
 
@@ -124,7 +131,7 @@ class MyFavoritesFragment(
                 .filter { it.refresh is LoadState.NotLoading }
                 .onEach { delay(1000) }
                 .collect {
-                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
+                    if(adapter.snapshot().items.isEmpty() && timeout > 0) {
                         timeout--
                         adapter.refresh()
                     }
@@ -144,20 +151,8 @@ class MyFavoritesFragment(
             adapter.refresh()
         }
 
-        myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
-            viewModel.deleteFavorites(adapter.snapshot().items)
-        })
-
         viewModel.postCount.observe(viewLifecycleOwner, {
-            if (it == 0) {
-                id_empty_group.visibility = View.VISIBLE
-                recycler_view.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                recycler_view.visibility = View.VISIBLE
-            }
-            myPagesViewModel.changeDataCount(tab, it)
-            layout_refresh.isRefreshing = false
+            emptyPageToggle(it<=0)
         })
 
         viewModel.showProgress.observe(viewLifecycleOwner,{
@@ -171,6 +166,21 @@ class MyFavoritesFragment(
                 requireContext(), R.drawable.img_love_empty
             )
         )
+
+    }
+
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+            timeout = 0
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = getText(R.string.empty_post)
+            recycler_view?.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            recycler_view?.visibility = View.VISIBLE
+
+        }
+        layout_refresh.isRefreshing = false
 
     }
 

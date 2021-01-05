@@ -123,14 +123,6 @@ class ClubItemMediator(
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-//                    database.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
-//                        database.postDBItemDao().getPostDBItems(id).takeIf {
-//                            it.isNullOrEmpty() || it.size <=1
-//                        }?.let {
-//                            database.postDBItemDao().deleteMemberPostItem(id)
-//                        }
-//
-//                    }
                     database.postDBItemDao().deleteItemByPageCode(pageCode)
                     database.postDBItemDao().deleteItemByPageCode(adCode)
                     database.remoteKeyDao().deleteByPageCode(pageCode)
@@ -140,7 +132,6 @@ class ClubItemMediator(
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
                 memberPostApiItems?.forEachIndexed { index, item ->
-                    if(type == ClubTabItemType.FOLLOW ) item.deducted = true
                     val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
 
                     val postItem = when (oldItem) {
@@ -157,27 +148,13 @@ class ClubItemMediator(
                             oldItem
                         }
                     }
+
+                    if(type == ClubTabItemType.FOLLOW ) item.deducted = true
                     item.adItem = getAdItem(adItems)
 
                     database.postDBItemDao().insertMemberPostItem(item)
                     database.postDBItemDao().insertItem(postItem)
                 }
-//                database.postDBItemDao().insertMemberPostItemAll(memberPostItems)
-//                database.postDBItemDao().insertAll(postDBItems)
-
-//                adItems.let {
-//                    val adDBItems = it.mapIndexed { index, item ->
-//                        PostDBItem(
-//                            postDBId = item.id,
-//                            postType = item.type,
-//                            pageCode= adCode,
-//                            timestamp = System.nanoTime(),
-//                            index = index
-//                        )
-//                    }
-//                    database.postDBItemDao().insertMemberPostItemAll(it)
-//                    database.postDBItemDao().insertAll(adDBItems)
-//                }
             }
 
             return MediatorResult.Success(endOfPaginationReached = !hasNext)

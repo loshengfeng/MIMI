@@ -397,6 +397,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
     private fun emptyPageToggle(isHide: Boolean) {
         if (isHide) {
+            timeout = 0
             id_empty_group.visibility = View.VISIBLE
             text_page_empty.text = when (type) {
                 ClubTabItemType.FOLLOW -> getText(R.string.empty_follow)
