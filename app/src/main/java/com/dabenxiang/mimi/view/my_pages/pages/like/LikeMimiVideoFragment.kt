@@ -67,6 +67,10 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
                 override fun onClean() {
                     viewModel.videoLike(VideoItem(id = item.videoId ?: 0), LikeType.DISLIKE, myPagesType)
                 }
+
+                override fun onCancel() {
+                    //do nothing
+                }
             })
 
             dialog.setMsg(getString(R.string.like_delete_favorite_message))

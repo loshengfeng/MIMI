@@ -240,7 +240,13 @@ class MyFavoritesFragment(
         ) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    checkStatus { viewModel.favoritePost(item, position, isFavorite) }
+                    viewModel.favoritePost(item, position, isFavorite)
+                }
+
+                override fun onCancel() {
+                    item.isFavorite = true
+                    item.favoriteCount++
+                    adapter.notifyItemChanged(position)
                 }
             })
 

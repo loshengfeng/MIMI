@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
@@ -156,6 +157,12 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
                     viewModel.likePost(item, position, isLike)
+                }
+
+                override fun onCancel() {
+                    item.likeType = LikeType.LIKE
+                    item.likeCount++
+                    adapter.notifyItemChanged(position)
                 }
             })
 

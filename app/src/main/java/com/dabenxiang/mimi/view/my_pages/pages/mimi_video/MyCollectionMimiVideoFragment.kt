@@ -257,7 +257,11 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         override fun onFavoriteClick(item: PlayItem, position: Int, isFavorite: Boolean, type: MyPagesType) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    checkStatus { viewModel.deleteVideoFavorite(type, item.videoId.toString()) }
+                    viewModel.deleteVideoFavorite(type, item.videoId.toString())
+                }
+
+                override fun onCancel() {
+                    //do nothing
                 }
             })
 
