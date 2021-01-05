@@ -47,7 +47,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
     }
 
     private val adapter: PostItemAdapter by lazy {
-        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope)
+        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope, AD_GAP)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item
