@@ -10,12 +10,9 @@ import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.vo.SearchPostItem
-import com.dabenxiang.mimi.view.mypost.MyPostFragment
-import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.EDIT
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment
-import com.dabenxiang.mimi.view.search.post.SearchPostFragment.Companion.KEY_DATA
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.hideKeyboard
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
@@ -47,7 +44,6 @@ class PostArticleFragment : BasePostFragment() {
     }
 
     override fun setUI(item: MediaItem, memberPostItem: MemberPostItem) {
-//        edt_content.setText(item.textContent)
         txt_contentCount.text = String.format(getString(R.string.typing_count, item.textContent.length, CONTENT_LIMIT))
         viewModel.getPostDetail(memberPostItem)
     }
@@ -95,65 +91,20 @@ class PostArticleFragment : BasePostFragment() {
     }
 
     private fun navigation(title: String, request: String) {
-        var isEdit = false
-        var page = ""
-        var searchPostItem: SearchPostItem? = null
-        var memberClubItem: MemberClubItem? = null
+        var memberPostItem: MemberPostItem? = null
 
         arguments?.let {
-            isEdit = it.getBoolean(EDIT, false)
-            page = it.getString(PAGE, "")
-            val data = it.getSerializable(KEY_DATA)
-            if (data != null) {
-                if (data is SearchPostItem) {
-                    searchPostItem = data
-                } else if (data is MemberClubItem){
-                    memberClubItem = data
-                }
+            if (it.containsKey(MEMBER_DATA)) {
+                memberPostItem = it.getSerializable(MEMBER_DATA) as MemberPostItem
             }
         }
 
-        val bundle = Bundle()
-        bundle.putBoolean(UPLOAD_ARTICLE, true)
-        bundle.putString(TITLE, title)
-        bundle.putString(REQUEST, request)
-        bundle.putStringArrayList(TAG, getTags())
-        if(isEdit){
-            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
-        }
-        mainViewModel?.uploadData?.value = bundle
+        val postClubItem = PostClubItem(PostType.TEXT.value, title, request, getTags(), memberPostItem = memberPostItem)
 
-        if (isEdit && page == MY_POST) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postArticleFragment_to_myPostFragment, bundle)
-        }  else if (isEdit && page == SEARCH) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MEMBER_DATA, item)
-            bundle.putSerializable(KEY_DATA, searchPostItem)
-            findNavController().navigate(R.id.action_postArticleFragment_to_searchPostFragment, bundle)
-        } else if (isEdit && page == CLUB) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MEMBER_DATA, item)
-            bundle.putSerializable(KEY_DATA, memberClubItem)
-            findNavController().navigate(R.id.action_postArticleFragment_to_topicDetailFragment, bundle)
-        } else if (isEdit && page == TAB) {
-            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-            bundle.putSerializable(MEMBER_DATA, item)
-            findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
-        } else if (isEdit && page == TEXT) {
-//            val item = arguments?.getSerializable(MEMBER_DATA) as MemberPostItem
-//            bundle.putSerializable(KEY_DATA, item)
-//            bundle.putSerializable(MEMBER_DATA, item)
-//            findNavController().navigate(R.id.action_postArticleFragment_to_clubTextFragment, bundle)
-            findNavController().navigateUp()
-        } else if (isEdit && page == FAVORITE) {
-            findNavController().navigateUp()
-        } else if (isEdit && page == LIKE) {
-            findNavController().navigateUp()
-        } else {
-            findNavController().navigate(R.id.action_postArticleFragment_to_clubTabFragment, bundle)
-        }
+        val bundle = Bundle()
+        bundle.putSerializable(POST_DATA, postClubItem)
+
+        mainViewModel?.uploadData?.value = bundle
+        findNavController().navigateUp()
     }
 }

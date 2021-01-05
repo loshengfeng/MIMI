@@ -90,6 +90,11 @@ class MyPostFragment : BaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(adapter.snapshot().items.isEmpty()) adapter.refresh()
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_my_post
     }
