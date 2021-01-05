@@ -37,6 +37,7 @@ class TopicListViewModel : ClubViewModel() {
                     pagingCallback,
                     domainManager,
                     pageCode,
+                    AD_CODE,
                     tag,
                     orderBy,
                     adWidth,
@@ -45,17 +46,9 @@ class TopicListViewModel : ClubViewModel() {
     ) {
         mimiDB.postDBItemDao().pagingSourceByPageCode(pageCode)
     }.flow.map { pagingData ->
-        val adItems = (mimiDB.postDBItemDao().getPostDBItemsByTime(AD_CODE) as ArrayList<MemberPostWithPostDBItem>)
         pagingData.map {
             it.memberPostItem
         }
-//            .insertSeparators{ before, after->
-//            if(before!=null && before.postDBItem.index >0 && before.postDBItem.index.rem(AD_GAP) == 0 ){
-//                getAdItem(adItems, before)
-//            }else {
-//                null
-//            }
-//        }
     }
     
 }

@@ -40,12 +40,7 @@ class ClubItemViewModel : ClubViewModel() {
         pagingData.map {
            it.memberPostItem
         }
-//            .insertSeparators { before, after ->
-//            if (before != null && before.postDBItem.index.rem(AD_GAP) == AD_GAP - 1) {
-//                getAdItem(arrayListOf(), before)
-//            } else {
-//                null
-            }
+     }
 
     fun getAdCode(type: ClubTabItemType): String {
         return when (type) {

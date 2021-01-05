@@ -131,30 +131,35 @@ class ClubItemMediator(
 
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
-                memberPostApiItems?.forEachIndexed { index, item ->
-                    val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
-
-                    val postItem = when (oldItem) {
-                        null -> PostDBItem(
-                            postDBId = item.id,
-                            postType = item.type,
-                            pageCode = pageCode,
-                            timestamp = System.nanoTime(),
-                            index = offset + index
-                        )
-                        else -> {
-                            oldItem.timestamp = System.nanoTime()
-                            oldItem.index = offset + index
-                            oldItem
-                        }
-                    }
-
+                memberPostApiItems?.map { item->
                     if(type == ClubTabItemType.FOLLOW ) item.deducted = true
                     item.adItem = getAdItem(adItems)
+                    item
+                }?.let {
+                    val postDBItems = it.mapIndexed { index, item ->
+                        val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
+                        when (oldItem) {
+                            null -> PostDBItem(
+                                    postDBId = item.id,
+                                    postType = item.type,
+                                    pageCode = pageCode,
+                                    timestamp = System.nanoTime(),
+                                    index = offset + index
+                            )
+                            else -> {
+                                oldItem.timestamp = System.nanoTime()
+                                oldItem.index = offset + index
+                                oldItem
+                            }
+                        }
+//
+                    }
 
-                    database.postDBItemDao().insertMemberPostItem(item)
-                    database.postDBItemDao().insertItem(postItem)
+                    database.postDBItemDao().insertMemberPostItemAll(it)
+                    database.postDBItemDao().insertAll(postDBItems)
+
                 }
+
             }
 
             return MediatorResult.Success(endOfPaginationReached = !hasNext)
