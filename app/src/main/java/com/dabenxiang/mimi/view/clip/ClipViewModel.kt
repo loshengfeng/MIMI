@@ -14,10 +14,12 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class ClipViewModel : BaseViewModel() {
 
@@ -146,9 +148,16 @@ class ClipViewModel : BaseViewModel() {
                     else -> apiRepository.deleteMePlaylist(item.id.toString())
                 }
                 if (!resp.isSuccessful) throw HttpException(resp)
+                val body = resp.body()?.content
+                val countItem = when {
+                    isFavorite -> body
+                    else -> (body as ArrayList<*>)[0]
+                }
+                countItem as CountItem
                 item.favorite = isFavorite
-                item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
+                item.favoriteCount = countItem.favoriteCount
                 _videoChangedResult.postValue(ApiResult.success(item))
+
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)

@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.android.synthetic.main.item_clip.view.*
 import kotlinx.android.synthetic.main.recharge_reminder.view.*
+import timber.log.Timber
 
 class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
@@ -37,9 +38,14 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         progress.visibility = View.GONE
         tvRetry.visibility = View.GONE
         tvTitle.text = item.title
-        tvFavorite.text = item.favoriteCount.toString()
 
-        LruCacheUtils.getShortVideoCount(item.id)?.commentCount?.run { item.commentCount = this.toLong() }
+        LruCacheUtils.getShortVideoCount(item.id)?.run {
+            this.favoriteCount?.also { count ->  item.favoriteCount = count.toLong() }
+            this.commentCount?.also { count ->  item.commentCount = count.toLong() }
+            this.favorite?.also { favorite ->  item.favorite = favorite }
+        }
+
+        tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()
 
         tvTitle.isSelected = true

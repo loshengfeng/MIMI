@@ -467,12 +467,12 @@ interface ApiService {
     @POST("/v1/Members/Me/Playlist")
     suspend fun addMePlaylist(
         @Body request: PlayListRequest
-    ): Response<Void>
+    ): Response<ApiBaseItem<CountItem>>
 
     @DELETE("/v1/Members/Me/Playlist/{videoId}")
     suspend fun deletePlaylist(
         @Path("videoId") videoId: String
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<CountItem>>>
 
     @GET("/v1/Members/Me/Playlist/{playlistType}")
     suspend fun getPlaylist(
