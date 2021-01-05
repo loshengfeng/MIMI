@@ -65,7 +65,7 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    viewModel.like(VideoItem(id = item.videoId ?: 0), LikeType.DISLIKE, myPagesType)
+                    viewModel.videoLike(VideoItem(id = item.videoId ?: 0), LikeType.DISLIKE, myPagesType)
                 }
             })
 
@@ -118,7 +118,7 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
             isFavorite: Boolean,
             type: MyPagesType
         ) {
-            viewModel.favorite(item, position, myPagesType)
+            viewModel.favorite(item, position, myPagesType, isFavorite)
         }
     }
 

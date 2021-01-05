@@ -23,7 +23,7 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class MyCollectionMIMIVideoViewHolder(
-        itemView: View
+    itemView: View
 ) : BaseViewHolder(itemView), KoinComponent {
 
     private val accountManager: AccountManager by inject()
@@ -44,11 +44,11 @@ class MyCollectionMIMIVideoViewHolder(
     private val vSeparator: View = itemView.v_separator
 
     fun onBind(
-            item: PlayItem,
-            position: Int,
-            listener: MyCollectionVideoListener,
-            viewModelScope: CoroutineScope,
-            searchTag: String = ""
+        item: PlayItem,
+        position: Int,
+        listener: MyCollectionVideoListener,
+        viewModelScope: CoroutineScope,
+        searchTag: String = ""
     ) {
         clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvTitle.setTextColor(App.self.getColor(R.color.color_black_1))
@@ -64,7 +64,7 @@ class MyCollectionMIMIVideoViewHolder(
         tagChipGroup.removeAllViews()
         item.tags?.forEach {
             val chip = LayoutInflater.from(tagChipGroup.context)
-                    .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
+                .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
             if (it == searchTag) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
             else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
@@ -75,10 +75,10 @@ class MyCollectionMIMIVideoViewHolder(
         }
 
         LoadImageUtils.setNormalOrDecryptImage(
-                viewModelScope,
-                item.source ?: "",
-                item.cover ?: "",
-                ivPhoto
+            viewModelScope,
+            item.source ?: "",
+            item.cover ?: "",
+            ivPhoto
 
         )
 
@@ -88,14 +88,15 @@ class MyCollectionMIMIVideoViewHolder(
 
         updateFavorite(item)
         val onFavoriteClickListener = View.OnClickListener {
+            item.favorite = !(item.favorite ?: false)
             item.favoriteCount =
-                    if (item.favorite == true) item.favoriteCount ?: 0 + 1 else item.favoriteCount
-                            ?: 0 - 1
+                if (item.favorite == true) item.favoriteCount ?: 0 + 1 else item.favoriteCount
+                    ?: 0 - 1
             listener.onFavoriteClick(
-                    item,
-                    position,
-                    item.favorite ?: false,
-                    MyPagesType.FAVORITE_MIMI_VIDEO
+                item,
+                position,
+                item.favorite?: false,
+                MyPagesType.FAVORITE_MIMI_VIDEO
             )
         }
         ivFavorite.setOnClickListener(onFavoriteClickListener)
@@ -105,8 +106,9 @@ class MyCollectionMIMIVideoViewHolder(
         updateLike(item)
         val onLikeClickListener = View.OnClickListener {
             item.like = item.like != true
-            item.likeCount = if (item.like == true) ((item.likeCount ?: 0) + 1) else ((item.likeCount ?: 0) - 1)
-            listener.onLikeClick(item, position, item.like == true)
+            item.likeCount =
+                if (item.like == true) ((item.likeCount ?: 0) + 1) else ((item.likeCount ?: 0) - 1)
+            listener.onLikeClick(item, position, item.like != true)
         }
         ivLike.setOnClickListener(onLikeClickListener)
         tvLikeCount.setOnClickListener(onLikeClickListener)

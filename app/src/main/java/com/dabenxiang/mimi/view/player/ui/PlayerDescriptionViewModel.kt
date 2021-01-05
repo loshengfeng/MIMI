@@ -136,6 +136,7 @@ class PlayerDescriptionViewModel : BaseViewModel() {
                 }
                 item.like = if (item.likeType == null) null
                 else item.likeType == LikeType.LIKE
+                changeLikeMimiVideoInDb(item.id, type)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)

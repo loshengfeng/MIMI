@@ -42,6 +42,9 @@ data class PlayItem(
     @SerializedName("like")
     var like: Boolean?=true,
 
+    @SerializedName("likeType")
+    var likeType: LikeType?=null,
+
     @SerializedName("likeCount")
     var likeCount: Int?=0,
 

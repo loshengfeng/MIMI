@@ -130,7 +130,6 @@ class ClubTextDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     when (it) {
                         is ApiResult.Success -> {
                             update(isFavorite, it.result.favoriteCount)
@@ -162,7 +161,6 @@ class ClubTextDetailViewModel : BaseViewModel() {
                     } else {
                         item.dislikeCount += 1
                     }
-                    emit(ApiResult.success(item))
                 } else {
                     if (originType == type) {
                         val result = apiRepository.deleteLike(item.id)
@@ -194,15 +192,15 @@ class ClubTextDetailViewModel : BaseViewModel() {
                         item.likeCount += 1
                         item.dislikeCount -= 1
                     }
-                    emit(ApiResult.success(item))
                 }
+                changeLikePostInDb(item.id, item.likeType)
+                emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     when (it) {
                         is ApiResult.Success -> {
                             update(like, it.result)

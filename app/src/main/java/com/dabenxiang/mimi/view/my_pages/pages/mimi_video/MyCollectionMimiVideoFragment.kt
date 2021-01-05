@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LoadState
@@ -202,14 +201,14 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
             checkStatus {
                 viewModel.videoLike(VideoItem(
-                    id = item.videoId?:0,
-                    favorite = item.favorite ?: false,
-                    favoriteCount = item.favoriteCount?:0,
-                    like = item.like,
-                    likeType = if(item.like==true) LikeType.LIKE else if(item.like==false) LikeType.DISLIKE else null,
-                    likeCount = item.likeCount?:0
+                        id = item.videoId?:0,
+                        favorite = item.favorite ?: false,
+                        favoriteCount = item.favoriteCount?:0,
+                        like = item.like,
+                        likeType = item.likeType,
+                        likeCount = item.likeCount?:0
 
-                ), LikeType.LIKE)
+                ), if(item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE, type)
             }
         }
 

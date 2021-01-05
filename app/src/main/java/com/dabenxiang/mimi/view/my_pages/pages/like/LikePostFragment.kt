@@ -12,12 +12,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
@@ -36,14 +34,11 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.koin.android.ext.android.inject
-import timber.log.Timber
 
 class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragment() {
 
     private val viewModel: LikePostViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
-    private val accountManager: AccountManager by inject()
 
     private val adapter: PostItemAdapter by lazy {
         PostItemAdapter(requireActivity(), postListener, viewModel.viewModelScope)
@@ -160,7 +155,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
         override fun onLikeClick(item: MemberPostItem, position: Int, isLike: Boolean) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    viewModel.like(item, position, isLike, myPagesType)
+                    viewModel.likePost(item, position, isLike)
                 }
             })
 

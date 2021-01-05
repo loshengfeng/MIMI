@@ -109,25 +109,7 @@ abstract class ClubViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 item.likeType = if (isLike) LikeType.LIKE else LikeType.DISLIKE
                 item.likeCount = item.likeCount
-
-                mimiDB.withTransaction {
-                    mimiDB.postDBItemDao().getMemberPostItemById(item.id)
-                        ?.let { memberPostItem ->
-                            val dbItem = memberPostItem.apply {
-                                when {
-                                    isLike -> {
-                                        this.likeType = LikeType.LIKE
-                                        this.likeCount += 1
-                                    }
-                                    else -> {
-                                        this.likeType = LikeType.DISLIKE
-                                        this.likeCount -= 1
-                                    }
-                                }
-                            }
-                            mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
-                        }
-                }
+                changeLikePostInDb(item.id, if(isLike) LikeType.LIKE else null)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -140,32 +122,19 @@ abstract class ClubViewModel : BaseViewModel() {
         }
     }
 
-    fun videoLike(item: VideoItem, type: LikeType) {
+    fun videoLike(item: VideoItem, type: LikeType?, pageType: MyPagesType) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val request = LikeRequest(type)
                 val result = apiRepository.like(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
-
-                mimiDB.withTransaction {
-                    mimiDB.postDBItemDao().getMemberPostItemById(item.id)
-                        ?.let { memberPostItem ->
-                            val dbItem = memberPostItem.apply {
-                                this.likeType = type
-                                when (type) {
-                                    LikeType.LIKE -> {
-                                        this.likeCount += 1
-                                    }
-                                    else -> {
-                                        this.likeCount -= 1
-                                    }
-                                }
-                            }
-                            mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
-                        }
+                when(pageType) {
+                    MyPagesType.FAVORITE_MIMI_VIDEO,
+                    MyPagesType.LIKE_MIMI -> changeLikeMimiVideoInDb(item.id, type)
+                    MyPagesType.FAVORITE_SHORT_VIDEO,
+                    MyPagesType.LIKE_SHORT_VIDEO -> changeLikeSmallVideoInDb(item.id, type)
                 }
-
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)

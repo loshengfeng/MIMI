@@ -264,8 +264,10 @@
         android:layout_height="wrap_content"
         android:scaleType="centerCrop"
         android:src="@drawable/img_ad"
+        tools:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/v_separator" />
+        app:layout_constraintTop_toBottomOf="@id/v_separator"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
