@@ -35,6 +35,7 @@ class LikeMimiVideoViewModel : ClubViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun posts(type: MyPagesType) = postItems(type).cachedIn(viewModelScope)
 
+    @OptIn(ExperimentalPagingApi::class)
     private fun postItems(type: MyPagesType) = Pager(
             config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
             remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pagingCallback)

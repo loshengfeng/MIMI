@@ -71,6 +71,7 @@ class SearchPostViewModel : ClubViewModel() {
             )
         }.cachedIn(viewModelScope)
 
+    @OptIn(ExperimentalPagingApi::class)
     private fun postItems(
         pageCode: String,
         type: PostType? = null,

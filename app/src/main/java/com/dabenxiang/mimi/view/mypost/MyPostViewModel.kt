@@ -33,6 +33,7 @@ class MyPostViewModel : ClubViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun posts(userId: Long) = postItems(userId).cachedIn(viewModelScope)
 
+    @OptIn(ExperimentalPagingApi::class)
     private fun postItems(userId: Long) = Pager(
             config = PagingConfig(pageSize = MyPostMediator.PER_LIMIT),
             remoteMediator = MyPostMediator(mimiDB, domainManager, userId)
