@@ -236,8 +236,9 @@ class TopUpFragment : BaseFragment() {
                     var paymentTypes: ArrayList<PaymentTypeItem> = it.result.paymentTypes
                     if(paymentTypes == null){
                         paymentTypes = arrayListOf()
-                        paymentTypes.add(PaymentTypeItem("Alipay", true))
-                        paymentTypes.add(PaymentTypeItem("WeChat", true))
+                        paymentTypes.add(PaymentTypeItem("Alipay", false))
+                        paymentTypes.add(PaymentTypeItem("WeChat", false))
+                        paymentTypes.add(PaymentTypeItem("TikTok", false))
                         paymentTypes.add(PaymentTypeItem("UnionPay", false))
                     }
 
@@ -314,8 +315,10 @@ class TopUpFragment : BaseFragment() {
         }
 
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            @SuppressLint("UseCompatLoadingForDrawables")
             override fun onTabSelected(tab: TabLayout.Tab) {
                 lastTabIndex = tab.position
+                tab.view.background = requireContext().getDrawable(R.drawable.bg_gray_10_stroke_1)
                 when (tab.tag) {
                     "UnionPay" -> updateOrderPackages(PaymentType.BANK)
                     "Alipay" -> updateOrderPackages(PaymentType.ALI)
@@ -323,11 +326,15 @@ class TopUpFragment : BaseFragment() {
                 }
             }
 
+            @SuppressLint("UseCompatLoadingForDrawables")
             override fun onTabUnselected(tab: TabLayout.Tab) {
+                tab.view.setBackgroundColor(requireContext().getColor(R.color.transparent))
             }
 
+            @SuppressLint("UseCompatLoadingForDrawables")
             override fun onTabReselected(tab: TabLayout.Tab) {
                 lastTabIndex = tab.position
+                tab.view.background = requireContext().getDrawable(R.drawable.bg_gray_10_stroke_1)
                 when (tab.tag) {
                     "UnionPay" -> updateOrderPackages(PaymentType.BANK)
                     "Alipay" -> updateOrderPackages(PaymentType.ALI)
