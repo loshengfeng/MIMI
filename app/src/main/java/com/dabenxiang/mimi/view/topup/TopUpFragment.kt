@@ -234,13 +234,14 @@ class TopUpFragment : BaseFragment() {
                     }
 
                     var paymentTypes: ArrayList<PaymentTypeItem> = it.result.paymentTypes
-                    if(paymentTypes == null){
-                        paymentTypes = arrayListOf()
-                        paymentTypes.add(PaymentTypeItem("Alipay", false))
-                        paymentTypes.add(PaymentTypeItem("WeChat", false))
-                        paymentTypes.add(PaymentTypeItem("TikTok", false))
-                        paymentTypes.add(PaymentTypeItem("UnionPay", false))
-                    }
+//                    var paymentTypes: ArrayList<PaymentTypeItem>? = null
+//                    if(paymentTypes == null){
+//                        paymentTypes = arrayListOf()
+//                        paymentTypes.add(PaymentTypeItem("Alipay", false))
+//                        paymentTypes.add(PaymentTypeItem("WeChat", false))
+//                        paymentTypes.add(PaymentTypeItem("TikTok", false))
+//                        paymentTypes.add(PaymentTypeItem("UnionPay", false))
+//                    }
 
                     for(type in paymentTypes)
                         if (type.disabled == false)
@@ -269,6 +270,7 @@ class TopUpFragment : BaseFragment() {
                 "Alipay" -> requireContext().getDrawable(R.drawable.ico_alipay)
                 "WeChat" -> requireContext().getDrawable(R.drawable.ico_wechat_pay)
                 "UnionPay" -> requireContext().getDrawable(R.drawable.ico_bank)
+                "TikTok" -> requireContext().getDrawable(R.drawable.ico_tiktokpay_160_px)
                 else -> requireContext().getDrawable(R.drawable.ico_bank)
             }
         )
@@ -323,6 +325,7 @@ class TopUpFragment : BaseFragment() {
                     "UnionPay" -> updateOrderPackages(PaymentType.BANK)
                     "Alipay" -> updateOrderPackages(PaymentType.ALI)
                     "WeChat" -> updateOrderPackages(PaymentType.WX)
+                    "TikTok" -> updateOrderPackages(PaymentType.TIK_TOK)
                 }
             }
 
@@ -339,6 +342,7 @@ class TopUpFragment : BaseFragment() {
                     "UnionPay" -> updateOrderPackages(PaymentType.BANK)
                     "Alipay" -> updateOrderPackages(PaymentType.ALI)
                     "WeChat" -> updateOrderPackages(PaymentType.WX)
+                    "TikTok" -> updateOrderPackages(PaymentType.TIK_TOK)
                 }
             }
         })
