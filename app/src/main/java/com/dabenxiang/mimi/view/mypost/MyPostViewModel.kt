@@ -30,14 +30,8 @@ class MyPostViewModel : ClubViewModel() {
         const val USER_ID_ME: Long = -1
     }
 
-    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
-
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(userId: Long) = flowOf(
-            clearListCh.receiveAsFlow().map { PagingData.empty() },
-            postItems(userId)
-
-    ).flattenMerge(2).cachedIn(viewModelScope)
+    fun posts(userId: Long) = postItems(userId).cachedIn(viewModelScope)
 
     private fun postItems(userId: Long) = Pager(
             config = PagingConfig(pageSize = MyPostMediator.PER_LIMIT),
@@ -45,61 +39,8 @@ class MyPostViewModel : ClubViewModel() {
     ) {
         mimiDB.postDBItemDao().pagingSourceByPageCode(MyPostMediator::class.simpleName + userId.toString())
 
-
     }.flow.map {
         it.map { it.memberPostItem }
     }
-
-//    fun getMyPostPagingItems(
-//        userId: Long
-//    ): Flow<PagingData<MemberPostItem>> {
-//        return Pager(
-//            config = PagingConfig(
-//                pageSize = ApiRepository.NETWORK_PAGE_SIZE,
-//                enablePlaceholders = false
-//            ),
-//            pagingSourceFactory = { MyPostPagingSource(userId, domainManager) }
-//        ).flow.cachedIn(viewModelScope)
-//    }
-//
-//    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
-//        viewModelScope.launch {
-//            flow {
-//                val apiRepository = domainManager.getApiRepository()
-//                val likeType = when {
-//                    isLike -> LikeType.LIKE
-//                    else -> LikeType.DISLIKE
-//                }
-//                val request = LikeRequest(likeType)
-//                val result = apiRepository.like(item.id, request)
-//                if (!result.isSuccessful) throw HttpException(result)
-//                emit(ApiResult.success(position))
-//            }
-//                .flowOn(Dispatchers.IO)
-//                .catch { e -> emit(ApiResult.error(e)) }
-//                .collect { _likePostResult.value = it }
-//        }
-//    }
-
-//    fun favoritePost(
-//        item: MemberPostItem,
-//        position: Int,
-//        isFavorite: Boolean
-//    ) {
-//        viewModelScope.launch {
-//            flow {
-//                val apiRepository = domainManager.getApiRepository()
-//                val result = when {
-//                    isFavorite -> apiRepository.addFavorite(item.id)
-//                    else -> apiRepository.deleteFavorite(item.id)
-//                }
-//                if (!result.isSuccessful) throw HttpException(result)
-//                emit(ApiResult.success(position))
-//            }
-//                .flowOn(Dispatchers.IO)
-//                .catch { e -> emit(ApiResult.error(e)) }
-//                .collect { _favoriteResult.value = it }
-//        }
-//    }
 
 }

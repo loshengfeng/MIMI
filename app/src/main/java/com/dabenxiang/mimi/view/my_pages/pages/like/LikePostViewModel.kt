@@ -27,14 +27,8 @@ class LikePostViewModel : ClubViewModel() {
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
 
-    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
-
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(type: MyPagesType) = flowOf(
-            clearListCh.receiveAsFlow().map { PagingData.empty() },
-            postItems(type)
-
-    ).flattenMerge(2).cachedIn(viewModelScope)
+    fun posts(type: MyPagesType) = postItems(type).cachedIn(viewModelScope)
 
     private fun postItems(type: MyPagesType) = Pager(
             config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
@@ -46,59 +40,6 @@ class LikePostViewModel : ClubViewModel() {
     }.flow.map {
         it.map { it.memberPostItem }
     }
-
-//    fun like(
-//            item: MemberPostItem,
-//            position: Int,
-//            isLike: Boolean,
-//            type:MyPagesType) {
-//        viewModelScope.launch {
-//            Timber.i("likePost item=$item")
-//            flow {
-//                val apiRepository = domainManager.getApiRepository()
-//
-//                val likeType: LikeType = when {
-//                    isLike -> LikeType.LIKE
-//                    else -> LikeType.DISLIKE
-//                }
-//                val request = LikeRequest(likeType)
-//                val result = when {
-//                    isLike -> apiRepository.like(item.id, request)
-//                    else -> apiRepository.deleteLike(item.id)
-//                }
-//                if (!result.isSuccessful) throw HttpException(result)
-//                item.likeType = if (isLike) LikeType.LIKE else LikeType.DISLIKE
-//                item.likeCount = item.likeCount
-//                _postChangedResult.postValue(ApiResult.success(item))
-//                emit(ApiResult.success(position))
-//            }
-//                    .flowOn(Dispatchers.IO)
-//                    .catch { e -> emit(ApiResult.error(e)) }
-//                    .onCompletion {
-//                        mimiDB.postDBItemDao().getMemberPostItemById(item.id)?.let { memberPostItem->
-//                            val item = memberPostItem.apply {
-//                                when {
-//                                    isLike -> {
-//                                        this.likeType = LikeType.LIKE
-//                                        this.likeCount += 1
-//                                    }
-//                                    else-> {
-//                                        this.likeType = LikeType.DISLIKE
-//                                        this.likeCount -= 1
-//                                    }
-//                                }
-//                            }
-//                            val pageCode =MyPagesPostMediator::class.simpleName + type.toString()
-//                            mimiDB.postDBItemDao().insertMemberPostItem(item)
-//                            mimiDB.postDBItemDao().deleteItemByPageCode(
-//                                    pageCode= pageCode,
-//                                    postDBId = memberPostItem.id
-//                            )
-//                        }
-//                    }
-//                    .collect {}
-//        }
-//    }
 
     fun deleteAllLike(type:MyPagesType, items: List<MemberPostItem>) {
         if (items.isEmpty()) return

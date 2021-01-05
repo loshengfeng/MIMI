@@ -20,14 +20,8 @@ class ClubItemViewModel : ClubViewModel() {
 
     var totalCount: Int = 0
 
-    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
-
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(pageCode:String, type: ClubTabItemType) = flowOf(
-            clearListCh.receiveAsFlow().map { PagingData.empty() },
-            postItems(pageCode, type)
-
-    ).flattenMerge(2).cachedIn(viewModelScope)
+    fun posts(pageCode:String, type: ClubTabItemType) =  postItems(pageCode, type).cachedIn(viewModelScope)
 
     private fun postItems(pageCode:String, type: ClubTabItemType) = Pager(
             config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
@@ -50,6 +44,13 @@ class ClubItemViewModel : ClubViewModel() {
             ClubTabItemType.SHORT_VIDEO -> "video"
             ClubTabItemType.PICTURE -> "image"
             ClubTabItemType.NOVEL -> "text"
+        }
+    }
+
+    fun refresh(pageCode: String):Flow<Void>{
+        return flow {
+            mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
+            mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
         }
     }
 
