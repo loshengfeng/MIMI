@@ -23,6 +23,7 @@ class ClubItemViewModel : ClubViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun posts(pageCode:String, type: ClubTabItemType) =  postItems(pageCode, type).cachedIn(viewModelScope)
 
+    @OptIn(ExperimentalPagingApi::class)
     private fun postItems(pageCode:String, type: ClubTabItemType) = Pager(
             config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
             remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight, pageCode,

@@ -30,6 +30,7 @@ class TopicListViewModel : ClubViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun posts(pageCode: String, tag: String, orderBy: OrderBy) = postItems(pageCode, tag, orderBy).cachedIn(viewModelScope)
 
+    @OptIn(ExperimentalPagingApi::class)
     private fun postItems(pageCode: String, tag: String, orderBy: OrderBy) = Pager(
             config = PagingConfig(pageSize = TopicPostMediator.PER_LIMIT),
             remoteMediator = TopicPostMediator(
