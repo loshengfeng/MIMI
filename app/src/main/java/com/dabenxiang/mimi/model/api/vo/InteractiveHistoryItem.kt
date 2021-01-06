@@ -4,19 +4,19 @@ import com.google.gson.annotations.SerializedName
 
 data class InteractiveHistoryItem(
     @SerializedName("id")
-    val id: Long = 0,
+    val id: Long? = 0,
 
     @SerializedName("isView")
-    val isView: Boolean = false,
+    val isView: Boolean? = false,
 
     @SerializedName("isLike")
-    val isLike: Boolean = false,
+    val isLike: Boolean? = false,
 
     @SerializedName("isDislike")
-    val isDislike: Boolean = false,
+    val isDislike: Boolean? = false,
 
     @SerializedName("isFavorite")
-    val isFavorite: Boolean = false,
+    val isFavorite: Boolean? = false,
 
     @SerializedName("likeCount")
     val likeCount: Long = 0,

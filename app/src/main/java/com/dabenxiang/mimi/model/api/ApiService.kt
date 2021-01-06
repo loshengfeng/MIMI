@@ -554,28 +554,28 @@ interface ApiService {
     @POST("/v1/Members/Post/{postId}/Favorite")
     suspend fun addFavorite(
         @Path("postId") postId: Long
-    ): Response<Void>
+    ): Response<ApiBaseItem<InteractiveHistoryItem>>
 
     @DELETE("/v1/Members/Post/{postId}/Favorite")
     suspend fun deleteFavorite(
         @Path("postId") postId: Long
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @POST("/v1/Members/Post/{postId}/Like")
     suspend fun like(
         @Path("postId") postId: Long,
         @Body body: LikeRequest
-    ): Response<Void>
+    ): Response<ApiBaseItem<InteractiveHistoryItem>>
 
     @DELETE("/v1/Members/Post/{postId}/Like")
     suspend fun deleteLike(
         @Path("postId") postId: Long
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @DELETE("/v1/Members/Post/{postId}/Like")
     suspend fun deleteAllLike(
         @Path("postId") postId: String
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @POST("/v1/Members/Post/{postId}/PostReport")
     suspend fun sendPostReport(

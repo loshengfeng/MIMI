@@ -81,7 +81,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     fun updateInteractiveHistory(item: VideoItem, interactiveHistoryItem: InteractiveHistoryItem) {
         item.commentCount = interactiveHistoryItem.commentCount
         item.favoriteCount = interactiveHistoryItem.favoriteCount
-        item.favorite = interactiveHistoryItem.isFavorite
+        interactiveHistoryItem.isFavorite?.run { item.favorite = this }
 
         tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()
