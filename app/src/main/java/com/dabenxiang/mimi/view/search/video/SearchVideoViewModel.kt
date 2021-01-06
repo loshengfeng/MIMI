@@ -92,7 +92,7 @@ class SearchVideoViewModel : BaseViewModel() {
                 }
                 countItem as InteractiveHistoryItem
                 item.isFavorite = item.isFavorite != true
-                item.favoriteCount = countItem.favoriteCount
+                countItem.favoriteCount?.run { item.favoriteCount = this.toInt() }
 
                 when (item.type) {
                     PostType.VIDEO_ON_DEMAND -> changeFavoriteMimiVideoInDb(item.id)
@@ -101,8 +101,8 @@ class SearchVideoViewModel : BaseViewModel() {
                             item.id,
                             PlayItem(
                                 favorite = item.isFavorite,
-                                favoriteCount = countItem.favoriteCount,
-                                commentCount = countItem.commentCount
+                                favoriteCount = countItem.favoriteCount?.toInt(),
+                                commentCount = countItem.commentCount?.toInt()
                             )
                         )
                         changeFavoriteSmallVideoInDb(item.id)

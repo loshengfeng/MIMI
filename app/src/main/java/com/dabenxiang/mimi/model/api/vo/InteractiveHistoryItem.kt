@@ -19,17 +19,17 @@ data class InteractiveHistoryItem(
     val isFavorite: Boolean? = false,
 
     @SerializedName("likeCount")
-    val likeCount: Int = 0,
+    val likeCount: Long? = 0,
 
     @SerializedName("dislikeCount")
-    val dislikeCount: Int = 0,
+    val dislikeCount: Long? = 0,
 
     @SerializedName("favoriteCount")
-    val favoriteCount: Int = 0,
+    val favoriteCount: Long? = 0,
 
     @SerializedName("followCount")
-    val followCount: Int = 0,
+    val followCount: Long? = 0,
 
     @SerializedName("commentCount")
-    val commentCount: Int = 0,
+    val commentCount: Long? = 0,
 )

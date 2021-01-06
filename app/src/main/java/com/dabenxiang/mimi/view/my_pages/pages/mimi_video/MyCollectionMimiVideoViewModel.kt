@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
+import timber.log.Timber
 
 class MyCollectionMimiVideoViewModel : ClubViewModel() {
 
@@ -64,8 +65,8 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                             videoId.toLong(),
                             PlayItem(
                                 favorite = false,
-                                favoriteCount = countItem.favoriteCount,
-                                commentCount = countItem.commentCount
+                                favoriteCount = countItem.favoriteCount?.toInt(),
+                                commentCount = countItem.commentCount?.toInt()
                             )
                         )
                         changeFavoriteSmallVideoInDb(videoId.toLong())
@@ -98,14 +99,16 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     items.forEachWithIndex { i, playItem ->
                         takeIf { i < countItems.size }?.let { countItems[i] }?.let { item ->
                             item as InteractiveHistoryItem
-                            LruCacheUtils.putShortVideoDataCache(
-                                playItem.id,
-                                PlayItem(
-                                    favorite = false,
-                                    favoriteCount = item.favoriteCount,
-                                    commentCount = item.commentCount
+                            playItem.videoId?.let { videoId ->
+                                LruCacheUtils.putShortVideoDataCache(
+                                    videoId,
+                                    PlayItem(
+                                        favorite = false,
+                                        favoriteCount = item.favoriteCount?.toInt(),
+                                        commentCount = item.commentCount?.toInt()
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }

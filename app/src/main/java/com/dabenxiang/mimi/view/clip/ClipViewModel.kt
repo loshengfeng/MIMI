@@ -168,7 +168,7 @@ class ClipViewModel : BaseViewModel() {
                 }
                 countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
-                item.favoriteCount = countItem.favoriteCount
+                countItem.favoriteCount?.run { item.favoriteCount = this.toInt() }
                 LruCacheUtils.putShortVideoDataCache(
                     item.id,
                     PlayItem(
@@ -178,7 +178,7 @@ class ClipViewModel : BaseViewModel() {
                     )
                 )
                 changeFavoriteSmallVideoInDb(item.id)
-                emit(ApiResult.success(countItem.favoriteCount))
+                emit(ApiResult.success(countItem.favoriteCount?.toInt()))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }

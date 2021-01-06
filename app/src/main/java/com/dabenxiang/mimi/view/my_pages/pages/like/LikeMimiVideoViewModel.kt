@@ -70,7 +70,7 @@ class LikeMimiVideoViewModel : ClubViewModel() {
                 }
                 countItem as InteractiveHistoryItem
                 item.favorite = !originFavorite
-                item.favoriteCount = countItem.favoriteCount
+                item.favoriteCount = countItem.favoriteCount?.toInt()
                 when (type) {
                     MyPagesType.LIKE_MIMI -> changeFavoriteMimiVideoInDb(item.videoId ?: 0)
                     MyPagesType.LIKE_SHORT_VIDEO -> {

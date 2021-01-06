@@ -45,7 +45,7 @@ class ClipSingleViewModel : BaseViewModel() {
                 }
                 countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
-                item.favoriteCount = countItem.favoriteCount
+                item.favoriteCount = countItem.favoriteCount?.toInt()
                 LruCacheUtils.putShortVideoDataCache(item.id, item)
                 changeFavoriteSmallVideoInDb(item.videoId?:0)
                 emit(

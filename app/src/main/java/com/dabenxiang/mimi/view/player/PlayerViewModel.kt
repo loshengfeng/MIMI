@@ -754,8 +754,8 @@ class PlayerViewModel : BaseViewModel() {
                     videoId,
                     PlayItem(
                         favorite = favoriteVideo.value != true,
-                        favoriteCount = countItem.favoriteCount.toInt(),
-                        commentCount = countItem.commentCount.toInt()
+                        favoriteCount = countItem.favoriteCount?.toInt(),
+                        commentCount = countItem.commentCount?.toInt()
                     )
                 )
                 emit(ApiResult.success(null))

@@ -235,20 +235,20 @@ interface ApiService {
     suspend fun postMembersPostComment(
         @Path("postId") postId: Long,
         @Body request: PostCommentRequest
-    ): Response<ApiBaseItem<Long>>
+    ): Response<ApiBaseItem<CmtCountItem>>
 
     @POST("/v1/Members/Post/{postId}/Comment/{commentId}/Like")
     suspend fun postMembersPostCommentLike(
         @Path("postId") postId: Long,
         @Path("commentId") commentId: Long,
         @Body request: PostLikeRequest
-    ): Response<Void>
+    ): Response<CmtCountItem>
 
     @DELETE("/v1/Members/Post/{postId}/Comment/{commentId}/Like")
     suspend fun deleteMembersPostCommentLike(
         @Path("postId") postId: Long,
         @Path("commentId") commentId: Long
-    ): Response<Void>
+    ): Response<CmtCountItem>
 
     @PUT("/v1/Members/Post/{id}")
     suspend fun updatePost(
