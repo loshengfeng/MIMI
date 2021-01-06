@@ -14,6 +14,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_my.*
 import kotlinx.android.synthetic.main.fragment_my.view.*
+import timber.log.Timber
 
 abstract class BaseMyPagesTabFragment : BaseFragment() {
 

@@ -144,17 +144,40 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
                 viewModel.deleteAllLike(myPagesType, adapter.snapshot().items)
             }
         })
+
+        viewModel.cleanResult.observe(this, {
+            when (it) {
+                is ApiResult.Empty -> {
+                    emptyPageToggle(true)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.videoLikeResult.observe(this){
+
+            Timber.i("videoLikeResult =$it")
+            when (it) {
+                is ApiResult.Success -> {
+                    if(adapter.snapshot().items.size <=1) {
+                        viewModel.viewModelScope.launch {
+                            val dbSize=viewModel.checkoutItemsSize(pageCode)
+                            if(dbSize<=0) emptyPageToggle(true)
+                        }
+                    }
+                    layout_refresh.isRefreshing = false
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                if(adapter.snapshot().items.isEmpty() && timeout >0){
-                    layout_refresh?.isRefreshing = true
-                }else{
-                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
-                }
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
         }
 
@@ -183,23 +206,29 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+            timeout = 0
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = getText(R.string.like_empty_msg)
+            recycler_view?.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            recycler_view?.visibility = View.VISIBLE
+
+        }
+        layout_refresh.isRefreshing = false
+
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         posts_list.adapter = adapter
 
         viewModel.postCount.observe(viewLifecycleOwner) {
-            Timber.i("postCount= $it")
-            if (it == 0) {
-                text_page_empty.text = getString(R.string.like_empty_msg)
-                id_empty_group.visibility = View.VISIBLE
-                posts_list.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                posts_list.visibility = View.VISIBLE
-            }
+            emptyPageToggle(it<=0)
             myPagesViewModel.changeDataCount(tab, it)
-            layout_refresh.isRefreshing = false
         }
 
         layout_refresh.setOnRefreshListener {

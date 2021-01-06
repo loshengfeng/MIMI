@@ -79,6 +79,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         }
 
         myPagesViewModel.deleteAll.observe(this){
+            Timber.i("deleteAll tab=$it ${adapter.snapshot().items.size}")
             if(tab == it){
                 viewModel.deleteVideos(type, adapter.snapshot().items)
             }
@@ -86,8 +87,6 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
 
         viewModel.cleanResult.observe(this) {
             when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Empty -> {
                     Timber.i("cleanResult items:${adapter.snapshot().items.isEmpty()}")
                     emptyPageToggle(true)
@@ -99,8 +98,6 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
 
         viewModel.videoFavoriteResult.observe(this) {
             when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
                     if(adapter.snapshot().items.size <=1) {
                         viewModel.viewModelScope.launch {

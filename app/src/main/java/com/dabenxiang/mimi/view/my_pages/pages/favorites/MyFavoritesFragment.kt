@@ -75,11 +75,7 @@ class MyFavoritesFragment(
 
         viewModel.cleanResult.observe(this, {
             when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Empty -> {
-//                    viewModel.getData(adapter, isLike)
-                    Timber.i("cleanResult items:${adapter.snapshot().items.isEmpty()}")
                     emptyPageToggle(true)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
@@ -88,8 +84,6 @@ class MyFavoritesFragment(
 
         viewModel.favoriteResult.observe(this, {
             when (it) {
-                is ApiResult.Loading -> progressHUD.show()
-                is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
                     if(adapter.snapshot().items.size <=1) {
                         viewModel.viewModelScope.launch {

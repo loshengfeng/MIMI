@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -36,6 +38,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragment() {
 
@@ -59,6 +62,30 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
             layout_refresh.isRefreshing = it
         })
 
+        viewModel.cleanResult.observe(this, {
+            when (it) {
+                is ApiResult.Empty -> {
+                    emptyPageToggle(true)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.likePostResult.observe(this){
+            when (it) {
+                is ApiResult.Success -> {
+                    if(adapter.snapshot().items.size <=1) {
+                        viewModel.viewModelScope.launch {
+                            val dbSize=viewModel.checkoutItemsSize(pageCode)
+                            if(dbSize<=0) emptyPageToggle(true)
+                        }
+                    }
+                    layout_refresh.isRefreshing = false
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
     }
@@ -67,11 +94,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
-                if(adapter.snapshot().items.isEmpty() && timeout >0){
-                    layout_refresh?.isRefreshing = true
-                }else{
-                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
-                }
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
         }
 
@@ -100,6 +123,20 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+            timeout = 0
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = getText(R.string.like_empty_msg)
+            recycler_view?.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            recycler_view?.visibility = View.VISIBLE
+
+        }
+        layout_refresh.isRefreshing = false
+
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -119,15 +156,8 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
         })
 
         viewModel.postCount.observe(viewLifecycleOwner, {
-            if (it == 0) {
-                id_empty_group.visibility = View.VISIBLE
-                recycler_view.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                recycler_view.visibility = View.VISIBLE
-            }
+            emptyPageToggle(it<=0)
             myPagesViewModel.changeDataCount(tab, it)
-            layout_refresh.isRefreshing = false
         })
 
         text_page_empty.text = getString(R.string.like_empty_msg)
@@ -164,7 +194,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
                 override fun onCancel() {
                     item.likeType = LikeType.LIKE
                     item.likeCount++
-                    adapter.notifyItemChanged(position)
+                    adapter.refresh()
                 }
             })
 

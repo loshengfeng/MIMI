@@ -136,7 +136,7 @@ abstract class ClubViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
-                .onCompletion {}
+                .onCompletion { setShowProgress(false) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _videoLikeResult.value = it }
         }

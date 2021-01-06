@@ -22,6 +22,7 @@ class CleanDialogFragment : BaseDialogFragment() {
             val fragment = CleanDialogFragment()
             fragment.onCleanDialogListener = listener
             fragment.msgResId = msgResId
+            fragment.isCancelable = false
             return fragment
         }
     }
