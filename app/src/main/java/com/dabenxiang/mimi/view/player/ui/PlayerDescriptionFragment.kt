@@ -127,14 +127,6 @@ class PlayerDescriptionFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-//        descriptionViewModel.videoChangedResult.observe(viewLifecycleOwner){
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        }
 
         viewModel.videoContentSource.observe(viewLifecycleOwner) {
             when (it) {

@@ -31,6 +31,7 @@ class SearchVideoViewModel : BaseViewModel() {
     var searchingTag = ""
     var searchingStr = ""
     var videoType: VideoType? = null
+    var userId = 0L
 
     private val _searchingTotalCount = MutableLiveData<Long>()
     val searchingTotalCount: LiveData<Long> = _searchingTotalCount

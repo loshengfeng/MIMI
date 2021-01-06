@@ -40,6 +40,15 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
+import kotlinx.android.synthetic.main.fragment_search_post.chip_group_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.ib_back
+import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_history
+import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_search_bar
+import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
+import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
+import kotlinx.android.synthetic.main.fragment_search_post.search_bar
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search
+import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -66,8 +75,6 @@ class SearchPostFragment : BaseFragment() {
     }
 
     private var searchType: PostType = PostType.TEXT_IMAGE_VIDEO
-    private var searchTag: String? = null
-    private var searchText: String? = null
     private var searchOrderBy: StatisticsOrderType = StatisticsOrderType.LATEST
     private var searchKeyword: String = ""
 
@@ -76,8 +83,8 @@ class SearchPostFragment : BaseFragment() {
             requireActivity(),
             postListener,
             viewModel.viewModelScope,
-            { searchText ?: "" },
-            { searchTag ?: "" })
+            { viewModel.searchText ?: "" },
+            { viewModel.searchTag ?: "" })
     }
 
     private val postListener = object : MyPostListener {
@@ -175,7 +182,7 @@ class SearchPostFragment : BaseFragment() {
                 it as MemberPostItem
 
                 val searchPostItem =
-                    SearchPostItem(searchType, searchOrderBy, searchTag, searchKeyword)
+                    SearchPostItem(searchType, searchOrderBy, viewModel.searchTag, searchKeyword)
                 val bundle = Bundle()
                 item.id
                 bundle.putBoolean(MyPostFragment.EDIT, true)
@@ -255,8 +262,8 @@ class SearchPostFragment : BaseFragment() {
             val searchPostItem = SearchPostItem(
                 searchType,
                 searchOrderBy,
-                tag,
-                searchText,
+                viewModel.searchTag,
+                viewModel.searchText,
             )
 
             arguments?.putSerializable(KEY_DATA, searchPostItem)
@@ -264,28 +271,28 @@ class SearchPostFragment : BaseFragment() {
     }
 
     override fun setupFirstTime() {
-        viewModel.adWidth =
-            GeneralUtils.getAdSize(requireActivity()).first
+        viewModel.userId = viewModel.accountManager.getProfile().userId
+        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         (arguments?.getSerializable(KEY_DATA) as SearchPostItem).also {
             searchType = it.type
-            searchTag = it.tag
-            searchText = it.keyword
+            viewModel.searchTag = it.tag
+            viewModel.searchText = it.keyword
             searchOrderBy = it.orderBy ?: StatisticsOrderType.LATEST
         }
 
-        if (!TextUtils.isEmpty(searchText)) {
+        if (!TextUtils.isEmpty(viewModel.searchText)) {
             recycler_search_result.visibility = View.VISIBLE
-            search_bar.setText(searchText)
-            search(text = searchText)
+            search_bar.setText(viewModel.searchText)
+            search(text = viewModel.searchText)
             search_bar.post {
                 search_bar.clearFocus()
             }
-        } else if (!TextUtils.isEmpty(searchTag)) {
+        } else if (!TextUtils.isEmpty(viewModel.searchTag)) {
             recycler_search_result.visibility = View.VISIBLE
-            search_bar.setText(searchTag)
-            search(tag = searchTag)
+            search_bar.setText(viewModel.searchTag)
+            search(tag = viewModel.searchTag)
             search_bar.post {
                 search_bar.clearFocus()
             }
@@ -382,7 +389,7 @@ class SearchPostFragment : BaseFragment() {
             val searchPostItem = SearchPostItem(
                 searchType,
                 searchOrderBy,
-                searchTag,
+                viewModel.searchTag,
                 search_bar.text.toString(),
             )
 
@@ -397,7 +404,7 @@ class SearchPostFragment : BaseFragment() {
                     val searchPostItem = SearchPostItem(
                         searchType,
                         searchOrderBy,
-                        searchTag,
+                        viewModel.searchTag,
                         search_bar.text.toString(),
                     )
 
@@ -430,18 +437,16 @@ class SearchPostFragment : BaseFragment() {
             search_bar.requestFocus()
             return
         }
+        viewModel.searchText = text
+        viewModel.searchTag = tag
         layout_search_text.visibility = View.GONE
         layout_search_history.visibility = View.GONE
         text?.let {
             viewModel.updateSearchHistory(text)
             searchKeyword = text
-            searchText = text
-            searchTag = ""
         }
         tag?.let {
             searchKeyword = tag
-            searchText = ""
-            searchTag = tag
         }
 
         when (searchType) {
@@ -547,7 +552,7 @@ class SearchPostFragment : BaseFragment() {
                 val searchPostItem = SearchPostItem(
                     searchType,
                     searchOrderBy,
-                    searchTag,
+                    viewModel.searchTag,
                     text,
                 )
 
@@ -587,6 +592,14 @@ class SearchPostFragment : BaseFragment() {
                 bundle
             )
         )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (recycler_search_result.visibility == View.VISIBLE && viewModel.userId != viewModel.accountManager.getProfile().userId) {
+            viewModel.userId = viewModel.accountManager.getProfile().userId
+            search(viewModel.searchText, viewModel.searchTag)
+        }
     }
 
 }

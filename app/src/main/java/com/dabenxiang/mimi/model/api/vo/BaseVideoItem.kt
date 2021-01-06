@@ -83,9 +83,7 @@ data class VideoItem(
     fun toMemberPostItem(): MemberPostItem {
         val tags = when (tags) {
             is List<*> -> tags as ArrayList<String>
-            is String -> {
-                tags.split(",").toList() as ArrayList<String>
-            }
+            is String -> tags.split(",").toMutableList() as ArrayList<String>
             else -> arrayListOf()
         }
         return MemberPostItem(
@@ -103,7 +101,7 @@ data class VideoItem(
             videoPerformers = performers,
             reported = reported ?: false,
             deducted = deducted ?: false,
-            likeType = likeType,
+            likeType = if(like==true) LikeType.LIKE else if(like==false) LikeType.DISLIKE else null,
             likeCount = likeCount,
             dislikeCount = dislikeCount,
             isFavorite = favorite,
