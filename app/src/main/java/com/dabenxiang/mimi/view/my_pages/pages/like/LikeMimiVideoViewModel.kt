@@ -9,13 +9,11 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.api.vo.PlayListRequest
-import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.MyCollectionMimiVideoDataSource
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -103,10 +101,15 @@ class LikeMimiVideoViewModel : BaseViewModel() {
                     else -> apiRepository.deleteMePlaylist(item.videoId.toString())
                 }
                 if (!result.isSuccessful) throw HttpException(result)
+                val body = result.body()?.content
+                val countItem = when {
+                    !originFavorite -> body
+                    else -> (body as ArrayList<*>)[0]
+                }
+                countItem as InteractiveHistoryItem
                 item.favorite = !originFavorite
-                item.favoriteCount =
-                    if (originFavorite) originFavoriteCnt - 1
-                    else originFavoriteCnt + 1
+                item.favoriteCount = countItem.favoriteCount.toInt()
+                LruCacheUtils.putShortVideoDataCache(item.id, item)
                 _videoChangedResult.postValue(
                     ApiResult.success(
                         VideoItem(

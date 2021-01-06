@@ -17,6 +17,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ApiResult.*
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.PostType
@@ -86,11 +87,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         viewModel.favoriteResult.observe(owner = viewLifecycleOwner) {
             when (it) {
                 is Loading -> progressHUD.show()
-                is Loaded -> progressHUD.dismiss()
-                is Success -> rv_clip.adapter?.notifyItemChanged(
-                    it.result,
-                    ClipAdapter.PAYLOAD_UPDATE_UI
-                )
+                is Loaded, is Success -> progressHUD.dismiss()
                 is Error -> onApiError(it.throwable)
                 else -> {
                 }
@@ -132,6 +129,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         viewModel.rechargeVipResult.observe(owner = viewLifecycleOwner) {
             if (viewModel.isVip()) {
                 clipAdapter.getM3U8()
+                clipAdapter.getInteractiveHistory()
             }
         }
     }
@@ -149,10 +147,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     override fun onResume() {
         super.onResume()
-        if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
-            clipAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
-            clipAdapter.notifyDataSetChanged()
-        }
+        this.clipAdapter.notifyItemChanged(clipAdapter.getCurrentPos(), ClipAdapter.PAYLOAD_UPDATE_COUNT)
     }
 
     override fun onPause() {
@@ -179,10 +174,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         }
     }
 
-    private fun onFavoriteClick(item: VideoItem, pos: Int, isFavorite: Boolean) {
+    private fun onFavoriteClick(item: VideoItem, isFavorite: Boolean, update: (Boolean, Int) -> Unit) {
         checkStatus {
-            Timber.d("onFavoriteClick,  item:$item, pos:$pos, isFavorite:$isFavorite")
-            viewModel.modifyFavorite(item, pos, isFavorite)
+            Timber.d("onFavoriteClick,  item:$item, isFavorite:$isFavorite")
+            viewModel.modifyFavorite(item, isFavorite, update)
         }
     }
 
@@ -229,6 +224,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     private fun getM3U8(item: VideoItem, position: Int, update: (Int, String, Int) -> Unit) {
         viewModel.getM3U8(item, position, update)
+    }
+
+    private fun getInteractiveHistory(item: VideoItem, position: Int, update: (Int, InteractiveHistoryItem) -> Unit) {
+        viewModel.getInteractiveHistory(item, position, update)
     }
 
     private fun scrollToNext(nextPosition: Int) {
@@ -324,7 +323,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     private val clipFuncItem by lazy {
         ClipFuncItem(
             { id, view, type -> viewModel.loadImage(id, view, type) },
-            { item, pos, isFavorite -> onFavoriteClick(item, pos, isFavorite) },
+            { item, isFavorite, update -> onFavoriteClick(item, isFavorite, update) },
             { item, pos, isLike -> onLikeClick(item, pos, isLike) },
             { item -> onCommentClick(item) },
             { item -> onMoreClick(item) },
@@ -332,6 +331,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             { onVipClick() },
             { onPromoteClick() },
             { item, pos, update -> getM3U8(item, pos, update) },
+            { item, pos, update -> getInteractiveHistory(item, pos, update) },
             { pos -> scrollToNext(pos) },
             { source -> viewModel.getDecryptSetting(source) },
             { videoItem, decryptSettingItem, function ->
@@ -402,6 +402,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                             clipAdapter.updateCurrentPosition(currentPos)
                             clipAdapter.notifyItemChanged(lastPos)
                             clipAdapter.getM3U8()
+                            clipAdapter.getInteractiveHistory()
                         }
                     }
                 }

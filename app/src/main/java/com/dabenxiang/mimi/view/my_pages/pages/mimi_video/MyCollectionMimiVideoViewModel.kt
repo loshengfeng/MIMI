@@ -9,16 +9,19 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.PlayListRequest
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import com.dabenxiang.mimi.view.my_pages.pages.like.MiMiLikeListDataSource
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -38,11 +41,15 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
 
     var totalCount: Int = 0
 
-    fun getData(adapter: MyCollectionMimiVideoAdapter, type: MyCollectionTabItemType, isLike: Boolean) {
+    fun getData(
+        adapter: MyCollectionMimiVideoAdapter,
+        type: MyCollectionTabItemType,
+        isLike: Boolean
+    ) {
         Timber.i("getData")
         CoroutineScope(Dispatchers.IO).launch {
             adapter.submitData(PagingData.empty())
-            if(isLike) {
+            if (isLike) {
                 getLikeItemList()
                     .collect {
                         adapter.submitData(it)
@@ -70,7 +77,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
             }
         )
             .flow
-            .onStart {  setShowProgress(true) }
+            .onStart { setShowProgress(true) }
             .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
     }
@@ -86,22 +93,32 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
             }
         )
             .flow
-            .onStart {  setShowProgress(true) }
+            .onStart { setShowProgress(true) }
             .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
     }
 
-    fun deleteMIMIVideoFavorite(videoId : String){
+    fun deleteMIMIVideoFavorite(videoId: String) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.deleteMePlaylist(videoId)
                 if (!result.isSuccessful) throw HttpException(result)
+                val body = result.body()?.content
+                val countItem = (body as ArrayList<*>)[0] as InteractiveHistoryItem
+                LruCacheUtils.putShortVideoDataCache(
+                    videoId.toLong(),
+                    PlayItem(
+                        favorite = false,
+                        favoriteCount = countItem.favoriteCount.toInt(),
+                        commentCount = countItem.commentCount.toInt()
+                    )
+                )
                 emit(ApiResult.success(result.isSuccessful))
             }
-                    .flowOn(Dispatchers.IO)
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .collect { _deleteFavoriteResult.value = it }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect { _deleteFavoriteResult.value = it }
         }
     }
 
@@ -120,8 +137,23 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     else -> apiRepository.deleteMePlaylist(item.id.toString())
                 }
                 if (!resp.isSuccessful) throw HttpException(resp)
+                val body = resp.body()?.content
+                val countItem = when {
+                    isFavorite -> body
+                    else -> (body as ArrayList<*>)[0]
+                }
+                countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
-                item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
+                item.favoriteCount = countItem.favoriteCount
+                LruCacheUtils.putShortVideoDataCache(
+                    item.id,
+                    PlayItem(
+                        favorite = isFavorite,
+                        favoriteCount = countItem.favoriteCount.toInt(),
+                        commentCount = countItem.commentCount.toInt()
+                    )
+                )
+
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -135,17 +167,35 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                        .deleteMePlaylist(
-                                items.map {it.videoId}.joinToString(separator = ",")
+                    .deleteMePlaylist(
+                        items.map { it.videoId }.joinToString(separator = ",")
+                    )
+
+                val body = result.body()?.content
+                val countItems = (body as ArrayList<*>)
+
+                items.forEachWithIndex { i, playItem ->
+                    takeIf { i < countItems.size }?.let { countItems[i] }?.let { item ->
+                        item as InteractiveHistoryItem
+                        LruCacheUtils.putShortVideoDataCache(
+                            playItem.id,
+                            PlayItem(
+                                favorite = false,
+                                favoriteCount = item.favoriteCount.toInt(),
+                                commentCount = item.commentCount.toInt()
+                            )
                         )
+                    }
+                }
+
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
-                    .flowOn(Dispatchers.IO)
-                    .onStart { emit(ApiResult.loading()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect { _cleanResult.value = it }
+                .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _cleanResult.value = it }
         }
     }
 
@@ -155,7 +205,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
             flow {
                 val result = domainManager.getApiRepository()
                     .deleteAllLike(
-                        items.map {it.videoId}.joinToString(separator = ",")
+                        items.map { it.videoId }.joinToString(separator = ",")
                     )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))

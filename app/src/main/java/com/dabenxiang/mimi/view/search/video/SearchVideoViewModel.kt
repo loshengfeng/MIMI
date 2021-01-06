@@ -6,14 +6,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.PlayListRequest
-import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.search.video.paging.SearchVideoDataSource
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -120,12 +119,27 @@ class SearchVideoViewModel : BaseViewModel() {
                 if (!result.isSuccessful) {
                     throw HttpException(result)
                 }
+                val body = result.body()?.content
+                val countItem = when (currentItem?.favorite) {
+                    false -> body
+                    else -> (body as ArrayList<*>)[0]
+                }
+                countItem as InteractiveHistoryItem
+
                 currentItem?.run {
                     favorite = favorite != true
-                    favoriteCount =
-                        if (favorite) (favoriteCount ?: 0) + 1
-                        else (favoriteCount ?: 0) - 1
+                    favoriteCount = countItem.favoriteCount
                 }
+
+                LruCacheUtils.putShortVideoDataCache(
+                    videoID,
+                    PlayItem(
+                        favorite = currentItem?.favorite,
+                        favoriteCount = countItem.favoriteCount.toInt(),
+                        commentCount = countItem.commentCount.toInt()
+                    )
+                )
+
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
