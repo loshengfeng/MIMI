@@ -50,7 +50,7 @@ class MyPostMediator(
                 }
             }?.toInt() ?: 0
 
-            Timber.i("MyPagesPostMediator pageName=$pageCode offset=$offset")
+            Timber.i("MyPostMediator pageName=$pageCode offset=$offset userId=$userId")
 
             val result =
                     if (userId == MyPostViewModel.USER_ID_ME) domainManager.getApiRepository().getMyPost(offset = offset, limit = PER_LIMIT)
@@ -60,6 +60,8 @@ class MyPostMediator(
                             creatorId = userId,
                             isAdult = true
                     )
+
+            Timber.i("MyPostMediator pageName=$pageCode result=$result ")
             if (!result.isSuccessful) throw HttpException(result)
 
             val body = result.body()

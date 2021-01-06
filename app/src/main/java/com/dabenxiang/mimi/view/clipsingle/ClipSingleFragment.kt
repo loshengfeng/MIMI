@@ -189,15 +189,6 @@ class ClipSingleFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-        viewModel.videoChangedResult.observe(viewLifecycleOwner){
-            when (it) {
-                is ApiResult.Success -> {
-                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        }
-
         viewModel.getM3U8Result.observe(this, {
             when (it) {
                 is ApiResult.Loading -> progressHUD.show()
