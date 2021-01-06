@@ -70,7 +70,9 @@ class MyFavoritesFragment(
         })
 
         myPagesViewModel.deleteAll.observe(this, {
-            viewModel.deleteFavorites(adapter.snapshot().items)
+            if(tab == it){
+                viewModel.deleteFavorites(adapter.snapshot().items)
+            }
         })
 
         viewModel.cleanResult.observe(this, {
