@@ -42,12 +42,6 @@ class MyFavoritesViewModel : ClubViewModel() {
         }
     }
 
-    suspend fun checkoutItemsSize(pageCode:String):Int{
-        return mimiDB.withTransaction {
-            mimiDB.postDBItemDao().getPostDBItems(pageCode)?.size ?: 0
-        }
-    }
-
     fun deleteFavorites(items: List<MemberPostItem>) {
         if (items.isEmpty()) return
         viewModelScope.launch {

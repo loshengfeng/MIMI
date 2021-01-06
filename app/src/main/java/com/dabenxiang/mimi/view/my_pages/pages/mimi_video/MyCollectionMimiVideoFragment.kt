@@ -89,8 +89,8 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Empty -> {
-                    timeout = 0
-                    adapter.refresh()
+                    Timber.i("cleanResult items:${adapter.snapshot().items.isEmpty()}")
+                    emptyPageToggle(true)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -102,9 +102,12 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
-                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
-                    timeout = 0
-                    adapter.refresh()
+                    if(adapter.snapshot().items.size <=1) {
+                        viewModel.viewModelScope.launch {
+                            val dbSize=viewModel.checkoutItemsSize(pageCode)
+                            if(dbSize<=0) emptyPageToggle(true)
+                        }
+                    }
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -115,9 +118,12 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
                 is ApiResult.Loading -> progressHUD.show()
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
-                    Timber.i("favoriteResult items:${adapter.snapshot().items.isEmpty()}")
-                    timeout = 0
-                    adapter.refresh()
+                    if(adapter.snapshot().items.size <=1) {
+                        viewModel.viewModelScope.launch {
+                            val dbSize=viewModel.checkoutItemsSize(pageCode)
+                            if(dbSize<=0) emptyPageToggle(true)
+                        }
+                    }
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }

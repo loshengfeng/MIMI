@@ -147,4 +147,10 @@ abstract class ClubViewModel : BaseViewModel() {
             _postCount.postValue(count.toInt())
         }
     }
+
+    suspend fun checkoutItemsSize(pageCode:String):Int{
+        return mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getPostDBItems(pageCode)?.size ?: 0
+        }
+    }
 }
