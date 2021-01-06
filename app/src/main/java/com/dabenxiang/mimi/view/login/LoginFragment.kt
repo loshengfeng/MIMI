@@ -5,10 +5,8 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Editable
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
-import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
@@ -254,6 +252,37 @@ class LoginFragment : BaseFragment() {
                 tv_invite_code_error.visibility = View.VISIBLE
             }
         })
+
+        viewModel.registerExistResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Empty -> {
+                    viewModel.onMobileError(getString(R.string.error_mobile_duplicate))
+                }
+                is Error -> {
+                    onApiError(it.throwable)
+                }
+            }
+        })
+
+        viewModel.loginExistResult.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Loading -> progressHUD.show()
+                is Loaded -> progressHUD.dismiss()
+                is Empty -> {
+                    viewModel.callValidateMessage(tv_login_call_prefix.text.toString(), viewModel.loginAccount.value
+                        ?: "")                }
+                is Error -> {
+                    onApiError(it.throwable)
+                }
+            }
+        })
+
+        viewModel.loginMobileErrorResult.observe(viewLifecycleOwner, Observer {
+            tv_login_account_error.text = it
+            tv_login_account_error.visibility = View.VISIBLE
+        })
     }
 
     private fun validateMobile(mobile: String, getCodeView: TextView, prefixView: TextView) {
@@ -368,12 +397,12 @@ class LoginFragment : BaseFragment() {
         }
 
         tv_get_code.setOnClickListener {
-            viewModel.callValidateMessage(tv_call_prefix.text.toString(), viewModel.mobile.value?:"")
+            viewModel.callRegisterIsMemberExist(tv_call_prefix.text.toString(), viewModel.mobile.value ?: "")
         }
 
         tv_get_login_code.setOnClickListener {
-            viewModel.callValidateMessage(tv_login_call_prefix.text.toString(), viewModel.loginAccount.value
-                    ?: "")
+            viewModel.callLoginIsMemberExist(tv_login_call_prefix.text.toString(), viewModel.loginAccount.value
+                ?: "")
         }
 
 //        layout_login_verification_code.setOnClickListener {
@@ -445,8 +474,8 @@ class LoginFragment : BaseFragment() {
         viewModel.loginVerificationCode.bindingEditText = edit_login_verification_code
         viewModel.loginPw.bindingEditText = edit_login_pw
 
-        tl_type.selectTab(
-            this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
+//        tl_type.selectTab(
+//            this.arguments?.getInt(KEY_TYPE, TYPE_REGISTER)?.let { tl_type.getTabAt(it) })
 
         val keepAccount = viewModel.accountManager.keepAccount
 
@@ -512,6 +541,13 @@ class LoginFragment : BaseFragment() {
                     )
                 ).setCancel(false)
                     .show(requireActivity().supportFragmentManager)
+            }
+            LOGIN_404000 -> {
+                if (viewModel.type == TYPE_REGISTER) {
+                    viewModel.callValidateMessage(tv_call_prefix.text.toString(), viewModel.mobile.value ?: "")
+                } else if (viewModel.type == TYPE_LOGIN) {
+                    viewModel.onLoginMobileError(getString(R.string.error_mobile_not_exist))
+                }
             }
             LOGIN_406000 -> {
                 viewModel.validateCodeError(R.string.error_validation_code)

@@ -240,6 +240,10 @@ class ApiRepository(private val apiService: ApiService) {
         unhealthy: Boolean = true
     ) = apiService.getMemberVideoReport(videoId, type, unhealthy)
 
+    suspend fun isMemberExist(
+        userName: String
+    ) = apiService.isMemberExists(userName)
+
     /**********************************************************
      *
      *                  Members/Post
