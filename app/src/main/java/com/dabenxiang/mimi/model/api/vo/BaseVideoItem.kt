@@ -80,19 +80,17 @@ data class VideoItem(
     var type: PostType? = null,
     var adItem: AdItem? = null
 ) : Serializable {
-    fun toMemberPostItem(): MemberPostItem {
+    fun toMemberPostItem(type:PostType): MemberPostItem {
         val tags = when (tags) {
             is List<*> -> tags as ArrayList<String>
-            is String -> {
-                tags.split(",").toList() as ArrayList<String>
-            }
+            is String -> tags.split(",").toMutableList() as ArrayList<String>
             else -> arrayListOf()
         }
         return MemberPostItem(
             id = id,
             title = title,
             cover = cover,
-            type = type ?: PostType.VIDEO_ON_DEMAND,
+            type = type,
             updateDate = updateDate,
             videoDescription = description,
             videoCountry = country,
@@ -103,7 +101,7 @@ data class VideoItem(
             videoPerformers = performers,
             reported = reported ?: false,
             deducted = deducted ?: false,
-            likeType = likeType,
+            likeType = if(like==true) LikeType.LIKE else if(like==false) LikeType.DISLIKE else null,
             likeCount = likeCount,
             dislikeCount = dislikeCount,
             isFavorite = favorite,

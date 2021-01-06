@@ -43,8 +43,11 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import java.util.*
 
 class SearchVideoFragment : BaseFragment() {
@@ -56,7 +59,7 @@ class SearchVideoFragment : BaseFragment() {
         fun createBundle(
             tag: String = "",
             category: String = "",
-            videoType: VideoType? = null
+            videoType: VideoType = VideoType.VIDEO_ON_DEMAND
         ): Bundle {
             val data = SearchingVideoItem()
             data.tag = tag
@@ -91,6 +94,8 @@ class SearchVideoFragment : BaseFragment() {
         get() = View.GONE
 
     override fun setupFirstTime() {
+        viewModel.userId = viewModel.accountManager.getProfile().userId
+
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
@@ -103,7 +108,7 @@ class SearchVideoFragment : BaseFragment() {
                 recyclerview_content.visibility = View.VISIBLE
                 layout_search_history.visibility = View.GONE
                 search_bar.setText(data.tag)
-                search(tag = data.tag, videoType = data.videoType)
+                search(tag = data.tag)
                 search_bar.post {
                     search_bar.clearFocus()
                 }
@@ -119,7 +124,10 @@ class SearchVideoFragment : BaseFragment() {
             layout_search_text.visibility = View.GONE
 
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
-            recyclerview_content.adapter = ConcatAdapter(adTop, videoListAdapter/*.withMimiLoadStateFooter { videoListAdapter.retry() }*/)
+            recyclerview_content.adapter = ConcatAdapter(
+                adTop,
+                videoListAdapter/*.withMimiLoadStateFooter { videoListAdapter.retry() }*/
+            )
 
             @OptIn(ExperimentalCoroutinesApi::class)
             viewModel.viewModelScope.launch {
@@ -426,15 +434,13 @@ class SearchVideoFragment : BaseFragment() {
 
     private fun search(
         keyword: String? = null,
-        tag: String? = null,
-        videoType: VideoType? = viewModel.videoType
+        tag: String? = null
     ) {
         recyclerview_content.visibility = View.INVISIBLE
         lifecycleScope.launch {
             viewModel.posts(
                 keyword,
-                tag,
-                videoType
+                tag
             )
                 .flowOn(Dispatchers.IO)
                 .collectLatest {
@@ -453,6 +459,14 @@ class SearchVideoFragment : BaseFragment() {
                     findNavController().navigate(R.id.action_to_loginFragment, data?.extras)
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (recyclerview_content.visibility == View.VISIBLE && viewModel.userId != viewModel.accountManager.getProfile().userId) {
+            viewModel.userId = viewModel.accountManager.getProfile().userId
+            search(viewModel.searchingStr, viewModel.searchingTag)
         }
     }
 

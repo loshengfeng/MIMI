@@ -5,19 +5,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.api.vo.PlayListRequest
-import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MyCollectionMimiVideoViewModel : ClubViewModel() {
 
@@ -33,17 +33,16 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
     var totalCount: Int = 0
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun posts(pageCode:String, type: MyPagesType) = postItems(pageCode, type).cachedIn(viewModelScope)
+    fun posts(pageCode: String, type: MyPagesType) =
+        postItems(pageCode, type).cachedIn(viewModelScope)
 
     @OptIn(ExperimentalPagingApi::class)
-    private fun postItems(pageCode:String, type: MyPagesType) = Pager(
+    private fun postItems(pageCode: String, type: MyPagesType) = Pager(
         config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
         remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pageCode, pagingCallback)
     ) {
         mimiDB.postDBItemDao()
             .pagingSourceByPageCode(pageCode)
-
-
     }.flow.map { pagingData ->
         pagingData.map { dbItem ->
             dbItem.memberPostItem.toPlayItem()
@@ -55,11 +54,22 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.deleteMePlaylist(videoId)
-                Timber.i("$type deleteMIMIVideoFavorite result= $result")
                 if (!result.isSuccessful) throw HttpException(result)
-                when(type){
+                val body = result.body()?.content
+                val countItem = (body as ArrayList<*>)[0] as InteractiveHistoryItem
+                when (type) {
                     MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId.toLong())
-                    MyPagesType.FAVORITE_SHORT_VIDEO -> changeFavoriteSmallVideoInDb(videoId.toLong())
+                    MyPagesType.FAVORITE_SHORT_VIDEO -> {
+                        LruCacheUtils.putShortVideoDataCache(
+                            videoId.toLong(),
+                            PlayItem(
+                                favorite = false,
+                                favoriteCount = countItem.favoriteCount,
+                                commentCount = countItem.commentCount
+                            )
+                        )
+                        changeFavoriteSmallVideoInDb(videoId.toLong())
+                    }
                 }
                 emit(ApiResult.success(result.isSuccessful))
             }
@@ -82,33 +92,30 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                         items.map { it.videoId }.joinToString(separator = ",")
                     )
                 if (!result.isSuccessful) throw HttpException(result)
-
-                items.map { it.videoId }.filterNotNull().forEach { videoId->
-                    when(type){
-                        MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId )
+                val body = result.body()?.content
+                val countItems = (body as ArrayList<*>)
+                if(type == MyPagesType.FAVORITE_SHORT_VIDEO){
+                    items.forEachWithIndex { i, playItem ->
+                        takeIf { i < countItems.size }?.let { countItems[i] }?.let { item ->
+                            item as InteractiveHistoryItem
+                            LruCacheUtils.putShortVideoDataCache(
+                                playItem.id,
+                                PlayItem(
+                                    favorite = false,
+                                    favoriteCount = item.favoriteCount,
+                                    commentCount = item.commentCount
+                                )
+                            )
+                        }
+                    }
+                }
+                items.map { it.videoId }.filterNotNull().forEach { videoId ->
+                    when (type) {
+                        MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId)
                         MyPagesType.FAVORITE_SHORT_VIDEO -> changeFavoriteSmallVideoInDb(videoId)
                     }
                 }
 
-                emit(ApiResult.success(null))
-            }
-                .flowOn(Dispatchers.IO)
-                .onStart { emit(ApiResult.loading()) }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .onCompletion { emit(ApiResult.loaded()) }
-                .collect { _cleanResult.value = it }
-        }
-    }
-
-    fun deleteAllLike(items: List<PlayItem>) {
-        if (items.isEmpty()) return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository()
-                    .deleteAllLike(
-                        items.map { it.videoId }.joinToString(separator = ",")
-                    )
-                if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)

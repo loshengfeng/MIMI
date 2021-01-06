@@ -5,16 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.player.ui.PlayerV2ViewModel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import timber.log.Timber
 
 class ClipSingleViewModel : BaseViewModel() {
 
@@ -40,8 +38,16 @@ class ClipSingleViewModel : BaseViewModel() {
                     else -> apiRepository.deleteMePlaylist(item.videoId.toString())
                 }
                 if (!resp.isSuccessful) throw HttpException(resp)
+                val body = resp.body()?.content
+                val countItem = when {
+                    isFavorite -> body
+                    else -> (body as ArrayList<*>)[0]
+                }
+                countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
-                item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
+                item.favoriteCount = countItem.favoriteCount
+                LruCacheUtils.putShortVideoDataCache(item.id, item)
+                changeFavoriteSmallVideoInDb(item.videoId?:0)
                 emit(
                     ApiResult.success(
                         VideoItem(

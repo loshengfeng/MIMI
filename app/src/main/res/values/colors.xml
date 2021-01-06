@@ -110,4 +110,7 @@
     <!--personal -->
     <color name="title_personal">@color/color_white_1</color>
 
+    <!-- Tag -->
+    <color name="club_tag_background">#19597ef7</color>
+
 </resources>

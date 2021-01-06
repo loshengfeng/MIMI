@@ -13,7 +13,6 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.player.GuessLikeDataSource
 import com.dabenxiang.mimi.view.player.GuessLikeFactory
 import kotlinx.coroutines.Dispatchers
@@ -110,17 +109,17 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         }
     }
 
-    fun like(item: VideoItem, type: LikeType) {
+    fun like(item: VideoItem, clickLikeType: LikeType) {
         viewModelScope.launch {
             flow {
                 val originType = item.likeType
                 val apiRepository = domainManager.getApiRepository()
-                if (type != originType) {
-                    val request = LikeRequest(type)
+                if (clickLikeType != originType) {
+                    val request = LikeRequest(clickLikeType)
                     val result = apiRepository.like(item.id, request)
                     if (!result.isSuccessful) throw HttpException(result)
-                    item.likeType = type
-                    if (type == LikeType.LIKE) {
+                    item.likeType = clickLikeType
+                    if (clickLikeType == LikeType.LIKE) {
                         if (originType == LikeType.DISLIKE) item.dislikeCount -= 1
                         item.likeCount += 1
                     } else {
@@ -131,12 +130,12 @@ class PlayerDescriptionViewModel : BaseViewModel() {
                     val result = apiRepository.deleteLike(item.id)
                     if (!result.isSuccessful) throw HttpException(result)
                     item.likeType = null
-                    if (type == LikeType.LIKE) item.likeCount -= 1
+                    if (clickLikeType == LikeType.LIKE) item.likeCount -= 1
                     else item.dislikeCount -= 1
                 }
                 item.like = if (item.likeType == null) null
                 else item.likeType == LikeType.LIKE
-                changeLikeMimiVideoInDb(item.id, type)
+                changeLikeMimiVideoInDb(item.id, item.likeType)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)

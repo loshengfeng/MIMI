@@ -309,15 +309,15 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         mimiDB.withTransaction {
             mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
                 val dbItem = memberPostItem.apply {
-                    this.likeType = likeType
                     when (likeType) {
                         LikeType.LIKE -> {
                             this.likeCount += 1
                         }
                         else -> {
-                            this.likeCount -= 1
+                            if (this.likeType == LikeType.LIKE) this.likeCount -= 1
                         }
                     }
+                    this.likeType = likeType
                 }
                 mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
 

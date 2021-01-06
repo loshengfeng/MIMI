@@ -23,6 +23,11 @@ class SearchPostViewModel : ClubViewModel() {
     val searchTotalCount: LiveData<Long> = _searchTotalCount
 
     var totalCount: Int = 0
+
+    var searchTag: String? = null
+    var searchText: String? = null
+    var userId = 0L
+
     override val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
             _searchTotalCount.postValue(count)

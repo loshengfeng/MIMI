@@ -240,6 +240,10 @@ class ApiRepository(private val apiService: ApiService) {
         unhealthy: Boolean = true
     ) = apiService.getMemberVideoReport(videoId, type, unhealthy)
 
+    suspend fun isMemberExist(
+        userName: String
+    ) = apiService.isMemberExists(userName)
+
     /**********************************************************
      *
      *                  Members/Post
@@ -287,6 +291,10 @@ class ApiRepository(private val apiService: ApiService) {
         isAdult: Boolean
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>> {
         return apiService.getMembersPost(offset, limit, creatorId, isAdult)
+    }
+
+    suspend fun getInteractiveHistory(id: String): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>> {
+        return apiService.getInteractiveHistory(id)
     }
 
     suspend fun getMemberPostDetail(postId: Long): Response<ApiBaseItem<MemberPostItem>> {

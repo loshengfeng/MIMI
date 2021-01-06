@@ -93,7 +93,7 @@ class SearchVideoAdapter(
                         UPDATE_FAVORITE -> holder.updateFavorite(item)
                     }
                 } else {
-                    holder.onBind(item, position, listener, getSearchText.invoke(), getSearchTag.invoke())
+                    holder.onBind(item, position, listener, getSearchText.invoke(), getSearchTag.invoke(), 5)
                 }
             }
         }
