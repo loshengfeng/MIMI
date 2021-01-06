@@ -126,7 +126,7 @@ class SearchVideoMediator(
                     database.postDBItemDao().insertAll(postDBItems)
                 }
             }
-
+            if (!hasNext && (result.body()?.paging?.count ?: 0) % 5 != 0L) pagingCallback.onLoaded()
             return MediatorResult.Success(endOfPaginationReached = !hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)

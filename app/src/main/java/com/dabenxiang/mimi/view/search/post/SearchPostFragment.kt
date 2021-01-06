@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
-import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -29,7 +28,7 @@ import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
+import com.dabenxiang.mimi.view.club.base.AdAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -51,6 +50,7 @@ import kotlinx.android.synthetic.main.fragment_search_post.tv_search
 import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 class SearchPostFragment : BaseFragment() {
 
@@ -70,8 +70,12 @@ class SearchPostFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_search_post
 
-    private val adTop: AdHeaderAdapter by lazy {
-        AdHeaderAdapter(requireContext())
+    private val adTop: AdAdapter by lazy {
+        AdAdapter(requireContext())
+    }
+
+    private val adBottom: AdAdapter by lazy {
+        AdAdapter(requireContext())
     }
 
     private var searchType: PostType = PostType.TEXT_IMAGE_VIDEO
@@ -308,7 +312,7 @@ class SearchPostFragment : BaseFragment() {
         }
 
         recycler_search_result.layoutManager = LinearLayoutManager(requireContext())
-        recycler_search_result.adapter = ConcatAdapter(adTop, adapter/*.withMimiLoadStateFooter { adapter.retry() }*/)
+        recycler_search_result.adapter = ConcatAdapter(adTop, adapter/*.withMimiLoadStateFooter { adapter.retry() }*/, adBottom)
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
@@ -323,22 +327,6 @@ class SearchPostFragment : BaseFragment() {
                 }
             }
         }
-
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            @OptIn(FlowPreview::class)
-            adapter.loadStateFlow
-                .distinctUntilChangedBy { it.refresh }
-                .filter { it.refresh is LoadState.NotLoading }
-                .onEach { delay(1000) }
-                .collect {
-                    if (adapter.snapshot().items.isEmpty() && timeout > 0) {
-                        timeout--
-                        adapter.refresh()
-                    }
-                }
-        }
-
     }
 
     override fun setupObservers() {
@@ -348,7 +336,14 @@ class SearchPostFragment : BaseFragment() {
 
         viewModel.topAdResult.observe(this) {
             adTop.adItem = it
+            adTop.visibility = View.VISIBLE
             adTop.notifyDataSetChanged()
+        }
+
+        viewModel.bottomAdResult.observe(this) {
+            adBottom.adItem = it
+            adBottom.visibility = View.VISIBLE
+            adBottom.notifyDataSetChanged()
         }
 
         viewModel.getTopAd("search_top")
@@ -429,6 +424,8 @@ class SearchPostFragment : BaseFragment() {
         }
         viewModel.searchText = text
         viewModel.searchTag = tag
+        adBottom.visibility = View.GONE
+        adBottom.notifyDataSetChanged()
         layout_search_text.visibility = View.GONE
         layout_search_history.visibility = View.GONE
         text?.let {

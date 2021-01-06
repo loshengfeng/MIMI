@@ -2,6 +2,7 @@ package com.dabenxiang.mimi.view.club.base
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -12,9 +13,10 @@ import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
-class AdHeaderAdapter(
+class AdAdapter(
     val context: Context,
-    var adItem: AdItem = AdItem()
+    var adItem: AdItem = AdItem(),
+    var visibility: Int = View.GONE
 ) : RecyclerView.Adapter<AdHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdHolder {
         val view = LayoutInflater.from(parent.context)
@@ -27,12 +29,13 @@ class AdHeaderAdapter(
     }
 
     override fun onBindViewHolder(holder: AdHolder, position: Int) {
+        holder.adImg.visibility = visibility
         val options = RequestOptions()
             .priority(Priority.NORMAL)
             .placeholder(R.drawable.img_ad)
             .error(R.drawable.img_ad)
         Glide.with(context)
-            .load(adItem?.href)
+            .load(adItem.href)
             .apply(options)
             .into(holder.adImg)
         holder.adImg.setOnClickListener {

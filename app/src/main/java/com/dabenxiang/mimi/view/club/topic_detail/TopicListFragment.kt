@@ -19,7 +19,7 @@ import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
+import com.dabenxiang.mimi.view.club.base.AdAdapter
 import com.dabenxiang.mimi.view.club.base.PostItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
@@ -41,8 +41,8 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
     private val viewModel: TopicListViewModel by viewModels()
     private val topicViewModel: TopicViewModel by viewModels({requireParentFragment()})
 
-    private val adTop: AdHeaderAdapter by lazy {
-        AdHeaderAdapter(requireContext())
+    private val adTop: AdAdapter by lazy {
+        AdAdapter(requireContext())
     }
 
     private val adapter: PostItemAdapter by lazy {

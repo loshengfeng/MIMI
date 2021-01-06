@@ -232,5 +232,4 @@ class MyPostClipPostHolder(
             ivFavorite.setImageResource(R.drawable.btn_favorite_n)
         }
     }
-
 }
