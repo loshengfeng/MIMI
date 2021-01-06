@@ -136,7 +136,7 @@ abstract class ClubViewModel : BaseViewModel() {
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
-                .onCompletion {}
+                .onCompletion { setShowProgress(false) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _videoLikeResult.value = it }
         }
@@ -145,6 +145,12 @@ abstract class ClubViewModel : BaseViewModel() {
     open val pagingCallback = object : PagingCallback {
         override fun onTotalCount(count: Long) {
             _postCount.postValue(count.toInt())
+        }
+    }
+
+    suspend fun checkoutItemsSize(pageCode:String):Int{
+        return mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getPostDBItems(pageCode)?.size ?: 0
         }
     }
 }
