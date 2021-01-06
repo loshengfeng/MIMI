@@ -98,14 +98,16 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     items.forEachWithIndex { i, playItem ->
                         takeIf { i < countItems.size }?.let { countItems[i] }?.let { item ->
                             item as InteractiveHistoryItem
-                            LruCacheUtils.putShortVideoDataCache(
-                                playItem.id,
-                                PlayItem(
-                                    favorite = false,
-                                    favoriteCount = item.favoriteCount,
-                                    commentCount = item.commentCount
+                            playItem.videoId?.let { videoId ->
+                                LruCacheUtils.putShortVideoDataCache(
+                                    videoId,
+                                    PlayItem(
+                                        favorite = false,
+                                        favoriteCount = item.favoriteCount,
+                                        commentCount = item.commentCount
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }
