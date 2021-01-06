@@ -333,6 +333,17 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    suspend fun changeCommentInDb(id: Long, count: Int) {
+        mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
+                val dbItem = memberPostItem.apply {
+                    this.commentCount = count
+                }
+                mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+            }
+        }
+    }
+
     fun getTopAd(code: String) {
         viewModelScope.launch {
             getAd(code).collect { _topAdResult.value = it }
