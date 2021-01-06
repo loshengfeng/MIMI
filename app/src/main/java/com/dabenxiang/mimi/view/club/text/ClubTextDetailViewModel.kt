@@ -273,7 +273,6 @@ class ClubTextDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     _followResult.value = ApiResult.success(null)
                 }
         }

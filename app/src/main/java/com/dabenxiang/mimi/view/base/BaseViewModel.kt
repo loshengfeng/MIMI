@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
+import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
@@ -128,20 +129,6 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private val _cleanRemovedPosList = MutableLiveData<Nothing>()
     val cleanRemovedPosList: LiveData<Nothing> = _cleanRemovedPosList
 
-    var deletePostIdList = MutableLiveData<ArrayList<Long>>().also { it.value = arrayListOf() }
-
-    protected var _postChangedResult = MutableLiveData<ApiResult<MemberPostItem>>()
-    val postChangedResult: LiveData<ApiResult<MemberPostItem>> = _postChangedResult
-
-    var postItemChangedList =
-        MutableLiveData<HashMap<Long, MemberPostItem>>().also { it.value = HashMap() }
-
-    protected var _videoChangedResult = MutableLiveData<ApiResult<VideoItem>>()
-    val videoChangedResult: LiveData<ApiResult<VideoItem>> = _videoChangedResult
-
-    var videoItemChangedList =
-        MutableLiveData<HashMap<Long, VideoItem>>().also { it.value = HashMap() }
-
     fun deletePost(
         item: MemberPostItem,
         position: Int
@@ -157,14 +144,11 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                 .catch { e -> emit(ApiResult.error(e)) }
                 .onCompletion {
                     mimiDB.withTransaction {
-                        mimiDB.postDBItemDao().getPostDBItems(item.id)?.forEach { postItem ->
-                            mimiDB.postDBItemDao().deleteMemberPostItem(postItem.id)
-                            mimiDB.postDBItemDao().deleteItem(postItem.id)
-                        }
+                        mimiDB.postDBItemDao().deleteMemberPostItem(item.id)
+                        mimiDB.postDBItemDao().deleteItem(item.id)
                     }
                 }
                 .collect {
-                    deletePostIdList.value?.add(item.id)
                     _deletePostResult.value = it
                 }
         }

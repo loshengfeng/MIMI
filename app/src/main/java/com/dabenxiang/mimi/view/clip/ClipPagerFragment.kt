@@ -74,16 +74,6 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     override fun setupObservers() {
-        viewModel.videoChangedResult.observe(owner = viewLifecycleOwner) {
-            when (it) {
-                is Success -> {
-                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
-                }
-                is Error -> onApiError(it.throwable)
-                else -> {}
-            }
-        }
-
         viewModel.favoriteResult.observe(owner = viewLifecycleOwner) {
             when (it) {
                 is Loading -> progressHUD.show()

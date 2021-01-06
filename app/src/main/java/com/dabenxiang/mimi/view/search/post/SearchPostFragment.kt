@@ -346,16 +346,6 @@ class SearchPostFragment : BaseFragment() {
             if (search_bar.text.isNotBlank()) setSearchResultText(count)
         })
 
-        mainViewModel?.deletePostResult?.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    adapter.removedPosList.add(it.result)
-                    adapter.notifyItemChanged(it.result)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        })
-
         viewModel.topAdResult.observe(this) {
             adTop.adItem = it
             adTop.notifyDataSetChanged()

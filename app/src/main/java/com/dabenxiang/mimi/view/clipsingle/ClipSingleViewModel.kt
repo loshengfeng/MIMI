@@ -61,7 +61,6 @@ class ClipSingleViewModel : BaseViewModel() {
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _videoChangedResult.value = it
                     _favoriteResult.value = it
                 }
         }
