@@ -16,6 +16,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -143,6 +144,8 @@ class SearchVideoViewHolder(
                 position
             )
         }
+
+        tvLike.visibility = if(item.type == PostType.SMALL_CLIP) View.GONE else View.VISIBLE
 
         tvLike.run {
             text = item.likeCount.toString()

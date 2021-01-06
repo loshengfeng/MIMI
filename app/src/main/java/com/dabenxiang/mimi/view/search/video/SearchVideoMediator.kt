@@ -30,7 +30,7 @@ class SearchVideoMediator(
     private val keyword: String? = null,
     private val adWidth: Int,
     private val adHeight: Int,
-    private val videoType: VideoType? = null
+    private val videoType: VideoType
 ) : RemoteMediator<Int, MemberPostWithPostDBItem>() {
 
     companion object {
@@ -84,8 +84,9 @@ class SearchVideoMediator(
             )
             val adCount =
                 ceil((memberPostApiItems?.size ?: 0).toFloat() / AD_GAP).toInt()
-            val adItems = domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
-                .body()?.content?.get(0)?.ad ?: arrayListOf()
+            val adItems =
+                domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
+                    .body()?.content?.get(0)?.ad ?: arrayListOf()
 
             if (loadType == LoadType.REFRESH) {
                 pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
@@ -102,10 +103,11 @@ class SearchVideoMediator(
 
                 memberPostApiItems?.map { item ->
                     item.adItem = getAdItem(adItems)
-                    item.toMemberPostItem()
+                    item.toMemberPostItem(videoType?.toPostType() ?: PostType.VIDEO_ON_DEMAND)
                 }?.let {
                     val postDBItems = it.mapIndexed { index, item ->
-                        when (val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)) {
+                        when (val oldItem =
+                            database.postDBItemDao().getPostDBItem(pageCode, item.id)) {
                             null -> PostDBItem(
                                 postDBId = item.id,
                                 postType = item.type,

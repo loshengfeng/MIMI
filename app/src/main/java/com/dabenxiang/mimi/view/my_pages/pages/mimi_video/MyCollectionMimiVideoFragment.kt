@@ -223,7 +223,6 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         }
 
         override fun onChipClick(type: VideoType, tag: String) {
-            Timber.d("onChipClick")
             val bundle = SearchVideoFragment.createBundle(tag = tag, videoType = type)
             navigateTo(
                 NavigateItem.Destination(

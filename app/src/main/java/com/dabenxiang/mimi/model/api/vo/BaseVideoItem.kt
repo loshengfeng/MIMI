@@ -80,7 +80,7 @@ data class VideoItem(
     var type: PostType? = null,
     var adItem: AdItem? = null
 ) : Serializable {
-    fun toMemberPostItem(): MemberPostItem {
+    fun toMemberPostItem(type:PostType): MemberPostItem {
         val tags = when (tags) {
             is List<*> -> tags as ArrayList<String>
             is String -> tags.split(",").toMutableList() as ArrayList<String>
@@ -90,7 +90,7 @@ data class VideoItem(
             id = id,
             title = title,
             cover = cover,
-            type = type ?: PostType.VIDEO_ON_DEMAND,
+            type = type,
             updateDate = updateDate,
             videoDescription = description,
             videoCountry = country,

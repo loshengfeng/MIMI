@@ -1,16 +1,16 @@
 package com.dabenxiang.mimi.view.topup
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
+import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.LinearLayout
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,8 +50,6 @@ class TopUpFragment : BaseFragment() {
     private var lastCheckedId: Int = -1
 
     private var lastTabIndex: Int = 0
-
-    private var views: ArrayList<ConstraintLayout> = arrayListOf()
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -159,10 +157,7 @@ class TopUpFragment : BaseFragment() {
                 is Loaded -> tv_proxy_empty.visibility = View.GONE
                 is Success -> {
                     orderPackageMap = it.result
-                    if (views.contains(iv_bank) && lastTabIndex == 0) {
-                        updateOrderPackages(PaymentType.BANK)
-                    }
-                    tl_type.getTabAt(lastTabIndex)?.select()
+                    tl_type.selectTab(tl_type.getTabAt(lastTabIndex))
                 }
                 is Error -> onApiError(it.throwable)
             }
@@ -182,7 +177,7 @@ class TopUpFragment : BaseFragment() {
                             .toString()
                     } else {
                         layout_error.visibility = View.GONE
-                        layout_next.visibility = View.VISIBLE
+                        layout_next.visibility  = View.VISIBLE
                         val selectItem = onlinePayAdapter.getSelectItem()
                         val bundle = OrderInfoFragment.createBundle(selectItem)
                         navigateTo(
@@ -236,64 +231,52 @@ class TopUpFragment : BaseFragment() {
                             else
                                 viewModel.getProxyPayList()
                         }
-
-                        var paymentTypes: ArrayList<PaymentTypeItem> = it.result.paymentTypes
-                        if(paymentTypes == null){
-                            paymentTypes = arrayListOf()
-                            paymentTypes.add(PaymentTypeItem("Alipay", true))
-                            paymentTypes.add(PaymentTypeItem("WeChat", true))
-                            paymentTypes.add(PaymentTypeItem("UnionPay", false))
-                        }
-
-                        for(type in paymentTypes){
-                            when (type.name) {
-                                "Alipay" -> {
-                                    if (type.disabled == false)
-                                        views.add(iv_ali)
-                                }
-                                "WeChat" -> {
-                                    if (type.disabled == false)
-                                        views.add(iv_wx)
-                                }
-                                "UnionPay" -> {
-                                    if (type.disabled == false)
-                                        views.add(iv_bank)
-                                }
-                            }
-                        }
-
-                        if (views.contains(iv_bank))
-                            tl_type.addTab(tl_type.newTab().setTag("UnionPay"))
-                        if (views.contains(iv_ali))
-                            tl_type.addTab(tl_type.newTab().setTag("Alipay"))
-                        if (views.contains(iv_wx))
-                            tl_type.addTab(tl_type.newTab().setTag("WeChat"))
-
-                        for (view in views)
-                            view.visibility = View.VISIBLE
-
-                        when (views.size) {
-                            3 -> {
-                                divide_line_bank.visibility = View.VISIBLE
-                                divide_line_ali.visibility = View.VISIBLE
-                            }
-                            2 -> {
-                                if (views.contains(iv_bank))
-                                    divide_line_bank.visibility = View.VISIBLE
-                                else if (views.contains(iv_ali))
-                                    divide_line_ali.visibility = View.VISIBLE
-                            }
-                            1 -> {
-                                tl_type.setSelectedTabIndicatorColor(Color.TRANSPARENT)
-                            }
-                        }
-
-                        tl_type.getTabAt(lastTabIndex)?.select()
                     }
+
+                    var paymentTypes: ArrayList<PaymentTypeItem> = it.result.paymentTypes
+//                    var paymentTypes: ArrayList<PaymentTypeItem>? = null
+//                    if(paymentTypes == null){
+//                        paymentTypes = arrayListOf()
+//                        paymentTypes.add(PaymentTypeItem("Alipay", false))
+//                        paymentTypes.add(PaymentTypeItem("WeChat", false))
+//                        paymentTypes.add(PaymentTypeItem("TikTok", false))
+//                        paymentTypes.add(PaymentTypeItem("UnionPay", false))
+//                    }
+
+                    for(type in paymentTypes)
+                        if (type.disabled == false)
+                            addTabImage(type)
                 }
                 is Error -> onApiError(it.throwable)
             }
         })
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun addTabImage(type: PaymentTypeItem) {
+        val imageView = ImageView(requireContext())
+
+        tl_type.addTab(tl_type.newTab().setTag(type.name))
+
+        val lp = LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        lp.weight = 1f
+        lp.gravity = Gravity.CENTER_HORIZONTAL
+        imageView.layoutParams = lp
+        imageView.setImageDrawable(
+            when(type.name){
+                "Alipay" -> requireContext().getDrawable(R.drawable.ico_alipay)
+                "WeChat" -> requireContext().getDrawable(R.drawable.ico_wechat_pay)
+                "UnionPay" -> requireContext().getDrawable(R.drawable.ico_bank)
+                "TikTok" -> requireContext().getDrawable(R.drawable.ico_tiktokpay_160_px)
+                else -> requireContext().getDrawable(R.drawable.ico_bank)
+            }
+        )
+        imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+
+        ll_tab_images.addView(imageView)
     }
 
     override fun setupListeners() {
@@ -334,18 +317,34 @@ class TopUpFragment : BaseFragment() {
         }
 
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            @SuppressLint("UseCompatLoadingForDrawables")
             override fun onTabSelected(tab: TabLayout.Tab) {
                 lastTabIndex = tab.position
+                tab.view.background = requireContext().getDrawable(R.drawable.bg_gray_10_stroke_1)
                 when (tab.tag) {
                     "UnionPay" -> updateOrderPackages(PaymentType.BANK)
                     "Alipay" -> updateOrderPackages(PaymentType.ALI)
                     "WeChat" -> updateOrderPackages(PaymentType.WX)
+                    "TikTok" -> updateOrderPackages(PaymentType.TIK_TOK)
                 }
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+                tab.view.setBackgroundColor(requireContext().getColor(R.color.transparent))
+            }
 
-            override fun onTabReselected(tab: TabLayout.Tab) {}
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTabReselected(tab: TabLayout.Tab) {
+                lastTabIndex = tab.position
+                tab.view.background = requireContext().getDrawable(R.drawable.bg_gray_10_stroke_1)
+                when (tab.tag) {
+                    "UnionPay" -> updateOrderPackages(PaymentType.BANK)
+                    "Alipay" -> updateOrderPackages(PaymentType.ALI)
+                    "WeChat" -> updateOrderPackages(PaymentType.WX)
+                    "TikTok" -> updateOrderPackages(PaymentType.TIK_TOK)
+                }
+            }
         })
 
         View.OnClickListener { buttonView ->
@@ -404,8 +403,8 @@ class TopUpFragment : BaseFragment() {
     }
 
     private fun initTopUp() {
-        views.clear()
         tl_type.removeAllTabs()
+        ll_tab_images.removeAllViews()
 
         tv_record_top_up.visibility = View.VISIBLE
 
