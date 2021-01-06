@@ -673,6 +673,12 @@ class PlayerViewModel : BaseViewModel() {
                 val resp = domainManager.getApiRepository().postMembersPostComment(videoId, body)
                 if (!resp.isSuccessful) throw HttpException(resp)
 
+                resp.body()?.content?.id?.let {id->
+                    resp.body()?.content?.post?.commentCount?.let {commentCount->
+                        changeCommentInDb(id, commentCount.toInt())
+                    }
+
+                }
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
