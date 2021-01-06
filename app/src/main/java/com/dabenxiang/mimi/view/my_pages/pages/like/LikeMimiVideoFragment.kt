@@ -2,12 +2,14 @@ package com.dabenxiang.mimi.view.my_pages.pages.like
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
+import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -15,30 +17,37 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.PlayerItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
-import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import kotlinx.android.synthetic.main.fragment_home.view.*
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
 import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
-import kotlinx.android.synthetic.main.item_ad.view.*
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.id_empty_group
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.img_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.layout_refresh
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.text_page_empty
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
-class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : BaseFragment() {
+class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragment() {
     private val viewModel: LikeMimiVideoViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
 
     private val adapter: LikeMimiVideoAdapter by lazy {
-        LikeMimiVideoAdapter(requireContext(), viewModel.viewModelScope, listener, type)
+        LikeMimiVideoAdapter(requireContext(), viewModel.viewModelScope, listener, myPagesType)
     }
+
+    val pageCode = MyPagesPostMediator::class.simpleName + myPagesType.toString()
 
     override fun getLayoutId() = R.layout.fragment_my_collection_videos
 
@@ -59,7 +68,11 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
         override fun onLikeClick(item: PlayItem, position: Int, isLike: Boolean) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    viewModel.like(VideoItem(id = item.videoId ?: 0), LikeType.DISLIKE)
+                    viewModel.videoLike(VideoItem(id = item.videoId ?: 0), LikeType.DISLIKE, myPagesType)
+                }
+
+                override fun onCancel() {
+                    //do nothing
                 }
             })
 
@@ -85,26 +98,17 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
             )
         }
 
-        override fun onItemClick(item: PlayItem, type: MyCollectionTabItemType) {
-            if (this@LikeMimiVideoFragment.type == MyCollectionTabItemType.MIMI_VIDEO) {
-                val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
-                navigateTo(
+        override fun onItemClick(item: PlayItem, type: MyPagesType) {
+            val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0))
+            navigateTo(
                     NavigateItem.Destination(
-                        R.id.action_to_playerV2Fragment,
-                        bundle
+                            R.id.action_to_playerV2Fragment,
+                            bundle
                     )
-                )
-            } else {
-                navigateTo(
-                    NavigateItem.Destination(
-                        R.id.action_to_clipSingleFragment,
-                        ClipSingleFragment.createBundle(item)
-                    )
-                )
-            }
+            )
         }
 
-        override fun onCommentClick(item: PlayItem, type: MyCollectionTabItemType) {
+        override fun onCommentClick(item: PlayItem, type: MyPagesType) {
             Timber.d("onCommentClick, item = $item")
             val bundle = PlayerV2Fragment.createBundle(PlayerItem(item.videoId ?: 0), true)
             navigateTo(
@@ -119,9 +123,9 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
             item: PlayItem,
             position: Int,
             isFavorite: Boolean,
-            type: MyCollectionTabItemType
+            type: MyPagesType
         ) {
-            viewModel.favorite(item, position)
+            viewModel.favorite(item, position, myPagesType, isFavorite)
         }
     }
 
@@ -130,77 +134,106 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
-        viewModel.videoChangedResult.observe(this){
-            when (it) {
-                is ApiResult.Success -> {
-                    mainViewModel?.videoItemChangedList?.value?.set(it.result.id, it.result)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
-        }
-
-        viewModel.deleteFavoriteResult.observe(this) {
-            viewModel.getData(adapter)
-        }
-
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it
         }
 
-        viewModel.postCount.observe(this) {
-            Timber.i("postCount= $it")
-            if (it == 0) {
-                text_page_empty.text = getString(R.string.like_empty_msg)
-                id_empty_group.visibility = View.VISIBLE
-                list_short.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                list_short.visibility = View.VISIBLE
-            }
-            myPagesViewModel.changeDataCount(tab, it)
-            layout_refresh.isRefreshing = false
-        }
-
-        viewModel.likeResult.observe(this, Observer {
-            when (it) {
-                is ApiResult.Success -> viewModel.getData(adapter)
-                is ApiResult.Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.favoriteResult.observe(this, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
-                        LikeMimiVideoAdapter.PAYLOAD_UPDATE_FAVORITE
-                    )
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
+        myPagesViewModel.deleteAll.observe(this, {
+            if (tab == it) {
+                layout_refresh.isRefreshing = false
+                viewModel.deleteAllLike(myPagesType, adapter.snapshot().items)
             }
         })
 
         viewModel.cleanResult.observe(this, {
             when (it) {
-                is ApiResult.Loading -> layout_refresh.isRefreshing = true
-                is ApiResult.Loaded -> layout_refresh.isRefreshing = false
-                is ApiResult.Empty -> viewModel.getData(adapter)
+                is ApiResult.Empty -> {
+                    emptyPageToggle(true)
+                }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
-        myPagesViewModel.deleteAll.observe(this, {
-            if (tab == it) viewModel.deleteAllLike(adapter.snapshot().items)
-        })
+        viewModel.videoLikeResult.observe(this){
+
+            Timber.i("videoLikeResult =$it")
+            when (it) {
+                is ApiResult.Success -> {
+                    if(adapter.snapshot().items.size <=1) {
+                        viewModel.viewModelScope.launch {
+                            val dbSize=viewModel.checkoutItemsSize(pageCode)
+                            if(dbSize<=0) emptyPageToggle(true)
+                        }
+                    }
+                    layout_refresh.isRefreshing = false
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
     }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(pageCode, myPagesType).flowOn(Dispatchers.IO).collectLatest {
+                adapter.submitData(it)
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
+                        timeout--
+                        adapter.refresh()
+                    }
+                }
+        }
+
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+            timeout = 0
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = getText(R.string.like_empty_msg)
+            recycler_view?.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            recycler_view?.visibility = View.VISIBLE
+
+        }
+        layout_refresh.isRefreshing = false
+
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        list_short.adapter = adapter
+        posts_list.adapter = adapter
+
+        viewModel.postCount.observe(viewLifecycleOwner) {
+            emptyPageToggle(it<=0)
+            myPagesViewModel.changeDataCount(tab, it)
+        }
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter)
+            adapter.refresh()
         }
 
         img_page_empty.setImageDrawable(
@@ -210,18 +243,8 @@ class LikeMimiVideoFragment(val tab: Int, val type: MyCollectionTabItemType) : B
         )
     }
 
-    override fun initSettings() {
-
-    }
-
     override fun onResume() {
         super.onResume()
-
-        if (viewModel.postCount.value ?: -1 <= 0) {
-            viewModel.getData(adapter)
-        }else if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
-            adapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
-            adapter.notifyDataSetChanged()
-        }
+        if(adapter.snapshot().items.isEmpty()) adapter.refresh()
     }
 }

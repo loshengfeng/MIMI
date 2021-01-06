@@ -7,9 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.AdItem
@@ -89,7 +86,7 @@ class ClubPicDetailAdapter(
             }
             is PictureDetailViewHolder -> {
                 val contentItem =
-                    Gson().fromJson(memberPostItem.content, MediaContentItem::class.java)
+                    Gson().fromJson(memberPostItem.postContent, MediaContentItem::class.java)
 
                 holder.posterName.text = memberPostItem.postFriendlyName
                 holder.posterTime.text =

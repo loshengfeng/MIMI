@@ -238,6 +238,7 @@ class MainViewModel : BaseViewModel() {
                 val result = domainManager.getApiRepository().sendPostReport(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
                 item.reported = true
+                saveReportItemInDB(item)
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
@@ -262,6 +263,7 @@ class MainViewModel : BaseViewModel() {
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 postCommentItem.reported = true
+                saveReportItemInDB(postItem)
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
@@ -269,6 +271,13 @@ class MainViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _postReportResult.value = it }
+        }
+    }
+
+    fun saveReportItemInDB(postItem: MemberPostItem){
+        mimiDB.postDBItemDao().getMemberPostItemById(postItem.id)?.let {
+            it.reported = true
+            mimiDB.postDBItemDao().insertMemberPostItem(it)
         }
     }
 

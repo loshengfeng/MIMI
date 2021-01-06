@@ -210,7 +210,7 @@ class CommentDialogFragment : BaseDialogFragment() {
                 viewModel.setupCommentDataSource(memberPostItem.id, playerInfoAdapter)
             }
 
-            takeIf { memberPostItem.commentCount == 0L }?.also {
+            takeIf { memberPostItem.commentCount == 0 }?.also {
                 tv_no_data.visibility = View.VISIBLE
             }
         }

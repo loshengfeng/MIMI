@@ -9,9 +9,6 @@ import android.widget.ImageView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
@@ -21,12 +18,13 @@ import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.SearchVideoViewHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 
 class SearchVideoAdapter(
     val context: Context,
-    private val listener: EventListener
-) : PagingDataAdapter<VideoItem, RecyclerView.ViewHolder>(diffCallback) {
+    private val listener: EventListener,
+    private val getSearchText: () -> String,
+    private val getSearchTag: () -> String
+) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
         const val UPDATE_LIKE = 0
@@ -35,21 +33,19 @@ class SearchVideoAdapter(
         const val VIEW_TYPE_VIDEO = 0
         const val VIEW_TYPE_AD = 1
 
-        private val diffCallback = object : DiffUtil.ItemCallback<VideoItem>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
             override fun areItemsTheSame(
-                oldItem: VideoItem,
-                newItem: VideoItem
+                oldItem: MemberPostItem,
+                newItem: MemberPostItem
             ): Boolean = oldItem == newItem
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(
-                oldItem: VideoItem,
-                newItem: VideoItem
+                oldItem: MemberPostItem,
+                newItem: MemberPostItem
             ): Boolean = oldItem == newItem
         }
     }
-
-    var changedPosList = HashMap<Long, VideoItem>()
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
@@ -74,7 +70,7 @@ class SearchVideoAdapter(
                         R.layout.item_favorite_normal,
                         parent,
                         false
-                    ), listener
+                    )
                 )
             }
         }
@@ -85,23 +81,19 @@ class SearchVideoAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        var item = getItem(position)
-        val changedItem = changedPosList[item?.id]
-        if (changedItem != null) {
-            item = changedItem
-        }
+        val item = getItem(position)?:MemberPostItem()
         when (holder) {
             is AdHolder -> {
-                holder.onBind(item?.adItem?: AdItem())
+                holder.onBind(item.adItem?: AdItem())
             }
             is SearchVideoViewHolder -> {
                 if (payloads.size == 1) {
                     when (payloads[0]) {
-                        UPDATE_LIKE -> holder.updateLike(item as VideoItem)
-                        UPDATE_FAVORITE -> holder.updateFavorite(item as VideoItem)
+                        UPDATE_LIKE -> holder.updateLike(item)
+                        UPDATE_FAVORITE -> holder.updateFavorite(item)
                     }
                 } else {
-                    holder.bind(item as VideoItem, position)
+                    holder.onBind(item, position, listener, getSearchText.invoke(), getSearchTag.invoke(), 5)
                 }
             }
         }
@@ -111,8 +103,8 @@ class SearchVideoAdapter(
     }
 
     interface EventListener {
-        fun onVideoClick(item: VideoItem)
-        fun onFunctionClick(type: FunctionType, view: View, item: VideoItem, position: Int)
+        fun onVideoClick(item: MemberPostItem)
+        fun onFunctionClick(type: FunctionType, view: View, item: MemberPostItem, position: Int)
         fun onChipClick(text: String)
         fun onAvatarDownload(view: ImageView, id: String)
         fun getDecryptSetting(source: String): DecryptSettingItem?

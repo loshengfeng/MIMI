@@ -23,8 +23,6 @@ class MyFollowListViewModel : ClubViewModel() {
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
-    private val _postCount = MutableLiveData<Int>()
-    val postCount: LiveData<Int> = _postCount
 
     fun getClubFollowData(adapter: ClubFollowPeopleAdapter) {
         Timber.i("getClubFollowData")
@@ -79,12 +77,6 @@ class MyFollowListViewModel : ClubViewModel() {
             .onStart { setShowProgress(true) }
             .onCompletion { setShowProgress(false) }
             .cachedIn(viewModelScope)
-    }
-
-    private val pagingCallback = object : PagingCallback {
-        override fun onTotalCount(count: Long) {
-            _postCount.postValue(count.toInt())
-        }
     }
 
     fun cleanAllFollowMember(items: List<MemberFollowItem>) {

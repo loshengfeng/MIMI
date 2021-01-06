@@ -1,85 +1,156 @@
 package com.dabenxiang.mimi.model.api.vo
 
+import androidx.room.*
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostStatus
 import com.dabenxiang.mimi.model.enums.PostType
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
+@Entity(
+        tableName = "MemberPostItems"
+)
 data class MemberPostItem(
+        @PrimaryKey
+        @ColumnInfo(name = "id")
+        @SerializedName("id")
+        var id: Long = 0,
 
-    @SerializedName("id")
-    var id: Long = 0,
+        @ColumnInfo(name = "postId")
+        @SerializedName("postId")
+        var postId: Long = 0,
 
-    @SerializedName("title")
-    var title: String = "",
+        @ColumnInfo(name = "videoId")
+        val videoId: Long = 0,
 
-    @SerializedName("cover")
-    var cover: String = "",
+        @ColumnInfo(name = "title")
+        @SerializedName("title")
+        var title: String = "",
 
-    @SerializedName("content")
-    var content: String = "",
+        @ColumnInfo(name = "cover")
+        @SerializedName("cover")
+        var cover: String = "",
 
-    @SerializedName("type")
-    val type: PostType = PostType.TEXT,
+        @ColumnInfo(name = "postContent")
+        @SerializedName("content")
+        var postContent: String = "",
 
-    @SerializedName("creationDate")
-    val creationDate: Date = Date(),
+        @ColumnInfo(name = "videoDescription")
+        val videoDescription: String = "",
 
-    @SerializedName("isFavorite")
-    var isFavorite: Boolean = false,
+        @ColumnInfo(name = "videoCountry")
+        val videoCountry: String = "",
 
-    @SerializedName("likeCount")
-    var likeCount: Int = 0,
+        @ColumnInfo(name = "videoSource")
+        val videoSource: String = "",
 
-    @SerializedName("dislikeCount")
-    var dislikeCount: Int = 0,
+        @ColumnInfo(name = "videoSources")
+        val videoSources: ArrayList<Source> = arrayListOf(),
 
-    @SerializedName("likeType")
-    var likeType: LikeType? = null,
+        @ColumnInfo(name = "videoEpisodes")
+        val videoEpisodes: ArrayList<VideoEpisode> = arrayListOf(),
 
-    @SerializedName("favoriteCount")
-    var favoriteCount: Int = 0,
+        @ColumnInfo(name = "videoTimesWatched")
+        val videoTimesWatched: Int = 0,
 
-    @SerializedName("commentCount")
-    var commentCount: Int = 0,
+        @ColumnInfo(name = "videoPerformers")
+        val videoPerformers: String = "",
 
-    @SerializedName("tags")
-    var tags: ArrayList<String>? = arrayListOf(),
+        @ColumnInfo(name = "type")
+        @SerializedName("type")
+        val type: PostType = PostType.TEXT,
 
-    @SerializedName("clickThroughCount")
-    val clickThroughCount: Int = 0,
+        @ColumnInfo(name = "creationDate")
+        @SerializedName("creationDate")
+        val creationDate: Date = Date(),
 
-    @SerializedName("avatarAttachmentId")
-    var avatarAttachmentId: Long = 0,
+        @ColumnInfo(name = "updateDate")
+        val updateDate: Date = Date(),
 
-    @SerializedName("creatorId")
-    var creatorId: Long = 0,
+        @ColumnInfo(name = "avatarAttachmentId")
+        @SerializedName("avatarAttachmentId")
+        var avatarAttachmentId: Long = 0,
 
-    @SerializedName("isFollow")
-    var isFollow: Boolean = false,
+        @ColumnInfo(name = "creatorId")
+        @SerializedName("creatorId")
+        var creatorId: Long = 0,
 
-    @SerializedName("reported")
-    var reported: Boolean = false,
+        @ColumnInfo(name = "postFriendlyName")
+        @SerializedName("postFriendlyName")
+        var postFriendlyName: String = "",
 
-    @SerializedName("postFriendlyName")
-    var postFriendlyName: String = "",
+        @ColumnInfo(name = "isFollow")
+        @SerializedName("isFollow")
+        var isFollow: Boolean = false,
 
-    @SerializedName("status")
-    val status: PostStatus? = PostStatus.ONLINE,
+        @ColumnInfo(name = "reported")
+        @SerializedName("reported")
+        var reported: Boolean = false,
 
-    @SerializedName("category")
-    val category: String? = "",
+        @ColumnInfo(name = "deducted")
+        @SerializedName("deducted")
+        var deducted: Boolean = false,
 
-    val adItem: AdItem? = null,
+        @ColumnInfo(name = "likeType")
+        @SerializedName("likeType")
+        var likeType: LikeType? = null,
 
-    @SerializedName("isFullContent")
-    val isFullContent: Boolean = false,
+        @ColumnInfo(name = "likeCount")
+        @SerializedName("likeCount")
+        var likeCount: Int = 0,
 
-    @SerializedName("deducted")
-    var deducted: Boolean = false,
+        @ColumnInfo(name = "dislikeCount")
+        @SerializedName("dislikeCount")
+        var dislikeCount: Int = 0,
 
-    @SerializedName("postId")
-    var postId: Long = 0
+        @ColumnInfo(name = "isFavorite")
+        @SerializedName("isFavorite")
+        var isFavorite: Boolean = false,
 
-) : BaseMemberPostItem()
+        @ColumnInfo(name = "favoriteCount")
+        @SerializedName("favoriteCount")
+        var favoriteCount: Int = 0,
+
+        @ColumnInfo(name = "commentCount")
+        @SerializedName("commentCount")
+        var commentCount: Int = 0,
+
+        @ColumnInfo(name = "tags")
+        @SerializedName("tags")
+        var tags: ArrayList<String>? = arrayListOf(),
+
+        @ColumnInfo(name = "status")
+        @SerializedName("status")
+        val status: PostStatus? = PostStatus.ONLINE,
+
+        @ColumnInfo(name = "adItem")
+        var adItem: AdItem? = null,
+
+        ) : BaseMemberPostItem() {
+
+    fun toPlayItem(): PlayItem {
+        return PlayItem(
+                videoId = id,
+                title = title,
+                favorite = isFavorite,
+                likeCount = likeCount,
+                favoriteCount = favoriteCount,
+                commentCount = commentCount,
+                tags = tags,
+                like = likeType?.value == 0,
+                cover = cover,
+                likeType = likeType
+        )
+    }
+}
+
+class MemberPostItemConverters {
+
+    @TypeConverter
+    fun itemToJson(item: MemberPostItem): String = Gson().toJson(item)
+
+    @TypeConverter
+    fun jsonToItem(value: String): MemberPostItem = Gson().fromJson(value, MemberPostItem::class.java)
+}

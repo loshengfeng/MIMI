@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.player.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -13,7 +12,6 @@ import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.view.base.BasePlayerFragment
 import com.dabenxiang.mimi.view.club.post.ClubCommentFragment
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_v2_player.*
@@ -104,7 +102,7 @@ class ClipPlayerFragment : BasePlayerFragment() {
     private fun parsingPostContent(postItem: MemberPostItem) {
         viewModel.parsingM3u8Source(
             requireContext(),
-            Gson().fromJson(postItem.content, MediaContentItem::class.java)
+            Gson().fromJson(postItem.postContent, MediaContentItem::class.java)
         )
     }
 }

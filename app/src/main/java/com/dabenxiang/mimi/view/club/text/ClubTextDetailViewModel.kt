@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
@@ -121,6 +122,7 @@ class ClubTextDetailViewModel : BaseViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 item.isFavorite = isFavorite
                 if (isFavorite) item.favoriteCount++ else item.favoriteCount--
+                changeFavoritePostInDb(item.id)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
@@ -128,7 +130,6 @@ class ClubTextDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     when (it) {
                         is ApiResult.Success -> {
                             update(isFavorite, it.result.favoriteCount)
@@ -160,7 +161,6 @@ class ClubTextDetailViewModel : BaseViewModel() {
                     } else {
                         item.dislikeCount += 1
                     }
-                    emit(ApiResult.success(item))
                 } else {
                     if (originType == type) {
                         val result = apiRepository.deleteLike(item.id)
@@ -192,15 +192,15 @@ class ClubTextDetailViewModel : BaseViewModel() {
                         item.likeCount += 1
                         item.dislikeCount -= 1
                     }
-                    emit(ApiResult.success(item))
                 }
+                changeLikePostInDb(item.id, item.likeType)
+                emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     when (it) {
                         is ApiResult.Success -> {
                             update(like, it.result)

@@ -12,9 +12,12 @@ import androidx.annotation.LayoutRes
 import androidx.fragment.app.DialogFragment
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.model.api.ExceptionResult
+import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 abstract class BaseDialogFragment : DialogFragment() {

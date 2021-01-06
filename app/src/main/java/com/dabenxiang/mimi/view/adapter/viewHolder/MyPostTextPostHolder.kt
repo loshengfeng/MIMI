@@ -5,9 +5,11 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.TextContentItem
@@ -19,7 +21,23 @@ import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.item_clip_post.view.*
 import kotlinx.android.synthetic.main.item_text_post.view.*
+import kotlinx.android.synthetic.main.item_text_post.view.chip_group_tag
+import kotlinx.android.synthetic.main.item_text_post.view.img_avatar
+import kotlinx.android.synthetic.main.item_text_post.view.iv_ad
+import kotlinx.android.synthetic.main.item_text_post.view.iv_comment
+import kotlinx.android.synthetic.main.item_text_post.view.iv_favorite
+import kotlinx.android.synthetic.main.item_text_post.view.iv_like
+import kotlinx.android.synthetic.main.item_text_post.view.iv_more
+import kotlinx.android.synthetic.main.item_text_post.view.tv_comment_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_favorite_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_follow
+import kotlinx.android.synthetic.main.item_text_post.view.tv_like_count
+import kotlinx.android.synthetic.main.item_text_post.view.tv_name
+import kotlinx.android.synthetic.main.item_text_post.view.tv_time
+import kotlinx.android.synthetic.main.item_text_post.view.tv_title
+import kotlinx.android.synthetic.main.item_text_post.view.v_separator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -47,6 +65,7 @@ class MyPostTextPostHolder(
     private val textLayout: ConstraintLayout = itemView.layout_text
     private val ivFavorite: ImageView = itemView.iv_favorite
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
+    private val ivAd:ImageView = itemView.iv_ad
 
     fun onBind(
             item: MemberPostItem,
@@ -54,15 +73,31 @@ class MyPostTextPostHolder(
             myPostListener: MyPostListener,
             viewModelScope: CoroutineScope,
             searchStr: String = "",
-            searchTag: String = ""
+            searchTag: String = "",
+            adGap:Int? = null
     ) {
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         tvTitle.text = if (searchStr.isNotBlank()) getSpanString(tvTitle.context, item.title, searchStr) else item.title
-
+        if (adGap != null && position % adGap == adGap - 1) {
+            ivAd.visibility = View.VISIBLE
+            val options = RequestOptions()
+                .priority(Priority.NORMAL)
+                .placeholder(R.drawable.img_ad_df)
+                .error(R.drawable.img_ad)
+            Glide.with(ivAd.context)
+                .load(item.adItem?.href)
+                .apply(options)
+                .into(ivAd)
+            ivAd.setOnClickListener {
+                GeneralUtils.openWebView(ivAd.context, item.adItem?.target ?: "")
+            }
+        } else {
+            ivAd.visibility = View.GONE
+        }
         try {
-            val contentItem = Gson().fromJson(item.content, TextContentItem::class.java)
+            val contentItem = Gson().fromJson(item.postContent, TextContentItem::class.java)
             tvTextDesc.text = contentItem.text
         } catch (e: Exception) {
             Timber.e(e)
@@ -95,6 +130,7 @@ class MyPostTextPostHolder(
             item.isFavorite = !item.isFavorite
             item.favoriteCount =
                 if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
+            updateFavorite(item)
             myPostListener.onFavoriteClick(
                 item,
                 position,
@@ -114,6 +150,7 @@ class MyPostTextPostHolder(
             item.likeType = if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
             item.likeCount =
                 if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
+            updateLike(item)
             myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
         ivLike.setOnClickListener(onLikeClickListener)

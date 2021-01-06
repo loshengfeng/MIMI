@@ -79,8 +79,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     fun updateInteractiveHistory(item: VideoItem, interactiveHistoryItem: InteractiveHistoryItem) {
-        interactiveHistoryItem.commentCount?.run { item.commentCount = this }
-        interactiveHistoryItem.favoriteCount?.run { item.favoriteCount = this }
+        interactiveHistoryItem.commentCount?.run { item.commentCount = this.toInt() }
+        interactiveHistoryItem.favoriteCount?.run { item.favoriteCount = this.toInt() }
         interactiveHistoryItem.isFavorite?.run { item.favorite = this }
 
         tvFavorite.text = item.favoriteCount.toString()
@@ -93,8 +93,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     fun updateCount(item: VideoItem) {
         LruCacheUtils.getShortVideoCount(item.id)?.run {
-            this.favoriteCount?.also { count ->  item.favoriteCount = count.toLong() }
-            this.commentCount?.also { count ->  item.commentCount = count.toLong() }
+            this.favoriteCount?.also { count ->  item.favoriteCount = count }
+            this.commentCount?.also { count ->  item.commentCount = count }
             this.favorite?.also { favorite ->  item.favorite = favorite }
         }
         tvFavorite.text = item.favoriteCount.toString()

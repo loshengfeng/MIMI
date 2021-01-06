@@ -2,12 +2,23 @@ package com.dabenxiang.mimi.view.dialog
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.room.withTransaction
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.MembersPostCommentItem
+import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.view.base.BaseDialogFragment
+import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.club.base.ClubViewModel
 import kotlinx.android.synthetic.main.fragment_dialog_more.*
+import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 import timber.log.Timber
 
 class MoreDialogFragment : BaseDialogFragment() {
@@ -21,7 +32,7 @@ class MoreDialogFragment : BaseDialogFragment() {
             isFromPostPage: Boolean = false
         ): MoreDialogFragment {
             val fragment = MoreDialogFragment()
-            fragment.item = item
+            fragment.baseMemberPostItem = item
             fragment.listener = listener
             fragment.isComment = isComment
             fragment.isLogin = isLogin
@@ -29,12 +40,12 @@ class MoreDialogFragment : BaseDialogFragment() {
             return fragment
         }
     }
-
-    var item: BaseMemberPostItem? = null
-    var isComment: Boolean? = false
-    var listener: OnMoreDialogListener? = null
-    var isLogin: Boolean = false
-    var isFromPostPage: Boolean = false
+    private val viewModel :MoreDialogViewModel by viewModels()
+    private var baseMemberPostItem: BaseMemberPostItem? = null
+    private var isComment: Boolean? = false
+    private var listener: OnMoreDialogListener? = null
+    private var isLogin: Boolean = false
+    private var isFromPostPage: Boolean = false
 
     override fun isFullLayout(): Boolean {
         return true
@@ -47,19 +58,41 @@ class MoreDialogFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.memberPostItemResult.observe(viewLifecycleOwner){ dbItem->
+            Timber.i("MoreDialogFragment dbItem: $dbItem")
+            dbItem?.let {
+                initUI(dbItem)
+            } ?: run {
+                baseMemberPostItem?.let { baseMemberPostItem ->
+                    initUI(baseMemberPostItem)
+                }
+            }
+
+        }
+
+        when (baseMemberPostItem) {
+            is MemberPostItem ->  viewModel.getDBItem((baseMemberPostItem as MemberPostItem).id)
+            else -> {
+                initUI(baseMemberPostItem as MembersPostCommentItem)
+            }
+        }
+
+    }
+
+    private fun initUI(item: BaseMemberPostItem){
         val isReport = when (item) {
-            is MemberPostItem -> (item as MemberPostItem).reported
+            is MemberPostItem -> item.reported
             else -> (item as MembersPostCommentItem).reported
         } ?: false
-        
+
         val deducted = if ((item is MemberPostItem)) {
             (item as MemberPostItem).deducted
         } else {
             true
         }
-
-        Timber.i("isReported: $isReport")
-        Timber.i("deducted: $deducted")
+        Timber.i("MoreDialogFragment item: $item")
+        Timber.i("MoreDialogFragment isReported: $isReport")
+        Timber.i("MoreDialogFragment deducted: $deducted")
 
         if (isFromPostPage) {
             if (!isLogin || isReport || !deducted) {
@@ -93,5 +126,22 @@ class MoreDialogFragment : BaseDialogFragment() {
     interface OnMoreDialogListener {
         fun onProblemReport(item: BaseMemberPostItem, isComment: Boolean)
         fun onCancel()
+    }
+}
+
+class MoreDialogViewModel : BaseViewModel() {
+    private val _memberPostItemResult = MutableLiveData<MemberPostItem?>()
+    val memberPostItemResult: LiveData<MemberPostItem?> = _memberPostItemResult
+
+    fun getDBItem(id:Long){
+        viewModelScope.launch {
+            mimiDB.withTransaction {
+                mimiDB.postDBItemDao().getMemberPostItemById(id)?.let {
+                    _memberPostItemResult.postValue(it)
+                } ?: run {
+                    _memberPostItemResult.postValue(null)
+                }
+            }
+        }
     }
 }

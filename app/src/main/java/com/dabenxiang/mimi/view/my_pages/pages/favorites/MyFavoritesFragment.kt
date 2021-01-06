@@ -2,28 +2,31 @@ package com.dabenxiang.mimi.view.my_pages.pages.favorites
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.model.enums.PostType
-import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
+import com.dabenxiang.mimi.view.club.base.PostItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.dialog.clean.CleanDialogFragment
 import com.dabenxiang.mimi.view.dialog.clean.OnCleanDialogListener
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
@@ -31,22 +34,28 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
-import org.koin.android.ext.android.inject
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.id_empty_group
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.img_page_empty
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.layout_refresh
+import kotlinx.android.synthetic.main.fragment_my_collection_favorites.text_page_empty
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 class MyFavoritesFragment(
     val tab: Int,
-    val type: MyCollectionTabItemType,
+    val myPagesType: MyPagesType,
     val isLike: Boolean = false
 ) : BaseFragment() {
 
     private val viewModel: MyFavoritesViewModel by viewModels()
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
-    private val accountManager: AccountManager by inject()
 
-    private val adapter: FavoritesAdapter by lazy {
-        FavoritesAdapter(requireActivity(), postListener, viewModel.viewModelScope)
+    private val adapter: PostItemAdapter by lazy {
+        PostItemAdapter(requireActivity(), postListener, viewModel.viewModelScope)
     }
+
+    val pageCode = MyPagesPostMediator::class.simpleName + myPagesType.toString()
 
     override val bottomNavigationVisibility: Int
         get() = View.GONE
@@ -60,67 +69,78 @@ class MyFavoritesFragment(
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.postCount.observe(this, {
-            if (it == 0) {
-                id_empty_group.visibility = View.VISIBLE
-                recycler_view.visibility = View.INVISIBLE
-            } else {
-                id_empty_group.visibility = View.GONE
-                recycler_view.visibility = View.VISIBLE
-            }
-            myPagesViewModel.changeDataCount(tab, it)
-            layout_refresh.isRefreshing = false
-        })
-
-        viewModel.likePostResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> {
-                    it.result.let { position ->
-                        adapter.notifyItemChanged(position, FavoritesAdapter.PAYLOAD_UPDATE_LIKE)
-                    }
-                }
-
-                else -> {
-                    onApiError(Exception("Unknown Error!"))
-                }
-            }
-        })
-
-        viewModel.favoriteResult.observe(this, {
-            when (it) {
-                is ApiResult.Success -> viewModel.getData(adapter, isLike)
-                else -> {
-                    onApiError(Exception("Unknown Error!"))
-                }
+        myPagesViewModel.deleteAll.observe(this, {
+            if(tab == it){
+                viewModel.deleteFavorites(adapter.snapshot().items)
             }
         })
 
         viewModel.cleanResult.observe(this, {
             when (it) {
-                is ApiResult.Loading -> progressHUD?.show()
-                is ApiResult.Loaded -> progressHUD?.dismiss()
                 is ApiResult.Empty -> {
-                    viewModel.getData(adapter, isLike)
+                    emptyPageToggle(true)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
+        })
+
+        viewModel.favoriteResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    if(adapter.snapshot().items.size <=1) {
+                        viewModel.viewModelScope.launch {
+                            val dbSize=viewModel.checkoutItemsSize(pageCode)
+                            if(dbSize<=0) emptyPageToggle(true)
+                        }
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+
         })
 
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
     }
 
-    override fun setupObservers() {
-        super.setupObservers()
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success -> {
-                    adapter.removedPosList.add(it.result)
-                    adapter.notifyItemChanged(it.result)
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
+    override fun onResume() {
+        super.onResume()
+        if(adapter.snapshot().items.isEmpty()) adapter.refresh()
+
+        else adapter.notifyDataSetChanged()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
             }
-        })
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(pageCode, myPagesType).flowOn(Dispatchers.IO).collectLatest {
+                adapter.submitData(it)
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if(adapter.snapshot().items.isEmpty() && timeout > 0) {
+                        timeout--
+                        adapter.refresh()
+                    }
+                }
+        }
+
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -130,37 +150,40 @@ class MyFavoritesFragment(
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            viewModel.getData(adapter, isLike)
+            adapter.refresh()
         }
 
-        myPagesViewModel.deleteAll.observe(viewLifecycleOwner, {
-            if (it == tab) {
-                if (isLike) viewModel.deleteAllLike(adapter.snapshot().items)
-                else viewModel.deleteFavorites(adapter.snapshot().items)
-            }
+        viewModel.postCount.observe(viewLifecycleOwner, {
+            emptyPageToggle(it<=0)
+        })
+
+        viewModel.showProgress.observe(viewLifecycleOwner,{
+            layout_refresh.isRefreshing = it
         })
 
         text_page_empty.text =
             if (isLike) getString(R.string.like_empty_msg) else getString(R.string.follow_empty_msg)
         img_page_empty.setImageDrawable(
             ContextCompat.getDrawable(
-                requireContext(),
-                when (isLike) {
-                    false -> R.drawable.img_history_empty_2
-                    true -> R.drawable.img_love_empty
-                }
+                requireContext(), R.drawable.img_love_empty
             )
         )
+
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (accountManager.isLogin() && adapter.snapshot().items.isEmpty()) {
-            viewModel.getData(adapter, isLike)
-        } else if (mainViewModel?.postItemChangedList?.value?.isNotEmpty() == true) {
-            adapter.changedPosList = mainViewModel?.postItemChangedList?.value ?: HashMap()
-            adapter.notifyDataSetChanged()
+    private fun emptyPageToggle(isHide:Boolean){
+        if (isHide) {
+            timeout = 0
+            id_empty_group.visibility = View.VISIBLE
+            text_page_empty.text = getText(R.string.empty_post)
+            recycler_view?.visibility = View.INVISIBLE
+        } else {
+            id_empty_group.visibility = View.GONE
+            recycler_view?.visibility = View.VISIBLE
+
         }
+        layout_refresh.isRefreshing = false
+
     }
 
     private val postListener = object : MyPostListener {
@@ -219,7 +242,13 @@ class MyFavoritesFragment(
         ) {
             val dialog = CleanDialogFragment.newInstance(object : OnCleanDialogListener {
                 override fun onClean() {
-                    checkStatus { viewModel.favoritePost(item, position, isFavorite) }
+                    viewModel.favoritePost(item, position, isFavorite)
+                }
+
+                override fun onCancel() {
+                    item.isFavorite = true
+                    item.favoriteCount++
+                    adapter.notifyItemChanged(position)
                 }
             })
 

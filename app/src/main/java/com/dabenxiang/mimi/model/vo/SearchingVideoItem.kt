@@ -7,5 +7,5 @@ class SearchingVideoItem : Serializable {
     var title: String = ""
     var tag: String = ""
     var category: String = ""
-    var videoType: VideoType? = null
+    var videoType: VideoType = VideoType.VIDEO_ON_DEMAND
 }

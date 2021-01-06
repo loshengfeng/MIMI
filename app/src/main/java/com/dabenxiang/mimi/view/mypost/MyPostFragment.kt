@@ -1,7 +1,9 @@
 package com.dabenxiang.mimi.view.mypost
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -22,6 +24,7 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.base.PostItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -31,18 +34,21 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MY_POST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import kotlinx.android.synthetic.main.fragment_club_item.*
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.fragment_my_post.*
+import kotlinx.android.synthetic.main.fragment_my_post.layout_refresh
 import kotlinx.android.synthetic.main.item_follow_no_data.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 
 class MyPostFragment : BaseFragment() {
 
-    private val adapter: MyPostAdapter by lazy {
-        MyPostAdapter(
+    private val adapter: PostItemAdapter by lazy {
+        PostItemAdapter(
                 requireContext(),
                 myPostListener,
                 viewModel.viewModelScope
@@ -86,16 +92,55 @@ class MyPostFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        getMyPost(userId)
+        if(adapter.snapshot().items.isEmpty()) adapter.refresh()
     }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_my_post
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                if(adapter.snapshot().items.isEmpty() && timeout >0){
+                    layout_refresh?.isRefreshing = true
+                }else{
+                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+                }
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(userId).flowOn(Dispatchers.IO).collectLatest {
+                adapter.submitData(it)
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            @OptIn(FlowPreview::class)
+            adapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .onEach { delay(1000) }
+                .collect {
+                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
+                        timeout--
+                        adapter.refresh()
+                    }
+                }
+        }
+
+
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initSettings()
+
     }
 
     override fun initSettings() {
@@ -159,37 +204,6 @@ class MyPostFragment : BaseFragment() {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.likePostResult.observe(viewLifecycleOwner, {
-            when (it) {
-                is Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
-                        MyPostAdapter.PAYLOAD_UPDATE_LIKE
-                    )
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.favoriteResult.observe(viewLifecycleOwner, {
-            when (it) {
-                is Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
-                        MyPostAdapter.PAYLOAD_UPDATE_FAVORITE
-                    )
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
-            when (it) {
-                is Success -> getMyPost(userId)
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
     }
 
     override fun navigationToText(bundle: Bundle) {
@@ -234,7 +248,7 @@ class MyPostFragment : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            getMyPost(userId)
+            adapter.refresh()
         }
     }
 
@@ -379,17 +393,6 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
-        }
-    }
-
-    private fun getMyPost(userId: Long) {
-        lifecycleScope.launch {
-            adapter.submitData(PagingData.empty())
-            viewModel.getMyPostPagingItems(userId)
-                .collectLatest {
-                    layout_refresh.isRefreshing = false
-                    adapter.submitData(it)
-                }
         }
     }
 

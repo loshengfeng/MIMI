@@ -6,18 +6,13 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.CoroutineScope
 
 class SearchPostAdapter(
@@ -50,7 +45,6 @@ class SearchPostAdapter(
         }
     }
 
-    var changedPosList = HashMap<Long,MemberPostItem>()
     var removedPosList = ArrayList<Int>()
 
     override fun getItemViewType(position: Int): Int {
@@ -107,11 +101,7 @@ class SearchPostAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        var item = getItem(position)
-        val changedItem = changedPosList[item?.id]
-        if (changedItem != null) {
-            item = changedItem
-        }
+        val item = getItem(position)
         item?.also {
             when (holder) {
                 is AdHolder -> {
@@ -130,7 +120,8 @@ class SearchPostAdapter(
                             myPostListener,
                             viewModelScope,
                             getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            getSearchTag.invoke(),
+                            SearchPostMediator.AD_GAP
                         )
                     }
                 }
@@ -148,7 +139,8 @@ class SearchPostAdapter(
                             myPostListener,
                             viewModelScope,
                             getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            getSearchTag.invoke(),
+                            SearchPostMediator.AD_GAP
                         )
                     }
                 }
@@ -165,7 +157,8 @@ class SearchPostAdapter(
                             myPostListener,
                             viewModelScope,
                             getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            getSearchTag.invoke(),
+                            SearchPostMediator.AD_GAP
                         )
                     }
                 }

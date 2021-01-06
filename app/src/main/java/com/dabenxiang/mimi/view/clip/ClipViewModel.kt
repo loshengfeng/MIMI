@@ -15,6 +15,7 @@ import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -167,18 +168,16 @@ class ClipViewModel : BaseViewModel() {
                 }
                 countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
-                item.favoriteCount = countItem.favoriteCount
+                countItem.favoriteCount?.run { item.favoriteCount = this.toInt() }
                 LruCacheUtils.putShortVideoDataCache(
                     item.id,
                     PlayItem(
                         favorite = isFavorite,
-                        favoriteCount = item.favoriteCount?.toInt(),
-                        commentCount = item.commentCount.toInt()
+                        favoriteCount = item.favoriteCount,
+                        commentCount = item.commentCount
                     )
                 )
-
-                _videoChangedResult.postValue(ApiResult.success(item))
-
+                changeFavoriteSmallVideoInDb(item.id)
                 emit(ApiResult.success(countItem.favoriteCount?.toInt()))
             }
                 .flowOn(Dispatchers.IO)

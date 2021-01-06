@@ -21,7 +21,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.item_clip_post.view.*
 import kotlinx.android.synthetic.main.item_text_post.view.*
 import kotlinx.android.synthetic.main.item_text_post.view.chip_group_tag
 import kotlinx.android.synthetic.main.item_text_post.view.img_avatar
@@ -79,7 +78,7 @@ class TextPostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponent {
 
         // FIXME: item.content json 資料格式有問題
         try {
-            val contentItem = Gson().fromJson(item.content, TextContentItem::class.java)
+            val contentItem = Gson().fromJson(item.postContent, TextContentItem::class.java)
             desc.text = contentItem.text
         } catch (e: Exception) {
 //            Timber.e(e)

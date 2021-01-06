@@ -34,7 +34,7 @@ class PostArticleFragment : BasePostFragment() {
                 is ApiResult.Success -> {
                     val item = it.result.content
                     val contentItem =
-                        Gson().fromJson(item?.content, TextContentItem::class.java)
+                        Gson().fromJson(item?.postContent, TextContentItem::class.java)
                     edt_content.setText(contentItem.text)
 
                 }

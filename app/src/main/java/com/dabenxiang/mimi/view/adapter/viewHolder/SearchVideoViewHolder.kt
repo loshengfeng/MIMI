@@ -10,48 +10,51 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.FunctionType
-import com.dabenxiang.mimi.view.base.BaseAnyViewHolder
+import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
+import com.dabenxiang.mimi.view.base.BaseViewHolder
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import kotlinx.android.synthetic.main.head_video_info.view.*
+import kotlinx.android.synthetic.main.item_favorite_common.view.*
+import kotlinx.android.synthetic.main.item_favorite_normal.view.*
 
 class SearchVideoViewHolder(
     itemView: View,
-    val listener: SearchVideoAdapter.EventListener
-) : BaseAnyViewHolder<VideoItem>(itemView) {
+) : BaseViewHolder(itemView) {
 
-    private val tvTitle = itemView.findViewById(R.id.tv_title) as TextView
-    private val tvDesc = itemView.findViewById(R.id.tv_desc) as TextView
-    private val ivPhoto = itemView.findViewById(R.id.iv_photo) as ImageView
-    private val tvLength = itemView.findViewById(R.id.tv_length) as TextView
-    private val reflowGroup = itemView.findViewById(R.id.reflow_group) as ChipGroup
-    private val tvFavorite = itemView.findViewById(R.id.tv_favorite) as TextView
-    private val tvLike = itemView.findViewById(R.id.tv_like) as TextView
-    private val tvMsg = itemView.findViewById(R.id.tv_msg) as TextView
-    private val tvShare = itemView.findViewById(R.id.tv_share) as TextView
-    private val tvMore = itemView.findViewById(R.id.tv_more) as TextView
+    private val tvTitle = itemView.tv_title
+    private val tvDesc = itemView.tv_desc
+    private val ivPhoto = itemView.iv_photo
+    private val tvLength = itemView.tv_length
+    private val reflowGroup = itemView.reflow_group
+    private val tvFavorite = itemView.tv_favorite
+    private val tvLike = itemView.tv_like
+    private val tvMsg = itemView.tv_msg
+    private val tvShare = itemView.tv_share
+    private val tvMore = itemView.tv_more
+    private val ivAd:ImageView = itemView.iv_ad
 
-    init {
-        ivPhoto.setOnClickListener { listener.onVideoClick(data!!) }
-        tvTitle.setOnClickListener { listener.onVideoClick(data!!) }
+    fun onBind(
+        item: MemberPostItem,
+        position:Int,
+        listener: SearchVideoAdapter.EventListener,
+        searchStr: String = "",
+        searchTag: String = "",
+        adGap:Int? = null
+    ) {
+        ivPhoto.setOnClickListener { listener.onVideoClick(item) }
+        tvTitle.setOnClickListener { listener.onVideoClick(item) }
         tvMore.visibility = View.GONE
-    }
-
-    override fun updated() {
-    }
-
-    override fun updated(position: Int) {
-//        var textColor = android.R.color.black
-//        var descTextColor = R.color.color_black_1_50
-
-        val title = SpannableString(data?.title)
+        val title = SpannableString(item.title)
         tvTitle.run {
-            text = if (data?.searchingStr != null && data?.searchingStr?.isNotBlank()!!) {
-                val firstChar = data?.searchingStr?.toLowerCase() ?: "".substring(0, 1)
+            text = if (searchStr.isNotBlank()) {
+                val firstChar = searchStr.toLowerCase()
                 val firstIndex = title.toString().toLowerCase().indexOf(firstChar)
                 if (firstIndex != -1) {
                     title.setSpan(
@@ -69,58 +72,67 @@ class SearchVideoViewHolder(
                 } else
                     title
             } else {
-                data?.title
+                item.title
             }
-//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
         }
 
         tvDesc.run {
-            text = data?.description
-//            setTextColor(ContextCompat.getColor(itemView.context, descTextColor))
+            text = item.videoDescription
         }
 
-        listener.getDecryptSetting(data?.source?:"")?.takeIf { it.isImageDecrypt }
+        if (adGap != null && position % adGap == adGap - 1) {
+            ivAd.visibility = View.VISIBLE
+            val options = RequestOptions()
+                .priority(Priority.NORMAL)
+                .placeholder(R.drawable.img_ad_df)
+                .error(R.drawable.img_ad)
+            Glide.with(ivAd.context)
+                .load(item.adItem?.href)
+                .apply(options)
+                .into(ivAd)
+            ivAd.setOnClickListener {
+                GeneralUtils.openWebView(ivAd.context, item.adItem?.target ?: "")
+            }
+        } else {
+            ivAd.visibility = View.GONE
+        }
+
+        listener.getDecryptSetting(item.videoSource ?: "")?.takeIf { it.isImageDecrypt }
             ?.let { decryptSettingItem ->
-                listener.decryptCover(data?.cover?:"", decryptSettingItem) {
+                listener.decryptCover(item.cover ?: "", decryptSettingItem) {
                     Glide.with(ivPhoto.context)
                         .load(it).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
                 }
             } ?: run {
             Glide.with(ivPhoto.context)
-                .load(data?.cover).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
+                .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivPhoto)
         }
 
         // todo: no length data...
         tvLength.visibility = View.INVISIBLE
 
-        if (data?.tags is String && (data?.tags as String).isNotEmpty()) {
-            setupChipGroup((data?.tags as String).split(","))
-        }
+        setupChipGroup(item.tags, searchStr, searchTag, listener)
 
         tvFavorite.run {
-            text = data?.favoriteCount.toString()
-            val resFavorite = when (data?.favorite) {
+            text = item.favoriteCount.toString()
+            val resFavorite = when (item.isFavorite) {
                 true -> R.drawable.btn_favorite_white_s
                 else -> R.drawable.btn_favorite_n
             }
             setCompoundDrawablesRelativeWithIntrinsicBounds(resFavorite, 0, 0, 0)
-//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
         }
 
         tvFavorite.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.FAVORITE,
                 it,
-                data!!,
+                item,
                 position
             )
         }
 
         tvShare.run {
-            val resShare = when (data?.isAdult) {
-                true -> R.drawable.btn_share_white_n
-                else -> R.drawable.btn_share_gray_n
-            }
+            val resShare = R.drawable.btn_share_gray_n
             setCompoundDrawablesRelativeWithIntrinsicBounds(resShare, 0, 0, 0)
         }
 
@@ -128,42 +140,42 @@ class SearchVideoViewHolder(
             listener.onFunctionClick(
                 FunctionType.SHARE,
                 it,
-                data!!,
+                item,
                 position
             )
         }
 
+        tvLike.visibility = if(item.type == PostType.SMALL_CLIP) View.GONE else View.VISIBLE
+
         tvLike.run {
-            text = data?.likeCount.toString()
-            val res = when (data?.like) {
-                true -> R.drawable.ico_nice_s
+            text = item.likeCount.toString()
+            val res = when (item.likeType) {
+                LikeType.LIKE -> R.drawable.ico_nice_s
                 else -> R.drawable.ico_nice_gray
             }
             setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
-//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
         }
 
         tvLike.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.LIKE,
                 it,
-                data!!,
+                item,
                 position
             )
         }
 
         tvMsg.run {
-            text = data?.commentCount.toString()
+            text = item.commentCount.toString()
             val resMsg = R.drawable.ico_messege_adult_gray
             setCompoundDrawablesRelativeWithIntrinsicBounds(resMsg, 0, 0, 0)
-//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
         }
 
         tvMsg.setOnClickListener {
             listener.onFunctionClick(
                 FunctionType.MSG,
                 it,
-                data!!,
+                item,
                 position
             )
         }
@@ -177,13 +189,18 @@ class SearchVideoViewHolder(
             listener.onFunctionClick(
                 FunctionType.MORE,
                 it,
-                data!!,
+                item,
                 position
             )
         }
     }
 
-    private fun setupChipGroup(list: List<String>?) {
+    private fun setupChipGroup(
+        list: List<String>?,
+        searchStr: String = "",
+        searchTag: String = "",
+        listener: SearchVideoAdapter.EventListener
+    ) {
         reflowGroup.reflow_group.removeAllViews()
         if (list == null) {
             return
@@ -196,7 +213,7 @@ class SearchVideoViewHolder(
                 .inflate(R.layout.chip_item, reflowGroup, false) as Chip
             chip.text = tag
 
-            if (tag == data?.searchingTag || tag == data?.searchingStr) {
+            if (tag == searchTag || tag == searchStr) {
                 chip.setTextColor(chip.context.getColor(R.color.color_red_1))
             } else {
                 chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
@@ -213,27 +230,25 @@ class SearchVideoViewHolder(
     }
 
 
-    fun updateLike(item: VideoItem) {
+    fun updateLike(item: MemberPostItem) {
         tvLike.run {
             text = item.likeCount.toString()
-            val res = when (item.like) {
-                true -> R.drawable.ico_nice_s
+            val res = when (item.likeType) {
+                LikeType.LIKE -> R.drawable.ico_nice_s
                 else -> R.drawable.ico_nice_gray
             }
             setCompoundDrawablesRelativeWithIntrinsicBounds(res, 0, 0, 0)
-//            setTextColor(ContextCompat.getColor(tvLike.context, android.R.color.black))
         }
     }
 
-    fun updateFavorite(item: VideoItem) {
+    fun updateFavorite(item: MemberPostItem) {
         tvFavorite.run {
             text = item.favoriteCount.toString()
-            val resFavorite = when (item.favorite) {
+            val resFavorite = when (item.isFavorite) {
                 true -> R.drawable.btn_favorite_white_s
                 else -> R.drawable.btn_favorite_n
             }
             setCompoundDrawablesRelativeWithIntrinsicBounds(resFavorite, 0, 0, 0)
-//            setTextColor(ContextCompat.getColor(itemView.context, textColor))
         }
     }
 }

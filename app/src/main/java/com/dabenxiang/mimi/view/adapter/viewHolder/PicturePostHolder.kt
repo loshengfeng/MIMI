@@ -96,7 +96,7 @@ class PicturePostHolder(itemView: View) : BaseViewHolder(itemView), KoinComponen
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        val contentItem = Gson().fromJson(item.postContent, MediaContentItem::class.java)
         pictureCount.tag = position
         pictureRecycler.layoutManager = LinearLayoutManager(
             pictureRecycler.context, LinearLayoutManager.HORIZONTAL, false

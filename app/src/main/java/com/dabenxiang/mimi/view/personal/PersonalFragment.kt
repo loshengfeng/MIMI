@@ -183,6 +183,7 @@ class PersonalFragment : BaseFragment() {
                 is Loading -> layout_refresh.isRefreshing = true
                 is Loaded -> layout_refresh.isRefreshing = false
                 is Empty -> {
+                    viewModel.cleanDb()
                     initUi()
                     scroll_view.smoothScrollTo(0, 0)
                     viewModel.getMemberInfo()

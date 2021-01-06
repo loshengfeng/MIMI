@@ -239,7 +239,7 @@ open class BasePostFragment : BaseFragment() {
 
     private fun setUI() {
         val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-        val contentItem = Gson().fromJson(item.content, MediaItem::class.java)
+        val contentItem = Gson().fromJson(item.postContent, MediaItem::class.java)
 
         postId = item.id
 

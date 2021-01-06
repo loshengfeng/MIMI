@@ -14,6 +14,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_my.*
 import kotlinx.android.synthetic.main.fragment_my.view.*
+import timber.log.Timber
 
 abstract class BaseMyPagesTabFragment : BaseFragment() {
 
@@ -68,8 +69,11 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
         viewModel.changeDataCount.observe(viewLifecycleOwner, {
             val tabIndex = it.first
             val count = it.second
-            dataCountByTab[tabIndex] = count
-            changeCleanBtnIsEnable(tabIndex)
+
+            if(tabIndex == view.tabs.selectedTabPosition){
+                dataCountByTab[tabIndex] = count
+                changeCleanBtnIsEnable(tabIndex)
+            }
         })
 
     }
@@ -97,11 +101,16 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
                 viewModel.setDeleteNotify(it.selectedTabPosition)
             }
         }
+
+        override fun onCancel() {
+
+        }
     }
 
     open val onTabSelectedListener: TabLayout.OnTabSelectedListener? = null
 
     fun changeCleanBtnIsEnable(tabIndex: Int) {
-        tool_bar.menu.getItem(0).isEnabled = dataCountByTab[tabIndex] > 0
+//        tool_bar.menu.getItem(0).isEnabled = dataCountByTab[tabIndex] > 0
+        //TODO FIX
     }
 }

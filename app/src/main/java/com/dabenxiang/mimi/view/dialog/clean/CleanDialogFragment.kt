@@ -22,6 +22,7 @@ class CleanDialogFragment : BaseDialogFragment() {
             val fragment = CleanDialogFragment()
             fragment.onCleanDialogListener = listener
             fragment.msgResId = msgResId
+            fragment.isCancelable = false
             return fragment
         }
     }
@@ -54,6 +55,7 @@ class CleanDialogFragment : BaseDialogFragment() {
             dismiss()
             when (btnView.id) {
                 R.id.btn_confirm -> onCleanDialogListener?.onClean()
+                R.id.btn_cancel -> onCleanDialogListener?.onCancel()
             }
         }.also {
             layout_root.setOnClickListener(it)
