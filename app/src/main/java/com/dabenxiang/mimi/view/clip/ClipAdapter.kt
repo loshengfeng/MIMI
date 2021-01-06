@@ -217,6 +217,7 @@ class ClipAdapter(
         url?.takeIf { currentPosition == position }?.run {
             if(url.isNullOrEmpty()) {
                 GeneralUtils.showToast(context, context.resources.getString(R.string.source_not_found))
+                handleOnPlayError()
             } else {
                 releasePlayer()
                 setupPlayer(playerView, this)
@@ -315,13 +316,17 @@ class ClipAdapter(
                 }
             }
 
-            currentViewHolder?.ibPlay?.visibility = View.GONE
-            currentViewHolder?.progress?.visibility = View.GONE
-            currentViewHolder?.tvRetry?.visibility = View.VISIBLE
-//            currentViewHolder?.tvRetry?.text = error.localizedMessage
-            getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
-                clipFuncItem.onVideoReport(id, true)
-            }
+            handleOnPlayError()
+        }
+    }
+
+    private fun handleOnPlayError() {
+        currentViewHolder?.ibPlay?.visibility = View.GONE
+        currentViewHolder?.progress?.visibility = View.GONE
+        currentViewHolder?.tvRetry?.visibility = View.VISIBLE
+//        currentViewHolder?.tvRetry?.text = error
+        getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
+            clipFuncItem.onVideoReport(id, true)
         }
     }
 }
