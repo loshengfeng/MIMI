@@ -135,8 +135,8 @@ class SearchVideoViewModel : BaseViewModel() {
                     videoID,
                     PlayItem(
                         favorite = currentItem?.favorite,
-                        favoriteCount = countItem.favoriteCount.toInt(),
-                        commentCount = countItem.commentCount.toInt()
+                        favoriteCount = countItem.favoriteCount?.toInt(),
+                        commentCount = countItem.commentCount?.toInt()
                     )
                 )
 

@@ -110,8 +110,8 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     videoId.toLong(),
                     PlayItem(
                         favorite = false,
-                        favoriteCount = countItem.favoriteCount.toInt(),
-                        commentCount = countItem.commentCount.toInt()
+                        favoriteCount = countItem.favoriteCount?.toInt(),
+                        commentCount = countItem.commentCount?.toInt()
                     )
                 )
                 emit(ApiResult.success(result.isSuccessful))
@@ -149,8 +149,8 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     item.id,
                     PlayItem(
                         favorite = isFavorite,
-                        favoriteCount = countItem.favoriteCount.toInt(),
-                        commentCount = countItem.commentCount.toInt()
+                        favoriteCount = countItem.favoriteCount?.toInt(),
+                        commentCount = countItem.commentCount?.toInt()
                     )
                 )
 
@@ -181,8 +181,8 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                             playItem.id,
                             PlayItem(
                                 favorite = false,
-                                favoriteCount = item.favoriteCount.toInt(),
-                                commentCount = item.commentCount.toInt()
+                                favoriteCount = item.favoriteCount?.toInt(),
+                                commentCount = item.commentCount?.toInt()
                             )
                         )
                     }

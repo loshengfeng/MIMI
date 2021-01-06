@@ -179,7 +179,7 @@ class ClipViewModel : BaseViewModel() {
 
                 _videoChangedResult.postValue(ApiResult.success(item))
 
-                emit(ApiResult.success(countItem.favoriteCount.toInt()))
+                emit(ApiResult.success(countItem.favoriteCount?.toInt()))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
