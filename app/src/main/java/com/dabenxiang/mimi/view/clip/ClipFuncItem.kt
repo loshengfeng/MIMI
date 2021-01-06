@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 
 data class ClipFuncItem(
     val getBitmap: ((Long?, ImageView, LoadImageType) -> Unit) = { _, _, _ -> },
-    val onFavoriteClick: ((VideoItem, Int, Boolean) -> Unit) = { _, _, _ -> },
+    val onFavoriteClick: ((VideoItem, Boolean, (Boolean, Int) -> Unit) -> Unit) = { _, _, _ -> },
     val onLikeClick: ((VideoItem, Int, Boolean) -> Unit) = { _, _, _ -> },
     val onCommentClick: ((VideoItem) -> Unit) = { _ -> },
     val onMoreClick: ((VideoItem) -> Unit) = { _ -> },

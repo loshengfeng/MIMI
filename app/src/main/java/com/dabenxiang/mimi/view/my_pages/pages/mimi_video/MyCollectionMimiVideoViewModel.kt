@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -169,6 +170,24 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                     .deleteMePlaylist(
                         items.map { it.videoId }.joinToString(separator = ",")
                     )
+
+                val body = result.body()?.content
+                val countItems = (body as ArrayList<*>)
+
+                items.forEachWithIndex { i, playItem ->
+                    takeIf { i < countItems.size }?.let { countItems[i] }?.let { item ->
+                        item as InteractiveHistoryItem
+                        LruCacheUtils.putShortVideoDataCache(
+                            playItem.id,
+                            PlayItem(
+                                favorite = false,
+                                favoriteCount = item.favoriteCount.toInt(),
+                                commentCount = item.commentCount.toInt()
+                            )
+                        )
+                    }
+                }
+
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
             }

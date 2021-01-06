@@ -14,6 +14,7 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -150,7 +151,7 @@ class ClipViewModel : BaseViewModel() {
     /**
      * 加入收藏與解除收藏
      */
-    fun modifyFavorite(item: VideoItem, position: Int, isFavorite: Boolean) {
+    fun modifyFavorite(item: VideoItem, isFavorite: Boolean, update: (Boolean, Int) -> Unit) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -167,13 +168,23 @@ class ClipViewModel : BaseViewModel() {
                 countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
                 item.favoriteCount = countItem.favoriteCount
+                LruCacheUtils.putShortVideoDataCache(
+                    item.id,
+                    PlayItem(
+                        favorite = isFavorite,
+                        favoriteCount = item.favoriteCount?.toInt(),
+                        commentCount = item.commentCount.toInt()
+                    )
+                )
+
                 _videoChangedResult.postValue(ApiResult.success(item))
 
-                emit(ApiResult.success(position))
+                emit(ApiResult.success(countItem.favoriteCount.toInt()))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
+                    if (it is ApiResult.Success) { update(isFavorite, it.result) }
                     _favoriteResult.value = it
                 }
         }

@@ -40,14 +40,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         tvRetry.visibility = View.GONE
         tvTitle.text = item.title
 
-        LruCacheUtils.getShortVideoCount(item.id)?.run {
-            this.favoriteCount?.also { count ->  item.favoriteCount = count.toLong() }
-            this.commentCount?.also { count ->  item.commentCount = count.toLong() }
-            this.favorite?.also { favorite ->  item.favorite = favorite }
-        }
-
-        tvFavorite.text = item.favoriteCount.toString()
-        tvComment.text = item.commentCount.toString()
+        updateCount(item)
 
         tvTitle.isSelected = true
 
@@ -61,13 +54,9 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             Glide.with(ivCover.context)
                 .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivCover)
         }
-
-        val favoriteRes = takeIf { item.favorite }?.let { R.drawable.btn_favorite_forvideo_s }
-            ?: let { R.drawable.btn_favorite_forvideo_n }
-        tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
     }
 
-    fun updateAfterM3U8(item: VideoItem, clipFuncItem: ClipFuncItem, pos: Int, isOverdue: Boolean) {
+    fun updateAfterM3U8(item: VideoItem, clipFuncItem: ClipFuncItem, isOverdue: Boolean) {
         if (isOverdue) {
             btnVip.setOnClickListener { clipFuncItem.onVipClick() }
             btnPromote.setOnClickListener { clipFuncItem.onPromoteClick() }
@@ -81,9 +70,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         } else {
             item.deducted = !isOverdue
-            tvFavorite.setOnClickListener {
-                clipFuncItem.onFavoriteClick(item, pos, !item.favorite)
-            }
+            tvFavorite.setOnClickListener { clipFuncItem.onFavoriteClick(item, !item.favorite, ::updateFavorite) }
             tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
             tvMore.setOnClickListener { clipFuncItem.onMoreClick(item) }
 
@@ -91,11 +78,36 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    fun updateCount(item: InteractiveHistoryItem) {
+    fun updateInteractiveHistory(item: VideoItem, interactiveHistoryItem: InteractiveHistoryItem) {
+        item.commentCount = interactiveHistoryItem.commentCount
+        item.favoriteCount = interactiveHistoryItem.favoriteCount
+        item.favorite = interactiveHistoryItem.isFavorite
+
         tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()
 
-        val favoriteRes = takeIf { item.isFavorite }?.let { R.drawable.btn_favorite_forvideo_s }
+        val favoriteRes = takeIf { item.favorite }?.let { R.drawable.btn_favorite_forvideo_s }
+            ?: let { R.drawable.btn_favorite_forvideo_n }
+        tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
+    }
+
+    fun updateCount(item: VideoItem) {
+        LruCacheUtils.getShortVideoCount(item.id)?.run {
+            this.favoriteCount?.also { count ->  item.favoriteCount = count.toLong() }
+            this.commentCount?.also { count ->  item.commentCount = count.toLong() }
+            this.favorite?.also { favorite ->  item.favorite = favorite }
+        }
+        tvFavorite.text = item.favoriteCount.toString()
+        tvComment.text = item.commentCount.toString()
+
+        val favoriteRes = takeIf { item.favorite }?.let { R.drawable.btn_favorite_forvideo_s }
+            ?: let { R.drawable.btn_favorite_forvideo_n }
+        tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
+    }
+
+    fun updateFavorite(isFavorite: Boolean, favoriteCount: Int) {
+        tvFavorite.text = favoriteCount.toString()
+        val favoriteRes = takeIf { isFavorite }?.let { R.drawable.btn_favorite_forvideo_s }
             ?: let { R.drawable.btn_favorite_forvideo_n }
         tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
     }

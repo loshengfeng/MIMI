@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.dabenxiang.mimi.R
@@ -46,6 +45,7 @@ class ClipAdapter(
         const val PAYLOAD_UPDATE_AFTER_M3U8 = 1
         const val PAYLOAD_UPDATE_SCROLL_AWAY = 2
         const val PAYLOAD_UPDATE_AFTER_HISTORY = 3
+        const val PAYLOAD_UPDATE_COUNT = 4
     }
 
     private var currentViewHolder: ClipViewHolder? = null
@@ -134,8 +134,6 @@ class ClipAdapter(
         }
     }
 
-    var changedPosList = HashMap<Long, VideoItem>()
-
     override fun onBindViewHolder(
         holder: ClipViewHolder,
         position: Int,
@@ -143,11 +141,6 @@ class ClipAdapter(
     ) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = getItem(position) ?: VideoItem()
-        val changedItem = changedPosList[item.id]
-        if (changedItem != null) {
-            item.favorite = changedItem.favorite
-            item.favoriteCount = changedItem.favoriteCount
-        }
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
@@ -159,13 +152,16 @@ class ClipAdapter(
                 }
                 PAYLOAD_UPDATE_AFTER_M3U8 -> {
                     holder.progress.visibility = View.GONE
-                    holder.updateAfterM3U8(item, clipFuncItem, position, isOverdue)
+                    holder.updateAfterM3U8(item, clipFuncItem, isOverdue)
                     takeUnless { isOverdue }?.run {
                         processUpdateAfterM3U8Payload(holder, position)
                     }
                 }
                 PAYLOAD_UPDATE_AFTER_HISTORY -> {
-                    interactiveHistoryItem?.run { holder.updateCount(this) }
+                    interactiveHistoryItem?.run { holder.updateInteractiveHistory(item, this) }
+                }
+                PAYLOAD_UPDATE_COUNT -> {
+                    holder.updateCount(item)
                 }
             }
         } ?: run {
