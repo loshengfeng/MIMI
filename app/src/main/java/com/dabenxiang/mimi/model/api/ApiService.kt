@@ -169,6 +169,11 @@ interface ApiService {
         @Query("unhealthy") unhealthy: Boolean
     ): Response<Void>
 
+    @GET("/v1/Members/Me/IsUsernameExists")
+    suspend fun isMemberExists(
+        @Query("username") userName: String
+    ): Response<Void>
+
     /**********************************************************
      *
      *                  Members/Post

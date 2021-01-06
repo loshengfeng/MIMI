@@ -86,6 +86,15 @@ class LoginViewModel : BaseViewModel() {
     private val _validateMessageResult = MutableLiveData<ApiResult<Nothing>>()
     val validateMessageResult: LiveData<ApiResult<Nothing>> = _validateMessageResult
 
+    private val _registerExistResult = MutableLiveData<ApiResult<Nothing>>()
+    val registerExistResult: LiveData<ApiResult<Nothing>> = _registerExistResult
+
+    private val _loginExistResult = MutableLiveData<ApiResult<Nothing>>()
+    val loginExistResult: LiveData<ApiResult<Nothing>> = _loginExistResult
+
+    private val _loginMobileErrorResult = MutableLiveData<String>()
+    val loginMobileErrorResult: LiveData<String> = _loginMobileErrorResult
+
     /**
      * 註冊邏輯
      */
@@ -201,6 +210,36 @@ class LoginViewModel : BaseViewModel() {
         _validateCodeError.value = app.getString(s)
     }
 
+    fun callRegisterIsMemberExist(callPrefix: String, phoneNumber: String) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.isMemberExist(callPrefix + phoneNumber)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _registerExistResult.value = it }
+        }
+    }
+
+    fun callLoginIsMemberExist(callPrefix: String, phoneNumber: String) {
+        viewModelScope.launch {
+            flow {
+                val apiRepository = domainManager.getApiRepository()
+                val result = apiRepository.isMemberExist(callPrefix + phoneNumber)
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(ApiResult.success(null))
+            }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _loginExistResult.value = it }
+        }
+    }
+
     fun callValidateMessage(callPrefix: String, phoneNumber: String) {
         viewModelScope.launch {
             flow {
@@ -228,6 +267,10 @@ class LoginViewModel : BaseViewModel() {
 
     fun onInvitedCodeError(msg: String) {
         _invitedCodeError.value = msg
+    }
+
+    fun onLoginMobileError(msg: String) {
+        _loginMobileErrorResult.value = msg
     }
 
     fun startTimer() {

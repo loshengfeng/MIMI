@@ -71,6 +71,7 @@
     <string name="verify_later">稍后验证</string>
     <string name="error_email_not_confirmed_title">尚未验证</string>
     <string name="error_email_not_confirmed_msg">Email 尚未验证，请先完成验证后登录</string>
+    <string name="error_mobile_not_exist">手机号不存在，请先注册 </string>
 
     <!-- Top Up -->
     <string name="topup_desc">购买 VIP</string>
