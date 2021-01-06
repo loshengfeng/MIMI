@@ -1,5 +1,6 @@
 package com.dabenxiang.mimi.view.mypost
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -99,7 +100,16 @@ class MyPostFragment : BaseFragment() {
         return R.layout.fragment_my_post
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        arguments?.let {
+            userId = it.getLong(KEY_USER_ID, USER_ID_ME)
+            userName = it.getString(KEY_USER_NAME, "")
+            isAdult = it.getBoolean(KEY_IS_ADULT, true)
+        }
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
             adapter.loadStateFlow.collectLatest { loadStates ->
@@ -144,11 +154,6 @@ class MyPostFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        arguments?.let {
-            userId = it.getLong(KEY_USER_ID, USER_ID_ME)
-            userName = it.getString(KEY_USER_NAME, "")
-            isAdult = it.getBoolean(KEY_IS_ADULT, true)
-        }
         adapter.addLoadStateListener(loadStateListener)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter.withMimiLoadStateFooter { adapter.retry() }
