@@ -37,13 +37,21 @@ class SearchVideoAdapter(
             override fun areItemsTheSame(
                 oldItem: MemberPostItem,
                 newItem: MemberPostItem
-            ): Boolean = oldItem == newItem
+            ): Boolean = oldItem.id == newItem.id
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(
                 oldItem: MemberPostItem,
                 newItem: MemberPostItem
             ): Boolean = oldItem == newItem
+
+            override fun getChangePayload(oldItem: MemberPostItem, newItem: MemberPostItem): Any? {
+                return when {
+                    oldItem.likeType != newItem.likeType || oldItem.likeCount != newItem.likeCount -> UPDATE_LIKE
+                    oldItem.isFavorite != newItem.isFavorite || oldItem.favoriteCount != newItem.favoriteCount -> UPDATE_FAVORITE
+                    else -> null
+                }
+            }
         }
     }
 
@@ -81,10 +89,10 @@ class SearchVideoAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        val item = getItem(position)?:MemberPostItem()
+        val item = getItem(position) ?: MemberPostItem()
         when (holder) {
             is AdHolder -> {
-                holder.onBind(item.adItem?: AdItem())
+                holder.onBind(item.adItem ?: AdItem())
             }
             is SearchVideoViewHolder -> {
                 if (payloads.size == 1) {
@@ -93,7 +101,14 @@ class SearchVideoAdapter(
                         UPDATE_FAVORITE -> holder.updateFavorite(item)
                     }
                 } else {
-                    holder.onBind(item, position, listener, getSearchText.invoke(), getSearchTag.invoke(), 5)
+                    holder.onBind(
+                        item,
+                        position,
+                        listener,
+                        getSearchText.invoke(),
+                        getSearchTag.invoke(),
+                        5
+                    )
                 }
             }
         }

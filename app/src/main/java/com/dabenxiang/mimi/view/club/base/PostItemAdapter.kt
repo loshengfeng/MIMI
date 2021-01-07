@@ -26,6 +26,11 @@ class PostItemAdapter(
     private val adGap: Int? = null
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
+    companion object {
+        const val UPDATE_LIKE = 0
+        const val UPDATE_FAVORITE = 1
+    }
+
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
         return when (item?.type) {
@@ -71,7 +76,11 @@ class PostItemAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         val item = getItem(position)
         item?.also { memberPostItem ->
             Timber.i("PostItemAdapter position=$position  holder=$holder")
@@ -120,6 +129,9 @@ class PostItemAdapter(
                 }
             }
         }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
     }
 
 }

@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter
 import kotlinx.coroutines.CoroutineScope
 
 class SearchPostAdapter(
@@ -41,6 +42,14 @@ class SearchPostAdapter(
                 oldItem: MemberPostItem,
                 newItem: MemberPostItem
             ): Boolean = oldItem == newItem
+
+            override fun getChangePayload(oldItem: MemberPostItem, newItem: MemberPostItem): Any? {
+                return when {
+                    oldItem.likeType != newItem.likeType || oldItem.likeCount != newItem.likeCount -> SearchVideoAdapter.UPDATE_LIKE
+                    oldItem.isFavorite != newItem.isFavorite || oldItem.favoriteCount != newItem.favoriteCount -> SearchVideoAdapter.UPDATE_FAVORITE
+                    else -> null
+                }
+            }
         }
     }
 

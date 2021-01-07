@@ -16,6 +16,7 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
@@ -26,12 +27,15 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
 import com.dabenxiang.mimi.view.club.base.AdAdapter
 import com.dabenxiang.mimi.view.club.base.PostItemAdapter
+import com.dabenxiang.mimi.view.club.base.PostItemAdapter.Companion.UPDATE_FAVORITE
+import com.dabenxiang.mimi.view.club.base.PostItemAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_item.*
@@ -93,6 +97,28 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             adTop.visibility = View.VISIBLE
             adTop.notifyDataSetChanged()
         }
+
+//        viewModel.likePostResult.observe(viewLifecycleOwner, {
+//            when (it) {
+//                is ApiResult.Success -> {
+//                    it.result.let { position ->
+//                        adapter.notifyItemChanged(position, UPDATE_LIKE)
+//                    }
+//                }
+//                is ApiResult.Error -> onApiError(it.throwable)
+//            }
+//        })
+//
+//        viewModel.favoriteResult.observe(viewLifecycleOwner, {
+//            when (it) {
+//                is ApiResult.Success -> {
+//                    it.result.let { position ->
+//                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
+//                    }
+//                }
+//                is ApiResult.Error -> onApiError(it.throwable)
+//            }
+//        })
     }
 
     override fun onCreateView(
