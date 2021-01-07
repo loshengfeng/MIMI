@@ -100,7 +100,8 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
                     when (orderItem.paymentType) {
                         PaymentType.ALI -> R.drawable.ico_alipay
                         PaymentType.WX -> R.drawable.ico_wechat_pay
-                        else -> R.drawable.ico_bank
+                        PaymentType.TIK_TOK -> R.drawable.ico_tiktokpay_160_px
+                        PaymentType.BANK -> R.drawable.ico_bank
                     }
                 )
             }
