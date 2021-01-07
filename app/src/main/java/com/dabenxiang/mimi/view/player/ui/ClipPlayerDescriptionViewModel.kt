@@ -105,7 +105,7 @@ class ClipPlayerDescriptionViewModel : BaseViewModel() {
                         item.dislikeCount = it.dislikeCount?.toInt() ?: 0
                     }
                 }
-                changeLikePostInDb(item.id, type, item.likeCount)
+                changeLikePostInDb(item.id, item.likeType, item.likeCount)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
