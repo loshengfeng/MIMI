@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.model.manager.mqtt
 
 import android.content.Context
+import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
@@ -9,6 +10,8 @@ import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.android.service.ParcelableMqttMessage
 import org.eclipse.paho.client.mqttv3.*
 import timber.log.Timber
+import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
+import java.util.logging.LogManager
 
 class MQTTManager(val context: Context, private val pref: Pref) {
 
@@ -22,11 +25,14 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
     private val messageIdSet = hashSetOf<String>()
 
-    fun init(serverUrl: String, clientId: String, extendedCallback: ExtendedCallback) {
+    private var extendedCallback: ExtendedCallback? = null
+
+    fun init(serverUrl: String, clientId: String, callback: ExtendedCallback) {
+        extendedCallback = callback
         client = MqttAndroidClient(context, serverUrl, clientId, MqttAndroidClient.Ack.MANUAL_ACK)
         client?.setCallback(object : MqttCallbackExtended {
             override fun connectComplete(reconnect: Boolean, serverURI: String) {
-                extendedCallback.onConnectComplete(reconnect, serverURI)
+                extendedCallback?.onConnectComplete(reconnect, serverURI)
             }
 
             override fun messageArrived(topic: String, message: MqttMessage) {
@@ -35,16 +41,16 @@ class MQTTManager(val context: Context, private val pref: Pref) {
                 client?.acknowledgeMessage(messageId)
                 if (!messageIdSet.contains(messageId)) {
                     messageIdSet.add(messageId)
-                    extendedCallback.onMessageArrived(topic, message)
+                    extendedCallback?.onMessageArrived(topic, message)
                 }
             }
 
             override fun connectionLost(cause: Throwable?) {
-                extendedCallback.onConnectionLost(cause)
+                extendedCallback?.onConnectionLost(cause)
             }
 
             override fun deliveryComplete(token: IMqttDeliveryToken) {
-                extendedCallback.onDeliveryComplete(token)
+                extendedCallback?.onDeliveryComplete(token)
             }
         })
 
@@ -57,7 +63,14 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     }
 
     fun isMqttConnect(): Boolean {
-        return client?.isConnected ?: false
+        return try {
+            client?.isConnected ?: false
+        }catch (e:IllegalArgumentException){
+            Timber.v("IllegalArgumentException:$e")
+            extendedCallback?.onInvalidHandle(e.cause)
+            false
+        }
+
     }
 
     fun connect(connectCallback: ConnectCallback) {
@@ -80,7 +93,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     }
 
     fun disconnect() {
-        if (client?.isConnected == true) {
+        isMqttConnect().takeIf { it }?.let {
             client?.disconnect()
         }
     }
