@@ -84,7 +84,7 @@ class MyPagesPostMediator(
                     memberPostItems?.size ?: 0
             )
 
-            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
+            if (offset == 0 && loadType == LoadType.REFRESH) pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){

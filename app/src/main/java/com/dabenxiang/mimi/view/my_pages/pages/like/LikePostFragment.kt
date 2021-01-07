@@ -38,7 +38,6 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_my_collection_favorites.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragment() {
 
@@ -66,6 +65,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
             when (it) {
                 is ApiResult.Empty -> {
                     emptyPageToggle(true)
+                    myPagesViewModel.changeDataIsEmpty(tab, true)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -77,7 +77,10 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
                     if(adapter.snapshot().items.size <=1) {
                         viewModel.viewModelScope.launch {
                             val dbSize=viewModel.checkoutItemsSize(pageCode)
-                            if(dbSize<=0) emptyPageToggle(true)
+                            if(dbSize<=0) {
+                                emptyPageToggle(true)
+                                myPagesViewModel.changeDataIsEmpty(tab, true)
+                            }
                         }
                     }
                     layout_refresh.isRefreshing = false
@@ -157,7 +160,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
 
         viewModel.postCount.observe(viewLifecycleOwner, {
             emptyPageToggle(it<=0)
-            myPagesViewModel.changeDataCount(tab, it)
+            myPagesViewModel.changeDataIsEmpty(tab, it<=0)
         })
 
         text_page_empty.text = getString(R.string.like_empty_msg)

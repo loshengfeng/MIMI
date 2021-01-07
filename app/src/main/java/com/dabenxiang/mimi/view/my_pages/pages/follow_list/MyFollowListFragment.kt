@@ -150,7 +150,7 @@ class MyFollowListFragment(val type: Int) : BaseFragment() {
                 id_empty_group.visibility = View.GONE
                 recycler_view.visibility = View.VISIBLE
             }
-            myPagesViewModel.changeDataCount(type, it)
+            myPagesViewModel.changeDataIsEmpty(type, it==0)
             layout_refresh.isRefreshing = false
         }
 

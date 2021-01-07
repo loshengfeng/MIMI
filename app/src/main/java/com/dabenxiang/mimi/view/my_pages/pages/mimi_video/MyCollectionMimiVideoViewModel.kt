@@ -18,12 +18,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MyCollectionMimiVideoViewModel : ClubViewModel() {
-
-    private var _videoFavoriteResult = MutableLiveData<ApiResult<Int>>()
-    val videoFavoriteResult: LiveData<ApiResult<Int>> = _videoFavoriteResult
 
     private val _deleteFavoriteResult = MutableLiveData<ApiResult<Boolean>>()
     val deleteFavoriteResult: LiveData<ApiResult<Boolean>> = _deleteFavoriteResult
