@@ -140,6 +140,10 @@ class MainActivity : BaseActivity() {
             }
         })
 
+        viewModel.closeAppFromMqtt.observe(this) {
+            finish()
+        }
+
         viewModel.isNavTransparent.observe(this, { setUiMode(it) })
         viewModel.isStatusBardDark.observe(this, { setupStatusBar(it) })
 
