@@ -48,6 +48,7 @@ class TopicTabFragment : BaseFragment() {
     val viewModel: TopicViewModel by viewModels()
     lateinit var memberClubItem:MemberClubItem
 
+    var isUpdateSetUp = true
     private val topicItem: MemberClubItem by lazy {
         Timber.i("topicItem arguments =$arguments")
         (arguments?.getSerializable(KEY_DATA) as MemberClubItem)
@@ -131,7 +132,7 @@ class TopicTabFragment : BaseFragment() {
 
     private fun setupUI(item:MemberClubItem) {
         Timber.i("MemberClubItem =$topicItem")
-        val isUpdateSetUp =this::memberClubItem.isInitialized
+
 
         memberClubItem = item
         memberClubItem?.let{item->
@@ -139,9 +140,10 @@ class TopicTabFragment : BaseFragment() {
             tv_desc.text = item.description
 
             tv_desc.post {
-                if (!isUpdateSetUp && tv_desc.lineCount > 1) {
+                if (isUpdateSetUp && tv_desc.lineCount > 1) {
+                    isUpdateSetUp = false
                     val params = toolbar_layout.layoutParams
-                    params.height = toolbar_layout.height +tv_desc.height/2
+                    params.height = toolbar_layout.height + tv_desc.height/2
                     toolbar_layout.layoutParams = params
                 }
             }
@@ -163,6 +165,7 @@ class TopicTabFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
+        isUpdateSetUp = true
         viewModel.getMembersClub(topicItem.id)
     }
 
