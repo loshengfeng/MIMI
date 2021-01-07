@@ -8,4 +8,5 @@ interface ExtendedCallback {
     fun onMessageArrived(topic: String, message: MqttMessage)
     fun onConnectionLost(cause: Throwable?)
     fun onDeliveryComplete(token: IMqttDeliveryToken)
+    fun onInvalidHandle(cause: Throwable?)
 }
