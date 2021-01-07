@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
+import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
@@ -51,5 +52,11 @@ class TopicListViewModel : ClubViewModel() {
             it.memberPostItem
         }
     }
-    
+
+   override val pagingCallback = object : SearchPagingCallback {
+        override fun onLoaded() {
+            getBottomAd(AD_CODE)
+        }
+    }
+
 }
