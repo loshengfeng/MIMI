@@ -50,14 +50,6 @@ class OrderResultUrlSuccessItemView(context: Context) : ConstraintLayout(context
     }
 
     @ModelProp
-    fun setupPaymentCountdown(second: Int) {
-        tv_payment_countdown.text = String.format(
-            context.getString(R.string.order_result_payment_guide),
-            second
-        )
-    }
-
-    @ModelProp
     fun setupPaymentCountdownColor(color: Int) {
         tv_payment_countdown.setTextColor(color)
     }
