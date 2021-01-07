@@ -68,6 +68,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private val _topAdResult = MutableLiveData<AdItem>()
     val topAdResult: LiveData<AdItem> = _topAdResult
 
+    private val _bottomAdResult = MutableLiveData<AdItem>()
+    val bottomAdResult: LiveData<AdItem> = _bottomAdResult
+
     fun setShowProgress(show: Boolean) {
         _showProgress.value = show
     }
@@ -330,17 +333,37 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    suspend fun changeCommentInDb(id: Long, count: Int) {
+        mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
+                val dbItem = memberPostItem.apply {
+                    this.commentCount = count
+                }
+                mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+            }
+        }
+    }
+
     fun getTopAd(code: String) {
         viewModelScope.launch {
-            flow {
-                val topAdItem =
-                    domainManager.getAdRepository().getAD(code, adWidth, adHeight)
-                        .body()?.content?.get(0)?.ad?.first() ?: AdItem()
-                emit(topAdItem)
-            }
-                .flowOn(Dispatchers.IO)
-                .collect { _topAdResult.value = it }
+            getAd(code).collect { _topAdResult.value = it }
         }
+    }
+
+    fun getBottomAd(code: String) {
+        viewModelScope.launch {
+            getAd(code).collect { _bottomAdResult.value = it }
+        }
+    }
+
+    fun getAd(code: String): Flow<AdItem> {
+        return flow {
+            val adItem =
+                domainManager.getAdRepository().getAD(code, adWidth, adHeight)
+                    .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+            emit(adItem)
+        }
+            .flowOn(Dispatchers.IO)
     }
 
     fun cleanDb() {

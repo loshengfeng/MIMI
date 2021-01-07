@@ -29,7 +29,6 @@ class SearchPostAdapter(
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
-        const val VIEW_TYPE_DELETED = 3
         const val VIEW_TYPE_AD = 4
 
         private val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
@@ -45,19 +44,13 @@ class SearchPostAdapter(
         }
     }
 
-    var removedPosList = ArrayList<Int>()
-
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(position)) {
-            VIEW_TYPE_DELETED
-        } else {
-            when (item?.type) {
-                PostType.VIDEO -> VIEW_TYPE_CLIP
-                PostType.IMAGE -> VIEW_TYPE_PICTURE
-                PostType.AD -> VIEW_TYPE_AD
-                else -> VIEW_TYPE_TEXT
-            }
+        return when (item?.type) {
+            PostType.VIDEO -> VIEW_TYPE_CLIP
+            PostType.IMAGE -> VIEW_TYPE_PICTURE
+            PostType.AD -> VIEW_TYPE_AD
+            else -> VIEW_TYPE_TEXT
         }
     }
 
@@ -105,7 +98,7 @@ class SearchPostAdapter(
         item?.also {
             when (holder) {
                 is AdHolder -> {
-                    holder.onBind(item.adItem?: AdItem())
+                    holder.onBind(item.adItem ?: AdItem())
                 }
                 is MyPostClipPostHolder -> {
                     if (payloads.size == 1) {

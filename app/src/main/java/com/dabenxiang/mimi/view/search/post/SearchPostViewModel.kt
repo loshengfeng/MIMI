@@ -30,7 +30,12 @@ class SearchPostViewModel : ClubViewModel() {
 
     override val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
+            totalCount= count.toInt()
             _searchTotalCount.postValue(count)
+        }
+
+        override fun onLoaded() {
+            getBottomAd("search")
         }
     }
 

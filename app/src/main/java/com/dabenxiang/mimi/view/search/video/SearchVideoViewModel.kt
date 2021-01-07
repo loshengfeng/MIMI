@@ -44,15 +44,8 @@ class SearchVideoViewModel : BaseViewModel() {
             _searchingTotalCount.postValue(count)
         }
 
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
         override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
+            getBottomAd("search")
         }
     }
 

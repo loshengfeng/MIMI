@@ -34,7 +34,7 @@ import com.dabenxiang.mimi.model.vo.SearchingVideoItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
-import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
+import com.dabenxiang.mimi.view.club.base.AdAdapter
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
@@ -82,8 +82,12 @@ class SearchVideoFragment : BaseFragment() {
             { viewModel.searchingTag })
     }
 
-    private val adTop: AdHeaderAdapter by lazy {
-        AdHeaderAdapter(requireContext())
+    private val adTop: AdAdapter by lazy {
+        AdAdapter(requireContext())
+    }
+
+    private val adBottom: AdAdapter by lazy {
+        AdAdapter(requireContext())
     }
 
     override fun getLayoutId(): Int {
@@ -126,7 +130,8 @@ class SearchVideoFragment : BaseFragment() {
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
             recyclerview_content.adapter = ConcatAdapter(
                 adTop,
-                videoListAdapter/*.withMimiLoadStateFooter { videoListAdapter.retry() }*/
+                videoListAdapter/*.withMimiLoadStateFooter { videoListAdapter.retry() }*/,
+                adBottom
             )
 
             @OptIn(ExperimentalCoroutinesApi::class)
@@ -160,7 +165,14 @@ class SearchVideoFragment : BaseFragment() {
 
         viewModel.topAdResult.observe(this) {
             adTop.adItem = it
+            adTop.visibility = View.VISIBLE
             adTop.notifyDataSetChanged()
+        }
+
+        viewModel.bottomAdResult.observe(this) {
+            adBottom.adItem = it
+            adBottom.visibility = View.VISIBLE
+            adBottom.notifyDataSetChanged()
         }
 
         viewModel.likeResult.observe(viewLifecycleOwner, {
@@ -185,6 +197,7 @@ class SearchVideoFragment : BaseFragment() {
             }
         })
 
+        viewModel.getTopAd("search_top")
     }
 
     override fun setupListeners() {
@@ -436,6 +449,7 @@ class SearchVideoFragment : BaseFragment() {
         keyword: String? = null,
         tag: String? = null
     ) {
+        adBottom.visibility = View.GONE
         recyclerview_content.visibility = View.INVISIBLE
         lifecycleScope.launch {
             viewModel.posts(

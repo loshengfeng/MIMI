@@ -88,8 +88,9 @@ class SearchPostMediator(
 
             val adCount =
                 ceil((memberPostApiItems?.size ?: 0).toFloat() / AD_GAP).toInt()
-            val adItems = domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
-                .body()?.content?.get(0)?.ad ?: arrayListOf()
+            val adItems =
+                domainManager.getAdRepository().getAD("search", adWidth, adHeight, adCount)
+                    .body()?.content?.get(0)?.ad ?: arrayListOf()
 
             if (loadType == LoadType.REFRESH) {
                 pagingCallback.onTotalCount(result.body()?.paging?.count ?: 0)
@@ -109,7 +110,8 @@ class SearchPostMediator(
                     item
                 }?.let {
                     val postDBItems = it.mapIndexed { index, item ->
-                        when (val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)) {
+                        when (val oldItem =
+                            database.postDBItemDao().getPostDBItem(pageCode, item.id)) {
                             null -> PostDBItem(
                                 postDBId = item.id,
                                 postType = item.type,
@@ -128,7 +130,7 @@ class SearchPostMediator(
                     database.postDBItemDao().insertAll(postDBItems)
                 }
             }
-
+            if (!hasNext && (result.body()?.paging?.count ?: 0) % 5 != 0L) pagingCallback.onLoaded()
             return MediatorResult.Success(endOfPaginationReached = !hasNext)
         } catch (e: IOException) {
             return MediatorResult.Error(e)

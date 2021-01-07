@@ -24,7 +24,7 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.club.ClubTabViewModel
-import com.dabenxiang.mimi.view.club.base.AdHeaderAdapter
+import com.dabenxiang.mimi.view.club.base.AdAdapter
 import com.dabenxiang.mimi.view.club.base.PostItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
@@ -51,8 +51,8 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val clubTabViewModel: ClubTabViewModel by viewModels({ requireParentFragment() })
     private val accountManager: AccountManager by inject()
 
-    private val adTop: AdHeaderAdapter by lazy {
-        AdHeaderAdapter(requireContext())
+    private val adTop: AdAdapter by lazy {
+        AdAdapter(requireContext())
     }
 
     private val adapter: PostItemAdapter by lazy {

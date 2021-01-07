@@ -198,6 +198,13 @@ class CommentDialogViewModel: BaseViewModel() {
                     likeType = null,
                     reported = false
                 )
+                resp.body()?.content?.id?.let {id->
+                    resp.body()?.content?.post?.commentCount?.let {commentCount->
+                        changeCommentInDb(id, commentCount.toInt())
+                    }
+
+                }
+
                 emit(ApiResult.success(comment))
             }
                 .flowOn(Dispatchers.IO)
