@@ -60,7 +60,8 @@ class OrderInfoFragment : BaseFragment() {
                 when (orderingPackageItem.paymentType) {
                     PaymentType.BANK -> R.string.order_detail_payment_bank
                     PaymentType.ALI -> R.string.order_detail_payment_ali
-                    else -> R.string.order_detail_payment_wx
+                    PaymentType.TIK_TOK -> R.string.order_detail_payment_tiktok
+                    PaymentType.WX -> R.string.order_detail_payment_wx
                 }
             )
         )
