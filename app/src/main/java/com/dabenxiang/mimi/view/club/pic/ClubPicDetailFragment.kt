@@ -28,6 +28,7 @@ import com.dabenxiang.mimi.view.post.BasePostFragment
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_club_text_detail.*
+import timber.log.Timber
 
 class ClubPicDetailFragment : BaseFragment() {
 
@@ -64,16 +65,6 @@ class ClubPicDetailFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_club_pic_detail
 
     override fun setupObservers() {
-
-        viewModel.postChangedResult.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is ApiResult.Success<*> -> {
-                    it.result as MemberPostItem
-                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
-                }
-                is ApiResult.Error<*> -> onApiError(it.throwable)
-            }
-        })
 
         mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, Observer{
             when (it) {
@@ -122,6 +113,8 @@ class ClubPicDetailFragment : BaseFragment() {
         adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         memberPostItem = arguments?.get(KEY_DATA) as MemberPostItem
+
+        Timber.i("ClubPicDetailFragment memberPostItem =$memberPostItem")
 
         pictureDetailAdapter =
             ClubPicDetailAdapter(

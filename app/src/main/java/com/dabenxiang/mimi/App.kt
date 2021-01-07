@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.dabenxiang.mimi.di.apiModule
 import com.dabenxiang.mimi.di.appModule
+import com.dabenxiang.mimi.di.dbModule
 import com.dabenxiang.mimi.di.managerModule
 import com.dabenxiang.mimi.widget.log.DebugLogTree
 import com.facebook.stetho.Stetho
@@ -49,7 +50,8 @@ class App : Application() {
         val module = listOf(
             appModule,
             apiModule,
-            managerModule
+            managerModule,
+            dbModule
         )
 
         startKoin {

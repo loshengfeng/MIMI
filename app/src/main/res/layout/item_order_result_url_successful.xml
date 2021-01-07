@@ -41,20 +41,6 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.1515" />
 
-    <!--    <androidx.constraintlayout.widget.Guideline-->
-    <!--        android:id="@+id/guideline_button_top"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:orientation="horizontal"-->
-    <!--        app:layout_constraintGuide_percent="0.674" />-->
-
-    <!--    <androidx.constraintlayout.widget.Guideline-->
-    <!--        android:id="@+id/guideline_button_bottom"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:orientation="horizontal"-->
-    <!--        app:layout_constraintGuide_percent="0.736" />-->
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_button_close_start"
         android:layout_width="wrap_content"
@@ -176,11 +162,11 @@
                 android:gravity="center_horizontal"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
+                android:text="@string/order_result_payment_guide"
                 android:textSize="16sp"
                 app:layout_constraintLeft_toLeftOf="@id/guideline_payment_start"
                 app:layout_constraintRight_toRightOf="@id/guideline_payment_end"
-                app:layout_constraintTop_toBottomOf="@+id/iv_payment"
-                tools:text="将引导您至支付页面  5S…" />
+                app:layout_constraintTop_toBottomOf="@+id/iv_payment" />
 
             <TextView
                 android:id="@+id/tv_payment_go"
@@ -215,10 +201,10 @@
                 android:id="@+id/url_tv_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/color_black_1"
-                android:textSize="14sp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="16dp"
+                android:textColor="@color/color_black_1"
+                android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="@+id/guideline_account_start"
                 app:layout_constraintTop_toBottomOf="@+id/tv_order_amount_title"

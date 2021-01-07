@@ -8,6 +8,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
@@ -24,7 +27,24 @@ import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.item_clip_post.view.*
 import kotlinx.android.synthetic.main.item_picture_post.view.*
+import kotlinx.android.synthetic.main.item_picture_post.view.chip_group_tag
+import kotlinx.android.synthetic.main.item_picture_post.view.img_avatar
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_ad
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_comment
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_favorite
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_like
+import kotlinx.android.synthetic.main.item_picture_post.view.iv_more
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_comment_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_favorite_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_follow
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_like_count
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_name
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_time
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_title
+import kotlinx.android.synthetic.main.item_picture_post.view.tv_title_more
+import kotlinx.android.synthetic.main.item_picture_post.view.v_separator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -56,6 +76,7 @@ class MyPostPicturePostHolder(
     private val vSeparator: View = itemView.v_separator
     private val ivFavorite: ImageView = itemView.iv_favorite
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
+    private val ivAd:ImageView = itemView.iv_ad
 
     fun onBind(
             item: MemberPostItem,
@@ -64,7 +85,7 @@ class MyPostPicturePostHolder(
             viewModelScope: CoroutineScope,
             searchStr: String = "",
             searchTag: String = "",
-
+            adGap:Int? = null
     ) {
         picturePostItemLayout.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(R.color.color_black_1))
@@ -75,6 +96,22 @@ class MyPostPicturePostHolder(
         ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
         ivMore.setImageResource(R.drawable.btn_more_gray_n)
         vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
+        if (adGap != null && position % adGap == adGap - 1) {
+            ivAd.visibility = View.VISIBLE
+            val options = RequestOptions()
+                .priority(Priority.NORMAL)
+                .placeholder(R.drawable.img_ad_df)
+                .error(R.drawable.img_ad)
+            Glide.with(ivAd.context)
+                .load(item.adItem?.href)
+                .apply(options)
+                .into(ivAd)
+            ivAd.setOnClickListener {
+                GeneralUtils.openWebView(ivAd.context, item.adItem?.target ?: "")
+            }
+        } else {
+            ivAd.visibility = View.GONE
+        }
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
@@ -114,7 +151,7 @@ class MyPostPicturePostHolder(
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        val contentItem = Gson().fromJson(item.postContent, MediaContentItem::class.java)
         if (pictureRecycler.adapter == null || tvPictureCount.tag != position) {
             tvPictureCount.tag = position
             pictureRecycler.layoutManager = LinearLayoutManager(
@@ -158,6 +195,8 @@ class MyPostPicturePostHolder(
             item.isFavorite = !item.isFavorite
             item.favoriteCount =
                     if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
+
+            updateFavorite(item)
             myPostListener.onFavoriteClick(
                     item,
                     position,
@@ -177,6 +216,7 @@ class MyPostPicturePostHolder(
             item.likeType = if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
             item.likeCount =
                 if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
+            updateLike(item)
             myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
         ivLike.setOnClickListener(onLikeClickListener)

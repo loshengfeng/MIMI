@@ -6,9 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.AdItem
@@ -85,7 +82,7 @@ class ClubTextDetailAdapter(
             }
             is TextDetailViewHolder -> {
                 val contentItem = try {
-                    Gson().fromJson(memberPostItem.content, TextContentItem::class.java)
+                    Gson().fromJson(memberPostItem.postContent, TextContentItem::class.java)
                 } catch (e: Exception) {
                     Timber.e(e)
                     TextContentItem()

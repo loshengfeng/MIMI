@@ -1,6 +1,7 @@
 package com.dabenxiang.mimi.view.post
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,7 +14,6 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
-import androidx.core.view.isEmpty
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -37,7 +37,6 @@ import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import timber.log.Timber
 
 open class BasePostFragment : BaseFragment() {
 
@@ -207,6 +206,7 @@ open class BasePostFragment : BaseFragment() {
             tv_title.text = getString(R.string.post_title)
             handlePic()
             handleVideo()
+            initDefaultTag()
         }
 
         useAdultTheme(false)
@@ -219,9 +219,27 @@ open class BasePostFragment : BaseFragment() {
 
     }
 
+    private fun initDefaultTag() {
+        haveMainTag = true
+        chipGroup.addView(setMainTag(getString(R.string.chip_default_club)))
+    }
+
+    private fun setMainTag(tag: String): Chip {
+        val chip = LayoutInflater.from(requireContext())
+            .inflate(R.layout.chip_item, chipGroup, false) as Chip
+        chip.text = tag
+        chip.setTextColor(chip.context.getColor(R.color.color_blue_2))
+        chip.chipBackgroundColor =
+            ColorStateList.valueOf(chip.context.getColor(R.color.club_tag_background))
+        chip.chipStrokeColor = ColorStateList.valueOf(
+            Color.parseColor("#19597ef7"))
+        chip.chipStrokeWidth = 2f
+        return chip
+    }
+
     private fun setUI() {
         val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-        val contentItem = Gson().fromJson(item.content, MediaItem::class.java)
+        val contentItem = Gson().fromJson(item.postContent, MediaItem::class.java)
 
         postId = item.id
 
@@ -247,14 +265,14 @@ open class BasePostFragment : BaseFragment() {
     }
 
     private fun addEditTag(tag: String) {
-        val chip = LayoutInflater.from(requireContext())
-            .inflate(R.layout.chip_item, chipGroup, false) as Chip
-        chip.text = tag
-        chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
-        chip.chipBackgroundColor =
-            ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
-
         if (chipGroup.size >= 1) {
+            val chip = LayoutInflater.from(requireContext())
+                .inflate(R.layout.chip_item, chipGroup, false) as Chip
+            chip.text = tag
+            chip.setTextColor(chip.context.getColor(R.color.color_black_1_50))
+            chip.chipBackgroundColor =
+                ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
+
             chip.closeIcon = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.btn_close_circle_small_black_n
@@ -266,11 +284,12 @@ open class BasePostFragment : BaseFragment() {
                 setTagCount()
                 enableHastEditText()
             }
+            chipGroup.addView(chip)
         } else {
+            chipGroup.addView(setMainTag(tag))
             viewModel.getClub(tag)
         }
 
-        chipGroup.addView(chip)
         setTagCount()
     }
 
@@ -297,26 +316,6 @@ open class BasePostFragment : BaseFragment() {
             if (haveMainTag) {
                 val mainTag = chipGroup[0] as Chip
                 mainTag.text = tag
-            } else {
-                haveMainTag = true
-
-                if (chipGroup.isEmpty()) {
-                    chipGroup.addView(chip)
-                    setTagCount()
-                } else {
-                    val chipList = arrayListOf<Chip>()
-                    for (i in 0 until chipGroup.size) {
-                        val chipItem = chipGroup[i] as Chip
-                        chipList.add(chipItem)
-                    }
-
-                    chipGroup.removeAllViews()
-                    chipGroup.addView(chip)
-                    for (tagItem in chipList) {
-                        chipGroup.addView(tagItem)
-                    }
-                    setTagCount()
-                }
             }
         } else {
             chip.closeIcon = ContextCompat.getDrawable(

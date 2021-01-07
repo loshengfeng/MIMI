@@ -55,16 +55,6 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
     override fun setupObservers() {
         super.setupObservers()
 
-        clipViewModel.postChangedResult.observe(viewLifecycleOwner){
-            when (it) {
-                is ApiResult.Success<*> -> {
-                    it.result as MemberPostItem
-                    mainViewModel?.postItemChangedList?.value?.set(it.result.id, it.result)
-                }
-                is ApiResult.Error<*> -> onApiError(it.throwable)
-            }
-        }
-
         mainViewModel?.deletePostResult?.observe(viewLifecycleOwner){
             when (it) {
                 is ApiResult.Success -> {
@@ -305,7 +295,6 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
         val bundle = SearchPostFragment.createBundle(
             SearchPostItem(PostType.VIDEO, tag = tag)
         )
-        bundle.putBoolean(PlayerFragment.KEY_IS_FROM_PLAYER, true)
         findNavController().navigate(
             R.id.action_to_searchPostFragment,
             bundle

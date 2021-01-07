@@ -9,22 +9,21 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyCollectionVideoListener
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
 import com.dabenxiang.mimi.model.enums.*
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import kotlinx.android.synthetic.main.item_my_follow_video.view.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import timber.log.Timber
 
 class MyCollectionShortVideoViewHolder(
         itemView: View,
-        val itemType: MyCollectionTabItemType
+        val itemType: MyPagesType
 ) : BaseViewHolder(itemView), KoinComponent {
 
     private val accountManager: AccountManager by inject()
@@ -106,7 +105,7 @@ class MyCollectionShortVideoViewHolder(
                     item,
                     position,
                     item.favorite ?: false,
-                    MyCollectionTabItemType.MIMI_VIDEO
+                    MyPagesType.FAVORITE_MIMI_VIDEO
             )
         }
         ivFavorite.setOnClickListener(onFavoriteClickListener)
@@ -124,20 +123,20 @@ class MyCollectionShortVideoViewHolder(
 
         tvCommentCount.text = item.commentCount.toString()
         val onCommentClickListener = View.OnClickListener {
-            listener.onCommentClick(item, MyCollectionTabItemType.MIMI_VIDEO)
+            listener.onCommentClick(item, MyPagesType.FAVORITE_MIMI_VIDEO)
         }
 
         ivComment.setOnClickListener(onCommentClickListener)
         tvCommentCount.setOnClickListener(onCommentClickListener)
 
         layoutClip.setOnClickListener {
-            listener.onItemClick(item, MyCollectionTabItemType.MIMI_VIDEO)
+            listener.onItemClick(item, MyPagesType.FAVORITE_MIMI_VIDEO)
         }
 
     }
 
     fun updateLike(item: PlayItem) {
-        if (itemType == MyCollectionTabItemType.MIMI_VIDEO) {
+        if (itemType == MyPagesType.FAVORITE_MIMI_VIDEO) {
             tvLikeCount.visibility = View.VISIBLE
             ivLike.visibility = View.VISIBLE
             tvLikeCount.text = item.likeCount.toString()

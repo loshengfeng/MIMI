@@ -16,7 +16,6 @@ import com.dabenxiang.mimi.extension.downloadFile
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
-import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoConsumeResult
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.BaseVideoItem
@@ -24,6 +23,7 @@ import com.dabenxiang.mimi.model.vo.CheckStatusItem
 import com.dabenxiang.mimi.model.vo.NotDeductedException
 import com.dabenxiang.mimi.model.vo.StatusItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
@@ -673,6 +673,12 @@ class PlayerViewModel : BaseViewModel() {
                 val resp = domainManager.getApiRepository().postMembersPostComment(videoId, body)
                 if (!resp.isSuccessful) throw HttpException(resp)
 
+                resp.body()?.content?.id?.let {id->
+                    resp.body()?.content?.post?.commentCount?.let {commentCount->
+                        changeCommentInDb(id, commentCount.toInt())
+                    }
+
+                }
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
@@ -744,6 +750,20 @@ class PlayerViewModel : BaseViewModel() {
 
                 if (!resp.isSuccessful) throw HttpException(resp)
 
+                val body = resp.body()?.content
+                val countItem = when (favoriteVideo.value) {
+                    false -> body
+                    else -> (body as ArrayList<*>)[0]
+                }
+                countItem as InteractiveHistoryItem
+                LruCacheUtils.putShortVideoDataCache(
+                    videoId,
+                    PlayItem(
+                        favorite = favoriteVideo.value != true,
+                        favoriteCount = countItem.favoriteCount?.toInt(),
+                        commentCount = countItem.commentCount?.toInt()
+                    )
+                )
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)

@@ -3,102 +3,39 @@ package com.dabenxiang.mimi.view.search.post
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.dabenxiang.mimi.callback.SearchPagingCallback
-import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
-import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.search.post.paging.SearchPostAllDataSource
-import com.dabenxiang.mimi.view.search.post.paging.SearchPostFollowDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
+import com.dabenxiang.mimi.view.club.base.ClubViewModel
+import com.dabenxiang.mimi.view.club.pages.ClubItemMediator
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
-class SearchPostViewModel : BaseViewModel() {
+class SearchPostViewModel : ClubViewModel() {
 
     private val _searchTotalCount = MutableLiveData<Long>()
     val searchTotalCount: LiveData<Long> = _searchTotalCount
 
-    private var _likePostResult = MutableLiveData<ApiResult<Int>>()
-    val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
-
-    private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
-    val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
-
-    fun favoritePost(
-        item: MemberPostItem,
-        position: Int,
-        isFavorite: Boolean
-    ) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val result = when {
-                    isFavorite -> apiRepository.addFavorite(item.id)
-                    else -> apiRepository.deleteFavorite(item.id)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _favoriteResult.value = it }
-        }
-    }
-
-    fun likePost(item: MemberPostItem, position: Int, isLike: Boolean) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val likeType = when {
-                    isLike -> LikeType.LIKE
-                    else -> LikeType.DISLIKE
-                }
-                val request =  LikeRequest(likeType)
-                val result = when {
-                    isLike -> apiRepository.like(item.id, request)
-                    else -> apiRepository.deleteLike(item.id)
-                }
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(position))
-            }
-                .flowOn(Dispatchers.IO)
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _likePostResult.value = it }
-        }
-    }
-
     var totalCount: Int = 0
-    private val pagingCallback = object : SearchPagingCallback {
+
+    var searchTag: String? = null
+    var searchText: String? = null
+    var userId = 0L
+
+    override val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
+            totalCount= count.toInt()
             _searchTotalCount.postValue(count)
         }
 
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
         override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
-            setShowProgress(false)
-        }
-
-        override fun onCurrentItemCount(count: Long, isInitial: Boolean) {
-            totalCount = if (isInitial) count.toInt()
-            else totalCount.plus(count.toInt())
-            if (isInitial) cleanRemovedPosList()
+            getBottomAd("search")
         }
     }
 
@@ -123,53 +60,61 @@ class SearchPostViewModel : BaseViewModel() {
         }
     }
 
-    fun getSearchPostFollowResult(
-        keyword: String? = null,
-        tag: String? = null
-    ): Flow<PagingData<MemberPostItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = SearchPostFollowDataSource.PER_LIMIT.toInt()),
-            pagingSourceFactory = {
-                SearchPostFollowDataSource(
-                    domainManager,
-                    pagingCallback,
-                    keyword,
-                    tag,
-                    adWidth,
-                    adHeight
-
-                )
-            }
-        )
-            .flow
-            .cachedIn(viewModelScope)
-    }
-
-    fun getSearchPostAllResult(
-        type: PostType,
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(
+        pageCode: String,
+        type: PostType? = null,
         keyword: String? = null,
         tag: String? = null,
-        orderBy: StatisticsOrderType
-    ): Flow<PagingData<MemberPostItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = SearchPostAllDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                SearchPostAllDataSource(
-                    domainManager,
-                    pagingCallback,
-                    type,
-                    keyword,
-                    tag,
-                    orderBy,
-                    adWidth,
-                    adHeight
+        orderBy: StatisticsOrderType? = null
+    ) = clearResult(pageCode)
+        .flatMapConcat {
+            postItems(
+                pageCode,
+                type,
+                keyword,
+                tag,
+                orderBy
+            )
+        }.cachedIn(viewModelScope)
 
-                )
-            }
+
+    @OptIn(ExperimentalPagingApi::class)
+    private fun postItems(
+        pageCode: String,
+        type: PostType? = null,
+        keyword: String? = null,
+        tag: String? = null,
+        orderBy: StatisticsOrderType? = null
+    ) = Pager(
+        config = PagingConfig(pageSize = SearchPostMediator.PER_LIMIT),
+        remoteMediator = SearchPostMediator(
+            mimiDB,
+            domainManager,
+            adWidth,
+            adHeight,
+            pageCode,
+            pagingCallback,
+            type,
+            keyword,
+            tag,
+            orderBy
         )
-            .flow
-            .cachedIn(viewModelScope)
+    ) {
+        mimiDB.postDBItemDao()
+            .pagingSourceByPageCode(pageCode)
+    }.flow.map { pagingData ->
+        pagingData.map {
+            it.memberPostItem
+        }
     }
 
+    private fun clearResult(pageCode: String): Flow<Nothing?> {
+        return flow {
+            mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
+            mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
+            emit(null)
+        }
+    }
 
 }

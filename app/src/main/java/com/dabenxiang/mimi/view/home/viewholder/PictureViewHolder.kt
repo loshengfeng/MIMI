@@ -35,7 +35,7 @@ class PictureViewHolder(
     }
 
     override fun updated(model: MemberPostItem?) {
-        val contentItem = Gson().fromJson(model?.content, MediaContentItem::class.java)
+        val contentItem = Gson().fromJson(model?.postContent, MediaContentItem::class.java)
         val postImageItem =
             takeIf { contentItem.images?.isNotEmpty() ?: false }?.let {
                 contentItem.images?.get(0)

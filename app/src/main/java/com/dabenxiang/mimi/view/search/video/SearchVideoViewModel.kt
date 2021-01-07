@@ -6,15 +6,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.PlayListRequest
-import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.LikeType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.search.video.paging.SearchVideoDataSource
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -24,9 +25,8 @@ class SearchVideoViewModel : BaseViewModel() {
     var category = ""
     var searchingTag = ""
     var searchingStr = ""
-    var videoType: VideoType? = null
-
-    var currentItem: VideoItem? = null
+    var videoType: VideoType = VideoType.VIDEO_ON_DEMAND
+    var userId = 0L
 
     private val _searchingTotalCount = MutableLiveData<Long>()
     val searchingTotalCount: LiveData<Long> = _searchingTotalCount
@@ -37,94 +37,80 @@ class SearchVideoViewModel : BaseViewModel() {
     private val _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
 
+    val pageCode = SearchVideoFragment::class.simpleName + ""
+
     private val pagingCallback = object : SearchPagingCallback {
         override fun onTotalCount(count: Long) {
             _searchingTotalCount.postValue(count)
         }
 
-        override fun onLoading() {
-            setShowProgress(true)
-        }
-
         override fun onLoaded() {
-            setShowProgress(false)
-        }
-
-        override fun onThrowable(throwable: Throwable) {
+            getBottomAd("search")
         }
     }
 
-    fun getSearchVideoResult(
-        keyword: String? = null,
-        tag: String? = null,
-        videoType: VideoType? =null
-    ): Flow<PagingData<VideoItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = SearchVideoDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                SearchVideoDataSource(
-                    domainManager,
-                    pagingCallback,
-                    category,
-                    tag,
-                    keyword,
-                    adWidth,
-                    adHeight,
-                    videoType
-                )
-            }
-        )
-            .flow
-            .cachedIn(viewModelScope)
-    }
-
-    fun modifyLike(position: Int) {
+    fun modifyLike(item: MemberPostItem, position: Int) {
         viewModelScope.launch {
             flow {
-                currentItem?.also { item ->
-                    val apiRepository = domainManager.getApiRepository()
-                    val likeType = when (item.like) {
-                        true -> null
-                        else -> LikeType.LIKE
-                    }
-                    val request =  LikeRequest(likeType)
-                    val result = when (item.like) {
-                        true -> apiRepository.deleteLike(item.id)
-                        else -> apiRepository.like(item.id, request)
-                    }
+                val apiRepository = domainManager.getApiRepository()
+                if (item.likeType != LikeType.LIKE) {
+                    val request = LikeRequest(LikeType.LIKE)
+                    val result = apiRepository.like(item.id, request)
                     if (!result.isSuccessful) throw HttpException(result)
-                    when (item.like) {
-                        true -> item.likeCount -= 1
-                        else -> item.likeCount += 1
+                    item.likeType = LikeType.LIKE
+                    result.body()?.content?.also {
+                        item.likeCount = it.likeCount?.toInt() ?: 0
                     }
-                    item.likeType = likeType
-                    item.like = item.like != true
-                    emit(ApiResult.success(position))
+                } else {
+                    val result = apiRepository.deleteLike(item.id)
+                    if (!result.isSuccessful) throw HttpException(result)
+                    item.likeType = null
+                    result.body()?.content?.get(0)?.also {
+                        item.likeCount = it.likeCount?.toInt() ?: 0
+                    }
                 }
+                changeLikeMimiVideoInDb(item.id, item.likeType, item.likeCount)
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
+                .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect { _likeResult.value = it }
         }
     }
 
-    fun modifyFavorite(videoID: Long, position: Int) {
+    fun modifyFavorite(item: MemberPostItem, position: Int) {
         viewModelScope.launch {
             flow {
-                val result = if (currentItem?.favorite == false) {
-                    domainManager.getApiRepository().postMePlaylist(PlayListRequest(videoID, 1))
+                val result = if (!item.isFavorite) {
+                    domainManager.getApiRepository().postMePlaylist(PlayListRequest(item.id, 1))
                 } else {
-                    domainManager.getApiRepository().deleteMePlaylist(videoID.toString())
+                    domainManager.getApiRepository().deleteMePlaylist(item.id.toString())
                 }
+                if (!result.isSuccessful) throw HttpException(result)
+                val countItem = result.body()?.content?.let {
+                    when (item.isFavorite) {
+                        false -> it
+                        else -> (it as ArrayList<*>)[0]
+                    }
+                } as InteractiveHistoryItem
+                item.isFavorite = item.isFavorite != true
+                item.favoriteCount = countItem.favoriteCount?.toInt() ?: 0
 
-                if (!result.isSuccessful) {
-                    throw HttpException(result)
-                }
-                currentItem?.run {
-                    favorite = favorite != true
-                    favoriteCount =
-                        if (favorite) (favoriteCount ?: 0) + 1
-                        else (favoriteCount ?: 0) - 1
+                when (item.type) {
+                    PostType.VIDEO_ON_DEMAND -> changeFavoriteMimiVideoInDb(item.id, item.isFavorite, item.favoriteCount)
+                    PostType.SMALL_CLIP -> {
+                        LruCacheUtils.putShortVideoDataCache(
+                            item.id,
+                            PlayItem(
+                                favorite = item.isFavorite,
+                                favoriteCount = countItem.favoriteCount?.toInt(),
+                                commentCount = countItem.commentCount?.toInt()
+                            )
+                        )
+                        changeFavoriteSmallVideoInDb(item.id, item.isFavorite, item.favoriteCount)
+                    }
                 }
                 emit(ApiResult.success(position))
             }
@@ -152,6 +138,48 @@ class SearchVideoViewModel : BaseViewModel() {
                 searchHistoryItem.searchHistory.add(keyword)
             }
             pref.searchHistoryItem = searchHistoryItem
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(
+        keyword: String?,
+        tag: String?
+    ) = clearResult()
+        .flatMapConcat { postItems(keyword, tag) }.cachedIn(viewModelScope)
+
+    @OptIn(ExperimentalPagingApi::class)
+    private fun postItems(
+        keyword: String?,
+        tag: String?
+    ) = Pager(
+        config = PagingConfig(pageSize = SearchVideoMediator.PER_LIMIT),
+        remoteMediator = SearchVideoMediator(
+            mimiDB,
+            domainManager,
+            pagingCallback,
+            pageCode,
+            category,
+            tag,
+            keyword,
+            adWidth,
+            adHeight,
+            videoType
+        )
+    ) {
+        mimiDB.postDBItemDao()
+            .pagingSourceByPageCode(pageCode)
+    }.flow.map { pagingData ->
+        pagingData.map {
+            it.memberPostItem
+        }
+    }
+
+    private fun clearResult(): Flow<Nothing?> {
+        return flow {
+            mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
+            mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
+            emit(null)
         }
     }
 }

@@ -11,7 +11,7 @@ class CleanDialogFragment : BaseDialogFragment() {
 
     private var onCleanDialogListener: OnCleanDialogListener? = null
     private var msgResId: Int? = 0
-    private var msg:String = ""
+    private var msg: String = ""
 
     companion object {
 
@@ -22,6 +22,7 @@ class CleanDialogFragment : BaseDialogFragment() {
             val fragment = CleanDialogFragment()
             fragment.onCleanDialogListener = listener
             fragment.msgResId = msgResId
+            fragment.isCancelable = false
             return fragment
         }
     }
@@ -38,7 +39,7 @@ class CleanDialogFragment : BaseDialogFragment() {
         msgResId?.let { tv_msg.setText(it) }
     }
 
-    fun setMsg(msg:String){
+    fun setMsg(msg: String) {
         this.msg = msg
     }
 
@@ -51,9 +52,15 @@ class CleanDialogFragment : BaseDialogFragment() {
     override fun setupListeners() {
         super.setupListeners()
         View.OnClickListener { btnView ->
-            dismiss()
             when (btnView.id) {
-                R.id.btn_confirm -> onCleanDialogListener?.onClean()
+                R.id.btn_confirm -> {
+                    onCleanDialogListener?.onClean()
+                    dismiss()
+                }
+                R.id.btn_cancel -> {
+                    onCleanDialogListener?.onCancel()
+                    dismiss()
+                }
             }
         }.also {
             layout_root.setOnClickListener(it)

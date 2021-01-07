@@ -80,3 +80,6 @@ fun provideApiLogInterceptor(): ApiLogInterceptor {
     return ApiLogInterceptor()
 }
 
+fun provideMemberPostItemDBRepository(apiService: ApiService): ApiRepository {
+    return ApiRepository(apiService)
+}

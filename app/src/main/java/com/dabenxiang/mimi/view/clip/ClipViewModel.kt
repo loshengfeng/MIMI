@@ -14,6 +14,8 @@ import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.StatisticsOrderType
 import com.dabenxiang.mimi.model.enums.VideoType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -73,6 +75,19 @@ class ClipViewModel : BaseViewModel() {
                         update(position, it, -1)
                     }
                 }
+        }
+    }
+
+    fun getInteractiveHistory(item: VideoItem, position: Int, update: (Int, InteractiveHistoryItem) -> Unit) {
+        viewModelScope.launch {
+            flow {
+                val result = domainManager.getApiRepository().getInteractiveHistory(item.id.toString())
+                if (!result.isSuccessful) throw HttpException(result)
+                emit(result.body()?.content?.get(0))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> e.printStackTrace() }
+                .collect { it?.run { update(position, this) } }
         }
     }
 
@@ -137,7 +152,7 @@ class ClipViewModel : BaseViewModel() {
     /**
      * 加入收藏與解除收藏
      */
-    fun modifyFavorite(item: VideoItem, position: Int, isFavorite: Boolean) {
+    fun modifyFavorite(item: VideoItem, isFavorite: Boolean, update: (Boolean, Int) -> Unit) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -146,14 +161,29 @@ class ClipViewModel : BaseViewModel() {
                     else -> apiRepository.deleteMePlaylist(item.id.toString())
                 }
                 if (!resp.isSuccessful) throw HttpException(resp)
+                val body = resp.body()?.content
+                val countItem = when {
+                    isFavorite -> body
+                    else -> (body as ArrayList<*>)[0]
+                }
+                countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
-                item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
-                _videoChangedResult.postValue(ApiResult.success(item))
-                emit(ApiResult.success(position))
+                countItem.favoriteCount?.run { item.favoriteCount = this.toInt() }
+                LruCacheUtils.putShortVideoDataCache(
+                    item.id,
+                    PlayItem(
+                        favorite = isFavorite,
+                        favoriteCount = item.favoriteCount,
+                        commentCount = item.commentCount
+                    )
+                )
+                changeFavoriteSmallVideoInDb(item.id, item.favorite, item.favoriteCount)
+                emit(ApiResult.success(countItem.favoriteCount?.toInt()))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
+                    if (it is ApiResult.Success) { update(isFavorite, it.result) }
                     _favoriteResult.value = it
                 }
         }

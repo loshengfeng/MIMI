@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
@@ -46,8 +47,10 @@ class ClubTextDetailViewModel : BaseViewModel() {
     val commentDeleteLikeResult: LiveData<SingleLiveEvent<ApiResult<Nothing>>> =
         _commentDeleteLikeResult
 
-    private val _postCommentResult = MutableLiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>>()
-    val postCommentResult: LiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>> = _postCommentResult
+    private val _postCommentResult =
+        MutableLiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>>()
+    val postCommentResult: LiveData<SingleLiveEvent<ApiResult<MembersPostCommentItem>>> =
+        _postCommentResult
 
     fun getPostDetail(item: MemberPostItem) {
         Timber.i("getPostDetail: item:$item")
@@ -78,7 +81,7 @@ class ClubTextDetailViewModel : BaseViewModel() {
                         }
                         adapter.setList(finalList)
                     }
-                    if(load.isEnd)
+                    if (load.isEnd)
                         adapter.loadMoreModule.loadMoreToLoading()
                 }
                 setupLoadMoreResult(adapter, load.isEnd)
@@ -119,8 +122,15 @@ class ClubTextDetailViewModel : BaseViewModel() {
                     else -> apiRepository.deleteFavorite(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
+                val countItem = result.body()?.content.let {
+                    when {
+                        isFavorite -> it
+                        else -> (it as ArrayList<*>)[0]
+                    }
+                } as InteractiveHistoryItem
                 item.isFavorite = isFavorite
-                if (isFavorite) item.favoriteCount++ else item.favoriteCount--
+                item.favoriteCount = countItem.favoriteCount?.toInt()?:0
+                changeFavoritePostInDb(item.id, isFavorite, item.favoriteCount)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
@@ -128,7 +138,6 @@ class ClubTextDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     when (it) {
                         is ApiResult.Success -> {
                             update(isFavorite, it.result.favoriteCount)
@@ -153,14 +162,13 @@ class ClubTextDetailViewModel : BaseViewModel() {
                     val request = LikeRequest(type)
                     val result = apiRepository.like(item.id, request)
                     if (!result.isSuccessful) throw HttpException(result)
+
                     item.likeType = type
 
-                    if (type == LikeType.LIKE) {
-                        item.likeCount += 1
-                    } else {
-                        item.dislikeCount += 1
+                    result.body()?.content?.also {
+                        item.likeCount = it.likeCount?.toInt() ?: 0
+                        item.dislikeCount = it.dislikeCount?.toInt() ?: 0
                     }
-                    emit(ApiResult.success(item))
                 } else {
                     if (originType == type) {
                         val result = apiRepository.deleteLike(item.id)
@@ -168,10 +176,9 @@ class ClubTextDetailViewModel : BaseViewModel() {
 
                         item.likeType = null
 
-                        if (type == LikeType.LIKE) {
-                            item.likeCount -= 1
-                        } else {
-                            item.dislikeCount -= 1
+                        result.body()?.content?.get(0)?.also {
+                            item.likeCount = it.likeCount?.toInt() ?: 0
+                            item.dislikeCount = it.dislikeCount?.toInt() ?: 0
                         }
                     } else if (originType == LikeType.LIKE) {
                         val request = LikeRequest(LikeType.DISLIKE)
@@ -180,8 +187,11 @@ class ClubTextDetailViewModel : BaseViewModel() {
 
                         like = true
                         item.likeType = LikeType.DISLIKE
-                        item.likeCount -= 1
-                        item.dislikeCount += 1
+
+                        result.body()?.content?.also {
+                            item.likeCount = it.likeCount?.toInt() ?: 0
+                            item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                        }
                     } else if (originType == LikeType.DISLIKE) {
                         val request = LikeRequest(LikeType.DISLIKE)
                         val result = apiRepository.like(item.id, request)
@@ -189,18 +199,21 @@ class ClubTextDetailViewModel : BaseViewModel() {
 
                         like = true
                         item.likeType = LikeType.LIKE
-                        item.likeCount += 1
-                        item.dislikeCount -= 1
+
+                        result.body()?.content?.also {
+                            item.likeCount = it.likeCount?.toInt() ?: 0
+                            item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                        }
                     }
-                    emit(ApiResult.success(item))
                 }
+                changeLikePostInDb(item.id, item.likeType, item.likeCount)
+                emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     when (it) {
                         is ApiResult.Success -> {
                             update(like, it.result)
@@ -273,7 +286,6 @@ class ClubTextDetailViewModel : BaseViewModel() {
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    _postChangedResult.value = it
                     _followResult.value = ApiResult.success(null)
                 }
         }
@@ -390,11 +402,18 @@ class ClubTextDetailViewModel : BaseViewModel() {
                     postName = accountManager.getProfile().friendlyName,
                     commentCount = 0,
                     dislikeCount = 0,
-                    id = resp.body()?.content,
+                    id = resp.body()?.content?.id,
                     likeCount = 0,
                     likeType = null,
                     reported = false
                 )
+
+                resp.body()?.content?.id?.let { id ->
+                    resp.body()?.content?.post?.commentCount?.let { commentCount ->
+                        changeCommentInDb(id, commentCount.toInt())
+                    }
+
+                }
                 emit(ApiResult.success(comment))
             }
                 .flowOn(Dispatchers.IO)

@@ -75,7 +75,7 @@ data class PostFavoriteItem(
             id = postId,
             postId = id,
             title = title,
-            content = content,
+            postContent = content,
             type = PostType.getTypeByValue(type),
             creationDate = postDate,
             isFavorite = isFavorite,
@@ -89,7 +89,7 @@ data class PostFavoriteItem(
             creatorId = posterId,
             isFollow = isFollow,
             postFriendlyName = posterName,
-            category = category
+            cover = cover
         )
     }
 

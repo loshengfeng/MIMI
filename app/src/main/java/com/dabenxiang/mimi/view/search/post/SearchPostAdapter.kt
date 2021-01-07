@@ -6,18 +6,13 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.CoroutineScope
 
 class SearchPostAdapter(
@@ -34,7 +29,6 @@ class SearchPostAdapter(
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
         const val VIEW_TYPE_TEXT = 2
-        const val VIEW_TYPE_DELETED = 3
         const val VIEW_TYPE_AD = 4
 
         private val diffCallback = object : DiffUtil.ItemCallback<MemberPostItem>() {
@@ -50,20 +44,13 @@ class SearchPostAdapter(
         }
     }
 
-    var changedPosList = HashMap<Long,MemberPostItem>()
-    var removedPosList = ArrayList<Int>()
-
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if (removedPosList.contains(position)) {
-            VIEW_TYPE_DELETED
-        } else {
-            when (item?.type) {
-                PostType.VIDEO -> VIEW_TYPE_CLIP
-                PostType.IMAGE -> VIEW_TYPE_PICTURE
-                PostType.AD -> VIEW_TYPE_AD
-                else -> VIEW_TYPE_TEXT
-            }
+        return when (item?.type) {
+            PostType.VIDEO -> VIEW_TYPE_CLIP
+            PostType.IMAGE -> VIEW_TYPE_PICTURE
+            PostType.AD -> VIEW_TYPE_AD
+            else -> VIEW_TYPE_TEXT
         }
     }
 
@@ -107,15 +94,11 @@ class SearchPostAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        var item = getItem(position)
-        val changedItem = changedPosList[item?.id]
-        if (changedItem != null) {
-            item = changedItem
-        }
+        val item = getItem(position)
         item?.also {
             when (holder) {
                 is AdHolder -> {
-                    holder.onBind(item.adItem?: AdItem())
+                    holder.onBind(item.adItem ?: AdItem())
                 }
                 is MyPostClipPostHolder -> {
                     if (payloads.size == 1) {
@@ -130,7 +113,8 @@ class SearchPostAdapter(
                             myPostListener,
                             viewModelScope,
                             getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            getSearchTag.invoke(),
+                            SearchPostMediator.AD_GAP
                         )
                     }
                 }
@@ -148,7 +132,8 @@ class SearchPostAdapter(
                             myPostListener,
                             viewModelScope,
                             getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            getSearchTag.invoke(),
+                            SearchPostMediator.AD_GAP
                         )
                     }
                 }
@@ -165,7 +150,8 @@ class SearchPostAdapter(
                             myPostListener,
                             viewModelScope,
                             getSearchText.invoke(),
-                            getSearchTag.invoke()
+                            getSearchTag.invoke(),
+                            SearchPostMediator.AD_GAP
                         )
                     }
                 }

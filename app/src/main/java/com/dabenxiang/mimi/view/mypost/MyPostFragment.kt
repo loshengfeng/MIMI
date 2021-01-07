@@ -1,7 +1,10 @@
 package com.dabenxiang.mimi.view.mypost
 
+import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -22,6 +25,7 @@ import com.dabenxiang.mimi.model.vo.SearchPostItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clip.ClipFragment
+import com.dabenxiang.mimi.view.club.base.PostItemAdapter
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
 import com.dabenxiang.mimi.view.club.text.ClubTextFragment
 import com.dabenxiang.mimi.view.login.LoginFragment
@@ -31,18 +35,21 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.MY_POST
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.PAGE
 import com.dabenxiang.mimi.view.search.post.SearchPostFragment
+import kotlinx.android.synthetic.main.fragment_club_item.*
+import kotlinx.android.synthetic.main.fragment_my_collection_videos.*
 import kotlinx.android.synthetic.main.fragment_my_post.*
+import kotlinx.android.synthetic.main.fragment_my_post.layout_refresh
 import kotlinx.android.synthetic.main.item_follow_no_data.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 
 class MyPostFragment : BaseFragment() {
 
-    private val adapter: MyPostAdapter by lazy {
-        MyPostAdapter(
+    private val adapter: PostItemAdapter by lazy {
+        PostItemAdapter(
                 requireContext(),
                 myPostListener,
                 viewModel.viewModelScope
@@ -86,110 +93,78 @@ class MyPostFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        getMyPost(userId)
+        if(adapter.snapshot().items.isEmpty()) adapter.refresh()
     }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_my_post
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initSettings()
-    }
-
-    override fun initSettings() {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         arguments?.let {
             userId = it.getLong(KEY_USER_ID, USER_ID_ME)
             userName = it.getString(KEY_USER_NAME, "")
             isAdult = it.getBoolean(KEY_IS_ADULT, true)
         }
-        adapter.addLoadStateListener(loadStateListener)
+    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStatus ->
+                when (loadStatus.refresh) {
+                    is LoadState.Error -> {
+                        Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                        onApiError((loadStatus.refresh as LoadState.Error).error)
+
+                        v_no_data?.run { this.visibility = View.VISIBLE }
+                        recyclerView?.run { this.visibility = View.INVISIBLE }
+                        layout_refresh?.run { this.isRefreshing = false }
+                    }
+                    is LoadState.Loading -> {
+                        v_no_data?.run { this.visibility = View.INVISIBLE }
+                        recyclerView?.run { this.visibility = View.INVISIBLE }
+                        layout_refresh?.run { this.isRefreshing = true }
+                    }
+                    is LoadState.NotLoading -> {
+                        if (adapter.itemCount == 0) {
+                            v_no_data?.run { this.visibility = View.VISIBLE }
+                            recyclerView?.run { this.visibility = View.INVISIBLE }
+                        } else {
+                            v_no_data?.run { this.visibility = View.INVISIBLE }
+                            recyclerView?.run { this.visibility = View.VISIBLE }
+                        }
+
+                        layout_refresh?.run { this.isRefreshing = false }
+                    }
+                }
+            }
+        }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel.viewModelScope.launch {
+            viewModel.posts(userId).flowOn(Dispatchers.IO).collectLatest {
+                adapter.submitData(it)
+            }
+        }
+
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initSettings()
+
+    }
+
+    override fun initSettings() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter.withMimiLoadStateFooter { adapter.retry() }
 
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         iv_icon.setImageResource(R.drawable.img_conment_empty)
         tv_text.text = getString(R.string.my_post_no_data)
-    }
-
-    private val loadStateListener = { loadStatus: CombinedLoadStates ->
-        when (loadStatus.refresh) {
-            is LoadState.Error -> {
-                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
-                onApiError((loadStatus.refresh as LoadState.Error).error)
-
-                v_no_data?.run { this.visibility = View.VISIBLE }
-                recyclerView?.run { this.visibility = View.INVISIBLE }
-                layout_refresh?.run { this.isRefreshing = false }
-            }
-            is LoadState.Loading -> {
-                v_no_data?.run { this.visibility = View.INVISIBLE }
-                recyclerView?.run { this.visibility = View.INVISIBLE }
-                layout_refresh?.run { this.isRefreshing = true }
-            }
-            is LoadState.NotLoading -> {
-                if (adapter.itemCount == 0) {
-                    v_no_data?.run { this.visibility = View.VISIBLE }
-                    recyclerView?.run { this.visibility = View.INVISIBLE }
-                } else {
-                    v_no_data?.run { this.visibility = View.INVISIBLE }
-                    recyclerView?.run { this.visibility = View.VISIBLE }
-                }
-
-                layout_refresh?.run { this.isRefreshing = false }
-            }
-        }
-
-        when (loadStatus.append) {
-            is LoadState.Error -> {
-                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
-            }
-            is LoadState.Loading -> {
-                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
-            }
-            is LoadState.NotLoading -> {
-                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
-            }
-        }
-    }
-
-    override fun setupObservers() {
-        viewModel.showProgress.observe(this, {
-            layout_refresh.isRefreshing = it
-        })
-
-        viewModel.likePostResult.observe(viewLifecycleOwner, {
-            when (it) {
-                is Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
-                        MyPostAdapter.PAYLOAD_UPDATE_LIKE
-                    )
-                }
-                is Error -> Timber.e(it.throwable)
-            }
-        })
-
-        viewModel.favoriteResult.observe(viewLifecycleOwner, {
-            when (it) {
-                is Success -> {
-                    adapter.notifyItemChanged(
-                        it.result,
-                        MyPostAdapter.PAYLOAD_UPDATE_FAVORITE
-                    )
-                }
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
-        mainViewModel?.deletePostResult?.observe(viewLifecycleOwner, {
-            when (it) {
-                is Success -> getMyPost(userId)
-                is Error -> onApiError(it.throwable)
-            }
-        })
-
     }
 
     override fun navigationToText(bundle: Bundle) {
@@ -234,7 +209,7 @@ class MyPostFragment : BaseFragment() {
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
-            getMyPost(userId)
+            adapter.refresh()
         }
     }
 
@@ -379,17 +354,6 @@ class MyPostFragment : BaseFragment() {
         }
 
         override fun onAvatarClick(userId: Long, name: String) {
-        }
-    }
-
-    private fun getMyPost(userId: Long) {
-        lifecycleScope.launch {
-            adapter.submitData(PagingData.empty())
-            viewModel.getMyPostPagingItems(userId)
-                .collectLatest {
-                    layout_refresh.isRefreshing = false
-                    adapter.submitData(it)
-                }
         }
     }
 

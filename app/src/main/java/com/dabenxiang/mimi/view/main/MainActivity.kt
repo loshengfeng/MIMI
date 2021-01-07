@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageInstaller
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -13,7 +12,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -37,19 +35,14 @@ import com.dabenxiang.mimi.view.dialog.dailycheckin.DailyCheckInDialogFragment
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mimi_home.MiMiFragment
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment.Companion.KEY_DEST_ID
+import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment.Companion.KEY_DEST_ID
 import com.dabenxiang.mimi.widget.utility.CryptUtils
 import com.dabenxiang.mimi.widget.utility.FileUtil.deleteExternalFile
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
-import com.dabenxiang.mimi.widget.utility.GeneralUtils.getApplicationSignature
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
-import java.lang.reflect.Method
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -76,7 +69,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         // check it's emulator and we want to block them.
-        Timber.d("@@@@  build type ${BuildConfig.BUILD_TYPE}")
         if (GeneralUtils.isProbablyRunningOnEmulator() && BuildConfig.BUILD_TYPE.contains("prod") && !BuildConfig.DEBUG)
             exitProcess(0)
 
@@ -147,6 +139,10 @@ class MainActivity : BaseActivity() {
                 tv_pop_hint?.animate()?.alpha(0.0f)?.duration = POP_HINT_ANIM_TIME
             }
         })
+
+        viewModel.closeAppFromMqtt.observe(this) {
+            finish()
+        }
 
         viewModel.isNavTransparent.observe(this, { setUiMode(it) })
         viewModel.isStatusBardDark.observe(this, { setupStatusBar(it) })

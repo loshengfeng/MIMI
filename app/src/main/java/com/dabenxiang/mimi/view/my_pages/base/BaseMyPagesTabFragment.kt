@@ -23,7 +23,7 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.fragment_my
 
-    private val dataCountByTab: ArrayList<Int> = arrayListOf()
+    private val dataIsEmptyByTab: ArrayList<Boolean> = arrayListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,14 +62,15 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
             true
         }
 
-        dataCountByTab.clear()
-        repeat(tabFragmentsCreators.count()) { dataCountByTab.add(0) }
+        dataIsEmptyByTab.clear()
+        repeat(tabFragmentsCreators.count()) { dataIsEmptyByTab.add(true) }
 
-        viewModel.changeDataCount.observe(viewLifecycleOwner, {
-            val tabIndex = it.first
-            val count = it.second
-            dataCountByTab[tabIndex] = count
-            changeCleanBtnIsEnable(tabIndex)
+        viewModel.changeDataIsEmpty.observe(viewLifecycleOwner, { (tabIndex, isEmpty) ->
+            dataIsEmptyByTab[tabIndex] = isEmpty
+
+            if(tabIndex == view.tabs.selectedTabPosition){
+                changeCleanBtnIsEnable(tabIndex)
+            }
         })
 
     }
@@ -97,11 +98,15 @@ abstract class BaseMyPagesTabFragment : BaseFragment() {
                 viewModel.setDeleteNotify(it.selectedTabPosition)
             }
         }
+
+        override fun onCancel() {
+
+        }
     }
 
     open val onTabSelectedListener: TabLayout.OnTabSelectedListener? = null
 
     fun changeCleanBtnIsEnable(tabIndex: Int) {
-        tool_bar.menu.getItem(0).isEnabled = dataCountByTab[tabIndex] > 0
+        tool_bar.menu.getItem(0).isEnabled = !dataIsEmptyByTab[tabIndex]
     }
 }

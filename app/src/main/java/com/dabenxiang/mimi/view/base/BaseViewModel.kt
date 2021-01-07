@@ -8,47 +8,41 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
-import com.bumptech.glide.Priority
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CenterInside
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
+import androidx.room.withTransaction
 import com.dabenxiang.mimi.PROJECT_NAME
-import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.extension.decryptSource
-import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.ExceptionResult
 import com.dabenxiang.mimi.model.api.vo.*
+import com.dabenxiang.mimi.model.db.DBRemoteKey
+import com.dabenxiang.mimi.model.db.MiMiDB
+import com.dabenxiang.mimi.model.db.PostDBItem
+import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.widget.utility.FileUtil
-import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.gson.Gson
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.HttpException
+import timber.log.Timber
 import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 
 abstract class BaseViewModel : ViewModel(), KoinComponent {
+
+    val mimiDB: MiMiDB by inject()
 
     companion object {
         const val POP_HINT_DURATION = 1000L
@@ -70,6 +64,12 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     private val _showPopHint = MutableLiveData<String>()
     val showPopHint: LiveData<String> = _showPopHint
+
+    private val _topAdResult = MutableLiveData<AdItem>()
+    val topAdResult: LiveData<AdItem> = _topAdResult
+
+    private val _bottomAdResult = MutableLiveData<AdItem>()
+    val bottomAdResult: LiveData<AdItem> = _bottomAdResult
 
     fun setShowProgress(show: Boolean) {
         _showProgress.value = show
@@ -132,20 +132,6 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private val _cleanRemovedPosList = MutableLiveData<Nothing>()
     val cleanRemovedPosList: LiveData<Nothing> = _cleanRemovedPosList
 
-    var deletePostIdList = MutableLiveData<ArrayList<Long>>().also { it.value = arrayListOf() }
-
-    protected var _postChangedResult = MutableLiveData<ApiResult<MemberPostItem>>()
-    val postChangedResult: LiveData<ApiResult<MemberPostItem>> = _postChangedResult
-
-    var postItemChangedList =
-        MutableLiveData<HashMap<Long, MemberPostItem>>().also { it.value = HashMap() }
-
-    protected var _videoChangedResult = MutableLiveData<ApiResult<VideoItem>>()
-    val videoChangedResult: LiveData<ApiResult<VideoItem>> = _videoChangedResult
-
-    var videoItemChangedList =
-        MutableLiveData<HashMap<Long, VideoItem>>().also { it.value = HashMap() }
-
     fun deletePost(
         item: MemberPostItem,
         position: Int
@@ -159,8 +145,13 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion {
+                    mimiDB.withTransaction {
+                        mimiDB.postDBItemDao().deleteMemberPostItem(item.id)
+                        mimiDB.postDBItemDao().deleteItem(item.id)
+                    }
+                }
                 .collect {
-                    deletePostIdList.value?.add(item.id)
                     _deletePostResult.value = it
                 }
         }
@@ -227,6 +218,146 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                         }
                     }
                 }
+        }
+    }
+
+    fun clearDBData() {
+        viewModelScope.launch {
+            mimiDB.apply {
+                withTransaction {
+                    postDBItemDao().deleteAll()
+                    postDBItemDao().deleteAllMemberPostItems()
+                }
+            }
+        }
+
+    }
+
+    suspend fun changeFavoritePostInDb(id: Long, isFavorite:Boolean, favoriteCount: Int) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_POST, isFavorite, favoriteCount)
+    }
+
+    suspend fun changeFavoriteMimiVideoInDb(id: Long, isFavorite:Boolean, favoriteCount: Int) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_MIMI_VIDEO, isFavorite, favoriteCount)
+    }
+
+    suspend fun changeFavoriteSmallVideoInDb(id: Long, isFavorite:Boolean, favoriteCount: Int) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_SHORT_VIDEO, isFavorite, favoriteCount)
+    }
+
+    private suspend fun changeFavoriteInDb(id: Long, type: MyPagesType, isFavorite:Boolean, favoriteCount: Int) {
+        mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
+                val dbItem = memberPostItem.apply {
+                    this.isFavorite = isFavorite
+                    this.favoriteCount = favoriteCount
+                }
+                mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+                val pageCode =
+                    MyPagesPostMediator::class.simpleName + type.toString()
+                if (!isFavorite) {
+                    mimiDB.postDBItemDao().deleteItemByPageCode(pageCode, id)
+                } else {
+                    mimiDB.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                    val timestamp =
+                        mimiDB.postDBItemDao().getFirstPostDBItem(pageCode)?.timestamp?.minus(1)
+                            ?: System.nanoTime()
+                    mimiDB.postDBItemDao().insertItem(
+                        PostDBItem(
+                            postDBId = id,
+                            postType = dbItem.type,
+                            pageCode = pageCode,
+                            timestamp = timestamp,
+                            index = 0
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    suspend fun changeLikePostInDb(id: Long, likeType: LikeType?, likeCount: Int) {
+        changeLikeInDb(id, MyPagesType.LIKE_POST, likeType, likeCount)
+    }
+
+    suspend fun changeLikeMimiVideoInDb(id: Long, likeType: LikeType?, likeCount: Int) {
+        changeLikeInDb(id, MyPagesType.LIKE_MIMI, likeType, likeCount)
+    }
+
+    private suspend fun changeLikeInDb(id: Long, type: MyPagesType, likeType: LikeType?, likeCount: Int) {
+        mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
+                val dbItem = memberPostItem.apply {
+                    this.likeType = likeType
+                    this.likeCount = likeCount
+                }
+                mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+
+                if (type == MyPagesType.LIKE_POST || type == MyPagesType.LIKE_MIMI) {
+                    val pageCode =
+                        MyPagesPostMediator::class.simpleName + type.toString()
+                    if (likeType != LikeType.LIKE) {
+                        mimiDB.postDBItemDao().deleteItemByPageCode(pageCode, id)
+                    } else {
+                        mimiDB.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, 0))
+                        val timestamp =
+                            mimiDB.postDBItemDao().getFirstPostDBItem(pageCode)?.timestamp?.minus(1)
+                                ?: System.nanoTime()
+                        mimiDB.postDBItemDao().insertItem(
+                            PostDBItem(
+                                postDBId = id,
+                                postType = dbItem.type,
+                                pageCode = pageCode,
+                                timestamp = timestamp,
+                                index = 0
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun changeCommentInDb(id: Long, count: Int) {
+        mimiDB.withTransaction {
+            mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
+                val dbItem = memberPostItem.apply {
+                    this.commentCount = count
+                }
+                mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
+            }
+        }
+    }
+
+    fun getTopAd(code: String) {
+        viewModelScope.launch {
+            getAd(code).collect { _topAdResult.value = it }
+        }
+    }
+
+    fun getBottomAd(code: String) {
+        viewModelScope.launch {
+            getAd(code).collect { _bottomAdResult.value = it }
+        }
+    }
+
+    fun getAd(code: String): Flow<AdItem> {
+        return flow {
+            val adItem =
+                domainManager.getAdRepository().getAD(code, adWidth, adHeight)
+                    .body()?.content?.get(0)?.ad?.first() ?: AdItem()
+            emit(adItem)
+        }
+            .flowOn(Dispatchers.IO)
+    }
+
+    fun cleanDb() {
+        viewModelScope.launch {
+            mimiDB.withTransaction {
+                mimiDB.postDBItemDao().deleteAll()
+                mimiDB.postDBItemDao().deleteAllMemberPostItems()
+                mimiDB.remoteKeyDao().deleteAll()
+            }
         }
     }
 }

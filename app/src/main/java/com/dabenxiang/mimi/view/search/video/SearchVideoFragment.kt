@@ -15,18 +15,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import androidx.paging.PagingData
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.model.api.ApiResult.Error
-import com.dabenxiang.mimi.model.api.ApiResult.Success
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.BaseMemberPostItem
 import com.dabenxiang.mimi.model.api.vo.DecryptSettingItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.enums.VideoType
@@ -35,21 +34,21 @@ import com.dabenxiang.mimi.model.vo.SearchingVideoItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
+import com.dabenxiang.mimi.view.club.base.AdAdapter
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.main.MainActivity
-import com.dabenxiang.mimi.view.pagingfooter.withMimiLoadStateFooter
-import com.dabenxiang.mimi.view.player.ui.PlayerFragment
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_FAVORITE
 import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_video.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
-import kotlin.collections.HashMap
 
 class SearchVideoFragment : BaseFragment() {
 
@@ -60,7 +59,7 @@ class SearchVideoFragment : BaseFragment() {
         fun createBundle(
             tag: String = "",
             category: String = "",
-            videoType: VideoType? = null
+            videoType: VideoType = VideoType.VIDEO_ON_DEMAND
         ): Bundle {
             val data = SearchingVideoItem()
             data.tag = tag
@@ -78,7 +77,17 @@ class SearchVideoFragment : BaseFragment() {
     var moreDialog: MoreDialogFragment? = null
 
     private val videoListAdapter by lazy {
-        SearchVideoAdapter(requireContext(), adapterListener)
+        SearchVideoAdapter(requireContext(), adapterListener,
+            { viewModel.searchingStr },
+            { viewModel.searchingTag })
+    }
+
+    private val adTop: AdAdapter by lazy {
+        AdAdapter(requireContext())
+    }
+
+    private val adBottom: AdAdapter by lazy {
+        AdAdapter(requireContext())
     }
 
     override fun getLayoutId(): Int {
@@ -88,36 +97,9 @@ class SearchVideoFragment : BaseFragment() {
     override val bottomNavigationVisibility: Int
         get() = View.GONE
 
-    private val loadStateListener = { loadStatus: CombinedLoadStates ->
-        when (loadStatus.refresh) {
-            is LoadState.Error -> {
-                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
-                progressHUD.dismiss()
-                onApiError((loadStatus.refresh as LoadState.Error).error)
-            }
-            is LoadState.Loading -> {
-                progressHUD.show()
-            }
-            is LoadState.NotLoading -> {
-                progressHUD.dismiss()
-            }
-        }
-
-        when (loadStatus.append) {
-            is LoadState.Error -> {
-                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
-                onApiError((loadStatus.refresh as LoadState.Error).error)
-            }
-            is LoadState.Loading -> {
-                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
-            }
-            is LoadState.NotLoading -> {
-                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
-            }
-        }
-    }
-
     override fun setupFirstTime() {
+        viewModel.userId = viewModel.accountManager.getProfile().userId
+
         viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
         viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
@@ -127,13 +109,15 @@ class SearchVideoFragment : BaseFragment() {
             viewModel.category = data.category
             viewModel.videoType = data.videoType
             if (data.tag.isNotBlank()) {
+                recyclerview_content.visibility = View.VISIBLE
                 layout_search_history.visibility = View.GONE
                 search_bar.setText(data.tag)
-                searchVideo(tag = data.tag, videoType = data.videoType)
+                search(tag = data.tag)
                 search_bar.post {
                     search_bar.clearFocus()
                 }
             } else {
+                recyclerview_content.visibility = View.INVISIBLE
                 iv_clear_search_bar.visibility = View.GONE
                 getSearchHistory()
                 search_bar.post {
@@ -143,10 +127,26 @@ class SearchVideoFragment : BaseFragment() {
             }
             layout_search_text.visibility = View.GONE
 
-            videoListAdapter.addLoadStateListener(loadStateListener)
             recyclerview_content.layoutManager = LinearLayoutManager(requireContext())
-            recyclerview_content.adapter =
-                videoListAdapter.withMimiLoadStateFooter { videoListAdapter.retry() }
+            recyclerview_content.adapter = ConcatAdapter(
+                adTop,
+                videoListAdapter/*.withMimiLoadStateFooter { videoListAdapter.retry() }*/,
+                adBottom
+            )
+
+            @OptIn(ExperimentalCoroutinesApi::class)
+            viewModel.viewModelScope.launch {
+                videoListAdapter.loadStateFlow.collectLatest { loadStates ->
+                    when (loadStates.refresh) {
+                        is LoadState.Loading -> progressHUD.show()
+                        is LoadState.NotLoading -> progressHUD.dismiss()
+                        is LoadState.Error -> {
+                            progressHUD.dismiss()
+                            onApiError((loadStates.refresh as LoadState.Error).error)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -163,28 +163,41 @@ class SearchVideoFragment : BaseFragment() {
             }
         })
 
+        viewModel.topAdResult.observe(this) {
+            adTop.adItem = it
+            adTop.visibility = View.VISIBLE
+            adTop.notifyDataSetChanged()
+        }
+
+        viewModel.bottomAdResult.observe(this) {
+            adBottom.adItem = it
+            adBottom.visibility = View.VISIBLE
+            adBottom.notifyDataSetChanged()
+        }
+
         viewModel.likeResult.observe(viewLifecycleOwner, {
             when (it) {
-                is Success -> {
+                is ApiResult.Success -> {
                     it.result.let { position ->
                         videoListAdapter.notifyItemChanged(position, UPDATE_LIKE)
                     }
                 }
-                is Error -> onApiError(it.throwable)
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.favoriteResult.observe(viewLifecycleOwner, {
             when (it) {
-                is Success -> {
+                is ApiResult.Success -> {
                     it.result.let { position ->
                         videoListAdapter.notifyItemChanged(position, UPDATE_FAVORITE)
                     }
                 }
-                is Error -> onApiError(it.throwable)
+                is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
+        viewModel.getTopAd("search_top")
     }
 
     override fun setupListeners() {
@@ -198,6 +211,7 @@ class SearchVideoFragment : BaseFragment() {
             GeneralUtils.hideKeyboard(requireActivity())
             GeneralUtils.showKeyboard(requireContext())
             search_bar.requestFocus()
+            recyclerview_content.visibility = View.INVISIBLE
         }
 
         tv_search.setOnClickListener {
@@ -214,7 +228,7 @@ class SearchVideoFragment : BaseFragment() {
                 iv_clear_search_bar.visibility = View.GONE
                 layout_search_text.visibility = View.GONE
                 getSearchHistory()
-                lifecycleScope.launch { videoListAdapter.submitData(PagingData.empty()) }
+                recyclerview_content.visibility = View.INVISIBLE
             } else {
                 iv_clear_search_bar.visibility = View.VISIBLE
             }
@@ -231,21 +245,13 @@ class SearchVideoFragment : BaseFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (mainViewModel?.videoItemChangedList?.value?.isNotEmpty() == true) {
-            videoListAdapter.changedPosList = mainViewModel?.videoItemChangedList?.value ?: HashMap()
-            videoListAdapter.notifyDataSetChanged()
-        }
-    }
-
     private fun searchText() {
         if (search_bar.text.isNotBlank()) {
             layout_search_text.visibility = View.GONE
             layout_search_history.visibility = View.GONE
             viewModel.searchingTag = ""
             viewModel.searchingStr = search_bar.text.toString()
-            searchVideo(keyword = search_bar.text.toString())
+            search(keyword = search_bar.text.toString())
             viewModel.updateSearchHistory(viewModel.searchingStr)
             GeneralUtils.hideKeyboard(requireActivity())
             search_bar.clearFocus()
@@ -259,13 +265,13 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     private val adapterListener = object : SearchVideoAdapter.EventListener {
-        override fun onVideoClick(item: VideoItem) {
-            when(viewModel.videoType) {
+        override fun onVideoClick(item: MemberPostItem) {
+            when (viewModel.videoType) {
                 VideoType.SHORT_VIDEO -> {
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_searchVideoFragment_to_clipSingleFragment,
-                            ClipSingleFragment.createBundle(item)
+                            ClipSingleFragment.createBundle(item.toPlayItem())
                         )
                     )
                 }
@@ -273,7 +279,7 @@ class SearchVideoFragment : BaseFragment() {
                     navigateTo(
                         NavigateItem.Destination(
                             R.id.action_searchVideoFragment_to_navigation_player,
-                            PlayerFragment.createBundle(PlayerItem(item.id))
+                            PlayerV2Fragment.createBundle(PlayerItem(item.id))
                         )
                     )
                 }
@@ -283,47 +289,35 @@ class SearchVideoFragment : BaseFragment() {
         override fun onFunctionClick(
             type: FunctionType,
             view: View,
-            item: VideoItem,
+            item: MemberPostItem,
             position: Int
         ) {
             when (type) {
                 FunctionType.LIKE -> {
-                    // 點擊更改喜歡,
-                    checkStatus {
-                        viewModel.currentItem = item
-                        item.id.let {
-                            viewModel.modifyLike(position)
-                        }
-                    }
+                    checkStatus { viewModel.modifyLike(item, position) }
                 }
 
                 FunctionType.FAVORITE -> {
-                    // 點擊後加入收藏,
-                    checkStatus {
-                        viewModel.currentItem = item
-                        item.id?.let {
-                            viewModel.modifyFavorite(it, position)
-                        }
-                    }
+                    checkStatus { viewModel.modifyFavorite(item, position) }
                 }
 
-                FunctionType.SHARE -> {
-                    /* 點擊後複製網址 */
-                    checkStatus {
-                        if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
-                            GeneralUtils.showToast(requireContext(), "copy url error")
-                        } else {
-                            GeneralUtils.copyToClipboard(
-                                requireContext(),
-                                viewModel.getShareUrl(item.tags, item.id)
-                            )
-                            GeneralUtils.showToast(
-                                requireContext(),
-                                requireContext().getString(R.string.copy_url)
-                            )
-                        }
-                    }
-                }
+//                FunctionType.SHARE -> {
+//                    /* 點擊後複製網址 */
+//                    checkStatus {
+//                        if (item.tags == null || (item.tags as String).isEmpty() || item.id == null) {
+//                            GeneralUtils.showToast(requireContext(), "copy url error")
+//                        } else {
+//                            GeneralUtils.copyToClipboard(
+//                                requireContext(),
+//                                viewModel.getShareUrl(item.tags, item.id)
+//                            )
+//                            GeneralUtils.showToast(
+//                                requireContext(),
+//                                requireContext().getString(R.string.copy_url)
+//                            )
+//                        }
+//                    }
+//                }
 
                 FunctionType.MSG -> {
                     // 點擊評論，進入播放頁面滾動到最下面
@@ -338,25 +332,18 @@ class SearchVideoFragment : BaseFragment() {
                 }
 
                 FunctionType.MORE -> {
-                    if (item.id != null) {
-                        val data = MemberPostItem(
-                            id = item.id,
-                            creationDate = Date(),
-                            type = PostType.VIDEO
-                        )
-                        moreDialog =
-                            MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
-                                it.show(
-                                    requireActivity().supportFragmentManager,
-                                    MoreDialogFragment::class.java.simpleName
-                                )
-                            }
-                    } else {
-                        GeneralUtils.showToast(
-                            requireContext(),
-                            getString(R.string.unexpected_error)
-                        )
-                    }
+                    val data = MemberPostItem(
+                        id = item.id,
+                        creationDate = Date(),
+                        type = PostType.VIDEO
+                    )
+                    moreDialog =
+                        MoreDialogFragment.newInstance(data, onMoreDialogListener).also {
+                            it.show(
+                                requireActivity().supportFragmentManager,
+                                MoreDialogFragment::class.java.simpleName
+                            )
+                        }
                 }
                 else -> {
                 }
@@ -368,7 +355,7 @@ class SearchVideoFragment : BaseFragment() {
             viewModel.searchingTag = text
             viewModel.searchingStr = ""
             search_bar.setText(text)
-            searchVideo(tag = text)
+            search(tag = text)
             GeneralUtils.hideKeyboard(requireActivity())
             search_bar.clearFocus()
         }
@@ -448,7 +435,7 @@ class SearchVideoFragment : BaseFragment() {
                 layout_search_history.visibility = View.GONE
                 viewModel.searchingStr = text
                 viewModel.searchingTag = ""
-                searchVideo(keyword = text)
+                search(keyword = text)
                 GeneralUtils.hideKeyboard(requireActivity())
                 search_bar.clearFocus()
             }
@@ -458,15 +445,22 @@ class SearchVideoFragment : BaseFragment() {
         layout_search_history.visibility = View.VISIBLE
     }
 
-    private fun searchVideo(
+    private fun search(
         keyword: String? = null,
-        tag: String? = null,
-        videoType: VideoType? = viewModel.videoType
+        tag: String? = null
     ) {
+        adBottom.visibility = View.GONE
+        recyclerview_content.visibility = View.INVISIBLE
         lifecycleScope.launch {
-            videoListAdapter.submitData(PagingData.empty())
-            viewModel.getSearchVideoResult(keyword, tag, videoType)
-                .collectLatest { videoListAdapter.submitData(it) }
+            viewModel.posts(
+                keyword,
+                tag
+            )
+                .flowOn(Dispatchers.IO)
+                .collectLatest {
+                    videoListAdapter.submitData(it)
+                    recyclerview_content?.visibility = View.VISIBLE
+                }
         }
     }
 
@@ -479,6 +473,14 @@ class SearchVideoFragment : BaseFragment() {
                     findNavController().navigate(R.id.action_to_loginFragment, data?.extras)
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (recyclerview_content.visibility == View.VISIBLE && viewModel.userId != viewModel.accountManager.getProfile().userId) {
+            viewModel.userId = viewModel.accountManager.getProfile().userId
+            search(viewModel.searchingStr, viewModel.searchingTag)
         }
     }
 

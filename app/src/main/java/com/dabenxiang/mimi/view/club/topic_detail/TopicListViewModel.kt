@@ -3,28 +3,24 @@ package com.dabenxiang.mimi.view.club.topic_detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.dabenxiang.mimi.callback.PagingCallback
+import androidx.paging.*
+import com.dabenxiang.mimi.callback.SearchPagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
+import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.enums.OrderBy
-import com.dabenxiang.mimi.view.base.BaseViewModel
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.dabenxiang.mimi.view.club.pages.ClubItemMediator
+import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_CODE
+import com.dabenxiang.mimi.view.club.topic_detail.TopicListFragment.Companion.AD_GAP
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
 
 class TopicListViewModel : ClubViewModel() {
-
-
-    private val _postCount = MutableLiveData<Int>()
-    val postCount: LiveData<Int> = _postCount
 
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
@@ -32,48 +28,35 @@ class TopicListViewModel : ClubViewModel() {
     private val _deleteFavorites = MutableLiveData<Int>()
     val deleteFavorites: LiveData<Int> = _deleteFavorites
 
-    fun getData(adapter:TopicListAdapter, tag: String, orderBy: OrderBy) {
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(pageCode: String, tag: String, orderBy: OrderBy) = postItems(pageCode, tag, orderBy).cachedIn(viewModelScope)
 
-        Timber.i("getData")
-        CoroutineScope(Dispatchers.IO).launch {
-            adapter.submitData(PagingData.empty())
-            getPostItemList(tag, orderBy)
-                    .collectLatest {
-                        adapter.submitData(it)
-                    }
+    @OptIn(ExperimentalPagingApi::class)
+    private fun postItems(pageCode: String, tag: String, orderBy: OrderBy) = Pager(
+            config = PagingConfig(pageSize = TopicPostMediator.PER_LIMIT),
+            remoteMediator = TopicPostMediator(
+                    mimiDB,
+                    pagingCallback,
+                    domainManager,
+                    pageCode,
+                    AD_CODE,
+                    tag,
+                    orderBy,
+                    adWidth,
+                    adHeight
+            )
+    ) {
+        mimiDB.postDBItemDao().pagingSourceByPageCode(pageCode)
+    }.flow.map { pagingData ->
+        pagingData.map {
+            it.memberPostItem
         }
     }
 
-    private fun getPostItemList(tag: String, orderBy: OrderBy): Flow<PagingData<MemberPostItem>> {
-        return Pager(
-                config = PagingConfig(pageSize = TopicPostDataSource.PER_LIMIT.toInt()),
-                pagingSourceFactory = {
-                    TopicPostDataSource(
-                            pagingCallback,
-                            domainManager,
-                            tag,
-                            orderBy,
-                            adWidth,
-                            adHeight
-                    )
-                }
-        )
-                .flow
-                .onStart {  setShowProgress(true) }
-                .onCompletion { setShowProgress(false) }
-                .cachedIn(viewModelScope)
-    }
-
-
-
-
-    private val pagingCallback = object : PagingCallback {
-
-        override fun onTotalCount(count: Long) {
-            _postCount.postValue(count.toInt())
+   override val pagingCallback = object : SearchPagingCallback {
+        override fun onLoaded() {
+            getBottomAd(AD_CODE)
         }
-
     }
-
 
 }

@@ -33,7 +33,7 @@ class ClubItemDataSource(
                     ClubTabItemType.FOLLOW -> {
                         domainManager.getApiRepository().getPostFollow(offset, PER_LIMIT)
                     }
-                    ClubTabItemType.RECOMMEND -> {
+                    ClubTabItemType.HOTTEST -> {
                         domainManager.getApiRepository().getMembersPost(
                             PostType.TEXT_IMAGE_VIDEO,
                             OrderBy.HOTTEST,
@@ -116,7 +116,7 @@ class ClubItemDataSource(
     private fun getAdCode(): String {
         return when (type) {
             ClubTabItemType.FOLLOW -> "subscribe"
-            ClubTabItemType.RECOMMEND -> "recommend"
+            ClubTabItemType.HOTTEST -> "recommend"
             ClubTabItemType.LATEST -> "news"
             ClubTabItemType.SHORT_VIDEO -> "video"
             ClubTabItemType.PICTURE -> "image"

@@ -3,32 +3,23 @@ package com.dabenxiang.mimi.view.my_pages.pages.mimi_video
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.dabenxiang.mimi.callback.PagingCallback
+import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiResult
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.PlayItem
-import com.dabenxiang.mimi.model.api.vo.PlayListRequest
-import com.dabenxiang.mimi.model.api.vo.VideoItem
-import com.dabenxiang.mimi.model.enums.MyCollectionTabItemType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
-import com.dabenxiang.mimi.view.my_pages.pages.like.MiMiLikeListDataSource
-import kotlinx.coroutines.CoroutineScope
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
+import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
+import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MyCollectionMimiVideoViewModel : ClubViewModel() {
-
-    private val _postCount = MutableLiveData<Int>()
-    val postCount: LiveData<Int> = _postCount
-
-    private var _videoFavoriteResult = MutableLiveData<ApiResult<Int>>()
-    val videoFavoriteResult: LiveData<ApiResult<Int>> = _videoFavoriteResult
 
     private val _deleteFavoriteResult = MutableLiveData<ApiResult<Boolean>>()
     val deleteFavoriteResult: LiveData<ApiResult<Boolean>> = _deleteFavoriteResult
@@ -38,126 +29,93 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
 
     var totalCount: Int = 0
 
-    fun getData(adapter: MyCollectionMimiVideoAdapter, type: MyCollectionTabItemType, isLike: Boolean) {
-        Timber.i("getData")
-        CoroutineScope(Dispatchers.IO).launch {
-            adapter.submitData(PagingData.empty())
-            if(isLike) {
-                getLikeItemList()
-                    .collect {
-                        adapter.submitData(it)
-                    }
-            } else {
-                getPostItemList(type)
-                    .collectLatest {
-                        adapter.submitData(it)
-                    }
-            }
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(pageCode: String, type: MyPagesType) =
+        postItems(pageCode, type).cachedIn(viewModelScope)
+
+    @OptIn(ExperimentalPagingApi::class)
+    private fun postItems(pageCode: String, type: MyPagesType) = Pager(
+        config = PagingConfig(pageSize = MyPagesPostMediator.PER_LIMIT),
+        remoteMediator = MyPagesPostMediator(mimiDB, domainManager, type, pageCode, pagingCallback)
+    ) {
+        mimiDB.postDBItemDao()
+            .pagingSourceByPageCode(pageCode)
+    }.flow.map { pagingData ->
+        pagingData.map { dbItem ->
+            dbItem.memberPostItem.toPlayItem()
         }
     }
 
-    fun getPostItemList(type: MyCollectionTabItemType): Flow<PagingData<PlayItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = MyCollectionMimiVideoDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                MyCollectionMimiVideoDataSource(
-                    domainManager,
-                    pagingCallback,
-                    adWidth,
-                    adHeight,
-                    type
-                )
-            }
-        )
-            .flow
-            .onStart {  setShowProgress(true) }
-            .onCompletion { setShowProgress(false) }
-            .cachedIn(viewModelScope)
-    }
-
-    fun getLikeItemList(): Flow<PagingData<PlayItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = MyCollectionMimiVideoDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                MiMiLikeListDataSource(
-                    domainManager,
-                    pagingCallback,
-                )
-            }
-        )
-            .flow
-            .onStart {  setShowProgress(true) }
-            .onCompletion { setShowProgress(false) }
-            .cachedIn(viewModelScope)
-    }
-
-    fun deleteMIMIVideoFavorite(videoId : String){
+    fun deleteVideoFavorite(type: MyPagesType, videoId: String) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.deleteMePlaylist(videoId)
                 if (!result.isSuccessful) throw HttpException(result)
+                val body = result.body()?.content
+                val countItem = (body as ArrayList<*>)[0] as InteractiveHistoryItem
+                when (type) {
+                    MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId.toLong(), false, countItem.favoriteCount?.toInt() ?: 0)
+                    MyPagesType.FAVORITE_SHORT_VIDEO -> {
+                        LruCacheUtils.putShortVideoDataCache(
+                            videoId.toLong(),
+                            PlayItem(
+                                favorite = false,
+                                favoriteCount = countItem.favoriteCount?.toInt(),
+                                commentCount = countItem.commentCount?.toInt()
+                            )
+                        )
+                        changeFavoriteSmallVideoInDb(videoId.toLong(), false, countItem.favoriteCount?.toInt() ?: 0)
+                    }
+                }
                 emit(ApiResult.success(result.isSuccessful))
             }
-                    .flowOn(Dispatchers.IO)
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .collect { _deleteFavoriteResult.value = it }
-        }
-    }
-
-    private val pagingCallback = object : PagingCallback {
-        override fun onTotalCount(count: Long) {
-            _postCount.postValue(count.toInt())
-        }
-    }
-
-    fun modifyFavorite(item: VideoItem, position: Int, isFavorite: Boolean) {
-        viewModelScope.launch {
-            flow {
-                val apiRepository = domainManager.getApiRepository()
-                val resp = when {
-                    isFavorite -> apiRepository.postMePlaylist(PlayListRequest(item.id, 1))
-                    else -> apiRepository.deleteMePlaylist(item.id.toString())
-                }
-                if (!resp.isSuccessful) throw HttpException(resp)
-                item.favorite = isFavorite
-                item.favoriteCount = item.favoriteCount?.let { if (isFavorite) it + 1 else it - 1 }
-                emit(ApiResult.success(position))
-            }
                 .flowOn(Dispatchers.IO)
+                .onStart { emit(ApiResult.loading()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _videoFavoriteResult.value = it }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect {
+                    _deleteFavoriteResult.value = it
+                }
         }
     }
 
-    fun deleteVideos(items: List<PlayItem>) {
+    fun deleteVideos(type: MyPagesType, items: List<PlayItem>) {
         if (items.isEmpty()) return
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository()
-                        .deleteMePlaylist(
-                                items.map {it.videoId}.joinToString(separator = ",")
-                        )
-                if (!result.isSuccessful) throw HttpException(result)
-                emit(ApiResult.success(null))
-            }
-                    .flowOn(Dispatchers.IO)
-                    .onStart { emit(ApiResult.loading()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect { _cleanResult.value = it }
-        }
-    }
-
-    fun deleteAllLike(items: List<PlayItem>) {
-        if (items.isEmpty()) return
-        viewModelScope.launch {
-            flow {
-                val result = domainManager.getApiRepository()
-                    .deleteAllLike(
-                        items.map {it.videoId}.joinToString(separator = ",")
+                    .deleteMePlaylist(
+                        items.map { it.videoId }.joinToString(separator = ",")
                     )
                 if (!result.isSuccessful) throw HttpException(result)
+                val body = result.body()?.content
+                val countItems = (body as ArrayList<*>)
+//                if(type == MyPagesType.FAVORITE_SHORT_VIDEO){
+//                    items.forEachWithIndex { i, playItem ->
+//                        takeIf { i < countItems.size }?.let { countItems[i] }?.let { item ->
+//                            item as InteractiveHistoryItem
+//                            playItem.videoId?.let { videoId ->
+//                                LruCacheUtils.putShortVideoDataCache(
+//                                    videoId,
+//                                    PlayItem(
+//                                        favorite = false,
+//                                        favoriteCount = item.favoriteCount?.toInt(),
+//                                        commentCount = item.commentCount?.toInt()
+//                                    )
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+                items.forEachWithIndex { index, item ->
+                    val count = result.body()?.content?.get(index)?.favoriteCount?.toInt()?:0
+                    when (type) {
+                        MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(item.videoId, false, count)
+                        MyPagesType.FAVORITE_SHORT_VIDEO -> changeFavoriteSmallVideoInDb(item.videoId, false, count)
+                    }
+                }
+
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)

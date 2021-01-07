@@ -13,3 +13,5 @@ const val NAVIGATE_TO_TOPUP_ACTION = "NAVIGATE_TO_TOPUP_ACTION"
 const val MIMI_INVITE_CODE = "mimi="
 
 const val JOEY = "joey"
+
+const val DB_NAME ="mimi.db"

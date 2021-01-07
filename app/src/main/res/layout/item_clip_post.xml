@@ -163,7 +163,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:scrollbars="none"
-        app:layout_constraintEnd_toEndOf="@id/tv_follow"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
         app:layout_constraintStart_toStartOf="@id/tv_title"
         app:layout_constraintTop_toBottomOf="@id/layout_clip">
 
@@ -242,10 +243,11 @@
 
     <ImageView
         android:id="@+id/iv_more"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="21dp"
+        android:layout_height="16dp"
         android:src="@drawable/btn_more_gray_n"
-        app:layout_constraintRight_toRightOf="@id/tv_follow"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/reflow_group_scroll" />
 
     <View
@@ -253,7 +255,24 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:background="@color/color_black_1_05"
         app:layout_constraintTop_toBottomOf="@+id/iv_like" />
+
+    <ImageView
+        android:id="@+id/iv_ad"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/img_ad"
+        tools:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/v_separator"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

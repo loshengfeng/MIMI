@@ -37,8 +37,8 @@ class ClipViewHolder(
     }
 
     override fun updated(model: MemberPostItem?) {
-        Timber.d("content: ${model?.content}")
-        val contentItem = Gson().fromJson(model?.content, MediaContentItem::class.java)
+        Timber.d("content: ${model?.postContent}")
+        val contentItem = Gson().fromJson(model?.postContent, MediaContentItem::class.java)
         val postImageItem =
             takeIf { contentItem.images != null && contentItem.images.isNotEmpty() }?.let {
                 contentItem.images?.get(0)

@@ -12,15 +12,16 @@
         android:drawableStart="@drawable/ico_nice_gray"
         android:drawablePadding="3dp"
         android:gravity="center"
+        android:paddingEnd="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="99" />
+        tools:text="99"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/tv_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
         android:drawableStart="@drawable/btn_favorite_white_s"
         android:drawablePadding="3dp"
         android:gravity="center"

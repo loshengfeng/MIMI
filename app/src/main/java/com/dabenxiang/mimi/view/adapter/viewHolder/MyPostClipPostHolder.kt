@@ -7,9 +7,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.R
-import com.dabenxiang.mimi.callback.MemberPostFuncItem
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -55,14 +56,16 @@ class MyPostClipPostHolder(
     private val tvFavoriteCount: TextView = itemView.tv_favorite_count
     private val layoutClip: ConstraintLayout = itemView.layout_clip
     private val vSeparator: View = itemView.v_separator
+    private val ivAd: ImageView = itemView.iv_ad
 
     fun onBind(
-            item: MemberPostItem,
-            position: Int,
-            myPostListener: MyPostListener,
-            viewModelScope: CoroutineScope,
-            searchStr: String = "",
-            searchTag: String = ""
+        item: MemberPostItem,
+        position: Int,
+        myPostListener: MyPostListener,
+        viewModelScope: CoroutineScope,
+        searchStr: String = "",
+        searchTag: String = "",
+        adGap: Int? = null
     ) {
         clClipPost.setBackgroundColor(App.self.getColor(R.color.color_white_1))
         tvName.setTextColor(App.self.getColor(R.color.color_black_1))
@@ -74,20 +77,37 @@ class MyPostClipPostHolder(
         ivComment.setImageResource(R.drawable.ico_messege_adult_gray)
         ivMore.setImageResource(R.drawable.btn_more_gray_n)
         vSeparator.setBackgroundColor(App.self.getColor(R.color.color_black_1_05))
+        if (adGap != null && position % adGap == adGap - 1) {
+            ivAd.visibility = View.VISIBLE
+            val options = RequestOptions()
+                .priority(Priority.NORMAL)
+                .placeholder(R.drawable.img_ad_df)
+                .error(R.drawable.img_ad)
+            Glide.with(ivAd.context)
+                .load(item.adItem?.href)
+                .apply(options)
+                .into(ivAd)
+            ivAd.setOnClickListener {
+                GeneralUtils.openWebView(ivAd.context, item.adItem?.target ?: "")
+            }
+        } else {
+            ivAd.visibility = View.GONE
+        }
 
         tvName.text = item.postFriendlyName
         tvTime.text = GeneralUtils.getTimeDiff(item.creationDate, Date())
         item.title.let {
             val title = if (searchStr.isNotBlank()) getSpanString(
-                    tvTitle.context,
-                    item.title,
-                    searchStr).toString() else item.title
+                tvTitle.context,
+                item.title,
+                searchStr
+            ).toString() else item.title
             tvTitle.text = title
 
             Timber.i("title size=${tvTitle.text.length}")
-            tvTitleMore.visibility = if(tvTitle.text.length >=45){
+            tvTitleMore.visibility = if (tvTitle.text.length >= 45) {
                 View.VISIBLE
-            }else{
+            } else {
                 View.GONE
             }
         }
@@ -99,7 +119,7 @@ class MyPostClipPostHolder(
             LoadImageUtils.loadImage(item.avatarAttachmentId, ivAvatar, LoadImageType.AVATAR)
         }
         ivAvatar.setOnClickListener {
-            myPostListener.onAvatarClick(item.creatorId,item.postFriendlyName)
+            myPostListener.onAvatarClick(item.creatorId, item.postFriendlyName)
         }
 
         tagChipGroup.removeAllViews()
@@ -107,7 +127,11 @@ class MyPostClipPostHolder(
             val chip = LayoutInflater.from(tagChipGroup.context)
                 .inflate(R.layout.chip_item, tagChipGroup, false) as Chip
             chip.text = it
-            if (it == searchTag || it == searchStr) chip.setTextColor(tagChipGroup.context.getColor(R.color.color_red_1))
+            if (it == searchTag || it == searchStr) chip.setTextColor(
+                tagChipGroup.context.getColor(
+                    R.color.color_red_1
+                )
+            )
             else chip.setTextColor(tagChipGroup.context.getColor(R.color.color_black_1_50))
             chip.setOnClickListener { view ->
                 myPostListener.onChipClick(PostType.VIDEO, (view as Chip).text.toString())
@@ -115,7 +139,7 @@ class MyPostClipPostHolder(
             tagChipGroup.addView(chip)
         }
 
-        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+        val contentItem = Gson().fromJson(item.postContent, MediaContentItem::class.java)
 
         tvLength.text = contentItem.shortVideo?.length
         contentItem.images?.also { images ->
@@ -126,14 +150,15 @@ class MyPostClipPostHolder(
             } else {
                 viewModelScope.launch {
                     LoadImageUtils.loadImage(
-                            images[0].id.toLongOrNull(),
-                            ivPhoto,
-                            LoadImageType.PICTURE_EMPTY)
+                        images[0].id.toLongOrNull(),
+                        ivPhoto,
+                        LoadImageType.PICTURE_EMPTY
+                    )
                 }
             }
         }
 
-        tvFollow.visibility =  View.GONE
+        tvFollow.visibility = View.GONE
 
         ivMore.setOnClickListener {
             myPostListener.onMoreClick(item, position)
@@ -144,6 +169,7 @@ class MyPostClipPostHolder(
             item.isFavorite = !item.isFavorite
             item.favoriteCount =
                 if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
+            updateFavorite(item)
             myPostListener.onFavoriteClick(
                 item,
                 position,
@@ -159,6 +185,7 @@ class MyPostClipPostHolder(
             item.likeType = if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
             item.likeCount =
                 if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
+            updateLike(item)
             myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
         }
         ivLike.setOnClickListener(onLikeClickListener)
@@ -205,5 +232,4 @@ class MyPostClipPostHolder(
             ivFavorite.setImageResource(R.drawable.btn_favorite_n)
         }
     }
-
 }

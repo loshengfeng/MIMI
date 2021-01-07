@@ -71,6 +71,7 @@
     <string name="verify_later">稍后验证</string>
     <string name="error_email_not_confirmed_title">尚未验证</string>
     <string name="error_email_not_confirmed_msg">Email 尚未验证，请先完成验证后登录</string>
+    <string name="error_mobile_not_exist">手机号不存在，请先注册 </string>
 
     <!-- Top Up -->
     <string name="topup_desc">购买 VIP</string>
@@ -547,7 +548,7 @@
     <string name="order_result_create_order_confirm">确定</string>
     <string name="order_result_create_order_account">收款帐户资讯</string>
     <string name="order_result_payment_type">支付方式</string>
-    <string name="order_result_payment_guide">将引导您至支付页面  %1$dS…</string>
+    <string name="order_result_payment_guide">将引导您至支付页面</string>
     <string name="order_result_payment_go">立即前往</string>
     <string name="order_result_create_order_amount">应付金额(¥)</string>
     <string name="order_result_create_order_close">关闭</string>
@@ -592,6 +593,7 @@
     <!-- Clip -->
     <string name="clip_newest">最新</string>
     <string name="clip_top_hit">热门</string>
+    <string name="chip_default_club">社区标签名称</string>
     <string-array name="clip_play_tabs">
         <item>@string/video_desc</item>
         <item>@string/comment</item>

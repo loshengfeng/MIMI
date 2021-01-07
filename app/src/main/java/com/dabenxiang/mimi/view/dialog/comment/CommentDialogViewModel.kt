@@ -193,11 +193,18 @@ class CommentDialogViewModel: BaseViewModel() {
                     postName = accountManager.getProfile().friendlyName,
                     commentCount = 0,
                     dislikeCount = 0,
-                    id = resp.body()?.content,
+                    id = resp.body()?.content?.id,
                     likeCount = 0,
                     likeType = null,
                     reported = false
                 )
+                resp.body()?.content?.id?.let {id->
+                    resp.body()?.content?.post?.commentCount?.let {commentCount->
+                        changeCommentInDb(id, commentCount.toInt())
+                    }
+
+                }
+
                 emit(ApiResult.success(comment))
             }
                 .flowOn(Dispatchers.IO)

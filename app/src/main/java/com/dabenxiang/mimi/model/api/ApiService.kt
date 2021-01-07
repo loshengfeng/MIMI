@@ -169,6 +169,11 @@ interface ApiService {
         @Query("unhealthy") unhealthy: Boolean
     ): Response<Void>
 
+    @GET("/v1/Members/Me/IsUsernameExists")
+    suspend fun isMemberExists(
+        @Query("username") userName: String
+    ): Response<Void>
+
     /**********************************************************
      *
      *                  Members/Post
@@ -206,6 +211,9 @@ interface ApiService {
         @Query("status") status: Int = 1
     ): Response<ApiBasePagingItem<ArrayList<MemberPostItem>>>
 
+    @GET("/v1/Members/Post/InteractiveHistory/{id}")
+    suspend fun getInteractiveHistory(@Path("id") id: String): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
+
     @GET("/v1/Members/Post/{id}")
     suspend fun getMemberPostDetail(@Path("id") postId: Long): Response<ApiBaseItem<MemberPostItem>>
 
@@ -227,20 +235,20 @@ interface ApiService {
     suspend fun postMembersPostComment(
         @Path("postId") postId: Long,
         @Body request: PostCommentRequest
-    ): Response<ApiBaseItem<Long>>
+    ): Response<ApiBaseItem<CmtCountItem>>
 
     @POST("/v1/Members/Post/{postId}/Comment/{commentId}/Like")
     suspend fun postMembersPostCommentLike(
         @Path("postId") postId: Long,
         @Path("commentId") commentId: Long,
         @Body request: PostLikeRequest
-    ): Response<Void>
+    ): Response<CmtCountItem>
 
     @DELETE("/v1/Members/Post/{postId}/Comment/{commentId}/Like")
     suspend fun deleteMembersPostCommentLike(
         @Path("postId") postId: Long,
         @Path("commentId") commentId: Long
-    ): Response<Void>
+    ): Response<CmtCountItem>
 
     @PUT("/v1/Members/Post/{id}")
     suspend fun updatePost(
@@ -467,12 +475,12 @@ interface ApiService {
     @POST("/v1/Members/Me/Playlist")
     suspend fun addMePlaylist(
         @Body request: PlayListRequest
-    ): Response<Void>
+    ): Response<ApiBaseItem<InteractiveHistoryItem>>
 
     @DELETE("/v1/Members/Me/Playlist/{videoId}")
     suspend fun deletePlaylist(
         @Path("videoId") videoId: String
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @GET("/v1/Members/Me/Playlist/{playlistType}")
     suspend fun getPlaylist(
@@ -499,7 +507,7 @@ interface ApiService {
     @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
     suspend fun deletePostFavorite(
         @Path("postFavoriteId") postFavoriteId: String
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @GET("/v1/Members/Me/PostFollow")
     suspend fun getPostFollow(
@@ -551,28 +559,28 @@ interface ApiService {
     @POST("/v1/Members/Post/{postId}/Favorite")
     suspend fun addFavorite(
         @Path("postId") postId: Long
-    ): Response<Void>
+    ): Response<ApiBaseItem<InteractiveHistoryItem>>
 
     @DELETE("/v1/Members/Post/{postId}/Favorite")
     suspend fun deleteFavorite(
         @Path("postId") postId: Long
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @POST("/v1/Members/Post/{postId}/Like")
     suspend fun like(
         @Path("postId") postId: Long,
         @Body body: LikeRequest
-    ): Response<Void>
+    ): Response<ApiBaseItem<InteractiveHistoryItem>>
 
     @DELETE("/v1/Members/Post/{postId}/Like")
     suspend fun deleteLike(
         @Path("postId") postId: Long
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @DELETE("/v1/Members/Post/{postId}/Like")
     suspend fun deleteAllLike(
         @Path("postId") postId: String
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @POST("/v1/Members/Post/{postId}/PostReport")
     suspend fun sendPostReport(

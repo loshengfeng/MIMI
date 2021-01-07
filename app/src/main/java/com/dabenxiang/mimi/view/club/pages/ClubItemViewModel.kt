@@ -1,60 +1,58 @@
 package com.dabenxiang.mimi.view.club.pages
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.dabenxiang.mimi.callback.PagingCallback
+import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
+import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
+import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.ClubTabItemType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.club.base.ClubViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.dabenxiang.mimi.view.club.pages.ClubItemMediator.Companion.AD_GAP
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ClubItemViewModel : ClubViewModel() {
 
-    private val _postCount = MutableLiveData<Int>()
-    val postCount: LiveData<Int> = _postCount
-
     var totalCount: Int = 0
 
-    fun getData(adapter: ClubItemAdapter, type: ClubTabItemType) {
-        Timber.i("getData")
-        CoroutineScope(Dispatchers.IO).launch {
-            adapter.submitData(PagingData.empty())
-            getPostItemList(type)
-                .collectLatest {
-                    adapter.submitData(it)
-                }
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun posts(pageCode:String, type: ClubTabItemType) =  postItems(pageCode, type).cachedIn(viewModelScope)
+
+    @OptIn(ExperimentalPagingApi::class)
+    private fun postItems(pageCode:String, type: ClubTabItemType) = Pager(
+            config = PagingConfig(pageSize = ClubItemMediator.PER_LIMIT),
+            remoteMediator = ClubItemMediator(mimiDB, domainManager, adWidth, adHeight, pageCode,
+                    type, getAdCode(type), pagingCallback)
+    ) {
+        mimiDB.postDBItemDao()
+            .pagingSourceByPageCode(pageCode)
+    }.flow.map { pagingData ->
+        pagingData.map {
+           it.memberPostItem
+        }
+     }
+
+    fun getAdCode(type: ClubTabItemType): String {
+        return when (type) {
+            ClubTabItemType.FOLLOW -> "subscribe"
+            ClubTabItemType.HOTTEST -> "recommend"
+            ClubTabItemType.LATEST -> "news"
+            ClubTabItemType.SHORT_VIDEO -> "video"
+            ClubTabItemType.PICTURE -> "image"
+            ClubTabItemType.NOVEL -> "text"
         }
     }
 
-    fun getPostItemList(type: ClubTabItemType): Flow<PagingData<MemberPostItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = ClubItemDataSource.PER_LIMIT),
-            pagingSourceFactory = {
-                ClubItemDataSource(
-                    domainManager,
-                    pagingCallback,
-                    adWidth,
-                    adHeight,
-                    type
-                )
-            }
-        )
-            .flow
-            .onStart {  setShowProgress(true) }
-            .onCompletion { setShowProgress(false) }
-            .cachedIn(viewModelScope)
-    }
-
-    private val pagingCallback = object : PagingCallback {
-        override fun onTotalCount(count: Long) {
-            _postCount.postValue(count.toInt())
+    fun refresh(pageCode: String):Flow<Void>{
+        return flow {
+            mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
+            mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
         }
-
     }
+
 }

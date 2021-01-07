@@ -8,11 +8,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.android.synthetic.main.item_clip.view.*
 import kotlinx.android.synthetic.main.recharge_reminder.view.*
+import timber.log.Timber
 
 class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
@@ -37,10 +39,8 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         progress.visibility = View.GONE
         tvRetry.visibility = View.GONE
         tvTitle.text = item.title
-        tvFavorite.text = item.favoriteCount.toString()
 
-        LruCacheUtils.getShortVideoCount(item.id)?.commentCount?.run { item.commentCount = this.toLong() }
-        tvComment.text = item.commentCount.toString()
+        updateCount(item)
 
         tvTitle.isSelected = true
 
@@ -54,13 +54,9 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             Glide.with(ivCover.context)
                 .load(item.cover).placeholder(R.drawable.img_nopic_03).into(ivCover)
         }
-
-        val favoriteRes = takeIf { item.favorite }?.let { R.drawable.btn_favorite_forvideo_s }
-            ?: let { R.drawable.btn_favorite_forvideo_n }
-        tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
     }
 
-    fun updateAfterM3U8(item: VideoItem, clipFuncItem: ClipFuncItem, pos: Int, isOverdue: Boolean) {
+    fun updateAfterM3U8(item: VideoItem, clipFuncItem: ClipFuncItem, isOverdue: Boolean) {
         if (isOverdue) {
             btnVip.setOnClickListener { clipFuncItem.onVipClick() }
             btnPromote.setOnClickListener { clipFuncItem.onPromoteClick() }
@@ -74,13 +70,45 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         } else {
             item.deducted = !isOverdue
-            tvFavorite.setOnClickListener {
-                clipFuncItem.onFavoriteClick(item, pos, !item.favorite)
-            }
+            tvFavorite.setOnClickListener { clipFuncItem.onFavoriteClick(item, !item.favorite, ::updateFavorite) }
             tvComment.setOnClickListener { clipFuncItem.onCommentClick(item) }
             tvMore.setOnClickListener { clipFuncItem.onMoreClick(item) }
 
             reminder.visibility = View.GONE
         }
+    }
+
+    fun updateInteractiveHistory(item: VideoItem, interactiveHistoryItem: InteractiveHistoryItem) {
+        interactiveHistoryItem.commentCount?.run { item.commentCount = this.toInt() }
+        interactiveHistoryItem.favoriteCount?.run { item.favoriteCount = this.toInt() }
+        interactiveHistoryItem.isFavorite?.run { item.favorite = this }
+
+        tvFavorite.text = item.favoriteCount.toString()
+        tvComment.text = item.commentCount.toString()
+
+        val favoriteRes = takeIf { item.favorite }?.let { R.drawable.btn_favorite_forvideo_s }
+            ?: let { R.drawable.btn_favorite_forvideo_n }
+        tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
+    }
+
+    fun updateCount(item: VideoItem) {
+        LruCacheUtils.getShortVideoCount(item.id)?.run {
+            this.favoriteCount?.also { count ->  item.favoriteCount = count }
+            this.commentCount?.also { count ->  item.commentCount = count }
+            this.favorite?.also { favorite ->  item.favorite = favorite }
+        }
+        tvFavorite.text = item.favoriteCount.toString()
+        tvComment.text = item.commentCount.toString()
+
+        val favoriteRes = takeIf { item.favorite }?.let { R.drawable.btn_favorite_forvideo_s }
+            ?: let { R.drawable.btn_favorite_forvideo_n }
+        tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
+    }
+
+    fun updateFavorite(isFavorite: Boolean, favoriteCount: Int) {
+        tvFavorite.text = favoriteCount.toString()
+        val favoriteRes = takeIf { isFavorite }?.let { R.drawable.btn_favorite_forvideo_s }
+            ?: let { R.drawable.btn_favorite_forvideo_n }
+        tvFavorite.setCompoundDrawablesRelativeWithIntrinsicBounds(0, favoriteRes, 0, 0)
     }
 }

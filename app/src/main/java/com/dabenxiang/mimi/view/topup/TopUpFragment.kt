@@ -404,6 +404,7 @@ class TopUpFragment : BaseFragment() {
 
     private fun initTopUp() {
         tl_type.removeAllTabs()
+        ll_tab_images.removeAllViews()
 
         tv_record_top_up.visibility = View.VISIBLE
 
