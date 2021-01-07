@@ -251,4 +251,9 @@ class SearchVideoViewHolder(
             setCompoundDrawablesRelativeWithIntrinsicBounds(resFavorite, 0, 0, 0)
         }
     }
+
+    fun updateInteractive(item: MemberPostItem) {
+        updateFavorite(item)
+        updateLike(item)
+    }
 }

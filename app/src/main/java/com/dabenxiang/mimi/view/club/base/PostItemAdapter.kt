@@ -29,6 +29,7 @@ class PostItemAdapter(
     companion object {
         const val UPDATE_LIKE = 0
         const val UPDATE_FAVORITE = 1
+        const val UPDATE_INTERACTIVE = 2
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -100,32 +101,56 @@ class PostItemAdapter(
                 }
 
                 is MyPostPicturePostHolder -> {
-                    holder.pictureRecycler.tag = position
-                    holder.onBind(
-                        memberPostItem,
-                        position,
-                        myPostListener,
-                        viewModelScope,
-                        adGap = adGap
-                    )
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            UPDATE_LIKE -> holder.updateLike(item)
+                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            UPDATE_INTERACTIVE -> holder.updateInteractive(item)
+                        }
+                    } else {
+                        holder.pictureRecycler.tag = position
+                        holder.onBind(
+                            memberPostItem,
+                            position,
+                            myPostListener,
+                            viewModelScope,
+                            adGap = adGap
+                        )
+                    }
                 }
                 is MyPostTextPostHolder -> {
-                    holder.onBind(
-                        memberPostItem,
-                        position,
-                        myPostListener,
-                        viewModelScope,
-                        adGap = adGap
-                    )
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            UPDATE_LIKE -> holder.updateLike(item)
+                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            UPDATE_INTERACTIVE -> holder.updateInteractive(item)
+                        }
+                    } else {
+                        holder.onBind(
+                            memberPostItem,
+                            position,
+                            myPostListener,
+                            viewModelScope,
+                            adGap = adGap
+                        )
+                    }
                 }
                 is MyPostClipPostHolder -> {
-                    holder.onBind(
-                        memberPostItem,
-                        position,
-                        myPostListener,
-                        viewModelScope,
-                        adGap = adGap
-                    )
+                    if (payloads.size == 1) {
+                        when (payloads[0]) {
+                            UPDATE_LIKE -> holder.updateLike(item)
+                            UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            UPDATE_INTERACTIVE -> holder.updateInteractive(item)
+                        }
+                    } else {
+                        holder.onBind(
+                            memberPostItem,
+                            position,
+                            myPostListener,
+                            viewModelScope,
+                            adGap = adGap
+                        )
+                    }
                 }
             }
         }

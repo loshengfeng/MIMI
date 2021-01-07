@@ -326,27 +326,27 @@ class SearchPostFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
-//        viewModel.likePostResult.observe(viewLifecycleOwner, {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    it.result.let { position ->
-//                        adapter.notifyItemChanged(position, UPDATE_LIKE)
-//                    }
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
-//
-//        viewModel.favoriteResult.observe(viewLifecycleOwner, {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    it.result.let { position ->
-//                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
-//                    }
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
+        viewModel.likePostResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_LIKE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.favoriteResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
 
         viewModel.searchTotalCount.observe(viewLifecycleOwner, { count ->
             if (search_bar.text.isNotBlank()) setSearchResultText(count)

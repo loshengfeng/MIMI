@@ -98,27 +98,27 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             adTop.notifyDataSetChanged()
         }
 
-//        viewModel.likePostResult.observe(viewLifecycleOwner, {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    it.result.let { position ->
-//                        adapter.notifyItemChanged(position, UPDATE_LIKE)
-//                    }
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
-//
-//        viewModel.favoriteResult.observe(viewLifecycleOwner, {
-//            when (it) {
-//                is ApiResult.Success -> {
-//                    it.result.let { position ->
-//                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
-//                    }
-//                }
-//                is ApiResult.Error -> onApiError(it.throwable)
-//            }
-//        })
+        viewModel.likePostResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_LIKE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.favoriteResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     override fun onCreateView(
@@ -227,9 +227,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             if (viewModel.accountManager.isLogin()) {
                 viewModel.likePost(item, position, isLike)
             } else {
-                item.likeCount -= 1
-                item.likeType =
-                    if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_loginFragment,
@@ -282,8 +279,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
             if (viewModel.accountManager.isLogin()) {
                 viewModel.favoritePost(item, position, isFavorite)
             } else {
-                item.favoriteCount -= 1
-                item.isFavorite = !item.isFavorite
                 navigateTo(
                     NavigateItem.Destination(
                         R.id.action_to_loginFragment,

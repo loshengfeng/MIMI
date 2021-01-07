@@ -96,11 +96,7 @@ abstract class ClubViewModel : BaseViewModel() {
             Timber.i("likePost item=$item")
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val likeType: LikeType = when {
-                    isLike -> LikeType.LIKE
-                    else -> LikeType.DISLIKE
-                }
-                val request = LikeRequest(likeType)
+                val request = LikeRequest(LikeType.LIKE)
                 val result = when {
                     isLike -> apiRepository.like(item.id, request)
                     else -> apiRepository.deleteLike(item.id)
@@ -112,9 +108,7 @@ abstract class ClubViewModel : BaseViewModel() {
                         else -> (it as ArrayList<*>)[0]
                     }
                 } as InteractiveHistoryItem
-                item.likeType = if (isLike) LikeType.LIKE else LikeType.DISLIKE
-                item.likeCount = countItem.likeCount?.toInt() ?: 0
-                changeLikePostInDb(item.id, if (isLike) LikeType.LIKE else null, item.likeCount)
+                changeLikePostInDb(item.id, if (isLike) LikeType.LIKE else null, countItem.likeCount?.toInt() ?: 0)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)

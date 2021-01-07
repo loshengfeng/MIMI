@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.SearchVideoViewHolder
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter
 
 class SearchVideoAdapter(
     val context: Context,
@@ -29,6 +30,7 @@ class SearchVideoAdapter(
     companion object {
         const val UPDATE_LIKE = 0
         const val UPDATE_FAVORITE = 1
+        const val UPDATE_INTERACTIVE = 2
 
         const val VIEW_TYPE_VIDEO = 0
         const val VIEW_TYPE_AD = 1
@@ -47,8 +49,7 @@ class SearchVideoAdapter(
 
             override fun getChangePayload(oldItem: MemberPostItem, newItem: MemberPostItem): Any? {
                 return when {
-                    oldItem.likeType != newItem.likeType || oldItem.likeCount != newItem.likeCount -> UPDATE_LIKE
-                    oldItem.isFavorite != newItem.isFavorite || oldItem.favoriteCount != newItem.favoriteCount -> UPDATE_FAVORITE
+                    oldItem.likeType != newItem.likeType || oldItem.likeCount != newItem.likeCount || oldItem.isFavorite != newItem.isFavorite || oldItem.favoriteCount != newItem.favoriteCount -> UPDATE_INTERACTIVE
                     else -> null
                 }
             }
@@ -99,6 +100,7 @@ class SearchVideoAdapter(
                     when (payloads[0]) {
                         UPDATE_LIKE -> holder.updateLike(item)
                         UPDATE_FAVORITE -> holder.updateFavorite(item)
+                        UPDATE_INTERACTIVE -> holder.updateInteractive(item)
                     }
                 } else {
                     holder.onBind(
