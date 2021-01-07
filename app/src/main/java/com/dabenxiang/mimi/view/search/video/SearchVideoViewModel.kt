@@ -101,14 +101,6 @@ class SearchVideoViewModel : BaseViewModel() {
                 when (item.type) {
                     PostType.VIDEO_ON_DEMAND -> changeFavoriteMimiVideoInDb(item.id, item.isFavorite, item.favoriteCount)
                     PostType.SMALL_CLIP -> {
-                        LruCacheUtils.putShortVideoDataCache(
-                            item.id,
-                            PlayItem(
-                                favorite = item.isFavorite,
-                                favoriteCount = countItem.favoriteCount?.toInt(),
-                                commentCount = countItem.commentCount?.toInt()
-                            )
-                        )
                         changeFavoriteSmallVideoInDb(item.id, item.isFavorite, item.favoriteCount)
                     }
                 }

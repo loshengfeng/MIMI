@@ -76,7 +76,6 @@ class LikeMimiVideoViewModel : ClubViewModel() {
                 when (type) {
                     MyPagesType.LIKE_MIMI -> changeFavoriteMimiVideoInDb(item.videoId, item.favorite ?: false, item.favoriteCount ?: 0)
                     MyPagesType.LIKE_SHORT_VIDEO -> {
-                        LruCacheUtils.putShortVideoDataCache(item.id, item)
                         changeFavoriteSmallVideoInDb(item.videoId, item.favorite ?: false, item.favoriteCount ?: 0)
                     }
                 }
