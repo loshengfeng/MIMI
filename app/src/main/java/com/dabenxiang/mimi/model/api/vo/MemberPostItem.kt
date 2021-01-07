@@ -50,7 +50,7 @@ data class MemberPostItem(
         val videoSources: ArrayList<Source> = arrayListOf(),
 
         @ColumnInfo(name = "videoEpisodes")
-        val videoEpisodes: ArrayList<VideoEpisode> = arrayListOf(),
+        var videoEpisodes: ArrayList<VideoEpisode> = arrayListOf(),
 
         @ColumnInfo(name = "videoTimesWatched")
         val videoTimesWatched: Int = 0,
