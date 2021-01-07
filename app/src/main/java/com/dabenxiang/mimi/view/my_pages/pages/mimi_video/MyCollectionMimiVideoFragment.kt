@@ -90,24 +90,11 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
                 is ApiResult.Empty -> {
                     Timber.i("cleanResult items:${adapter.snapshot().items.isEmpty()}")
                     emptyPageToggle(true)
+                    myPagesViewModel.changeDataIsEmpty(tab, true)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
 
-        }
-
-        viewModel.videoFavoriteResult.observe(this) {
-            when (it) {
-                is ApiResult.Success -> {
-                    if(adapter.snapshot().items.size <=1) {
-                        viewModel.viewModelScope.launch {
-                            val dbSize=viewModel.checkoutItemsSize(pageCode)
-                            if(dbSize<=0) emptyPageToggle(true)
-                        }
-                    }
-                }
-                is ApiResult.Error -> onApiError(it.throwable)
-            }
         }
 
         viewModel.deleteFavoriteResult.observe(this) {
@@ -118,7 +105,10 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
                     if(adapter.snapshot().items.size <=1) {
                         viewModel.viewModelScope.launch {
                             val dbSize=viewModel.checkoutItemsSize(pageCode)
-                            if(dbSize<=0) emptyPageToggle(true)
+                            if(dbSize<=0) {
+                                emptyPageToggle(true)
+                                myPagesViewModel.changeDataIsEmpty(tab, true)
+                            }
                         }
                     }
                 }
@@ -132,12 +122,10 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
         posts_list.adapter = adapter
 
         viewModel.postCount.observe(viewLifecycleOwner) {
-            Timber.i("postCount= $it")
             emptyPageToggle(it==0)
-            myPagesViewModel.changeDataCount(tab, it)
+            myPagesViewModel.changeDataIsEmpty(tab, it==0)
             layout_refresh.isRefreshing = false
         }
-
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false

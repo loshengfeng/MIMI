@@ -149,24 +149,34 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
             when (it) {
                 is ApiResult.Empty -> {
                     emptyPageToggle(true)
+                    myPagesViewModel.changeDataIsEmpty(tab, true)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         })
 
         viewModel.videoLikeResult.observe(this){
-
             Timber.i("videoLikeResult =$it")
             when (it) {
                 is ApiResult.Success -> {
                     if(adapter.snapshot().items.size <=1) {
                         viewModel.viewModelScope.launch {
                             val dbSize=viewModel.checkoutItemsSize(pageCode)
-                            if(dbSize<=0) emptyPageToggle(true)
+                            if(dbSize<=0) {
+                                emptyPageToggle(true)
+                                myPagesViewModel.changeDataIsEmpty(tab, true)
+                            }
                         }
                     }
                     layout_refresh.isRefreshing = false
                 }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
+        viewModel.favoriteMimiResult.observe(this) {
+            when (it) {
+                is ApiResult.Success -> adapter.notifyItemChanged(it.result)
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         }
@@ -228,7 +238,7 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
 
         viewModel.postCount.observe(viewLifecycleOwner) {
             emptyPageToggle(it<=0)
-            myPagesViewModel.changeDataCount(tab, it)
+            myPagesViewModel.changeDataIsEmpty(tab, it<=0)
         }
 
         layout_refresh.setOnRefreshListener {

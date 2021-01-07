@@ -39,9 +39,12 @@ import timber.log.Timber
 class TopicListFragment(private val memberClubItem: MemberClubItem, private val orderBy: OrderBy, private val topicTag:String) : BaseFragment() {
 
     private val viewModel: TopicListViewModel by viewModels()
-    private val topicViewModel: TopicViewModel by viewModels({requireParentFragment()})
 
     private val adTop: AdAdapter by lazy {
+        AdAdapter(requireContext())
+    }
+
+    private val adBottom: AdAdapter by lazy {
         AdAdapter(requireContext())
     }
 
@@ -81,8 +84,15 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
 
         viewModel.topAdResult.observe(this, {
             adTop.adItem = it
+            adTop.visibility = View.VISIBLE
             adTop.notifyDataSetChanged()
         })
+
+        viewModel.bottomAdResult.observe(this) {
+            adBottom.adItem = it
+            adBottom.visibility = View.VISIBLE
+            adBottom.notifyDataSetChanged()
+        }
     }
 
     private fun emptyPageToggle(isHide:Boolean){
@@ -139,7 +149,7 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("pageCode=$pageCode onViewCreated")
-        posts_list.adapter = ConcatAdapter(adTop, adapter)
+        posts_list.adapter = ConcatAdapter(adTop, adapter, adBottom)
 
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false

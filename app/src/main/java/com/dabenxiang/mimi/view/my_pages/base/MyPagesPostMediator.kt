@@ -84,7 +84,7 @@ class MyPagesPostMediator(
                     memberPostItems?.size ?: 0
             )
 
-            pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
+            if (offset == 0 && loadType == LoadType.REFRESH) pagingCallback.onTotalCount( result.body()?.paging?.count ?: 0)
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
@@ -103,8 +103,16 @@ class MyPagesPostMediator(
                 Timber.i("MyPagesPostMediator $loadType nextKey=$nextKey ")
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
-                memberPostItems?.let {
+                val checkedMemberPostItems =memberPostItems?.map { memberPostItem ->
+                    database.postDBItemDao().getMemberPostItemById(memberPostItem.id)?.videoEpisodes?.let {
+                        memberPostItem.videoEpisodes =it
+                    }
+                    memberPostItem
+                }
+
+                checkedMemberPostItems?.let {
                     val postDBItems = it.mapIndexed { index, item ->
+                        Timber.i("MyPagesPostMediator item =${item.videoEpisodes} ")
                         val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
 
                         when(oldItem) {

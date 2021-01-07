@@ -25,7 +25,7 @@ data class PlayItem(
     val source: String?="",
 
     @SerializedName("videoId")
-    val videoId: Long?=0,
+    val videoId: Long=0,
 
     @SerializedName("episode")
     val episode: String?="",

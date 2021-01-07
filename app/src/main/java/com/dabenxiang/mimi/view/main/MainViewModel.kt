@@ -137,6 +137,8 @@ class MainViewModel : BaseViewModel() {
 
     val uploadData = MutableLiveData<Bundle>()
 
+    val closeAppFromMqtt = MutableLiveData<String>()
+
     private var job = Job()
 
     fun setupNormalCategoriesItem(item: CategoriesItem?) {
@@ -379,6 +381,11 @@ class MainViewModel : BaseViewModel() {
                 PROJECT_NAME,
                 "MQTT - DeliveryComplete message:: ${String(token.message.payload)}"
             )
+        }
+
+        override fun onInvalidHandle(cause: Throwable?) {
+            SendLogManager.e(PROJECT_NAME,"IllegalArgumentException:$cause")
+            closeAppFromMqtt.postValue(cause?.toString() ?: "")
         }
     }
 

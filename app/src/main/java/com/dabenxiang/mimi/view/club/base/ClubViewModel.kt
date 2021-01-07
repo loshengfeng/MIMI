@@ -6,10 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.dabenxiang.mimi.callback.PagingCallback
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.AdItem
-import com.dabenxiang.mimi.model.api.vo.LikeRequest
-import com.dabenxiang.mimi.model.api.vo.MemberPostItem
-import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.LikeType
@@ -73,7 +70,13 @@ abstract class ClubViewModel : BaseViewModel() {
                     else -> apiRepository.deleteFavorite(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                changeFavoritePostInDb(item.id)
+                val countItem = result.body()?.content.let {
+                    when {
+                        isFavorite -> it
+                        else -> (it as ArrayList<*>)[0]
+                    }
+                } as InteractiveHistoryItem
+                changeFavoritePostInDb(item.id, isFavorite, countItem.favoriteCount?.toInt()?:0)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -93,7 +96,6 @@ abstract class ClubViewModel : BaseViewModel() {
             Timber.i("likePost item=$item")
             flow {
                 val apiRepository = domainManager.getApiRepository()
-
                 val likeType: LikeType = when {
                     isLike -> LikeType.LIKE
                     else -> LikeType.DISLIKE
@@ -104,9 +106,15 @@ abstract class ClubViewModel : BaseViewModel() {
                     else -> apiRepository.deleteLike(item.id)
                 }
                 if (!result.isSuccessful) throw HttpException(result)
+                val countItem = result.body()?.content.let {
+                    when {
+                        isLike -> it
+                        else -> (it as ArrayList<*>)[0]
+                    }
+                } as InteractiveHistoryItem
                 item.likeType = if (isLike) LikeType.LIKE else LikeType.DISLIKE
-                item.likeCount = item.likeCount
-                changeLikePostInDb(item.id, if(isLike) LikeType.LIKE else null)
+                item.likeCount = countItem.likeCount?.toInt() ?: 0
+                changeLikePostInDb(item.id, if (isLike) LikeType.LIKE else null, item.likeCount)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -126,11 +134,11 @@ abstract class ClubViewModel : BaseViewModel() {
                 val request = LikeRequest(type)
                 val result = apiRepository.like(item.id, request)
                 if (!result.isSuccessful) throw HttpException(result)
-                when(pageType) {
+                item.likeType = type
+                item.likeCount = result.body()?.content?.likeCount?.toInt() ?: 0
+                when (pageType) {
                     MyPagesType.FAVORITE_MIMI_VIDEO,
-                    MyPagesType.LIKE_MIMI -> changeLikeMimiVideoInDb(item.id, type)
-                    MyPagesType.FAVORITE_SHORT_VIDEO,
-                    MyPagesType.LIKE_SHORT_VIDEO -> changeLikeSmallVideoInDb(item.id, type)
+                    MyPagesType.LIKE_MIMI -> changeLikeMimiVideoInDb(item.id, type, item.likeCount)
                 }
                 emit(ApiResult.success(item))
             }
@@ -148,7 +156,7 @@ abstract class ClubViewModel : BaseViewModel() {
         }
     }
 
-    suspend fun checkoutItemsSize(pageCode:String):Int{
+    suspend fun checkoutItemsSize(pageCode: String): Int {
         return mimiDB.withTransaction {
             mimiDB.postDBItemDao().getPostDBItems(pageCode)?.size ?: 0
         }

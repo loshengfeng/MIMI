@@ -18,12 +18,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
-import timber.log.Timber
 
 class MyCollectionMimiVideoViewModel : ClubViewModel() {
-
-    private var _videoFavoriteResult = MutableLiveData<ApiResult<Int>>()
-    val videoFavoriteResult: LiveData<ApiResult<Int>> = _videoFavoriteResult
 
     private val _deleteFavoriteResult = MutableLiveData<ApiResult<Boolean>>()
     val deleteFavoriteResult: LiveData<ApiResult<Boolean>> = _deleteFavoriteResult
@@ -59,7 +55,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                 val body = result.body()?.content
                 val countItem = (body as ArrayList<*>)[0] as InteractiveHistoryItem
                 when (type) {
-                    MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId.toLong())
+                    MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId.toLong(), false, countItem.favoriteCount?.toInt() ?: 0)
                     MyPagesType.FAVORITE_SHORT_VIDEO -> {
                         LruCacheUtils.putShortVideoDataCache(
                             videoId.toLong(),
@@ -69,7 +65,7 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                                 commentCount = countItem.commentCount?.toInt()
                             )
                         )
-                        changeFavoriteSmallVideoInDb(videoId.toLong())
+                        changeFavoriteSmallVideoInDb(videoId.toLong(), false, countItem.favoriteCount?.toInt() ?: 0)
                     }
                 }
                 emit(ApiResult.success(result.isSuccessful))
@@ -95,27 +91,28 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                 if (!result.isSuccessful) throw HttpException(result)
                 val body = result.body()?.content
                 val countItems = (body as ArrayList<*>)
-                if(type == MyPagesType.FAVORITE_SHORT_VIDEO){
-                    items.forEachWithIndex { i, playItem ->
-                        takeIf { i < countItems.size }?.let { countItems[i] }?.let { item ->
-                            item as InteractiveHistoryItem
-                            playItem.videoId?.let { videoId ->
-                                LruCacheUtils.putShortVideoDataCache(
-                                    videoId,
-                                    PlayItem(
-                                        favorite = false,
-                                        favoriteCount = item.favoriteCount?.toInt(),
-                                        commentCount = item.commentCount?.toInt()
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-                items.map { it.videoId }.filterNotNull().forEach { videoId ->
+//                if(type == MyPagesType.FAVORITE_SHORT_VIDEO){
+//                    items.forEachWithIndex { i, playItem ->
+//                        takeIf { i < countItems.size }?.let { countItems[i] }?.let { item ->
+//                            item as InteractiveHistoryItem
+//                            playItem.videoId?.let { videoId ->
+//                                LruCacheUtils.putShortVideoDataCache(
+//                                    videoId,
+//                                    PlayItem(
+//                                        favorite = false,
+//                                        favoriteCount = item.favoriteCount?.toInt(),
+//                                        commentCount = item.commentCount?.toInt()
+//                                    )
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+                items.forEachWithIndex { index, item ->
+                    val count = result.body()?.content?.get(index)?.favoriteCount?.toInt()?:0
                     when (type) {
-                        MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId)
-                        MyPagesType.FAVORITE_SHORT_VIDEO -> changeFavoriteSmallVideoInDb(videoId)
+                        MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(item.videoId, false, count)
+                        MyPagesType.FAVORITE_SHORT_VIDEO -> changeFavoriteSmallVideoInDb(item.videoId, false, count)
                     }
                 }
 

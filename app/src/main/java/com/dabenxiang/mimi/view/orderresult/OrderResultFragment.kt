@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.orderresult
 
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.View
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
@@ -30,7 +29,6 @@ class OrderResultFragment : BaseFragment() {
     private val viewModel: OrderResultViewModel by viewModels()
 
     private var topUpTimer: Timer? = null
-    private var countdownTimer: CountDownTimer? = null
 
     lateinit var epoxyController: OrderResultEpoxyController
 
@@ -85,7 +83,6 @@ class OrderResultFragment : BaseFragment() {
 
                 if (viewModel.isOpenPaymentWebView(it.orderPayloadItem)) {
                     viewModel.setupOrderPayloadItem(it.orderPayloadItem)
-                    startCountdownTimer()
                 }
             }
         })
@@ -97,7 +94,6 @@ class OrderResultFragment : BaseFragment() {
 
     override fun onDestroyView() {
         stopTopUpTimer()
-        stopCountdownTimer()
         super.onDestroyView()
     }
 
@@ -117,7 +113,6 @@ class OrderResultFragment : BaseFragment() {
         }
 
         override fun onOpenPaymentWebView(url: String) {
-            stopCountdownTimer()
             viewModel.getOrderPayloadItem()?.also {
                 it.isCountdownVisible = false
                 epoxyController.setData(it)
@@ -162,7 +157,7 @@ class OrderResultFragment : BaseFragment() {
     private fun startTopUpTimer() {
         var count = 1L
         val task = timerTask {
-            if(count >= DELAY_TOP_UP_TIME) {
+            if (count >= DELAY_TOP_UP_TIME) {
                 epoxyController.setData(OrderPayloadItem())
                 topUpTimer?.cancel()
             } else {
@@ -176,28 +171,6 @@ class OrderResultFragment : BaseFragment() {
 
     private fun stopTopUpTimer() {
         topUpTimer?.cancel()
-    }
-
-    private fun startCountdownTimer() {
-        countdownTimer = object : CountDownTimer(5000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                viewModel.getOrderPayloadItem()?.also {
-                    it.countdown = (millisUntilFinished / 1000).toInt() + 1
-                    epoxyController.setData(it)
-                }
-            }
-
-            override fun onFinish() {
-                viewModel.getOrderPayloadItem()?.also {
-                    successListener.onOpenPaymentWebView(it.paymentUrl)
-                }
-            }
-        }
-        countdownTimer?.start()
-    }
-
-    private fun stopCountdownTimer() {
-        countdownTimer?.cancel()
     }
 
 }

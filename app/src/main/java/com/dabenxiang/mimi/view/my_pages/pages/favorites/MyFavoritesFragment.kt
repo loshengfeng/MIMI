@@ -79,6 +79,7 @@ class MyFavoritesFragment(
             when (it) {
                 is ApiResult.Empty -> {
                     emptyPageToggle(true)
+                    myPagesViewModel.changeDataIsEmpty(tab, true)
                 }
                 is ApiResult.Error -> onApiError(it.throwable)
             }
@@ -90,7 +91,10 @@ class MyFavoritesFragment(
                     if(adapter.snapshot().items.size <=1) {
                         viewModel.viewModelScope.launch {
                             val dbSize=viewModel.checkoutItemsSize(pageCode)
-                            if(dbSize<=0) emptyPageToggle(true)
+                            if(dbSize<=0) {
+                                emptyPageToggle(true)
+                                myPagesViewModel.changeDataIsEmpty(tab, true)
+                            }
                         }
                     }
                 }
@@ -155,6 +159,7 @@ class MyFavoritesFragment(
 
         viewModel.postCount.observe(viewLifecycleOwner, {
             emptyPageToggle(it<=0)
+            myPagesViewModel.changeDataIsEmpty(tab, it<=0)
         })
 
         viewModel.showProgress.observe(viewLifecycleOwner,{

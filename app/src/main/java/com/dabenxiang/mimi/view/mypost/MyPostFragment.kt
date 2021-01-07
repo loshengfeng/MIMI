@@ -112,11 +112,32 @@ class MyPostFragment : BaseFragment() {
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            adapter.loadStateFlow.collectLatest { loadStates ->
-                if(adapter.snapshot().items.isEmpty() && timeout >0){
-                    layout_refresh?.isRefreshing = true
-                }else{
-                    layout_refresh?.isRefreshing = loadStates.refresh is LoadState.Loading
+            adapter.loadStateFlow.collectLatest { loadStatus ->
+                when (loadStatus.refresh) {
+                    is LoadState.Error -> {
+                        Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
+                        onApiError((loadStatus.refresh as LoadState.Error).error)
+
+                        v_no_data?.run { this.visibility = View.VISIBLE }
+                        recyclerView?.run { this.visibility = View.INVISIBLE }
+                        layout_refresh?.run { this.isRefreshing = false }
+                    }
+                    is LoadState.Loading -> {
+                        v_no_data?.run { this.visibility = View.INVISIBLE }
+                        recyclerView?.run { this.visibility = View.INVISIBLE }
+                        layout_refresh?.run { this.isRefreshing = true }
+                    }
+                    is LoadState.NotLoading -> {
+                        if (adapter.itemCount == 0) {
+                            v_no_data?.run { this.visibility = View.VISIBLE }
+                            recyclerView?.run { this.visibility = View.INVISIBLE }
+                        } else {
+                            v_no_data?.run { this.visibility = View.INVISIBLE }
+                            recyclerView?.run { this.visibility = View.VISIBLE }
+                        }
+
+                        layout_refresh?.run { this.isRefreshing = false }
+                    }
                 }
             }
         }
@@ -128,22 +149,6 @@ class MyPostFragment : BaseFragment() {
             }
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        viewModel.viewModelScope.launch {
-            @OptIn(FlowPreview::class)
-            adapter.loadStateFlow
-                .distinctUntilChangedBy { it.refresh }
-                .filter { it.refresh is LoadState.NotLoading }
-                .onEach { delay(1000) }
-                .collect {
-                    if(adapter.snapshot().items.isEmpty()&& timeout >0) {
-                        timeout--
-                        adapter.refresh()
-                    }
-                }
-        }
-
-
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -154,61 +159,12 @@ class MyPostFragment : BaseFragment() {
     }
 
     override fun initSettings() {
-        adapter.addLoadStateListener(loadStateListener)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter.withMimiLoadStateFooter { adapter.retry() }
 
         tv_title.text = if (userId == USER_ID_ME) getString(R.string.personal_my_post) else userName
         iv_icon.setImageResource(R.drawable.img_conment_empty)
         tv_text.text = getString(R.string.my_post_no_data)
-    }
-
-    private val loadStateListener = { loadStatus: CombinedLoadStates ->
-        when (loadStatus.refresh) {
-            is LoadState.Error -> {
-                Timber.e("Refresh Error: ${(loadStatus.refresh as LoadState.Error).error.localizedMessage}")
-                onApiError((loadStatus.refresh as LoadState.Error).error)
-
-                v_no_data?.run { this.visibility = View.VISIBLE }
-                recyclerView?.run { this.visibility = View.INVISIBLE }
-                layout_refresh?.run { this.isRefreshing = false }
-            }
-            is LoadState.Loading -> {
-                v_no_data?.run { this.visibility = View.INVISIBLE }
-                recyclerView?.run { this.visibility = View.INVISIBLE }
-                layout_refresh?.run { this.isRefreshing = true }
-            }
-            is LoadState.NotLoading -> {
-                if (adapter.itemCount == 0) {
-                    v_no_data?.run { this.visibility = View.VISIBLE }
-                    recyclerView?.run { this.visibility = View.INVISIBLE }
-                } else {
-                    v_no_data?.run { this.visibility = View.INVISIBLE }
-                    recyclerView?.run { this.visibility = View.VISIBLE }
-                }
-
-                layout_refresh?.run { this.isRefreshing = false }
-            }
-        }
-
-        when (loadStatus.append) {
-            is LoadState.Error -> {
-                Timber.e("Append Error:${(loadStatus.append as LoadState.Error).error.localizedMessage}")
-            }
-            is LoadState.Loading -> {
-                Timber.d("Append Loading endOfPaginationReached:${(loadStatus.append as LoadState.Loading).endOfPaginationReached}")
-            }
-            is LoadState.NotLoading -> {
-                Timber.d("Append NotLoading endOfPaginationReached:${(loadStatus.append as LoadState.NotLoading).endOfPaginationReached}")
-            }
-        }
-    }
-
-    override fun setupObservers() {
-        viewModel.showProgress.observe(this, {
-            layout_refresh.isRefreshing = it
-        })
-
     }
 
     override fun navigationToText(bundle: Bundle) {

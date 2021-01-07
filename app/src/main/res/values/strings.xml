@@ -548,7 +548,7 @@
     <string name="order_result_create_order_confirm">确定</string>
     <string name="order_result_create_order_account">收款帐户资讯</string>
     <string name="order_result_payment_type">支付方式</string>
-    <string name="order_result_payment_guide">将引导您至支付页面  %1$dS…</string>
+    <string name="order_result_payment_guide">将引导您至支付页面</string>
     <string name="order_result_payment_go">立即前往</string>
     <string name="order_result_create_order_amount">应付金额(¥)</string>
     <string name="order_result_create_order_close">关闭</string>

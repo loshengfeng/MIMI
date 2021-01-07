@@ -90,6 +90,7 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
 
         viewModel.topAdResult.observe(this) {
             adTop.adItem = it
+            adTop.visibility = View.VISIBLE
             adTop.notifyDataSetChanged()
         }
     }

@@ -25,6 +25,9 @@ class LikeMimiVideoViewModel : ClubViewModel() {
     private val _deleteFavoriteResult = MutableLiveData<ApiResult<Boolean>>()
     val deleteFavoriteResult: LiveData<ApiResult<Boolean>> = _deleteFavoriteResult
 
+    private val _favoriteResult = MutableLiveData<ApiResult<Int>>()
+    val favoriteMimiResult: LiveData<ApiResult<Int>> = _favoriteResult
+
     private val _cleanResult = MutableLiveData<ApiResult<Nothing>>()
     val cleanResult: LiveData<ApiResult<Nothing>> = _cleanResult
 
@@ -51,7 +54,6 @@ class LikeMimiVideoViewModel : ClubViewModel() {
     fun favorite(item: PlayItem, position: Int, type: MyPagesType, isFavorite: Boolean) {
         viewModelScope.launch {
             flow {
-                val originFavorite = item.favorite ?: false
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
                     isFavorite -> apiRepository.postMePlaylist(
@@ -63,19 +65,19 @@ class LikeMimiVideoViewModel : ClubViewModel() {
                     else -> apiRepository.deleteMePlaylist(item.videoId.toString())
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                val body = result.body()?.content
-                val countItem = when {
-                    !originFavorite -> body
-                    else -> (body as ArrayList<*>)[0]
-                }
-                countItem as InteractiveHistoryItem
-                item.favorite = !originFavorite
-                item.favoriteCount = countItem.favoriteCount?.toInt()
+                val countItem = result.body()?.content?.let {
+                    when {
+                        isFavorite -> it
+                        else -> (it as ArrayList<*>)[0]
+                    }
+                } as InteractiveHistoryItem
+                item.favorite = isFavorite
+                countItem.favoriteCount?.let{ item.favoriteCount = it.toInt() }
                 when (type) {
-                    MyPagesType.LIKE_MIMI -> changeFavoriteMimiVideoInDb(item.videoId ?: 0)
+                    MyPagesType.LIKE_MIMI -> changeFavoriteMimiVideoInDb(item.videoId, item.favorite ?: false, item.favoriteCount ?: 0)
                     MyPagesType.LIKE_SHORT_VIDEO -> {
                         LruCacheUtils.putShortVideoDataCache(item.id, item)
-                        changeFavoriteSmallVideoInDb(item.videoId ?: 0)
+                        changeFavoriteSmallVideoInDb(item.videoId, item.favorite ?: false, item.favoriteCount ?: 0)
                     }
                 }
                 emit(ApiResult.success(position))
@@ -84,7 +86,7 @@ class LikeMimiVideoViewModel : ClubViewModel() {
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { }
+                .collect { _favoriteResult.value = it }
         }
     }
 

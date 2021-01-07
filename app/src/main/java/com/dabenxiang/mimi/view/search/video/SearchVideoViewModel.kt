@@ -58,14 +58,18 @@ class SearchVideoViewModel : BaseViewModel() {
                     val result = apiRepository.like(item.id, request)
                     if (!result.isSuccessful) throw HttpException(result)
                     item.likeType = LikeType.LIKE
-                    item.likeCount += 1
+                    result.body()?.content?.also {
+                        item.likeCount = it.likeCount?.toInt() ?: 0
+                    }
                 } else {
                     val result = apiRepository.deleteLike(item.id)
                     if (!result.isSuccessful) throw HttpException(result)
                     item.likeType = null
-                    item.likeCount -= 1
+                    result.body()?.content?.get(0)?.also {
+                        item.likeCount = it.likeCount?.toInt() ?: 0
+                    }
                 }
-                changeLikeMimiVideoInDb(item.id, item.likeType)
+                changeLikeMimiVideoInDb(item.id, item.likeType, item.likeCount)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -85,17 +89,17 @@ class SearchVideoViewModel : BaseViewModel() {
                     domainManager.getApiRepository().deleteMePlaylist(item.id.toString())
                 }
                 if (!result.isSuccessful) throw HttpException(result)
-                val body = result.body()?.content
-                val countItem = when (item.isFavorite) {
-                    false -> body
-                    else -> (body as ArrayList<*>)[0]
-                }
-                countItem as InteractiveHistoryItem
+                val countItem = result.body()?.content?.let {
+                    when (item.isFavorite) {
+                        false -> it
+                        else -> (it as ArrayList<*>)[0]
+                    }
+                } as InteractiveHistoryItem
                 item.isFavorite = item.isFavorite != true
-                countItem.favoriteCount?.run { item.favoriteCount = this.toInt() }
+                item.favoriteCount = countItem.favoriteCount?.toInt() ?: 0
 
                 when (item.type) {
-                    PostType.VIDEO_ON_DEMAND -> changeFavoriteMimiVideoInDb(item.id)
+                    PostType.VIDEO_ON_DEMAND -> changeFavoriteMimiVideoInDb(item.id, item.isFavorite, item.favoriteCount)
                     PostType.SMALL_CLIP -> {
                         LruCacheUtils.putShortVideoDataCache(
                             item.id,
@@ -105,7 +109,7 @@ class SearchVideoViewModel : BaseViewModel() {
                                 commentCount = countItem.commentCount?.toInt()
                             )
                         )
-                        changeFavoriteSmallVideoInDb(item.id)
+                        changeFavoriteSmallVideoInDb(item.id, item.isFavorite, item.favoriteCount)
                     }
                 }
                 emit(ApiResult.success(position))
