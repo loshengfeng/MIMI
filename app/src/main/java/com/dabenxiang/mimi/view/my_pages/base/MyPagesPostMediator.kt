@@ -103,14 +103,12 @@ class MyPagesPostMediator(
                 Timber.i("MyPagesPostMediator $loadType nextKey=$nextKey ")
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
-                val checkedMemberPostItems =memberPostItems?.map { memberPostItem ->
+               memberPostItems?.map { memberPostItem ->
                     database.postDBItemDao().getMemberPostItemById(memberPostItem.id)?.videoEpisodes?.let {
-                        memberPostItem.videoEpisodes =it
+                        if(it.isNotEmpty()) memberPostItem.videoEpisodes =it
                     }
                     memberPostItem
-                }
-
-                checkedMemberPostItems?.let {
+                }?.let {
                     val postDBItems = it.mapIndexed { index, item ->
                         Timber.i("MyPagesPostMediator item =${item.videoEpisodes} ")
                         val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
