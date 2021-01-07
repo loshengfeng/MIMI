@@ -8,5 +8,8 @@ data class PaymentTypeItem(
     val name: String? = "",
 
     @SerializedName("disabled")
-    val disabled: Boolean? = true
+    val disabled: Boolean? = true,
+
+    @SerializedName("sorting")
+    val sorting: Int? = 0
 )
