@@ -144,6 +144,38 @@ data class MemberPostItem(
                 likeType = likeType
         )
     }
+
+    fun toVideoItem(): VideoItem {
+            return VideoItem(
+                    id = id,
+                    title = title,
+                    cover = cover,
+                    type = type,
+                    updateDate = updateDate,
+                    description = videoDescription,
+                    country = videoCountry,
+                    source = videoSource,
+                    sources = videoSources,
+                    videoEpisodes = videoEpisodes,
+                    timesWatched = videoTimesWatched,
+                    performers = videoPerformers,
+                    reported = reported,
+                    deducted = deducted,
+                    like = when(likeType) {
+                      LikeType.LIKE -> true
+                      LikeType.DISLIKE -> true
+                      else -> null
+                    },
+                    likeType = likeType,
+                    likeCount = likeCount,
+                    dislikeCount = dislikeCount,
+                    favorite = isFavorite,
+                    favoriteCount = favoriteCount,
+                    commentCount = commentCount,
+                    tags = tags,
+                    adItem = adItem
+            )
+    }
 }
 
 class MemberPostItemConverters {
