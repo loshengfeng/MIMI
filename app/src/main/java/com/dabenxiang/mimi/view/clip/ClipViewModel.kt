@@ -177,7 +177,7 @@ class ClipViewModel : BaseViewModel() {
                         commentCount = item.commentCount
                     )
                 )
-                changeFavoriteSmallVideoInDb(item.id)
+                changeFavoriteSmallVideoInDb(item.id, item.favorite, item.favoriteCount)
                 emit(ApiResult.success(countItem.favoriteCount?.toInt()))
             }
                 .flowOn(Dispatchers.IO)

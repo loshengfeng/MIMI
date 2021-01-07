@@ -507,7 +507,7 @@ interface ApiService {
     @DELETE("/v1/Members/Me/PostFavorite/{postFavoriteId}")
     suspend fun deletePostFavorite(
         @Path("postFavoriteId") postFavoriteId: String
-    ): Response<Void>
+    ): Response<ApiBaseItem<ArrayList<InteractiveHistoryItem>>>
 
     @GET("/v1/Members/Me/PostFollow")
     suspend fun getPostFollow(

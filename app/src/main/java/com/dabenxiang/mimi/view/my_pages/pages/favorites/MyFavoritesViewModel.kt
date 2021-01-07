@@ -16,6 +16,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.collections.forEachWithIndex
 import retrofit2.HttpException
 
 class MyFavoritesViewModel : ClubViewModel() {
@@ -51,8 +52,9 @@ class MyFavoritesViewModel : ClubViewModel() {
                         items.map { it.postId }.joinToString(separator = ",")
                     )
                 if (!result.isSuccessful) throw HttpException(result)
-                items.forEach {
-                    changeFavoritePostInDb(it.id)
+                items.forEachWithIndex { index, memberPostItem ->
+                    val count = result.body()?.content?.get(index)?.favoriteCount?.toInt()?:0
+                    changeFavoritePostInDb(memberPostItem.id, false, count)
                 }
                 emit(ApiResult.success(null))
             }

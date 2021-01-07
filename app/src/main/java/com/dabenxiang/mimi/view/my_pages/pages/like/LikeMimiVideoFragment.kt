@@ -155,7 +155,6 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
         })
 
         viewModel.videoLikeResult.observe(this){
-
             Timber.i("videoLikeResult =$it")
             when (it) {
                 is ApiResult.Success -> {
@@ -167,6 +166,13 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
                     }
                     layout_refresh.isRefreshing = false
                 }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
+        viewModel.favoriteMimiResult.observe(this) {
+            when (it) {
+                is ApiResult.Success -> adapter.notifyItemChanged(it.result)
                 is ApiResult.Error -> onApiError(it.throwable)
             }
         }

@@ -233,28 +233,24 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     }
 
-    suspend fun changeFavoritePostInDb(id: Long) {
-        changeFavoriteInDb(id, MyPagesType.FAVORITE_POST)
+    suspend fun changeFavoritePostInDb(id: Long, isFavorite:Boolean, favoriteCount: Int) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_POST, isFavorite, favoriteCount)
     }
 
-    suspend fun changeFavoriteMimiVideoInDb(id: Long) {
-        changeFavoriteInDb(id, MyPagesType.FAVORITE_MIMI_VIDEO)
+    suspend fun changeFavoriteMimiVideoInDb(id: Long, isFavorite:Boolean, favoriteCount: Int) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_MIMI_VIDEO, isFavorite, favoriteCount)
     }
 
-    suspend fun changeFavoriteSmallVideoInDb(id: Long) {
-        changeFavoriteInDb(id, MyPagesType.FAVORITE_SHORT_VIDEO)
+    suspend fun changeFavoriteSmallVideoInDb(id: Long, isFavorite:Boolean, favoriteCount: Int) {
+        changeFavoriteInDb(id, MyPagesType.FAVORITE_SHORT_VIDEO, isFavorite, favoriteCount)
     }
 
-    private suspend fun changeFavoriteInDb(id: Long, type: MyPagesType) {
+    private suspend fun changeFavoriteInDb(id: Long, type: MyPagesType, isFavorite:Boolean, favoriteCount: Int) {
         mimiDB.withTransaction {
             mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
-                val isFavorite = !memberPostItem.isFavorite
                 val dbItem = memberPostItem.apply {
                     this.isFavorite = isFavorite
-                    this.favoriteCount = when (isFavorite) {
-                        true -> this.favoriteCount + 1
-                        else -> this.favoriteCount - 1
-                    }
+                    this.favoriteCount = favoriteCount
                 }
                 mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
                 val pageCode =
@@ -280,31 +276,20 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    suspend fun changeLikePostInDb(id: Long, likeType: LikeType?) {
-        changeLikeInDb(id, MyPagesType.LIKE_POST, likeType)
+    suspend fun changeLikePostInDb(id: Long, likeType: LikeType?, likeCount: Int) {
+        changeLikeInDb(id, MyPagesType.LIKE_POST, likeType, likeCount)
     }
 
-    suspend fun changeLikeMimiVideoInDb(id: Long, likeType: LikeType?) {
-        changeLikeInDb(id, MyPagesType.LIKE_MIMI, likeType)
+    suspend fun changeLikeMimiVideoInDb(id: Long, likeType: LikeType?, likeCount: Int) {
+        changeLikeInDb(id, MyPagesType.LIKE_MIMI, likeType, likeCount)
     }
 
-    suspend fun changeLikeSmallVideoInDb(id: Long, likeType: LikeType?) {
-        changeLikeInDb(id, MyPagesType.LIKE_SHORT_VIDEO, likeType)
-    }
-
-    private suspend fun changeLikeInDb(id: Long, type: MyPagesType, likeType: LikeType?) {
+    private suspend fun changeLikeInDb(id: Long, type: MyPagesType, likeType: LikeType?, likeCount: Int) {
         mimiDB.withTransaction {
             mimiDB.postDBItemDao().getMemberPostItemById(id)?.let { memberPostItem ->
                 val dbItem = memberPostItem.apply {
-                    when (likeType) {
-                        LikeType.LIKE -> {
-                            this.likeCount += 1
-                        }
-                        else -> {
-                            if (this.likeType == LikeType.LIKE) this.likeCount -= 1
-                        }
-                    }
                     this.likeType = likeType
+                    this.likeCount = likeCount
                 }
                 mimiDB.postDBItemDao().insertMemberPostItem(dbItem)
 

@@ -194,7 +194,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
                 override fun onCancel() {
                     item.likeType = LikeType.LIKE
                     item.likeCount++
-                    adapter.refresh()
+                    adapter.notifyItemChanged(position)
                 }
             })
 

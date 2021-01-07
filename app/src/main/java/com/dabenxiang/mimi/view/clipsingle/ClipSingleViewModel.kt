@@ -47,11 +47,11 @@ class ClipSingleViewModel : BaseViewModel() {
                 item.favorite = isFavorite
                 item.favoriteCount = countItem.favoriteCount?.toInt()
                 LruCacheUtils.putShortVideoDataCache(item.id, item)
-                changeFavoriteSmallVideoInDb(item.videoId?:0)
+                changeFavoriteSmallVideoInDb(item.videoId, item.favorite ?: false, item.favoriteCount ?: 0)
                 emit(
                     ApiResult.success(
                         VideoItem(
-                            id = item.videoId ?: 0,
+                            id = item.videoId,
                             favorite = item.favorite ?: false,
                             favoriteCount = item.favoriteCount?:0
                         )

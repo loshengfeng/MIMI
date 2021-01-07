@@ -86,17 +86,22 @@ class PlayerDescriptionViewModel : BaseViewModel() {
         viewModelScope.launch {
             flow {
                 val originFavorite = item.favorite
-                val originFavoriteCnt = item.favoriteCount ?: 0
+                val originFavoriteCnt = item.favoriteCount
                 val apiRepository = domainManager.getApiRepository()
                 val result = when {
                     !originFavorite -> apiRepository.postMePlaylist(PlayListRequest(item.id, 1))
                     else -> apiRepository.deleteMePlaylist(item.id.toString())
                 }
                 if (!result.isSuccessful) throw HttpException(result)
+                val countItem = result.body()?.content?.let {
+                    when {
+                        !originFavorite -> it
+                        else -> (it as ArrayList<*>)[0]
+                    }
+                } as InteractiveHistoryItem
                 item.favorite = !originFavorite
-                item.favoriteCount = if (originFavorite) originFavoriteCnt - 1
-                else originFavoriteCnt + 1
-                changeFavoriteMimiVideoInDb(item.id)
+                item.favoriteCount = countItem.favoriteCount?.toInt()?:0
+                changeFavoriteMimiVideoInDb(item.id, item.favorite, item.favoriteCount)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
@@ -119,23 +124,22 @@ class PlayerDescriptionViewModel : BaseViewModel() {
                     val result = apiRepository.like(item.id, request)
                     if (!result.isSuccessful) throw HttpException(result)
                     item.likeType = clickLikeType
-                    if (clickLikeType == LikeType.LIKE) {
-                        if (originType == LikeType.DISLIKE) item.dislikeCount -= 1
-                        item.likeCount += 1
-                    } else {
-                        if (originType == LikeType.LIKE) item.likeCount -= 1
-                        item.dislikeCount += 1
+                    result.body()?.content?.also {
+                        item.likeCount = it.likeCount?.toInt() ?: 0
+                        item.dislikeCount = it.dislikeCount?.toInt() ?: 0
                     }
                 } else {
                     val result = apiRepository.deleteLike(item.id)
                     if (!result.isSuccessful) throw HttpException(result)
                     item.likeType = null
-                    if (clickLikeType == LikeType.LIKE) item.likeCount -= 1
-                    else item.dislikeCount -= 1
+                    result.body()?.content?.get(0)?.also {
+                        item.likeCount = it.likeCount?.toInt() ?: 0
+                        item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                    }
                 }
                 item.like = if (item.likeType == null) null
                 else item.likeType == LikeType.LIKE
-                changeLikeMimiVideoInDb(item.id, item.likeType)
+                changeLikeMimiVideoInDb(item.id, item.likeType, item.likeCount)
                 emit(ApiResult.success(item))
             }
                 .flowOn(Dispatchers.IO)
