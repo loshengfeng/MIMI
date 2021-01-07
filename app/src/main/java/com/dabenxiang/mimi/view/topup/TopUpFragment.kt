@@ -237,13 +237,15 @@ class TopUpFragment : BaseFragment() {
 //                    var paymentTypes: ArrayList<PaymentTypeItem>? = null
 //                    if(paymentTypes == null){
 //                        paymentTypes = arrayListOf()
-//                        paymentTypes.add(PaymentTypeItem("Alipay", false))
-//                        paymentTypes.add(PaymentTypeItem("WeChat", false))
-//                        paymentTypes.add(PaymentTypeItem("TikTok", false))
-//                        paymentTypes.add(PaymentTypeItem("UnionPay", false))
+//                        paymentTypes.add(PaymentTypeItem("Alipay", false, 3))
+//                        paymentTypes.add(PaymentTypeItem("WeChat", false, 2))
+//                        paymentTypes.add(PaymentTypeItem("TikTok", false, 1))
+//                        paymentTypes.add(PaymentTypeItem("UnionPay", false, 4))
 //                    }
 
-                    for(type in paymentTypes)
+                    var sortedPaymentTypes = paymentTypes.sortedWith(compareBy({ it.sorting }))
+
+                    for(type in sortedPaymentTypes)
                         if (type.disabled == false)
                             addTabImage(type)
                 }
