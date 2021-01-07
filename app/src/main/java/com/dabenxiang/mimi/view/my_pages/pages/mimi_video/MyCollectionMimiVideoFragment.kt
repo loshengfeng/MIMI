@@ -202,7 +202,7 @@ class MyCollectionMimiVideoFragment(val tab:Int, val type: MyPagesType) : BaseFr
                         likeType = item.likeType,
                         likeCount = item.likeCount?:0
 
-                ), if(item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE, type)
+                ), position, if(item.likeType == LikeType.LIKE) LikeType.DISLIKE else LikeType.LIKE, type)
             }
         }
 
