@@ -3,10 +3,7 @@ package com.dabenxiang.mimi.view.clip
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.*
@@ -17,7 +14,10 @@ import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -78,10 +78,15 @@ class ClipViewModel : BaseViewModel() {
         }
     }
 
-    fun getInteractiveHistory(item: VideoItem, position: Int, update: (Int, InteractiveHistoryItem) -> Unit) {
+    fun getInteractiveHistory(
+        item: VideoItem,
+        position: Int,
+        update: (Int, InteractiveHistoryItem) -> Unit
+    ) {
         viewModelScope.launch {
             flow {
-                val result = domainManager.getApiRepository().getInteractiveHistory(item.id.toString())
+                val result =
+                    domainManager.getApiRepository().getInteractiveHistory(item.id.toString())
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(result.body()?.content?.get(0))
             }
@@ -169,34 +174,49 @@ class ClipViewModel : BaseViewModel() {
                 countItem as InteractiveHistoryItem
                 item.favorite = isFavorite
                 countItem.favoriteCount?.run { item.favoriteCount = this.toInt() }
-                LruCacheUtils.putShortVideoDataCache(
-                    item.id,
-                    PlayItem(
-                        favorite = isFavorite,
-                        favoriteCount = item.favoriteCount,
-                        commentCount = item.commentCount
-                    )
-                )
-                changeFavoriteSmallVideoInDb(item.id, item.favorite, item.favoriteCount)
                 emit(ApiResult.success(countItem.favoriteCount?.toInt()))
             }
                 .flowOn(Dispatchers.IO)
                 .catch { e -> emit(ApiResult.error(e)) }
                 .collect {
-                    if (it is ApiResult.Success) { update(isFavorite, it.result) }
+                    if (it is ApiResult.Success) {
+                        update(isFavorite, it.result)
+                    }
                     _favoriteResult.value = it
                 }
         }
     }
 
-    fun getClips(orderByType: StatisticsOrderType): Flow<PagingData<VideoItem>> {
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    fun getClips(
+        orderByType: StatisticsOrderType
+    ) = clearResult(orderByType)
+        .flatMapConcat { clips(orderByType) }.cachedIn(viewModelScope)
+
+    @OptIn(ExperimentalPagingApi::class)
+    private fun clips(orderByType: StatisticsOrderType): Flow<PagingData<VideoItem>> {
+        val pageCode = "${ClipMediator::class.java.simpleName}${orderByType.name}"
         return Pager(
             config = PagingConfig(
                 pageSize = ApiRepository.NETWORK_PAGE_SIZE,
                 enablePlaceholders = false,
             ),
-            pagingSourceFactory = { ClipPagingSource(domainManager, orderByType) }
-        ).flow.cachedIn(viewModelScope)
+            remoteMediator = ClipMediator(mimiDB, domainManager, orderByType, pageCode)
+        ) { mimiDB.postDBItemDao().pagingSourceByPageCode(pageCode) }.flow.map { pagingData ->
+            pagingData.map {
+                it.memberPostItem.toVideoItem()
+            }
+        }
+    }
+
+    private fun clearResult(orderByType: StatisticsOrderType): Flow<Nothing?> {
+        val pageCode = "${ClipMediator::class.java.simpleName}${orderByType.name}"
+        return flow {
+            mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
+            mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
+            emit(null)
+        }
     }
 
     fun getLimitClips(items: ArrayList<VideoItem>): Flow<PagingData<VideoItem>> {

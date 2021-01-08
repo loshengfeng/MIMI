@@ -355,7 +355,6 @@ class ClipSingleFragment : BaseFragment() {
 
             override fun onUpdateCommentCount(count: Int) {
                 playItem?.commentCount = count
-                playItem?.run { LruCacheUtils.putShortVideoDataCache(this.id, this)}
                 tv_comment.text = count.toString()
             }
         }

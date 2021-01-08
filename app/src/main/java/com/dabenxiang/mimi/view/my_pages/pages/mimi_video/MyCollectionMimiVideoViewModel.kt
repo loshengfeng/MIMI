@@ -57,14 +57,6 @@ class MyCollectionMimiVideoViewModel : ClubViewModel() {
                 when (type) {
                     MyPagesType.FAVORITE_MIMI_VIDEO -> changeFavoriteMimiVideoInDb(videoId.toLong(), false, countItem.favoriteCount?.toInt() ?: 0)
                     MyPagesType.FAVORITE_SHORT_VIDEO -> {
-                        LruCacheUtils.putShortVideoDataCache(
-                            videoId.toLong(),
-                            PlayItem(
-                                favorite = false,
-                                favoriteCount = countItem.favoriteCount?.toInt(),
-                                commentCount = countItem.commentCount?.toInt()
-                            )
-                        )
                         changeFavoriteSmallVideoInDb(videoId.toLong(), false, countItem.favoriteCount?.toInt() ?: 0)
                     }
                 }

@@ -117,6 +117,10 @@ class PaymentInfoFragment : BaseFragment() {
                 iv_payment.setImageResource(R.drawable.ico_wechat_pay_160_px)
                 tv_payment_go.setBackgroundResource(R.drawable.bg_green_2_radius_6)
             }
+            PaymentType.TIK_TOK -> {
+                iv_payment.setImageResource(R.drawable.ico_tiktokpay_160_px)
+                tv_payment_go.setBackgroundResource(R.drawable.bg_black_2_radius_6)
+            }
         }
 
         tv_payment_go.setOnClickListener {

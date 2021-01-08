@@ -10,6 +10,7 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiRepository.Companion.ERROR_CODE_ACCOUNT_OVERDUE
 import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.exoplayer2.*
@@ -21,7 +22,8 @@ import timber.log.Timber
 class ClipAdapter(
     private val context: Context,
     private var currentPosition: Int = 0,
-    private var clipFuncItem: ClipFuncItem = ClipFuncItem()
+    private var clipFuncItem: ClipFuncItem = ClipFuncItem(),
+    private val db: MiMiDB
 ) : PagingDataAdapter<VideoItem, ClipViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -93,7 +95,8 @@ class ClipAdapter(
                 R.layout.item_clip,
                 parent,
                 false
-            )
+            ),
+            clipFuncItem, db
         )
     }
 
@@ -144,15 +147,15 @@ class ClipAdapter(
         payloads.takeIf { it.isNotEmpty() }?.also {
             when (it[0] as Int) {
                 PAYLOAD_UPDATE_UI -> {
-                    holder.onBind(item, clipFuncItem)
+                    holder.onBind(item)
                 }
                 PAYLOAD_UPDATE_SCROLL_AWAY -> {
                     holder.ivCover.visibility = View.VISIBLE
-                    holder.onBind(item, clipFuncItem)
+                    holder.onBind(item)
                 }
                 PAYLOAD_UPDATE_AFTER_M3U8 -> {
                     holder.progress.visibility = View.GONE
-                    holder.updateAfterM3U8(item, clipFuncItem, isOverdue)
+                    holder.updateAfterM3U8(item, isOverdue)
                     takeUnless { isOverdue }?.run {
                         processUpdateAfterM3U8Payload(holder, position)
                     }
@@ -165,7 +168,7 @@ class ClipAdapter(
                 }
             }
         } ?: run {
-            holder.onBind(item, clipFuncItem)
+            holder.onBind(item)
             holder.progress.visibility = View.VISIBLE
         }
     }
@@ -215,8 +218,11 @@ class ClipAdapter(
     private fun processClip(playerView: PlayerView, url: String?, position: Int) {
         Timber.d("processClip position:$position, url:$url")
         url?.takeIf { currentPosition == position }?.run {
-            if(url.isNullOrEmpty()) {
-                GeneralUtils.showToast(context, context.resources.getString(R.string.source_not_found))
+            if (url.isNullOrEmpty()) {
+                GeneralUtils.showToast(
+                    context,
+                    context.resources.getString(R.string.source_not_found)
+                )
                 handleOnPlayError()
             } else {
                 releasePlayer()
@@ -292,7 +298,10 @@ class ClipAdapter(
                 ExoPlaybackException.TYPE_SOURCE -> {
                     Timber.d("error: TYPE_SOURCE")
                     //showErrorDialog("SOURCE")
-                    GeneralUtils.showToast(context, context.resources.getString(R.string.source_not_found))
+                    GeneralUtils.showToast(
+                        context,
+                        context.resources.getString(R.string.source_not_found)
+                    )
                 }
                 ExoPlaybackException.TYPE_RENDERER -> {
                     Timber.d("error: TYPE_RENDERER")

@@ -50,7 +50,7 @@ data class MemberPostItem(
         val videoSources: ArrayList<Source> = arrayListOf(),
 
         @ColumnInfo(name = "videoEpisodes")
-        val videoEpisodes: ArrayList<VideoEpisode> = arrayListOf(),
+        var videoEpisodes: ArrayList<VideoEpisode> = arrayListOf(),
 
         @ColumnInfo(name = "videoTimesWatched")
         val videoTimesWatched: Int = 0,
@@ -143,6 +143,38 @@ data class MemberPostItem(
                 cover = cover,
                 likeType = likeType
         )
+    }
+
+    fun toVideoItem(): VideoItem {
+            return VideoItem(
+                    id = id,
+                    title = title,
+                    cover = cover,
+                    type = type,
+                    updateDate = updateDate,
+                    description = videoDescription,
+                    country = videoCountry,
+                    source = videoSource,
+                    sources = videoSources,
+                    videoEpisodes = videoEpisodes,
+                    timesWatched = videoTimesWatched,
+                    performers = videoPerformers,
+                    reported = reported,
+                    deducted = deducted,
+                    like = when(likeType) {
+                      LikeType.LIKE -> true
+                      LikeType.DISLIKE -> true
+                      else -> null
+                    },
+                    likeType = likeType,
+                    likeCount = likeCount,
+                    dislikeCount = dislikeCount,
+                    favorite = isFavorite,
+                    favoriteCount = favoriteCount,
+                    commentCount = commentCount,
+                    tags = tags,
+                    adItem = adItem
+            )
     }
 }
 

@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.lifecycle.viewModelScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,8 +30,12 @@ import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import kotlinx.android.synthetic.main.fragment_club_item.*
 import kotlinx.android.synthetic.main.item_clip_pager.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -195,8 +200,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     private fun getClips() {
         lifecycleScope.launch {
-            viewModel.getClips(orderByType).collectLatest {
-                (rv_clip.adapter as ClipAdapter).submitData(it)
+            viewModel.getClips(orderByType).flowOn(Dispatchers.IO).collectLatest {
+                rv_clip?.run { (this.adapter as ClipAdapter).submitData(it) }
             }
         }
     }
@@ -207,7 +212,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     private fun getLimitClips(items: ArrayList<VideoItem>) {
         lifecycleScope.launch {
             viewModel.getLimitClips(items).collectLatest {
-                (rv_clip.adapter as ClipAdapter).submitData(it)
+                (rv_clip?.adapter as ClipAdapter).submitData(it)
             }
         }
     }
@@ -335,7 +340,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
     }
 
     private val clipAdapter by lazy {
-        val adapter = ClipAdapter(requireContext(), clipFuncItem = clipFuncItem)
+        val adapter = ClipAdapter(requireContext(), clipFuncItem = clipFuncItem, db = viewModel.mimiDB)
         val loadStateListener = { loadStatus: CombinedLoadStates ->
             when (loadStatus.refresh) {
                 is LoadState.Error -> {
@@ -353,7 +358,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                     cl_error?.visibility = View.GONE
 
                     /**API首次載入觸發獲取m3u8流程**/
-                    takeIf { this@ClipPagerFragment.isVisible && adapter.itemCount > 0 }?.let {
+                    takeIf { this@ClipPagerFragment.isVisible && adapter.itemCount > 0}?.let {
                         adapter.getM3U8()
                     }
                 }

@@ -134,11 +134,6 @@ class ClubCommentFragment : BaseFragment() {
                         memberPostItem?.commentCount =
                             memberPostItem?.commentCount?.let { count -> count + 1 } ?: run { 1 }
 
-                        LruCacheUtils.getShortVideoCount(memberPostItem?.id ?: 0)?.run {
-                            this.commentCount = this.commentCount?.let { count -> count + 1 } ?: 1
-                            LruCacheUtils.putShortVideoDataCache(this.id, this)
-                        }
-
                         if (isParent) {
                             memberPostItem?.also { memberPostItem ->
                                 viewModel.getCommentInfo(

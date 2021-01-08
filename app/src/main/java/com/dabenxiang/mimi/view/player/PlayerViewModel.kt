@@ -756,14 +756,6 @@ class PlayerViewModel : BaseViewModel() {
                     else -> (body as ArrayList<*>)[0]
                 }
                 countItem as InteractiveHistoryItem
-                LruCacheUtils.putShortVideoDataCache(
-                    videoId,
-                    PlayItem(
-                        favorite = favoriteVideo.value != true,
-                        favoriteCount = countItem.favoriteCount?.toInt(),
-                        commentCount = countItem.commentCount?.toInt()
-                    )
-                )
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)

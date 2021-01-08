@@ -10,13 +10,15 @@ import com.bumptech.glide.Glide
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.vo.InteractiveHistoryItem
 import com.dabenxiang.mimi.model.api.vo.VideoItem
+import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.widget.utility.LruCacheUtils
 import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.android.synthetic.main.item_clip.view.*
 import kotlinx.android.synthetic.main.recharge_reminder.view.*
 import timber.log.Timber
 
-class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class ClipViewHolder(view: View, private val clipFuncItem: ClipFuncItem, private val db: MiMiDB) :
+    RecyclerView.ViewHolder(view) {
 
     var playerView: PlayerView = view.player_view
     var ivCover: ImageView = view.iv_cover
@@ -32,7 +34,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private var btnVip: View = view.btn_vip
     private var btnPromote: View = view.btn_promote
 
-    fun onBind(item: VideoItem, clipFuncItem: ClipFuncItem) {
+    fun onBind(item: VideoItem) {
         reminder.visibility = View.GONE
         ibReplay.visibility = View.GONE
         ibPlay.visibility = View.GONE
@@ -56,7 +58,7 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    fun updateAfterM3U8(item: VideoItem, clipFuncItem: ClipFuncItem, isOverdue: Boolean) {
+    fun updateAfterM3U8(item: VideoItem, isOverdue: Boolean) {
         if (isOverdue) {
             btnVip.setOnClickListener { clipFuncItem.onVipClick() }
             btnPromote.setOnClickListener { clipFuncItem.onPromoteClick() }
@@ -92,10 +94,10 @@ class ClipViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     fun updateCount(item: VideoItem) {
-        LruCacheUtils.getShortVideoCount(item.id)?.run {
-            this.favoriteCount?.also { count ->  item.favoriteCount = count }
-            this.commentCount?.also { count ->  item.commentCount = count }
-            this.favorite?.also { favorite ->  item.favorite = favorite }
+        db.postDBItemDao().getMemberPostItemByVideoId(item.id)?.run {
+            this.favoriteCount.also { count -> item.favoriteCount = count }
+            this.commentCount.also { count -> item.commentCount = count }
+            this.isFavorite.also { favorite -> item.favorite = favorite }
         }
         tvFavorite.text = item.favoriteCount.toString()
         tvComment.text = item.commentCount.toString()
