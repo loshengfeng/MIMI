@@ -41,15 +41,15 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
     private val viewModel: TopicListViewModel by viewModels()
 
     private val adTop: AdAdapter by lazy {
-        AdAdapter(requireContext())
+        AdAdapter(requireContext(), adClickListener = adClickListener)
     }
 
     private val adBottom: AdAdapter by lazy {
-        AdAdapter(requireContext())
+        AdAdapter(requireContext(), adClickListener = adClickListener)
     }
 
     private val adapter: PostItemAdapter by lazy {
-        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope, AD_GAP)
+        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope, AD_GAP, adClickListener)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item

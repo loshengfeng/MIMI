@@ -51,6 +51,10 @@
         <action
             android:id="@+id/action_to_postVideoFragment"
             app:destination="@id/postVideoFragment" />
+
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -75,6 +79,9 @@
         <action
             android:id="@+id/action_to_clubTabFragment"
             app:destination="@id/clubTabFragment" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -105,6 +112,9 @@
         <action
             android:id="@+id/action_to_clubTabFragment"
             app:destination="@id/clubTabFragment" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -135,6 +145,9 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -195,4 +208,23 @@
         android:id="@+id/postViewerFragment"
         android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
         tools:layout="@layout/fragment_post_viewer" />
+
+    <fragment
+        android:id="@+id/topUpFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
+        android:label="TopUpFragment" >
+        <action
+            android:id="@+id/action_topupFragment_to_orderFragment"
+            app:destination="@id/orderFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
+        <action
+            android:id="@+id/action_topupFragment_to_chatContentFragment"
+            app:destination="@id/chatContentFragment" />
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
 </navigation>

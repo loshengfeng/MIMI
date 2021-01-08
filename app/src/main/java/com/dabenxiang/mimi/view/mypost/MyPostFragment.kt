@@ -52,7 +52,8 @@ class MyPostFragment : BaseFragment() {
         PostItemAdapter(
                 requireContext(),
                 myPostListener,
-                viewModel.viewModelScope
+                viewModel.viewModelScope,
+            adClickListener = adClickListener
         )
     }
 

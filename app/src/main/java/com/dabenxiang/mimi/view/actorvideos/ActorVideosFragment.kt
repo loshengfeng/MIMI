@@ -44,7 +44,7 @@ class ActorVideosFragment : BaseFragment() {
     }
 
     private val generalVideoAdapter by lazy {
-        GeneralVideoAdapter(onItemClick)
+        GeneralVideoAdapter(onItemClick, adClickListener = adClickListener)
     }
 
     private val onItemClick: (StatisticsItem) -> Unit = {

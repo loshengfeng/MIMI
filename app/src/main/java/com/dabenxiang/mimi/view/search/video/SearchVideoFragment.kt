@@ -83,11 +83,11 @@ class SearchVideoFragment : BaseFragment() {
     }
 
     private val adTop: AdAdapter by lazy {
-        AdAdapter(requireContext())
+        AdAdapter(requireContext(), adClickListener = adClickListener)
     }
 
     private val adBottom: AdAdapter by lazy {
-        AdAdapter(requireContext())
+        AdAdapter(requireContext(), adClickListener = adClickListener)
     }
 
     override fun getLayoutId(): Int {

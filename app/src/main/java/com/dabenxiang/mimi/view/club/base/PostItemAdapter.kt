@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdClickListener
 import com.dabenxiang.mimi.callback.MyPostListener
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
@@ -23,7 +24,8 @@ class PostItemAdapter(
     val context: Context,
     private val myPostListener: MyPostListener,
     private val viewModelScope: CoroutineScope,
-    private val adGap: Int? = null
+    private val adGap: Int? = null,
+    private val adClickListener: AdClickListener
 ) : PagingDataAdapter<MemberPostItem, RecyclerView.ViewHolder>(diffCallback) {
 
     override fun getItemViewType(position: Int): Int {
@@ -86,7 +88,7 @@ class PostItemAdapter(
                         .apply(options)
                         .into(holder.adImg)
                     holder.adImg.setOnClickListener {
-                        GeneralUtils.openWebView(context, item.adItem?.target ?: "")
+                        adClickListener.onAdClick(item.adItem!!)
                     }
                 }
 

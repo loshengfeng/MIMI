@@ -8,13 +8,15 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdClickListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.HomeListItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import kotlinx.android.synthetic.main.item_recommend.view.*
 
 class RecommendContentAdapter(
-    private val recommendFuncItem: RecommendFuncItem
+    private val recommendFuncItem: RecommendFuncItem,
+    private val adClickListener: AdClickListener
 ) :
     PagingDataAdapter<HomeListItem, RecyclerView.ViewHolder>(diffCallback) {
     companion object {
@@ -38,7 +40,7 @@ class RecommendContentAdapter(
             VIEW_TYPE_AD -> {
                 val mView = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_ad, parent, false)
-                AdHolder(mView)
+                AdHolder(mView, adClickListener)
             }
 
             else -> {

@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdClickListener
 import com.dabenxiang.mimi.callback.OnItemClickListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
@@ -28,7 +29,8 @@ class ClubCommentAdapter(
     private val memberPostItem: MemberPostItem,
     private val onTextDetailListener: OnTextDetailListener,
     private val onItemClickListener: OnItemClickListener,
-    private var mAdItem: AdItem? = null
+    private var mAdItem: AdItem? = null,
+    private val adClickListener: AdClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
 
     companion object {
@@ -46,7 +48,7 @@ class ClubCommentAdapter(
             VIEW_TYPE_AD -> {
                 mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_ad, parent, false)
-                AdHolder(mView)
+                AdHolder(mView, adClickListener)
             }
 
             VIEW_TYPE_COMMENT_TITLE -> {

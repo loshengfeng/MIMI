@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.RequestOptions
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdClickListener
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -16,7 +17,8 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 class AdAdapter(
     val context: Context,
     var adItem: AdItem = AdItem(),
-    var visibility: Int = View.GONE
+    var visibility: Int = View.GONE,
+    private val adClickListener: AdClickListener
 ) : RecyclerView.Adapter<AdHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdHolder {
         val view = LayoutInflater.from(parent.context)
@@ -39,7 +41,7 @@ class AdAdapter(
             .apply(options)
             .into(holder.adImg)
         holder.adImg.setOnClickListener {
-            GeneralUtils.openWebView(context, adItem?.target )
+            adClickListener.onAdClick(adItem)
         }
     }
 

@@ -45,7 +45,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
     private val myPagesViewModel: MyPagesViewModel by viewModels({ requireParentFragment() })
 
     private val adapter: PostItemAdapter by lazy {
-        PostItemAdapter(requireActivity(), postListener, viewModel.viewModelScope)
+        PostItemAdapter(requireActivity(), postListener, viewModel.viewModelScope, adClickListener = adClickListener)
     }
 
     val pageCode = MyPagesPostMediator::class.simpleName+ myPagesType.toString()

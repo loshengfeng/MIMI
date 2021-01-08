@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdClickListener
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.vo.AdItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
@@ -30,7 +31,8 @@ class ClubPicDetailAdapter(
     private val onPictureDetailListener: OnPictureDetailListener,
     private val onPhotoGridItemClickListener: ClubPhotoGridAdapter.OnItemClickListener,
     private var mAdItem: AdItem? = null,
-    private val clubPostFuncItem: ClubPostFuncItem = ClubPostFuncItem()
+    private val clubPostFuncItem: ClubPostFuncItem = ClubPostFuncItem(),
+    private val adClickListener: AdClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
 
     companion object {
@@ -50,7 +52,7 @@ class ClubPicDetailAdapter(
             VIEW_TYPE_AD -> {
                 mView = LayoutInflater.from(context)
                     .inflate(R.layout.item_ad, parent, false)
-                AdHolder(mView)
+                AdHolder(mView, adClickListener)
             }
             VIEW_TYPE_PICTURE_DETAIL -> {
                 mView = LayoutInflater.from(context)

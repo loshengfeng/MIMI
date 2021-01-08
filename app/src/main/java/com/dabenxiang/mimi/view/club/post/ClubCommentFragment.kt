@@ -224,7 +224,8 @@ class ClubCommentFragment : BaseFragment() {
             requireContext(),
             memberPostItem!!,
             onTextDetailListener,
-            onItemClickListener
+            onItemClickListener,
+            adClickListener = adClickListener
         )
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = textDetailAdapter

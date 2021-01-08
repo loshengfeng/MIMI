@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdClickListener
 import com.dabenxiang.mimi.callback.OnMeMoreDialogListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -39,8 +40,8 @@ import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
-
 import com.dabenxiang.mimi.view.post.utility.PostManager
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
@@ -97,6 +98,20 @@ abstract class BaseFragment : Fragment() {
     private var postClubItem = PostClubItem()
 
     var timeout= 5
+
+    val adClickListener = object : AdClickListener {
+        override fun onAdClick(adItem: AdItem) {
+            if (adItem.targetType == 1) {
+                checkStatus {
+                    navigateTo(NavigateItem.Destination(R.id.action_to_topUpFragment))
+                    mainViewModel?.setAdUrlToServer(adItem.target)
+                }
+            } else {
+                GeneralUtils.openWebView(requireContext(), adItem.target)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.let { mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java) }

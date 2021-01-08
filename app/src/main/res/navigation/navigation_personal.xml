@@ -277,6 +277,9 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -356,6 +359,9 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -377,6 +383,9 @@
         <action
             android:id="@+id/action_to_postPicFragment"
             app:destination="@id/postPicFragment" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -401,6 +410,9 @@
         <action
             android:id="@+id/action_to_postVideoFragment"
             app:destination="@+id/postVideoFragment" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -419,6 +431,9 @@
         <action
             android:id="@+id/action_searchVideoFragment_to_clipSingleFragment"
             app:destination="@id/clipSingleFragment" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment

@@ -46,6 +46,12 @@
         <action
             android:id="@+id/action_to_inviteVipFragment"
             app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
 
     </fragment>
 
@@ -121,6 +127,9 @@
         <action
             android:id="@+id/action_searchVideoFragment_to_clipSingleFragment"
             app:destination="@id/clipSingleFragment" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -156,6 +165,9 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
     </fragment>
 
     <fragment
@@ -188,6 +200,28 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/topUpFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
+        android:label="TopUpFragment" >
+        <action
+            android:id="@+id/action_topupFragment_to_orderFragment"
+            app:destination="@id/orderFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
+        <action
+            android:id="@+id/action_topupFragment_to_chatContentFragment"
+            app:destination="@id/chatContentFragment" />
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
 </navigation>

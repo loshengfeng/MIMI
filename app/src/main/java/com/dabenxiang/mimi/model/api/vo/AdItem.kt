@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.model.api.vo
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class AdItem(
     @SerializedName("href")
@@ -12,8 +13,11 @@ data class AdItem(
     val targetType: Int = 0,
 
     @SerializedName("target")
-    val target: String = ""
-)
+    val target: String = "",
+
+    @SerializedName("custom")
+    val custom: String = ""
+) : Serializable
 
 class AdItemConverters {
 
