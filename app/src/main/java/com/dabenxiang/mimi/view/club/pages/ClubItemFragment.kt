@@ -216,8 +216,6 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
         )
         if (adapter.snapshot().items.isEmpty()) {
             adapter.refresh()
-        }else{
-            adapter.notifyDataSetChanged()
         }
     }
 
