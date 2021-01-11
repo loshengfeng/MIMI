@@ -126,6 +126,7 @@ class ClubCommentFragment : BaseFragment() {
                         val isParent = et_message.tag == null
 
                         GeneralUtils.hideKeyboard(requireActivity())
+                        btn_send.isEnabled = true
                         et_message.text = null
                         et_message.tag = null
                         tv_replay_name.text = null
@@ -203,6 +204,7 @@ class ClubCommentFragment : BaseFragment() {
                     }?.also { (id, comment) ->
                         val replyId = et_message.tag?.let { rid -> rid as Long }
                         val replyName = tv_replay_name.text.toString()
+                        btn_send.isEnabled = false
                         viewModel.postComment(id, replyId, "$replyName $comment")
                     }
                 }
@@ -346,6 +348,7 @@ class ClubCommentFragment : BaseFragment() {
         override fun onItemClick() {
             GeneralUtils.hideKeyboard(requireActivity())
             et_message.setText("")
+            btn_send.isEnabled = true
         }
     }
 
