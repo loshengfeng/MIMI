@@ -90,6 +90,9 @@
         <action
             android:id="@+id/action_to_topup"
             app:destination="@id/navigation_topup" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
