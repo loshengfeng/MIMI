@@ -155,12 +155,11 @@ class ClubPicDetailFragment : BaseFragment() {
 
     private fun likePost(
         memberPostItem: MemberPostItem,
-        isLike: Boolean,
         type: LikeType,
         originType: LikeType?,
-        update: (Boolean, MemberPostItem) -> Unit
+        update: (MemberPostItem) -> Unit
     ) {
-        checkStatus { viewModel.likePost(memberPostItem, isLike, type, originType, update) }
+        checkStatus { viewModel.likePost(memberPostItem, type, originType, update) }
     }
 
     private val clubPostFuncItem by lazy {
@@ -168,7 +167,7 @@ class ClubPicDetailFragment : BaseFragment() {
             {},
             { id, view, type -> viewModel.loadImage(id, view, type) },
             { item, items, isFollow, func -> followMember(item, items, isFollow, func) },
-            { item, isLike, type, originType, func -> likePost(item, isLike, type, originType, func) },
+            { item, type, originType, func -> likePost(item, type, originType, func) },
             { item, isFavorite, func -> favoritePost(item, isFavorite, func) }
         )
     }

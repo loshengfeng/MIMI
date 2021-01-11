@@ -28,9 +28,9 @@ class LikeMimiVideoAdapter(
 ) : PagingDataAdapter<PlayItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
-        const val PAYLOAD_UPDATE_LIKE = 0
-        const val PAYLOAD_UPDATE_FAVORITE = 1
-        const val PAYLOAD_UPDATE_FOLLOW = 2
+        const val UPDATE_LIKE = 0
+        const val UPDATE_FAVORITE = 1
+        const val UPDATE_FOLLOW = 2
 
         const val MIMI_VIDEO = 3
         const val SHORT_VIDEO = 5

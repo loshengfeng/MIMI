@@ -9,7 +9,6 @@ import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.CommentType
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.view.base.BaseViewModel
-import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.view.player.CommentAdapter
 import com.dabenxiang.mimi.view.player.CommentDataSource
 import com.dabenxiang.mimi.view.player.NestedCommentNode
@@ -129,7 +128,7 @@ class ClubTextDetailViewModel : BaseViewModel() {
                     }
                 } as InteractiveHistoryItem
                 item.isFavorite = isFavorite
-                item.favoriteCount = countItem.favoriteCount?.toInt()?:0
+                item.favoriteCount = countItem.favoriteCount?.toInt() ?: 0
                 changeFavoritePostInDb(item.id, isFavorite, item.favoriteCount)
                 emit(ApiResult.success(item))
             }
@@ -149,63 +148,70 @@ class ClubTextDetailViewModel : BaseViewModel() {
 
     fun likePost(
         item: MemberPostItem,
-        isLike: Boolean,
-        type: LikeType,
+        clickType: LikeType,
         originType: LikeType?,
-        update: (Boolean, MemberPostItem) -> Unit
+        update: (MemberPostItem) -> Unit
     ) {
         viewModelScope.launch {
-            var like = isLike
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                if (isLike) {
-                    val request = LikeRequest(type)
-                    val result = apiRepository.like(item.id, request)
-                    if (!result.isSuccessful) throw HttpException(result)
+                when (clickType) {
+                    LikeType.LIKE -> {
+                        when (originType) {
+                            LikeType.LIKE -> {
+                                val result = apiRepository.deleteLike(item.id)
+                                if (!result.isSuccessful) throw HttpException(result)
 
-                    item.likeType = type
+                                item.likeType = null
 
-                    result.body()?.content?.also {
-                        item.likeCount = it.likeCount?.toInt() ?: 0
-                        item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                                result.body()?.content?.get(0)?.also {
+                                    item.likeCount = it.likeCount?.toInt() ?: 0
+                                    item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                                }
+                            }
+                            else -> {
+                                val request = LikeRequest(LikeType.LIKE)
+                                val result = apiRepository.like(item.id, request)
+                                if (!result.isSuccessful) throw HttpException(result)
+
+                                item.likeType = LikeType.LIKE
+
+                                result.body()?.content?.also {
+                                    item.likeCount = it.likeCount?.toInt() ?: 0
+                                    item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                                }
+                            }
+                        }
                     }
-                } else {
-                    if (originType == type) {
-                        val result = apiRepository.deleteLike(item.id)
-                        if (!result.isSuccessful) throw HttpException(result)
+                    LikeType.DISLIKE -> {
+                        when (originType) {
+                            LikeType.DISLIKE -> {
+                                val result = apiRepository.deleteLike(item.id)
+                                if (!result.isSuccessful) throw HttpException(result)
 
-                        item.likeType = null
+                                item.likeType = null
 
-                        result.body()?.content?.get(0)?.also {
-                            item.likeCount = it.likeCount?.toInt() ?: 0
-                            item.dislikeCount = it.dislikeCount?.toInt() ?: 0
-                        }
-                    } else if (originType == LikeType.LIKE) {
-                        val request = LikeRequest(LikeType.DISLIKE)
-                        val result = apiRepository.like(item.id, request)
-                        if (!result.isSuccessful) throw HttpException(result)
+                                result.body()?.content?.get(0)?.also {
+                                    item.likeCount = it.likeCount?.toInt() ?: 0
+                                    item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                                }
+                            }
+                            else -> {
+                                val request = LikeRequest(LikeType.DISLIKE)
+                                val result = apiRepository.like(item.id, request)
+                                if (!result.isSuccessful) throw HttpException(result)
 
-                        like = true
-                        item.likeType = LikeType.DISLIKE
+                                item.likeType = LikeType.DISLIKE
 
-                        result.body()?.content?.also {
-                            item.likeCount = it.likeCount?.toInt() ?: 0
-                            item.dislikeCount = it.dislikeCount?.toInt() ?: 0
-                        }
-                    } else if (originType == LikeType.DISLIKE) {
-                        val request = LikeRequest(LikeType.DISLIKE)
-                        val result = apiRepository.like(item.id, request)
-                        if (!result.isSuccessful) throw HttpException(result)
-
-                        like = true
-                        item.likeType = LikeType.LIKE
-
-                        result.body()?.content?.also {
-                            item.likeCount = it.likeCount?.toInt() ?: 0
-                            item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                                result.body()?.content?.also {
+                                    item.likeCount = it.likeCount?.toInt() ?: 0
+                                    item.dislikeCount = it.dislikeCount?.toInt() ?: 0
+                                }
+                            }
                         }
                     }
                 }
+
                 changeLikePostInDb(item.id, item.likeType, item.likeCount)
                 emit(ApiResult.success(item))
             }
@@ -216,49 +222,13 @@ class ClubTextDetailViewModel : BaseViewModel() {
                 .collect {
                     when (it) {
                         is ApiResult.Success -> {
-                            update(like, it.result)
+                            update(it.result)
 //                            getAllOtherPosts(lastPosition)
                         }
                     }
                 }
         }
     }
-
-//    fun likePost(item: MemberPostItem, isLike: Boolean, update: (Boolean, Int) -> Unit) {
-//        Log.d("arvin", "isLike : " + isLike)
-//        viewModelScope.launch {
-//            flow {
-//                val apiRepository = domainManager.getApiRepository()
-//                val likeType = when {
-//                    isLike -> LikeType.LIKE
-//                    else -> LikeType.DISLIKE
-//                }
-//                val request = LikeRequest(likeType)
-//                val result = apiRepository.like(item.id, request)
-//                if (!result.isSuccessful) throw HttpException(result)
-//
-////                item.likeType = likeType
-//                item.likeCount = when (item.likeType) {
-//                    LikeType.LIKE -> item.likeCount + 1
-//                    else -> item.likeCount - 1
-//                }
-//
-//                emit(ApiResult.success(item.likeCount))
-//            }
-//                .flowOn(Dispatchers.IO)
-//                .onStart { emit(ApiResult.loading()) }
-//                .onCompletion { emit(ApiResult.loaded()) }
-//                .catch { e -> emit(ApiResult.error(e)) }
-//                .collect {
-//                    when (it) {
-//                        is ApiResult.Success -> {
-//                            update(isLike, it.result)
-////                            getAllOtherPosts(lastPosition)
-//                        }
-//                    }
-//                }
-//        }
-//    }
 
     fun followMember(
         item: MemberPostItem,

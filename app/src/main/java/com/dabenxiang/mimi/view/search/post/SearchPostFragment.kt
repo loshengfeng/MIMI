@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.AdultTabType
 import com.dabenxiang.mimi.model.enums.AttachmentType
@@ -36,21 +37,16 @@ import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment.Companion.MEMBER_DATA
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_FAVORITE
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter.Companion.UPDATE_LIKE
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_search_post.*
-import kotlinx.android.synthetic.main.fragment_search_post.chip_group_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.ib_back
-import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_history
-import kotlinx.android.synthetic.main.fragment_search_post.iv_clear_search_bar
-import kotlinx.android.synthetic.main.fragment_search_post.layout_search_history
-import kotlinx.android.synthetic.main.fragment_search_post.layout_search_text
-import kotlinx.android.synthetic.main.fragment_search_post.search_bar
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search
-import kotlinx.android.synthetic.main.fragment_search_post.tv_search_text
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import timber.log.Timber
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 class SearchPostFragment : BaseFragment() {
 
@@ -330,6 +326,28 @@ class SearchPostFragment : BaseFragment() {
     }
 
     override fun setupObservers() {
+        viewModel.likePostResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_LIKE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.favoriteResult.observe(viewLifecycleOwner, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, UPDATE_FAVORITE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.searchTotalCount.observe(viewLifecycleOwner, { count ->
             if (search_bar.text.isNotBlank()) setSearchResultText(count)
         })

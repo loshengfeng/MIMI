@@ -30,8 +30,8 @@ abstract class ClubViewModel : BaseViewModel() {
     private var _likePostResult = MutableLiveData<ApiResult<Int>>()
     val likePostResult: LiveData<ApiResult<Int>> = _likePostResult
 
-    private var _videoLikeResult = MutableLiveData<ApiResult<VideoItem>>()
-    val videoLikeResult: LiveData<ApiResult<VideoItem>> = _videoLikeResult
+    private var _videoLikeResult = MutableLiveData<ApiResult<Int>>()
+    val videoLikeResult: LiveData<ApiResult<Int>> = _videoLikeResult
 
     private var _favoriteResult = MutableLiveData<ApiResult<Int>>()
     val favoriteResult: LiveData<ApiResult<Int>> = _favoriteResult
@@ -76,6 +76,8 @@ abstract class ClubViewModel : BaseViewModel() {
                         else -> (it as ArrayList<*>)[0]
                     }
                 } as InteractiveHistoryItem
+                item.isFavorite = isFavorite
+                item.favoriteCount = countItem.favoriteCount?.toInt()?:0
                 changeFavoritePostInDb(item.id, isFavorite, countItem.favoriteCount?.toInt()?:0)
                 emit(ApiResult.success(position))
             }
@@ -96,11 +98,7 @@ abstract class ClubViewModel : BaseViewModel() {
             Timber.i("likePost item=$item")
             flow {
                 val apiRepository = domainManager.getApiRepository()
-                val likeType: LikeType = when {
-                    isLike -> LikeType.LIKE
-                    else -> LikeType.DISLIKE
-                }
-                val request = LikeRequest(likeType)
+                val request = LikeRequest(LikeType.LIKE)
                 val result = when {
                     isLike -> apiRepository.like(item.id, request)
                     else -> apiRepository.deleteLike(item.id)
@@ -112,9 +110,9 @@ abstract class ClubViewModel : BaseViewModel() {
                         else -> (it as ArrayList<*>)[0]
                     }
                 } as InteractiveHistoryItem
-                item.likeType = if (isLike) LikeType.LIKE else LikeType.DISLIKE
+                item.likeType = if (isLike) LikeType.LIKE else null
                 item.likeCount = countItem.likeCount?.toInt() ?: 0
-                changeLikePostInDb(item.id, if (isLike) LikeType.LIKE else null, item.likeCount)
+                changeLikePostInDb(item.id, if (isLike) LikeType.LIKE else null, countItem.likeCount?.toInt() ?: 0)
                 emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
@@ -127,7 +125,7 @@ abstract class ClubViewModel : BaseViewModel() {
         }
     }
 
-    fun videoLike(item: VideoItem, type: LikeType?, pageType: MyPagesType) {
+    fun videoLike(item: VideoItem, position: Int, type: LikeType?, pageType: MyPagesType) {
         viewModelScope.launch {
             flow {
                 val apiRepository = domainManager.getApiRepository()
@@ -140,7 +138,7 @@ abstract class ClubViewModel : BaseViewModel() {
                     MyPagesType.FAVORITE_MIMI_VIDEO,
                     MyPagesType.LIKE_MIMI -> changeLikeMimiVideoInDb(item.id, type, item.likeCount)
                 }
-                emit(ApiResult.success(item))
+                emit(ApiResult.success(position))
             }
                 .flowOn(Dispatchers.IO)
                 .onStart { emit(ApiResult.loading()) }

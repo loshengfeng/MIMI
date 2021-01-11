@@ -272,7 +272,7 @@ class TopUpFragment : BaseFragment() {
                 "Alipay" -> requireContext().getDrawable(R.drawable.ico_alipay)
                 "WeChat" -> requireContext().getDrawable(R.drawable.ico_wechat_pay)
                 "UnionPay" -> requireContext().getDrawable(R.drawable.ico_bank)
-                "TikTok" -> requireContext().getDrawable(R.drawable.ico_tiktokpay_160_px)
+                "TikTok" -> requireContext().getDrawable(R.drawable.ico_tiktokpay)
                 else -> requireContext().getDrawable(R.drawable.ico_bank)
             }
         )

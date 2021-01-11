@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
@@ -85,9 +86,19 @@ class MyFavoritesFragment(
             }
         })
 
+        viewModel.likePostResult.observe(this){
+            when (it) {
+                is ApiResult.Success -> {
+                    adapter.notifyItemChanged(it.result, PostItemAdapter.UPDATE_INTERACTIVE)
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        }
+
         viewModel.favoriteResult.observe(this, {
             when (it) {
                 is ApiResult.Success -> {
+                    adapter.notifyItemChanged(it.result, PostItemAdapter.UPDATE_INTERACTIVE)
                     if(adapter.snapshot().items.size <=1) {
                         viewModel.viewModelScope.launch {
                             val dbSize=viewModel.checkoutItemsSize(pageCode)

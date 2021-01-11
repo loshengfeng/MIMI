@@ -13,6 +13,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.MyPostListener
+import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.MemberClubItem
 import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.*
@@ -93,6 +94,28 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
             adBottom.visibility = View.VISIBLE
             adBottom.notifyDataSetChanged()
         }
+
+        viewModel.likePostResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, PostItemAdapter.UPDATE_INTERACTIVE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
+        viewModel.favoriteResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, PostItemAdapter.UPDATE_INTERACTIVE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
     }
 
     private fun emptyPageToggle(isHide:Boolean){
@@ -204,9 +227,6 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
             if (viewModel.accountManager.isLogin()) {
                 viewModel.likePost(item, position, isLike)
             } else {
-                item.likeCount -= 1
-                item.likeType =
-                        if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
                 navigateTo(
                         NavigateItem.Destination(
                                 R.id.action_to_loginFragment,
@@ -259,8 +279,6 @@ class TopicListFragment(private val memberClubItem: MemberClubItem, private val 
             if (viewModel.accountManager.isLogin()) {
                 viewModel.favoritePost(item, position, isFavorite)
             } else {
-                item.favoriteCount -= 1
-                item.isFavorite = !item.isFavorite
                 navigateTo(
                         NavigateItem.Destination(
                                 R.id.action_to_loginFragment,

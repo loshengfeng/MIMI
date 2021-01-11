@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.model.enums.FunctionType
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.AdHolder
 import com.dabenxiang.mimi.view.adapter.viewHolder.SearchVideoViewHolder
+import com.dabenxiang.mimi.view.search.post.SearchPostAdapter
 
 class SearchVideoAdapter(
     val context: Context,
@@ -29,6 +30,7 @@ class SearchVideoAdapter(
     companion object {
         const val UPDATE_LIKE = 0
         const val UPDATE_FAVORITE = 1
+        const val UPDATE_INTERACTIVE = 2
 
         const val VIEW_TYPE_VIDEO = 0
         const val VIEW_TYPE_AD = 1
@@ -37,13 +39,20 @@ class SearchVideoAdapter(
             override fun areItemsTheSame(
                 oldItem: MemberPostItem,
                 newItem: MemberPostItem
-            ): Boolean = oldItem == newItem
+            ): Boolean = oldItem.id == newItem.id
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(
                 oldItem: MemberPostItem,
                 newItem: MemberPostItem
             ): Boolean = oldItem == newItem
+
+            override fun getChangePayload(oldItem: MemberPostItem, newItem: MemberPostItem): Any? {
+                return when {
+                    oldItem.likeType != newItem.likeType || oldItem.likeCount != newItem.likeCount || oldItem.isFavorite != newItem.isFavorite || oldItem.favoriteCount != newItem.favoriteCount -> UPDATE_INTERACTIVE
+                    else -> null
+                }
+            }
         }
     }
 
@@ -81,19 +90,27 @@ class SearchVideoAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        val item = getItem(position)?:MemberPostItem()
+        val item = getItem(position) ?: MemberPostItem()
         when (holder) {
             is AdHolder -> {
-                holder.onBind(item.adItem?: AdItem())
+                holder.onBind(item.adItem ?: AdItem())
             }
             is SearchVideoViewHolder -> {
                 if (payloads.size == 1) {
                     when (payloads[0]) {
                         UPDATE_LIKE -> holder.updateLike(item)
                         UPDATE_FAVORITE -> holder.updateFavorite(item)
+                        UPDATE_INTERACTIVE -> holder.updateInteractive(item)
                     }
                 } else {
-                    holder.onBind(item, position, listener, getSearchText.invoke(), getSearchTag.invoke(), 5)
+                    holder.onBind(
+                        item,
+                        position,
+                        listener,
+                        getSearchText.invoke(),
+                        getSearchTag.invoke(),
+                        5
+                    )
                 }
             }
         }

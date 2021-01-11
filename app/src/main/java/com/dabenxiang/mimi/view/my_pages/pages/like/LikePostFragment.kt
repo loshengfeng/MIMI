@@ -71,9 +71,21 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
             }
         })
 
+        viewModel.favoriteResult.observe(this, {
+            when (it) {
+                is ApiResult.Success -> {
+                    it.result.let { position ->
+                        adapter.notifyItemChanged(position, PostItemAdapter.UPDATE_INTERACTIVE)
+                    }
+                }
+                is ApiResult.Error -> onApiError(it.throwable)
+            }
+        })
+
         viewModel.likePostResult.observe(this){
             when (it) {
                 is ApiResult.Success -> {
+                    adapter.notifyItemChanged(it.result, PostItemAdapter.UPDATE_INTERACTIVE)
                     if(adapter.snapshot().items.size <=1) {
                         viewModel.viewModelScope.launch {
                             val dbSize=viewModel.checkoutItemsSize(pageCode)

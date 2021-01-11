@@ -185,22 +185,18 @@ class ClubPicDetailAdapter(
                 }
 
                 holder.imgLike.setOnClickListener {
-                    val isLike = memberPostItem.likeType != null
                     clubPostFuncItem.onLikeClick(
                         memberPostItem,
-                        !isLike,
                         LikeType.LIKE,
                         memberPostItem.likeType
-                    ) { like, item -> updateLike(like, item, holder) }
+                    ) { item -> updateLike(item, holder) }
                 }
                 holder.imgDislike.setOnClickListener {
-                    val isLike = memberPostItem.likeType != null
                     clubPostFuncItem.onLikeClick(
                         memberPostItem,
-                        !isLike,
                         LikeType.DISLIKE,
                         memberPostItem.likeType
-                    ) { like, item -> updateLike(like, item, holder) }
+                    ) { item -> updateLike(item, holder) }
                 }
                 holder.imgFavorite.setOnClickListener {
                     val isFavorite = memberPostItem.isFavorite
@@ -235,11 +231,11 @@ class ClubPicDetailAdapter(
         mAdItem = item
     }
 
-    private fun updateLike(isLike: Boolean, item: MemberPostItem, holder: PictureDetailViewHolder) {
-        if (isLike && item.likeType == LikeType.LIKE) {
+    private fun updateLike(item: MemberPostItem, holder: PictureDetailViewHolder) {
+        if (item.likeType == LikeType.LIKE) {
             holder.imgLike.setImageResource(R.drawable.ico_nice_s)
             holder.imgDislike.setImageResource(R.drawable.ico_bad)
-        } else if (isLike && item.likeType == LikeType.DISLIKE) {
+        } else if (item.likeType == LikeType.DISLIKE) {
             holder.imgDislike.setImageResource(R.drawable.ico_bad_s)
             holder.imgLike.setImageResource(R.drawable.ico_nice)
         } else {

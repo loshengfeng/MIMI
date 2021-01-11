@@ -166,14 +166,14 @@ class MyPostClipPostHolder(
 
         updateFavorite(item)
         val onFavoriteClickListener = View.OnClickListener {
-            item.isFavorite = !item.isFavorite
-            item.favoriteCount =
-                if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
-            updateFavorite(item)
+//            item.isFavorite = !item.isFavorite
+//            item.favoriteCount =
+//                if (item.isFavorite) item.favoriteCount + 1 else item.favoriteCount - 1
+//            updateFavorite(item)
             myPostListener.onFavoriteClick(
                 item,
                 position,
-                item.isFavorite,
+                !item.isFavorite,
                 AttachmentType.ADULT_HOME_CLIP
             )
         }
@@ -182,11 +182,11 @@ class MyPostClipPostHolder(
 
         updateLike(item)
         val onLikeClickListener = View.OnClickListener {
-            item.likeType = if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
-            item.likeCount =
-                if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
-            updateLike(item)
-            myPostListener.onLikeClick(item, position, item.likeType == LikeType.LIKE)
+//            item.likeType = if (item.likeType == LikeType.LIKE) null else LikeType.LIKE
+//            item.likeCount =
+//                if (item.likeType == LikeType.LIKE) item.likeCount + 1 else item.likeCount - 1
+//            updateLike(item)
+            myPostListener.onLikeClick(item, position, item.likeType != LikeType.LIKE)
         }
         ivLike.setOnClickListener(onLikeClickListener)
         tvLikeCount.setOnClickListener(onLikeClickListener)
@@ -231,5 +231,10 @@ class MyPostClipPostHolder(
         } else {
             ivFavorite.setImageResource(R.drawable.btn_favorite_n)
         }
+    }
+
+    fun updateInteractive(item: MemberPostItem) {
+        updateFavorite(item)
+        updateLike(item)
     }
 }

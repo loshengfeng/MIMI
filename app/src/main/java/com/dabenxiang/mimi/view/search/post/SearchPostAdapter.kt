@@ -13,6 +13,7 @@ import com.dabenxiang.mimi.model.api.vo.MemberPostItem
 import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.adapter.viewHolder.*
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.search.video.SearchVideoAdapter
 import kotlinx.coroutines.CoroutineScope
 
 class SearchPostAdapter(
@@ -25,6 +26,7 @@ class SearchPostAdapter(
     companion object {
         const val UPDATE_LIKE = 0
         const val UPDATE_FAVORITE = 1
+        const val UPDATE_INTERACTIVE = 2
 
         const val VIEW_TYPE_CLIP = 0
         const val VIEW_TYPE_PICTURE = 1
@@ -41,6 +43,13 @@ class SearchPostAdapter(
                 oldItem: MemberPostItem,
                 newItem: MemberPostItem
             ): Boolean = oldItem == newItem
+
+            override fun getChangePayload(oldItem: MemberPostItem, newItem: MemberPostItem): Any? {
+                return when {
+                    oldItem.likeType != newItem.likeType || oldItem.likeCount != newItem.likeCount || oldItem.isFavorite != newItem.isFavorite || oldItem.favoriteCount != newItem.favoriteCount -> UPDATE_INTERACTIVE
+                    else -> null
+                }
+            }
         }
     }
 
@@ -105,6 +114,7 @@ class SearchPostAdapter(
                         when (payloads[0]) {
                             UPDATE_LIKE -> holder.updateLike(item)
                             UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            UPDATE_INTERACTIVE -> holder.updateInteractive(item)
                         }
                     } else {
                         holder.onBind(
@@ -123,6 +133,7 @@ class SearchPostAdapter(
                         when (payloads[0]) {
                             UPDATE_LIKE -> holder.updateLike(item)
                             UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            UPDATE_INTERACTIVE -> holder.updateInteractive(item)
                         }
                     } else {
                         holder.pictureRecycler.tag = position
@@ -142,6 +153,7 @@ class SearchPostAdapter(
                         when (payloads[0]) {
                             UPDATE_LIKE -> holder.updateLike(item)
                             UPDATE_FAVORITE -> holder.updateFavorite(item)
+                            UPDATE_INTERACTIVE -> holder.updateInteractive(item)
                         }
                     } else {
                         holder.onBind(
