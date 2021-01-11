@@ -37,6 +37,7 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
+import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
@@ -63,6 +64,8 @@ abstract class BaseFragment : Fragment() {
         const val PERMISSION_VIDEO_REQUEST_CODE = 20001
         const val PERMISSION_PIC_REQUEST_CODE = 20002
         const val PERMISSION_GALLERY_REQUEST_CODE = 20003
+
+        private const val PAYMENT = "payment="
     }
 
     open var mainViewModel: MainViewModel? = null
@@ -103,7 +106,20 @@ abstract class BaseFragment : Fragment() {
         override fun onAdClick(adItem: AdItem) {
             if (adItem.targetType == 1) {
                 checkStatus {
-                    navigateTo(NavigateItem.Destination(R.id.action_to_topUpFragment))
+                    if (adItem.custom == PAYMENT) {
+                        navigateTo(NavigateItem.Destination(R.id.action_to_topUpFragment))
+                    } else {
+                        val jsonStr = adItem.custom.replace(PAYMENT, "")
+                        val selectItem = Gson().fromJson(jsonStr, OrderingPackageItem::class.java)
+                        val bundle = OrderInfoFragment.createBundle(selectItem)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_orderInfoFragment,
+                                bundle
+                            )
+                        )
+                    }
+
                     mainViewModel?.setAdUrlToServer(adItem.target)
                 }
             } else {

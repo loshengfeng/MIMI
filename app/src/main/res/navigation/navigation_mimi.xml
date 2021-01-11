@@ -52,6 +52,9 @@
         <action
             android:id="@+id/action_to_topUpFragment"
             app:destination="@id/topUpFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
 
     </fragment>
 
@@ -106,6 +109,14 @@
             android:id="@+id/action_to_navigation_player"
             app:destination="@id/navigation_player" />
 
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
+
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
+
     </fragment>
 
     <fragment
@@ -130,6 +141,9 @@
         <action
             android:id="@+id/action_to_topUpFragment"
             app:destination="@id/topUpFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
     </fragment>
 
     <fragment
@@ -168,6 +182,9 @@
         <action
             android:id="@+id/action_to_topUpFragment"
             app:destination="@id/topUpFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
     </fragment>
 
     <fragment
@@ -203,6 +220,9 @@
         <action
             android:id="@+id/action_to_topUpFragment"
             app:destination="@id/topUpFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
     </fragment>
 
     <fragment
@@ -222,6 +242,15 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderInfoFragment"
+        android:name="com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment"
+        android:label="OrderInfoFragment">
+        <action
+            android:id="@+id/action_orderInfoFragment_to_orderResultFragment"
+            app:destination="@id/orderResultFragment" />
     </fragment>
 
 </navigation>
