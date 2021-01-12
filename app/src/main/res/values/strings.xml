@@ -302,7 +302,7 @@
 
     <!-- Player -->
     <string name="introduction">简介</string>
-    <string name="player_info_format">更新: %-20s地區: %s</string>
+    <string name="player_info_format">更新: %-20s地区: %s</string>
     <string name="write_comment">留下评论</string>
     <string name="point_not_enough">点数不足</string>
     <string name="point_not_enough_message">&lt;font color=\"#000000\"&gt;请先至充值页面，&lt;/font&gt;&lt;font color=\"#ff4d4d\"&gt;充值&lt;/font&gt;&lt;font color=\"#000000\"&gt;去吧&lt;/font&gt;</string>
