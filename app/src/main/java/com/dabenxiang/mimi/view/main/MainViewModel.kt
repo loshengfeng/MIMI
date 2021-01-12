@@ -143,6 +143,8 @@ class MainViewModel : BaseViewModel() {
 
     val closeAppFromMqtt = MutableLiveData<String>()
 
+    var onTabReselect: (() -> Unit) = {}
+
     private var job = Job()
 
     fun setupNormalCategoriesItem(item: CategoriesItem?) {

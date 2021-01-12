@@ -145,6 +145,11 @@ abstract class BaseFragment : Fragment() {
         return mView
     }
 
+    override fun onResume() {
+        super.onResume()
+        mainViewModel?.onTabReselect = { onTabReselect() }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -171,6 +176,8 @@ abstract class BaseFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         resetObservers()
+//        mainViewModel?.onTabReselect = {
+//            Timber.d("@@onTabReselect") }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -903,4 +910,6 @@ abstract class BaseFragment : Fragment() {
             )
         }
     }
+
+    open fun onTabReselect() {}
 }
