@@ -59,13 +59,13 @@ class ClipAdapter(
     private var interactiveHistoryItem: InteractiveHistoryItem? = null
 
     fun getM3U8() {
-        getItem(currentPosition)?.run {
+        takeIf { currentPosition < itemCount }?.getItem(currentPosition)?.run {
             clipFuncItem.getM3U8(this, currentPosition, ::updateAfterM3U8)
         }
     }
 
     fun getInteractiveHistory() {
-        getItem(currentPosition)?.run {
+        takeIf { currentPosition < itemCount }?.getItem(currentPosition)?.run {
             clipFuncItem.getInteractiveHistory(this, currentPosition, ::updateAfterHistory)
         }
     }
@@ -105,7 +105,7 @@ class ClipAdapter(
     }
 
     fun getVideoItem(position: Int): VideoItem? {
-        return takeIf { itemCount > 0 }?.let { getItem(position) }
+        return takeIf { position < itemCount }?.let { getItem(position) }
     }
 
     fun updateCurrentPosition(position: Int) {
@@ -142,8 +142,8 @@ class ClipAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
-        Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
-        val item = getItem(position) ?: VideoItem()
+        Timber.d("@@onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
+        val item = takeIf { position < itemCount }?.getItem(position) ?: VideoItem()
         payloads.takeIf { it.isNotEmpty() }?.onEach { payload ->
             when (payload as Int) {
                 PAYLOAD_UPDATE_UI -> {
