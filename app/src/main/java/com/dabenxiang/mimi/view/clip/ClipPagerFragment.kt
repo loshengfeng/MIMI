@@ -76,6 +76,10 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 getLimitClips(ArrayList(this.filterIsInstance<VideoItem>()))
             } ?: run { getClips() }
         }
+
+        swipeRefreshLayout.setProgressViewOffset(false,
+            resources.getDimensionPixelSize(R.dimen.refresher_offset),
+            resources.getDimensionPixelSize(R.dimen.refresher_offset_end))
     }
 
     override fun setupObservers() {
@@ -137,6 +141,12 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
         btn_retry.setOnClickListener {
             progressHUD.show()
             getClips()
+        }
+
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            progressHUD.show()
+            clipAdapter.refresh()
         }
     }
 

@@ -13,4 +13,6 @@
     <dimen name="zero">0dp</dimen>
     <dimen name="big_margin">34dp</dimen>
     <dimen name="dialog_padding">5dp</dimen>
+    <dimen name="refresher_offset">50dp</dimen>
+    <dimen name="refresher_offset_end">100dp</dimen>
 </resources>

@@ -105,7 +105,7 @@ class ClipAdapter(
     }
 
     fun getVideoItem(position: Int): VideoItem? {
-        return getItem(position)
+        return takeIf { itemCount > 0 }?.let { getItem(position) }
     }
 
     fun updateCurrentPosition(position: Int) {

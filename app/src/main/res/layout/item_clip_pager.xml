@@ -5,14 +5,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/color_black_1"
     android:keepScreenOn="true">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_clip"
+    
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stateListAnimator="@null"
-        android:background="@color/color_black_1"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_clip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:stateListAnimator="@null"
+            android:background="@color/color_black_1"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_error"
