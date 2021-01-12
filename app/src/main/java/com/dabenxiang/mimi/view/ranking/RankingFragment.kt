@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.view.ranking
 
-import android.app.Activity
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -38,49 +37,35 @@ class RankingFragment : BaseFragment() {
 
     private val viewModel: RankingViewModel by viewModels()
 
-    private val videosAdapter by lazy {
-        RankingVideosAdapter(requireActivity(),
+    private val adapter by lazy {
+        RankingAdapter(requireActivity(),
             RankingFuncItem(
-                onVideoItemClick = {
-                    val playerData =
-                        PlayerItem(it.id)
-                    val bundle = PlayerV2Fragment.createBundle(playerData)
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_rankingFragment_to_navigation_player,
-                            bundle
-                        )
-                    )
+                onItemClick = { items, position ->
+                    val item = items[position]
+                    when(PostType.getTypeByValue(item.type)){
+                        PostType.VIDEO_ON_DEMAND -> {
+                            val playerData = PlayerItem(item.id)
+                            val bundle = PlayerV2Fragment.createBundle(playerData)
+                            navigateTo(
+                                NavigateItem.Destination(
+                                    R.id.action_rankingFragment_to_navigation_player,
+                                    bundle
+                                )
+                            )
+                        }
+                        PostType.SMALL_CLIP -> {
+                            viewModel.getInteractiveHistory(item)
+                        }
+                        PostType.IMAGE -> {
+                            viewModel.getPostDetail(item.id)
+                        }
+                    }
                 },
                 getBitmap = { id, view ->
                     viewModel.loadImage(
                         id,
                         view,
                         LoadImageType.PICTURE_THUMBNAIL
-                    )
-                },
-                getDecryptSetting = { source -> viewModel.getDecryptSetting(source) },
-                decryptCover = { videoItem, decryptSettingItem, function ->
-                    viewModel.decryptCover(
-                        videoItem,
-                        decryptSettingItem,
-                        function
-                    )
-                }
-            )
-        )
-    }
-
-    private val clipAdapter by lazy {
-        RankingClipAdapter(
-            requireContext(),
-            RankingFuncItem(
-                onClipItemClick = { item ->
-                    navigateTo(
-                        NavigateItem.Destination(
-                            R.id.action_to_clipSingleFragment,
-                            ClipSingleFragment.createBundle(item)
-                        )
                     )
                 }
             ),
@@ -91,23 +76,6 @@ class RankingFragment : BaseFragment() {
                         videoItem,
                         decryptSettingItem,
                         function
-                    )
-                }
-            )
-        )
-    }
-
-    private val pictureAdapter by lazy {
-        RankingAdapter(requireActivity(),
-            RankingFuncItem(
-                onItemClick = { items, position ->
-                    viewModel.getPostDetail(items[position].id)
-                },
-                getBitmap = { id, view ->
-                    viewModel.loadImage(
-                        id,
-                        view,
-                        LoadImageType.PICTURE_THUMBNAIL
                     )
                 }
             )
@@ -148,24 +116,18 @@ class RankingFragment : BaseFragment() {
         return R.layout.fragment_ranking
     }
 
-    override fun setupObservers() {
-        viewModel.showProgress.observe(viewLifecycleOwner, {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        viewModel.showProgress.observe(this, {
             layout_refresh.isRefreshing = it
         })
 
-        viewModel.rankingVideosList.observe(viewLifecycleOwner, {
-            videosAdapter.submitList(it)
+        viewModel.rankingList.observe(this, {
+            adapter.submitList(it)
         })
 
-        viewModel.rankingList.observe(viewLifecycleOwner, {
-            pictureAdapter.submitList(it)
-        })
-
-        viewModel.rankingClipList.observe(viewLifecycleOwner, {
-            clipAdapter.submitList(it)
-        })
-
-        viewModel.postDetail.observe(viewLifecycleOwner, {
+        viewModel.postDetail.observe(this, {
             when(it) {
                 is ApiResult.Loading -> layout_refresh.isRefreshing = true
                 is ApiResult.Loaded ->  layout_refresh.isRefreshing = false
@@ -180,23 +142,29 @@ class RankingFragment : BaseFragment() {
                 }
             }
         })
+
+        viewModel.clipInteractiveHistory.observe(this, {
+            when(it){
+                is ApiResult.Success -> {
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_to_clipSingleFragment,
+                            ClipSingleFragment.createBundle(it.result)
+                        ))
+                }
+            }
+        })
     }
 
     private fun setupAdapter() {
         Timber.i("post type=${tab_type_filter.selectedTabPosition} ")
-        rv_ranking_content.adapter =
-            when (tab_type_filter.selectedTabPosition) {
-                0 -> videosAdapter
-                1 -> clipAdapter
-                else -> pictureAdapter
-            }
+        rv_ranking_content.adapter =adapter
         viewModel.setStatisticsTypeFunction(tab_temporal_filter.selectedTabPosition)
         viewModel.setPostType(tab_type_filter.selectedTabPosition)
         getRankingList()
     }
 
     override fun setupListeners() {
-
         requireActivity().onBackPressedDispatcher.addCallback(
             owner = viewLifecycleOwner,
             onBackPressed = { navigateTo(NavigateItem.Up) }
@@ -214,12 +182,6 @@ class RankingFragment : BaseFragment() {
 
         tab_type_filter.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                rv_ranking_content.adapter =
-                    when (tab.position) {
-                        0 -> videosAdapter
-                        1 -> clipAdapter
-                        else -> pictureAdapter
-                    }
                 viewModel.setPostType(tab.position)
                 getRankingList()
             }
@@ -235,11 +197,7 @@ class RankingFragment : BaseFragment() {
     }
 
     fun getRankingList() {
-        when (viewModel.postTypeSelected) {
-            PostType.VIDEO_ON_DEMAND -> viewModel.getVideosRanking()
-            PostType.VIDEO -> viewModel.getRankingClipList()
-            PostType.IMAGE -> viewModel.getRankingPostList()
-            else -> {}
-        }
+        adapter.submitList(null)
+        viewModel.getRankingList()
     }
 }
