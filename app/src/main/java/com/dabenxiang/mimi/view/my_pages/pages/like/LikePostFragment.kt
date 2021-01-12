@@ -115,7 +115,7 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            viewModel.posts(pageCode, myPagesType).flowOn(Dispatchers.IO).collectLatest {
+            viewModel.posts(pageCode, myPagesType).collectLatest {
                 adapter.submitData(it)
             }
         }
@@ -188,6 +188,11 @@ class LikePostFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFragmen
     override fun onResume() {
         super.onResume()
         if(adapter.snapshot().items.isEmpty()) adapter.refresh()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainViewModel?.deleteClear(pageCode)
     }
 
     private val postListener = object : MyPostListener {

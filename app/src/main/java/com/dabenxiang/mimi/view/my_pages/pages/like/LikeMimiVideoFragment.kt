@@ -129,10 +129,15 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mainViewModel?.deleteClear(pageCode)
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
-        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
+//        viewModel.adWidth = GeneralUtils.getAdSize(requireActivity()).first
+//        viewModel.adHeight = GeneralUtils.getAdSize(requireActivity()).second
 
         viewModel.showProgress.observe(this) {
             layout_refresh.isRefreshing = it
@@ -193,7 +198,7 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
 
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModel.viewModelScope.launch {
-            viewModel.posts(pageCode, myPagesType).flowOn(Dispatchers.IO).collectLatest {
+            viewModel.posts(pageCode, myPagesType).collectLatest {
                 adapter.submitData(it)
             }
         }
@@ -209,6 +214,8 @@ class LikeMimiVideoFragment(val tab: Int, val myPagesType: MyPagesType) : BaseFr
                     if(adapter.snapshot().items.isEmpty()&& timeout >0) {
                         timeout--
                         adapter.refresh()
+                    }else{
+//                        posts_list.scrollToPosition(0)
                     }
                 }
         }

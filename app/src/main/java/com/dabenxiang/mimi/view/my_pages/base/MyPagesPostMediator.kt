@@ -88,14 +88,6 @@ class MyPagesPostMediator(
 
             database.withTransaction {
                 if(loadType == LoadType.REFRESH){
-//                    database.postDBItemDao().getPostDBIdsByPageCode(pageCode)?.forEach {id->
-//                        database.postDBItemDao().getPostDBItems(id).takeIf {
-//                            it.isNullOrEmpty() || it.size <=1
-//                        }?.let {
-//                            database.postDBItemDao().deleteMemberPostItem(id)
-//                        }
-//
-//                    }
                     database.postDBItemDao().deleteItemByPageCode(pageCode)
                     database.remoteKeyDao().deleteByPageCode(pageCode)
                 }
@@ -110,25 +102,14 @@ class MyPagesPostMediator(
                     memberPostItem
                 }?.let {
                     val postDBItems = it.mapIndexed { index, item ->
-                        Timber.i("MyPagesPostMediator item =${item.videoEpisodes} ")
-                        val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
+                        PostDBItem(
+                            postDBId = item.id,
+                            postType = item.type,
+                            pageCode= pageCode,
+                            timestamp = System.nanoTime(),
+                            index = offset+index
 
-                        when(oldItem) {
-                            null-> PostDBItem(
-                                    postDBId = item.id,
-                                    postType = item.type,
-                                    pageCode= pageCode,
-                                    timestamp = System.nanoTime(),
-                                    index = offset+index
-
-                            )
-                            else-> {
-                                oldItem.postDBId = item.id
-                                oldItem.timestamp = System.nanoTime()
-                                oldItem.index = offset+index
-                                oldItem
-                            }
-                        }
+                        )
                     }
                     database.postDBItemDao().insertMemberPostItemAll(it)
                     database.postDBItemDao().insertAll(postDBItems)

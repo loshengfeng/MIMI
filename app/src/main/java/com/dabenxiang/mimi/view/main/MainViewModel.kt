@@ -842,4 +842,13 @@ class MainViewModel : BaseViewModel() {
     fun setIsShowSnackBar(isShow: Boolean) {
         _isShowSnackBar.value = isShow
     }
+
+    fun deleteClear(pageCode:String){
+        Timber.i("deleteClear $pageCode")
+        viewModelScope.launch {
+            mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
+            mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
+        }
+
+    }
 }
