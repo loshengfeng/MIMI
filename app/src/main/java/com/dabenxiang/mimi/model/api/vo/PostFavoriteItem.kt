@@ -54,6 +54,8 @@ data class PostFavoriteItem(
     @SerializedName("isFollow")
     var isFollow: Boolean = false,
 
+    @SerializedName("reported")
+    var reported: Boolean = false,
     // 0 = like, 1= dislike
     @SerializedName("likeType")
     var likeType: Int? = null,
@@ -79,6 +81,7 @@ data class PostFavoriteItem(
             type = PostType.getTypeByValue(type),
             creationDate = postDate,
             isFavorite = isFavorite,
+            reported = reported,
             likeCount = likeCount,
             likeType = LikeType.getByValue(likeType),
             dislikeCount = dislikeCount,
