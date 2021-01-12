@@ -148,7 +148,7 @@
     <!-- Personal -->
     <string name="phone_num">手机号</string>
     <string name="personal_title">我的</string>
-    <string name="personal_not_login_tips">請立即登錄享受完整功能</string>
+    <string name="personal_not_login_tips">请立即登录享受完整功能</string>
     <string name="personal_not_login_tips_1">还没登录吗?</string>
     <string name="personal_not_login_tips_2">赶紧登录观看更多内容</string>
     <string name="personal_not_login_tips_3">若尚未成为会员，赶紧注册体验更多内容</string>
