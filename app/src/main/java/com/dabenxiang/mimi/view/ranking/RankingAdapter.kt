@@ -16,13 +16,17 @@ import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.callback.RankingFuncItem
 import com.dabenxiang.mimi.model.api.vo.MediaContentItem
 import com.dabenxiang.mimi.model.api.vo.PostStatisticsItem
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.view.base.BaseViewHolder
+import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.item_ranking.view.*
+import timber.log.Timber
 
 class RankingAdapter(
     private val context: Context,
-    private val rankingFuncItem: RankingFuncItem = RankingFuncItem()
+    private val rankingFuncItem: RankingFuncItem = RankingFuncItem(),
+    private val funcItem: CollectionFuncItem
 ) : PagedListAdapter<PostStatisticsItem, RecyclerView.ViewHolder>(diffCallback) {
 
     companion object {
@@ -52,7 +56,8 @@ class RankingAdapter(
             position,
             currentList?.toMutableList()!!,
             getItem(position)!!,
-            rankingFuncItem
+            rankingFuncItem,
+            funcItem
         )
     }
 
@@ -68,7 +73,8 @@ class RankingAdapter(
             position: Int,
             items: MutableList<PostStatisticsItem>,
             item: PostStatisticsItem,
-            rankingFuncItem: RankingFuncItem
+            rankingFuncItem: RankingFuncItem,
+            funcItem: CollectionFuncItem
         ) {
 
             ranking.let {
@@ -84,19 +90,51 @@ class RankingAdapter(
                 }
             }
 
-            val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
-            contentItem.images?.also { images ->
-                if (images.isEmpty()) {
-                    return@also
-                } else if (!TextUtils.isEmpty(images[0].url)) {
+            when (PostType.getTypeByValue(item.type)) {
+                PostType.SMALL_CLIP -> {
+                    funcItem.getDecryptSetting(item.source)
+                        ?.takeIf { it.isImageDecrypt }
+                        ?.let { decryptSettingItem ->
+                            funcItem.decryptCover(item.cover, decryptSettingItem) {
+                                Glide.with(picture.context)
+                                    .load(it).placeholder(R.drawable.img_nopic_03).into(picture)
+                            }
+                        } ?: run {
+                        Glide.with(picture.context)
+                            .load(item.cover).placeholder(R.drawable.img_nopic_03).into(picture)
+                    }
+                }
+                PostType.IMAGE -> {
+                    try {
+                        val contentItem = Gson().fromJson(item.content, MediaContentItem::class.java)
+                        contentItem.images?.also { images ->
+                            if (images.isEmpty()) {
+                                return@also
+                            } else if (!TextUtils.isEmpty(images[0].url)) {
+                                Glide.with(picture.context)
+                                    .load(images[0].url)
+                                    .placeholder(R.drawable.img_nopic_03)
+                                    .error(R.drawable.img_nopic_03)
+                                    .into(picture)
+                            } else {
+                                rankingFuncItem.getBitmap(
+                                    images[0].id.toLongOrNull(),
+                                    picture
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        Glide.with(picture.context)
+                            .load(item.cover)
+                            .placeholder(R.drawable.img_nopic_03)
+                            .error(R.drawable.img_nopic_03)
+                            .into(picture)
+                    }
+                }
+                else -> {
                     Glide.with(picture.context)
-                        .load(images[0].url).placeholder(R.drawable.img_nopic_03)
-                        .into(picture)
-                } else {
-                    rankingFuncItem.getBitmap(
-                        images[0].id.toLongOrNull(),
-                        picture
-                    )
+                        .load(item.cover).placeholder(R.drawable.img_nopic_03).into(picture)
                 }
             }
 
