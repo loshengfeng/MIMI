@@ -13,8 +13,14 @@ data class PostStatisticsItem(
     @SerializedName("type")
     val type: Int = 0,
 
+    @SerializedName("cover")
+    val cover: String = "",
+
     @SerializedName("content")
     val content: String = "",
+
+    @SerializedName("source")
+    val source: String = "",
 
     @SerializedName("avatarAttachmentId")
     val avatarAttachmentId: Long = 0,

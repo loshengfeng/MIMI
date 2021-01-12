@@ -479,11 +479,13 @@
         <action
             android:id="@+id/action_to_topup"
             app:destination="@id/navigation_topup" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
         android:id="@+id/postViewerFragment"
         android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
         tools:layout="@layout/fragment_post_viewer" />
-
 </navigation>

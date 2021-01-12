@@ -315,4 +315,21 @@
             android:id="@+id/action_orderInfoFragment_to_orderResultFragment"
             app:destination="@id/orderResultFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/orderResultFragment"
+        android:name="com.dabenxiang.mimi.view.orderresult.OrderResultFragment"
+        android:label="OrderResultFragment">
+
+        <action
+            android:id="@+id/action_orderResultFragment_to_orderFragment"
+            app:destination="@id/orderFragment"
+            app:popUpTo="@id/topUpFragment" />
+
+        <action
+            android:id="@+id/action_orderResultFragment_to_topupFragment"
+            app:destination="@id/topUpFragment"
+            app:popUpTo="@id/topUpFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

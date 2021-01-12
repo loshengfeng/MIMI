@@ -180,11 +180,15 @@ class ClipSingleFragment : BaseFragment() {
         }
 
         btn_vip.setOnClickListener {
-            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+            checkStatus {
+                navigateTo(NavigateItem.Destination(R.id.action_to_topup))
+            }
         }
 
         btn_promote.setOnClickListener {
-            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+            checkStatus {
+                navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
+            }
         }
     }
 

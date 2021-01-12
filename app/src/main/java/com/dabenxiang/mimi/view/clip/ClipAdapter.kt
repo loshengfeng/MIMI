@@ -105,7 +105,7 @@ class ClipAdapter(
     }
 
     fun getVideoItem(position: Int): VideoItem? {
-        return getItem(position)
+        return takeIf { itemCount > 0 }?.let { getItem(position) }
     }
 
     fun updateCurrentPosition(position: Int) {
@@ -144,8 +144,8 @@ class ClipAdapter(
     ) {
         Timber.d("onBindViewHolder position:$position, currentPosition: $currentPosition, payloads: $payloads")
         val item = getItem(position) ?: VideoItem()
-        payloads.takeIf { it.isNotEmpty() }?.also {
-            when (it[0] as Int) {
+        payloads.takeIf { it.isNotEmpty() }?.onEach { payload ->
+            when (payload as Int) {
                 PAYLOAD_UPDATE_UI -> {
                     holder.onBind(item)
                 }
