@@ -235,8 +235,11 @@ class LoginFragment : BaseFragment() {
                 is Loading -> progressHUD?.show()
                 is Loaded -> progressHUD?.dismiss()
                 is Empty -> {
-                    countDownTimer.start()
-                    loginCountDownTimer.start()
+                    if (viewModel.clickType == TYPE_REGISTER) {
+                        countDownTimer.start()
+                    } else {
+                        loginCountDownTimer.start()
+                    }
                     GeneralUtils.showToast(requireContext(), getString(R.string.send_msg))
                 }
                 is Error -> onApiError(it.throwable)
@@ -327,6 +330,7 @@ class LoginFragment : BaseFragment() {
         tl_type.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 viewModel.type = tab.position
+                viewModel.clickType = tab.position
                 when (tab.position) {
                     0 -> {
                         item_register.visibility = View.VISIBLE

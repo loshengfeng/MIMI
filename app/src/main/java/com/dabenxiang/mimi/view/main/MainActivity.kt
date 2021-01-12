@@ -204,6 +204,8 @@ class MainActivity : BaseActivity() {
             setUiMode()
         })
 
+        bottom_navigation.setOnNavigationItemReselectedListener { viewModel.onTabReselect() }
+
         for (type in BottomNavType.values()) {
             addBadgeView(type)
         }

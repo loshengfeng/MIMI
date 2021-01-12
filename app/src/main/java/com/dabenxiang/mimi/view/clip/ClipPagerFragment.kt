@@ -434,4 +434,6 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
             reportDialog?.dismiss()
         }
     }
+
+    override fun onTabReselect() { rv_clip?.smoothScrollToPosition(0) }
 }
