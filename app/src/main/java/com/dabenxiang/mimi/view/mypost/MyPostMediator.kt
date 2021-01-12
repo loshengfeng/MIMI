@@ -9,6 +9,7 @@ import com.dabenxiang.mimi.model.db.DBRemoteKey
 import com.dabenxiang.mimi.model.db.MemberPostWithPostDBItem
 import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
+import com.dabenxiang.mimi.model.enums.ClubTabItemType
 import com.dabenxiang.mimi.model.manager.DomainManager
 import retrofit2.HttpException
 import timber.log.Timber
@@ -90,7 +91,10 @@ class MyPostMediator(
 
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
-                memberPostItems?.let {
+                memberPostItems?.map { item->
+                    item.deducted = true
+                    item
+                }?.let {
                     val postDBItems = it.mapIndexed { index, item ->
                         val oldItem = database.postDBItemDao().getPostDBItem(pageCode, item.id)
 
