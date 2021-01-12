@@ -56,11 +56,11 @@ class ClubItemFragment(val type: ClubTabItemType) : BaseFragment() {
     private val accountManager: AccountManager by inject()
 
     private val adTop: AdAdapter by lazy {
-        AdAdapter(requireContext())
+        AdAdapter(requireContext(), adClickListener = adClickListener)
     }
 
     private val adapter: PostItemAdapter by lazy {
-        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope, 5)
+        PostItemAdapter(requireContext(), postListener, viewModel.viewModelScope, 5, adClickListener)
     }
 
     override fun getLayoutId() = R.layout.fragment_club_item

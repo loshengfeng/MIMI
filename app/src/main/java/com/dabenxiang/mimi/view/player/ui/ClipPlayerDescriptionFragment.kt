@@ -86,7 +86,7 @@ class ClipPlayerDescriptionFragment : BaseFragment() {
                         .into(iv_ad)
 
                     iv_ad.setOnClickListener { view ->
-                        GeneralUtils.openWebView(requireContext(), it.result.target)
+                        adClickListener.onAdClick(it.result)
                     }
                 }
                 is ApiResult.Error -> onApiError(it.throwable)

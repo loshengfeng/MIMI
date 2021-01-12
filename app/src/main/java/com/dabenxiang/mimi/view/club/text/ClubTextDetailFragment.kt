@@ -115,7 +115,8 @@ class ClubTextDetailFragment : BaseFragment() {
                 memberPostItem!!,
                 onTextDetailListener,
                 null,
-                clubPostFuncItem
+                clubPostFuncItem,
+                adClickListener
             )
 
         recyclerView.layoutManager = LinearLayoutManager(context)

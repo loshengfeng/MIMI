@@ -67,11 +67,11 @@ class SearchPostFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_search_post
 
     private val adTop: AdAdapter by lazy {
-        AdAdapter(requireContext())
+        AdAdapter(requireContext(), adClickListener = adClickListener)
     }
 
     private val adBottom: AdAdapter by lazy {
-        AdAdapter(requireContext())
+        AdAdapter(requireContext(), adClickListener = adClickListener)
     }
 
     private var searchType: PostType = PostType.TEXT_IMAGE_VIDEO

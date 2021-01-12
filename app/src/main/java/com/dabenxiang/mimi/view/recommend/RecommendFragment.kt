@@ -38,7 +38,7 @@ class RecommendFragment : BaseFragment() {
     private val viewModel: RecommendViewModel by viewModels()
 
     private val recommendContentAdapter by lazy {
-        val adapter = RecommendContentAdapter(recommendFuncItem)
+        val adapter = RecommendContentAdapter(recommendFuncItem, adClickListener)
         val loadStateListener = { loadStatus: CombinedLoadStates ->
             when (loadStatus.refresh) {
                 is LoadState.Error -> {

@@ -9,6 +9,7 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdClickListener
 import com.dabenxiang.mimi.callback.ClubPostFuncItem
 import com.dabenxiang.mimi.model.api.ApiResult
 import com.dabenxiang.mimi.model.api.vo.ImageItem
@@ -123,7 +124,8 @@ class ClubPicDetailFragment : BaseFragment() {
                 onPictureDetailListener,
                 onPhotoGridItemClickListener,
                 null,
-                clubPostFuncItem
+                clubPostFuncItem,
+                adClickListener
             )
 
         recyclerView.layoutManager = LinearLayoutManager(context)

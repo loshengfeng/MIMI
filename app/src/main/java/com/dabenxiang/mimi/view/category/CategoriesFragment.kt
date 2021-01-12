@@ -60,7 +60,7 @@ class CategoriesFragment : BaseFragment() {
     private var lstFilterRV: List<RecyclerView> = listOf()
     private var lstFilterText: ArrayList<List<String>> = arrayListOf()
 
-    private val videoListAdapter by lazy { GeneralVideoAdapter(onItemClick) }
+    private val videoListAdapter by lazy { GeneralVideoAdapter(onItemClick, adClickListener = adClickListener) }
 
     private val onItemClick: (StatisticsItem) -> Unit = {
         navToPlayer(PlayerItem(it.id))

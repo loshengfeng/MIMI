@@ -48,7 +48,7 @@ class GeneralVideoFragment(val category: String) : BaseFragment() {
     }
 
     private val generalVideoAdapter by lazy {
-        GeneralVideoAdapter(onItemClick, videoFuncItem)
+        GeneralVideoAdapter(onItemClick, videoFuncItem, adClickListener)
     }
 
     override fun setupFirstTime() {

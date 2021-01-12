@@ -10,6 +10,7 @@
     <include app:graph="@navigation/navigation_clip_player" />
     <include app:graph="@navigation/navigation_clip" />
     <include app:graph="@navigation/navigation_my_post" />
+    <include app:graph="@navigation/navigation_topup" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -46,6 +47,15 @@
         <action
             android:id="@+id/action_to_inviteVipFragment"
             app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
 
     </fragment>
 
@@ -71,10 +81,18 @@
         android:id="@+id/clipSingleFragment"
         android:name="com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment"
         android:label="ClipSingleFragment">
-
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_inviteVipFragment"
+            app:destination="@id/inviteVipFragment" />
+        <action
+            android:id="@+id/action_to_topup"
+            app:destination="@id/navigation_topup" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
@@ -100,6 +118,14 @@
             android:id="@+id/action_to_navigation_player"
             app:destination="@id/navigation_player" />
 
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
+
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
+
     </fragment>
 
     <fragment
@@ -121,6 +147,12 @@
         <action
             android:id="@+id/action_searchVideoFragment_to_clipSingleFragment"
             app:destination="@id/clipSingleFragment" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
     </fragment>
 
     <fragment
@@ -156,6 +188,12 @@
         <action
             android:id="@+id/action_to_loginFragment"
             app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
     </fragment>
 
     <fragment
@@ -188,6 +226,57 @@
         <action
             android:id="@+id/action_to_myPostFragment"
             app:destination="@id/navigation_my_post" />
+        <action
+            android:id="@+id/action_to_topUpFragment"
+            app:destination="@id/topUpFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/topUpFragment"
+        android:name="com.dabenxiang.mimi.view.topup.TopUpFragment"
+        android:label="TopUpFragment" >
+        <action
+            android:id="@+id/action_topupFragment_to_orderFragment"
+            app:destination="@id/orderFragment" />
+        <action
+            android:id="@+id/action_to_orderInfoFragment"
+            app:destination="@id/orderInfoFragment" />
+        <action
+            android:id="@+id/action_topupFragment_to_chatContentFragment"
+            app:destination="@id/chatContentFragment" />
+
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/navigation_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderInfoFragment"
+        android:name="com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment"
+        android:label="OrderInfoFragment">
+        <action
+            android:id="@+id/action_orderInfoFragment_to_orderResultFragment"
+            app:destination="@id/orderResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderResultFragment"
+        android:name="com.dabenxiang.mimi.view.orderresult.OrderResultFragment"
+        android:label="OrderResultFragment">
+
+        <action
+            android:id="@+id/action_orderResultFragment_to_orderFragment"
+            app:destination="@id/orderFragment"
+            app:popUpTo="@id/topUpFragment" />
+
+        <action
+            android:id="@+id/action_orderResultFragment_to_topupFragment"
+            app:destination="@id/topUpFragment"
+            app:popUpTo="@id/topUpFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

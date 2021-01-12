@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.callback.AdClickListener
 import com.dabenxiang.mimi.callback.OnMeMoreDialogListener
 import com.dabenxiang.mimi.extension.handleException
 import com.dabenxiang.mimi.model.api.ApiResult
@@ -36,11 +37,12 @@ import com.dabenxiang.mimi.view.main.MainActivity
 import com.dabenxiang.mimi.view.main.MainViewModel
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.mypost.MyPostViewModel
+import com.dabenxiang.mimi.view.orderinfo.OrderInfoFragment
 import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
-
 import com.dabenxiang.mimi.view.post.utility.PostManager
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.dabenxiang.mimi.widget.utility.UriUtils
 import com.google.android.material.snackbar.Snackbar
@@ -62,6 +64,8 @@ abstract class BaseFragment : Fragment() {
         const val PERMISSION_VIDEO_REQUEST_CODE = 20001
         const val PERMISSION_PIC_REQUEST_CODE = 20002
         const val PERMISSION_GALLERY_REQUEST_CODE = 20003
+
+        private const val PAYMENT = "payment="
     }
 
     open var mainViewModel: MainViewModel? = null
@@ -97,6 +101,33 @@ abstract class BaseFragment : Fragment() {
     private var postClubItem = PostClubItem()
 
     var timeout= 5
+
+    val adClickListener = object : AdClickListener {
+        override fun onAdClick(adItem: AdItem) {
+            if (adItem.targetType == 1) {
+                checkStatus {
+                    if (adItem.custom == PAYMENT) {
+                        navigateTo(NavigateItem.Destination(R.id.action_to_topUpFragment))
+                    } else {
+                        val jsonStr = adItem.custom.replace(PAYMENT, "")
+                        val selectItem = Gson().fromJson(jsonStr, OrderingPackageItem::class.java)
+                        val bundle = OrderInfoFragment.createBundle(selectItem)
+                        navigateTo(
+                            NavigateItem.Destination(
+                                R.id.action_to_orderInfoFragment,
+                                bundle
+                            )
+                        )
+                    }
+
+                    mainViewModel?.setAdUrlToServer(adItem.target)
+                }
+            } else {
+                GeneralUtils.openWebView(requireContext(), adItem.target)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.let { mainViewModel = ViewModelProvider(it).get(MainViewModel::class.java) }
