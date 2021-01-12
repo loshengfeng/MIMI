@@ -132,6 +132,7 @@ data class MemberPostItem(
 
     fun toPlayItem(): PlayItem {
         return PlayItem(
+                id = id,
                 videoId = id,
                 title = title,
                 favorite = isFavorite,
