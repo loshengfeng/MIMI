@@ -77,7 +77,7 @@ class MyPagesPostMediator(
                     else -> (it as PostFavoriteItem).toMemberPostItem()
                 }
             }
-
+            Timber.i("MyPagesPostMediator memberPostItems=$memberPostItems" )
             val hasNext = hasNextPage(
                     result.body()?.paging?.count ?: 0,
                     result.body()?.paging?.offset ?: 0,
@@ -96,6 +96,7 @@ class MyPagesPostMediator(
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
                memberPostItems?.map { memberPostItem ->
+                    memberPostItem.deducted = true
                     database.postDBItemDao().getMemberPostItemById(memberPostItem.id)?.videoEpisodes?.let {
                         if(it.isNotEmpty()) memberPostItem.videoEpisodes =it
                     }
