@@ -41,7 +41,8 @@ class MyPostViewModel : ClubViewModel() {
         mimiDB.postDBItemDao().pagingSourceByPageCode(MyPostMediator::class.simpleName + userId.toString())
 
     }.flow.map {
-        it.map { it.memberPostItem }
+        it.map {
+            it.memberPostItem }
     }
 
 }
