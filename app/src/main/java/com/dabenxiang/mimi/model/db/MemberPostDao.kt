@@ -60,6 +60,12 @@ interface PostDBItemDao {
     @Query("DELETE FROM PostDBItems WHERE pageCode = :pageCode")
     suspend fun deleteItemByPageCode(pageCode: String)
 
+    @Query("DELETE FROM PostDBItems WHERE postType != :postType")
+    suspend fun deleteItemByPostType(postType: PostType)
+
+    @Query("DELETE FROM MemberPostItems WHERE type != :postType")
+    suspend fun deleteMemberPostItemByPostType(postType: PostType)
+
     @Query("DELETE FROM PostDBItems WHERE pageCode = :pageCode and postDBId = :postDBId")
     suspend fun deleteItemByPageCode(pageCode: String, postDBId: Long)
 

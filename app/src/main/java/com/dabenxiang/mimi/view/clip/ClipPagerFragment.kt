@@ -49,6 +49,8 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
                 it.putSerializable(KEY_DATA, items)
             }
         }
+        val pageCodeClipHottest = ClipMediator::class.java.simpleName + StatisticsOrderType.HOTTEST.toString()
+        val pageCodeClipLatest = ClipMediator::class.java.simpleName + StatisticsOrderType.LATEST.toString()
     }
 
     private val viewModel: ClipViewModel by viewModels()

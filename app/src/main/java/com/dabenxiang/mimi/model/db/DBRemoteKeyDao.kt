@@ -13,6 +13,9 @@ interface DBRemoteKeyDao {
     @Query("DELETE FROM db_remote_keys WHERE pageCode = :pageCode")
     suspend fun deleteByPageCode(pageCode: String)
 
+    @Query("DELETE FROM db_remote_keys WHERE pageCode != :pageCode_1 and  pageCode != :pageCode_2")
+    suspend fun deleteByPageCodeExcept(pageCode_1: String, pageCode_2: String)
+
     @Query("DELETE FROM db_remote_keys")
     suspend fun deleteAll()
 

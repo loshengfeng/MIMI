@@ -19,10 +19,13 @@ import com.dabenxiang.mimi.model.db.MiMiDB
 import com.dabenxiang.mimi.model.db.PostDBItem
 import com.dabenxiang.mimi.model.enums.LikeType
 import com.dabenxiang.mimi.model.enums.LoadImageType
+import com.dabenxiang.mimi.model.enums.PostType
 import com.dabenxiang.mimi.model.manager.AccountManager
 import com.dabenxiang.mimi.model.manager.DomainManager
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
+import com.dabenxiang.mimi.view.clip.ClipPagerFragment.Companion.pageCodeClipHottest
+import com.dabenxiang.mimi.view.clip.ClipPagerFragment.Companion.pageCodeClipLatest
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.widget.utility.FileUtil
@@ -221,18 +224,6 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun clearDBData() {
-        viewModelScope.launch {
-            mimiDB.apply {
-                withTransaction {
-                    postDBItemDao().deleteAll()
-                    postDBItemDao().deleteAllMemberPostItems()
-                }
-            }
-        }
-
-    }
-
     suspend fun changeFavoritePostInDb(id: Long, isFavorite:Boolean, favoriteCount: Int) {
         changeFavoriteInDb(id, MyPagesType.FAVORITE_POST, isFavorite, favoriteCount)
     }
@@ -354,9 +345,12 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     fun cleanDb() {
         viewModelScope.launch {
             mimiDB.withTransaction {
-                mimiDB.postDBItemDao().deleteAll()
-                mimiDB.postDBItemDao().deleteAllMemberPostItems()
-                mimiDB.remoteKeyDao().deleteAll()
+//                mimiDB.postDBItemDao().deleteAll()
+//                mimiDB.postDBItemDao().deleteAllMemberPostItems()
+//                mimiDB.remoteKeyDao().deleteAll()
+                mimiDB.postDBItemDao().deleteItemByPostType(PostType.SMALL_CLIP)
+                mimiDB.postDBItemDao().deleteMemberPostItemByPostType(PostType.SMALL_CLIP)
+                mimiDB.remoteKeyDao().deleteByPageCodeExcept(pageCodeClipHottest, pageCodeClipLatest)
             }
         }
     }
