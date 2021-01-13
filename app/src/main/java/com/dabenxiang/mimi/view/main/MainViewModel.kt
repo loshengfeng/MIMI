@@ -443,7 +443,6 @@ class MainViewModel : BaseViewModel() {
                     type = PostType.TEXT.value,
                     tags = postClubItem.tags
                 )
-
                 if (postClubItem.memberPostItem == null) {
                     val resp = domainManager.getApiRepository().postMembersPost(request)
                     if (!resp.isSuccessful) throw HttpException(resp)

@@ -254,7 +254,7 @@ interface ApiService {
     suspend fun updatePost(
         @Path("id") postId: Long,
         @Body request: PostMemberRequest
-    ): Response<ApiBaseItem<Long>>
+    ): Response<ApiBaseItem<PostItem>>
 
     /**********************************************************
      *

@@ -762,7 +762,6 @@ abstract class BaseFragment : Fragment() {
         }
 
         mainViewModel?.setIsShowSnackBar(false)
-
         PostManager().dismissSnackBar(
             snackBar!!,
             object : PostManager.SnackBarListener {

@@ -20,7 +20,7 @@ class OrderInfoViewModel : BaseViewModel() {
     fun createOrder(paymentType: PaymentType, packageId: Long) {
         viewModelScope.launch {
             flow {
-                val request = CreateOrderRequest(paymentType, packageId)
+                val request = CreateOrderRequest(paymentType.value, packageId)
                 val apiRepository = domainManager.getApiRepository()
                 val result = apiRepository.createOrder(request)
                 if (!result.isSuccessful) throw HttpException(result)
