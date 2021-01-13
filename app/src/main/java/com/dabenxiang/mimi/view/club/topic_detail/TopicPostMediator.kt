@@ -97,6 +97,7 @@ class TopicPostMediator(
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
                 memberPostItems?.map { item->
+                    item.deducted = true
                     item.adItem = getAdItem(adItems)
                     item
                 }?.let {

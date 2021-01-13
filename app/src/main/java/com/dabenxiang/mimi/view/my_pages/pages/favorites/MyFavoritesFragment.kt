@@ -284,6 +284,7 @@ class MyFavoritesFragment(
         }
 
         override fun onMoreClick(item: MemberPostItem, position: Int) {
+            Timber.i("MoreDialogFragment onMoreClick=$item")
             onMoreClick(item, position) {
                 it as MemberPostItem
 

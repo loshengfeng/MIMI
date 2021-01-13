@@ -28,6 +28,7 @@ import com.dabenxiang.mimi.view.dialog.GeneralDialog
 import com.dabenxiang.mimi.view.dialog.GeneralDialogData
 import com.dabenxiang.mimi.view.dialog.show
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.hideKeyboard
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
@@ -331,6 +332,7 @@ class LoginFragment : BaseFragment() {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 viewModel.type = tab.position
                 viewModel.clickType = tab.position
+                hideKeyboard(requireActivity())
                 when (tab.position) {
                     0 -> {
                         item_register.visibility = View.VISIBLE
@@ -356,7 +358,10 @@ class LoginFragment : BaseFragment() {
             }
 
             when (buttonView.id) {
-                R.id.btn_register_cancel, R.id.btn_login_cancel, R.id.btnClose -> navigateTo(NavigateItem.Up)
+                R.id.btn_register_cancel, R.id.btn_login_cancel, R.id.btnClose -> {
+                    hideKeyboard(requireActivity())
+                    navigateTo(NavigateItem.Up)
+                }
 
                 R.id.btn_register -> {
                     viewModel.doRegisterValidateAndSubmit(tv_call_prefix.text.toString())

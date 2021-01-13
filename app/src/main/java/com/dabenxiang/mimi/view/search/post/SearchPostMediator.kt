@@ -106,6 +106,7 @@ class SearchPostMediator(
                 database.remoteKeyDao().insertOrReplace(DBRemoteKey(pageCode, nextKey?.toLong()))
 
                 memberPostApiItems?.map { item ->
+                    item.deducted = true
                     item.adItem = getAdItem(adItems)
                     item
                 }?.let {
