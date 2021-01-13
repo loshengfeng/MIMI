@@ -121,8 +121,8 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             requestBuilder.addHeader(ApiRepository.AUTHORIZATION, auth)
         }
 
-        requestBuilder.addHeader(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
-        requestBuilder.addHeader(ApiRepository.X_REQUESTED_FROM, "Android")
+        requestBuilder.header(ApiRepository.X_DEVICE_ID, GeneralUtils.getAndroidID())
+        requestBuilder.header(ApiRepository.X_REQUESTED_FROM, "Android")
 
         return requestBuilder.build()
     }
