@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class CreateOrderRequest(
     @SerializedName("paymentType")
-    val paymentType: PaymentType? = PaymentType.BANK,
+    val paymentType: Int? = PaymentType.BANK.value,
 
     @SerializedName("packageId")
     val packageId: Long = 0
