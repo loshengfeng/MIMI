@@ -37,12 +37,15 @@ import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_post_article.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 
 open class BasePostFragment : BaseFragment() {
 
     val viewModel: PostViewModel by viewModels()
 
     private var haveMainTag = false
+
+    var isSetTag = false
 
     var postId: Long = 0
 
@@ -255,6 +258,7 @@ open class BasePostFragment : BaseFragment() {
             String.format(getString(R.string.typing_count, item.tags?.size, HASHTAG_LIMIT))
 
         haveMainTag = true
+        isSetTag = true
 
         setUI(contentItem, item)
         enableHastEditText()
@@ -313,6 +317,7 @@ open class BasePostFragment : BaseFragment() {
             ColorStateList.valueOf(chip.context.getColor(R.color.color_black_1_10))
 
         if (isMainTag) {
+            isSetTag = true
             if (haveMainTag) {
                 val mainTag = chipGroup[0] as Chip
                 mainTag.text = tag
@@ -407,7 +412,7 @@ open class BasePostFragment : BaseFragment() {
             return true
         }
 
-        if (chipGroup.childCount == 0) {
+        if (!isSetTag) {
             Toast.makeText(requireContext(), R.string.post_warning_tag, Toast.LENGTH_SHORT).show()
             return true
         }
@@ -415,26 +420,11 @@ open class BasePostFragment : BaseFragment() {
         return false
     }
 
-    fun getRequest(title: String, type: Int): PostMemberRequest {
-        return PostMemberRequest(
-            title = title,
-            type = type,
-            tags = getTags()
-        )
-    }
-
     fun checkTagCountIsValid(): Boolean {
         return if (chipGroup.size > HASHTAG_LIMIT) {
             Toast.makeText(
                 requireContext(),
                 R.string.post_warning_tag_limit,
-                Toast.LENGTH_SHORT
-            ).show()
-            false
-        } else if (!haveMainTag) {
-            Toast.makeText(
-                requireContext(),
-                R.string.post_warning_tag,
                 Toast.LENGTH_SHORT
             ).show()
             false
