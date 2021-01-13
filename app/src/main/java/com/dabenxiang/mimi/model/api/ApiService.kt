@@ -817,10 +817,10 @@ interface ApiService {
 
     /**********************************************************
      *
-     *         Operators/DecryptSetting 取得各來源解碼key
+     *         DecryptSetting 取得各來源解碼key
      *
      ***********************************************************/
-    @GET("/v1/Operators/DecryptSetting")
+    @GET("/v1/Player/DecryptSetting")
     suspend fun getDecryptSetting(): Response<ApiBaseItem<List<DecryptSettingItem>>>
 
     /**********************************************************
