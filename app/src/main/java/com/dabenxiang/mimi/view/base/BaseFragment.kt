@@ -108,7 +108,7 @@ abstract class BaseFragment : Fragment() {
                 checkStatus {
                     if (adItem.custom == PAYMENT) {
                         navigateTo(NavigateItem.Destination(R.id.action_to_topUpFragment))
-                    } else {
+                    } else if (adItem.custom.contains(PAYMENT)) {
                         val jsonStr = adItem.custom.replace(PAYMENT, "")
                         val selectItem = Gson().fromJson(jsonStr, OrderingPackageItem::class.java)
                         val bundle = OrderInfoFragment.createBundle(selectItem)
