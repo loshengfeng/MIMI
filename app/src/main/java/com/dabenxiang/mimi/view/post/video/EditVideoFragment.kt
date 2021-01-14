@@ -24,6 +24,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_edit_video.*
 import kotlinx.android.synthetic.main.item_setting_bar.*
+import timber.log.Timber
 
 
 class EditVideoFragment : BaseFragment() {
@@ -77,10 +78,10 @@ class EditVideoFragment : BaseFragment() {
         }
 
         tv_clean.setOnClickListener {
+            tv_clean.isEnabled = false
             val editVideoRangeFragment = editVideoFragmentPagerAdapter.getFragment(0) as EditVideoRangeFragment
             editVideoRangeFragment.setEditVideoListener(editTrimmerVideoListener)
             editVideoRangeFragment.save()
-            tv_clean.isEnabled = false
         }
 
         tabLayout.addOnTabSelectedListener(object :
@@ -154,6 +155,11 @@ class EditVideoFragment : BaseFragment() {
             cropVideoFragment.setEditVideoListener(editCropVideoListener)
             cropVideoFragment.save()
         }
+
+        override fun onError(errMsg: String) {
+            Timber.e(errMsg)
+            tv_clean.isEnabled = true
+        }
     }
 
     private val editCropVideoListener = object : EditVideoListener {
@@ -185,6 +191,11 @@ class EditVideoFragment : BaseFragment() {
             }
 
             findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)
+        }
+
+        override fun onError(errMsg: String) {
+            Timber.e(errMsg)
+            tv_clean.isEnabled = true
         }
     }
 

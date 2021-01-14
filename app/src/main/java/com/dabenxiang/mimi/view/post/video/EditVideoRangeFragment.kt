@@ -12,6 +12,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.video.trimmer.interfaces.OnTrimVideoListener
 import com.video.trimmer.interfaces.OnVideoListener
 import kotlinx.android.synthetic.main.fragment_edit_video_range.*
+import timber.log.Timber
 
 
 class EditVideoRangeFragment : BaseFragment(), OnTrimVideoListener, OnVideoListener {
@@ -78,10 +79,16 @@ class EditVideoRangeFragment : BaseFragment(), OnTrimVideoListener, OnVideoListe
     }
 
     override fun onError(message: String) {
-        GeneralUtils.showToast(
-            requireContext(),
-            getString(R.string.device_not_support)
-        )
+        val deviceNotSupportStr = getString(R.string.device_not_support)
+
+        if (message == deviceNotSupportStr) {
+            GeneralUtils.showToast(
+                requireContext(),
+                getString(R.string.device_not_support)
+            )
+        } else {
+            editVideoListener?.onError(message)
+        }
     }
 
     override fun onTrimStarted() {
