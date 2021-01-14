@@ -137,8 +137,8 @@ class RecommendFragment : BaseFragment() {
             it.setIndicator(indicator)
             it.setPageTransformer(ScaleInTransformer())
             it.setPageMargin(
-                GeneralUtils.dpToPx(it.context, 20),
-                GeneralUtils.dpToPx(it.context, 10)
+                GeneralUtils.dpToPx(it.context, 10),
+                GeneralUtils.dpToPx(it.context, 5)
             )
             it.adapter = BannerAdapter(categoryBanners, bannerFuncItem)
         }
