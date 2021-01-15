@@ -56,7 +56,7 @@ open class BasePostFragment : BaseFragment() {
         const val INTENT_SELECT_IMG = 10001
         const val REQUEST_VIDEO_CAPTURE = 10002
 
-        private const val TITLE_LIMIT = 60
+        private const val TITLE_LIMIT = 500 //Modified #196 [VAI6.1.6]發帖的標題字數增加
         private const val HASHTAG_LIMIT = 20
         private const val INIT_VALUE = 0
 

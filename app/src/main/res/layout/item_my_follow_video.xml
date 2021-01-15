@@ -19,7 +19,7 @@
         android:maxEms="5"
         android:maxLines="2"
         android:singleLine="true"
-        android:maxLength="60"
+        android:maxLength="500"
         android:textColor="@color/color_black_1"
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@id/layout_clip"
