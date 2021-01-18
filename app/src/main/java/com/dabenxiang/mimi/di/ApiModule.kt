@@ -2,10 +2,7 @@ package com.dabenxiang.mimi.di
 
 import com.dabenxiang.mimi.API_HOST_URL
 import com.dabenxiang.mimi.BuildConfig
-import com.dabenxiang.mimi.model.api.ApiLogInterceptor
-import com.dabenxiang.mimi.model.api.ApiRepository
-import com.dabenxiang.mimi.model.api.ApiService
-import com.dabenxiang.mimi.model.api.AuthInterceptor
+import com.dabenxiang.mimi.model.api.*
 import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.factory.EnumTypeAdapterFactory
 import com.facebook.stetho.okhttp3.StethoInterceptor
@@ -20,10 +17,11 @@ import java.util.concurrent.TimeUnit
 val apiModule = module {
     single { provideAuthInterceptor(get()) }
     single { provideHttpLoggingInterceptor() }
-    single { provideOkHttpClient(get(), get(), get()) }
+    single { provideOkHttpClient(get(), get(), get(), get()) }
     single { provideApiService(get()) }
     single { provideApiRepository(get()) }
     single { provideApiLogInterceptor() }
+    single { provideEncryptionInterceptor() }
 }
 
 fun provideAuthInterceptor(pref: Pref): AuthInterceptor {
@@ -44,6 +42,7 @@ fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
 
 fun provideOkHttpClient(
     authInterceptor: AuthInterceptor,
+    encryptionInterceptor  :EncryptionInterceptor,
     httpLoggingInterceptor: HttpLoggingInterceptor,
     apiLogInterceptor: ApiLogInterceptor
 ): OkHttpClient {
@@ -52,6 +51,7 @@ fun provideOkHttpClient(
         .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
         .addInterceptor(authInterceptor)
+        .addInterceptor(encryptionInterceptor)
         .addInterceptor(apiLogInterceptor)
         .addInterceptor(httpLoggingInterceptor)
 
@@ -78,6 +78,10 @@ fun provideApiRepository(apiService: ApiService): ApiRepository {
 
 fun provideApiLogInterceptor(): ApiLogInterceptor {
     return ApiLogInterceptor()
+}
+
+fun provideEncryptionInterceptor(): EncryptionInterceptor {
+    return EncryptionInterceptor()
 }
 
 fun provideMemberPostItemDBRepository(apiService: ApiService): ApiRepository {

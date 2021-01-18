@@ -38,8 +38,6 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
             return chain.proceed(chain.request())
         }
 
-        val requestBody = request.body
-
         val hasMemberToken = checkHasMemberToken(url.toString())
         if (hasMemberToken) {
             when (accountManager.getMemberTokenResult()) {
@@ -57,7 +55,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
 
         try {
             response = chain.proceed(newRequest)
-            Timber.d("Response Code: ${response.code}")
+            Timber.d("AuthInterceptor Response Code: ${response.code}")
             return when (response.code) {
                 HttpURLConnection.HTTP_UNAUTHORIZED -> {
                     response.close()
