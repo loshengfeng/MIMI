@@ -122,11 +122,11 @@ class ClipViewModel : BaseViewModel() {
     /**
      * 影片回報問題(用於內部播放錯誤主動回報)
      */
-    fun sendVideoReport(id: Long, unhealthy: Boolean) {
+    fun sendVideoReport(videoId: Long, unhealthy: Boolean) {
         viewModelScope.launch {
             flow {
                 val result = domainManager.getApiRepository().getMemberVideoReport(
-                    videoId = id, type = VideoType.SHORT_VIDEO.value, unhealthy
+                    videoId = videoId, type = VideoType.SHORT_VIDEO.value, unhealthy
                 )
                 if (!result.isSuccessful) throw HttpException(result)
                 emit(ApiResult.success(null))
