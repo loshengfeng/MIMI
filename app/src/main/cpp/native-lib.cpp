@@ -213,6 +213,48 @@ std::string bytestohexstring(char *bytes,int bytelength){
     }
     return str;
 }
+
+//加密
+std::string EncodeEcbAES(const unsigned char *master_key,std::string data){
+    AES_KEY key;
+    AES_set_encrypt_key(master_key, 128, &key);
+
+    std::string data_bak = data.c_str();
+    unsigned int data_length = (unsigned int) data_bak.length();
+
+    std::string encryhex;
+    for(unsigned int i = 0; i < data_length/AES_BLOCK_SIZE; i++)
+    {
+        std::string str16 = data_bak.substr(i*AES_BLOCK_SIZE, AES_BLOCK_SIZE);
+        unsigned char out[AES_BLOCK_SIZE];
+        memset(out, 0, AES_BLOCK_SIZE);
+        AES_ecb_encrypt((const unsigned char *) str16.c_str(), out, &key, AES_ENCRYPT);
+        encryhex += bytestohexstring((char *) out, AES_BLOCK_SIZE);
+    }
+    return encryhex;
+
+}
+//解密
+std::string DecodeEcbAES(const unsigned char *master_key,std::string data){
+    AES_KEY key;
+    AES_set_decrypt_key(master_key, 128, &key);
+
+    std::string ret;
+    for(unsigned int i = 0; i < data.length()/(AES_BLOCK_SIZE*2); i++)
+    {
+        std::string str16 = data.substr(i*AES_BLOCK_SIZE*2, AES_BLOCK_SIZE*2);
+        unsigned char out[AES_BLOCK_SIZE];
+        memset(out, 0, AES_BLOCK_SIZE);
+        char *buf = hexstringToBytes(str16);
+        AES_ecb_encrypt((const unsigned char *)buf , out, &key, AES_DECRYPT);
+        delete(buf);
+        ret += hex2char(bytestohexstring((char *) out, AES_BLOCK_SIZE));
+    }
+    return ret;
+}
+
+
+
 //加密
 std::string EncodeAES(const unsigned char *master_key,std::string data,const unsigned char *iv){
     AES_KEY key;
@@ -270,6 +312,32 @@ std::string DecodeAES(const unsigned char *master_key,std::string data,const uns
 
 extern "C"
 JNIEXPORT jstring JNICALL
+Java_com_dabenxiang_mimi_widget_utility_CryptUtils_cEcbEncrypt(JNIEnv *env, jobject thiz, jstring str_) {
+    const char *str = env->GetStringUTFChars(str_, 0);
+
+    const unsigned char *master_key = (const unsigned char *) "1234567890123456";
+
+    std::string h = EncodeEcbAES(master_key, str);
+
+    env->ReleaseStringUTFChars(str_, str);
+    return env->NewStringUTF(h.c_str());
+}
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_dabenxiang_mimi_widget_utility_CryptUtils_cEcbDecrypt(JNIEnv *env, jobject thiz, jstring str_) {
+    const char *str = env->GetStringUTFChars(str_, 0);
+
+    const unsigned char *master_key = (const unsigned char *) "1234567890123456";
+
+
+    std::string s = DecodeEcbAES(master_key,str);
+    env->ReleaseStringUTFChars(str_, str);
+
+    return env->NewStringUTF(s.c_str());
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
 Java_com_dabenxiang_mimi_widget_utility_CryptUtils_cEncrypt(JNIEnv *env, jobject thiz, jstring str_) {
     const char *str = env->GetStringUTFChars(str_, 0);
 
@@ -295,6 +363,7 @@ Java_com_dabenxiang_mimi_widget_utility_CryptUtils_cDecrypt(JNIEnv *env, jobject
 
     return env->NewStringUTF(s.c_str());
 }
+
 bool isVerify =false;
 
 extern "C"

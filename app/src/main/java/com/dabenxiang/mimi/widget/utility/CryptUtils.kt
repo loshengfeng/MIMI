@@ -12,6 +12,8 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 object CryptUtils {
+    external fun cEcbEncrypt(str: String?): String?
+    external fun cEcbDecrypt(str: String?): String?
     external fun cEncrypt(str: String?): String?
     external fun cDecrypt(str: String?): String?
     external fun cIsVerify(): Boolean
