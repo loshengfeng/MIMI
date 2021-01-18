@@ -260,7 +260,7 @@ class ClipAdapter(
                     "ExoPlayer.STATE_BUFFERING"
                 }
                 ExoPlayer.STATE_READY -> {
-                    getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
+                    getVideoItem(currentPosition)?.id?.also { id ->
                         clipFuncItem.onVideoReport(id, false)
                     }
                     currentViewHolder?.progress?.visibility = View.GONE
@@ -334,7 +334,7 @@ class ClipAdapter(
         currentViewHolder?.progress?.visibility = View.GONE
         currentViewHolder?.tvRetry?.visibility = View.VISIBLE
 //        currentViewHolder?.tvRetry?.text = error
-        getVideoItem(currentPosition)?.videoEpisodes?.get(0)?.videoStreams?.get(0)?.id?.also { id ->
+        getVideoItem(currentPosition)?.id?.also { id ->
             clipFuncItem.onVideoReport(id, true)
         }
     }

@@ -238,8 +238,8 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
     }
 
     fun sendVideoReport(unhealthy: Boolean) {
-        if(streamId != 0L)
-            playerViewModel.sendVideoReport(streamId, unhealthy)
+        if(contentId != 0L)
+            playerViewModel.sendVideoReport(contentId, unhealthy)
         if(unhealthy) {
             GeneralUtils.showToast(requireContext(), resources.getString(R.string.source_not_found))
         }

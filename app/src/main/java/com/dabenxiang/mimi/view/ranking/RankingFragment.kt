@@ -18,6 +18,7 @@ import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.clipsingle.ClipSingleFragment
 import com.dabenxiang.mimi.view.club.pic.ClubPicFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.my_pages.pages.mimi_video.CollectionFuncItem
 import com.dabenxiang.mimi.view.player.ui.PlayerV2Fragment
 import com.google.android.material.tabs.TabLayout
@@ -57,7 +58,17 @@ class RankingFragment : BaseFragment() {
                             viewModel.getInteractiveHistory(item)
                         }
                         PostType.IMAGE -> {
-                            viewModel.getPostDetail(item.id)
+                            if(viewModel.accountManager.isLogin()){
+                                viewModel.getPostDetail(item.id)
+                            } else {
+                                navigateTo(
+                                    NavigateItem.Destination(
+                                        R.id.action_to_loginFragment,
+                                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                                    )
+                                )
+                            }
+
                         }
                     }
                 },

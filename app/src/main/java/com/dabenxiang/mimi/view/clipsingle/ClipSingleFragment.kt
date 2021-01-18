@@ -277,7 +277,7 @@ class ClipSingleFragment : BaseFragment() {
                     "ExoPlayer.STATE_BUFFERING"
                 }
                 ExoPlayer.STATE_READY -> {
-                    viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
+                    viewModel.videoItem?.id?.run {
                         viewModel.sendVideoReport(this, false)
                     }
                     progress_video?.visibility = View.GONE
@@ -335,7 +335,7 @@ class ClipSingleFragment : BaseFragment() {
             progress_video?.visibility = View.GONE
             tv_retry.visibility = View.VISIBLE
 //            tv_retry.text = error.localizedMessage
-            viewModel.videoEpisodeItem?.videoStreams?.get(0)?.id?.run {
+            viewModel.videoItem?.id?.run {
                 viewModel.sendVideoReport(this, true)
             }
         }
