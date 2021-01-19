@@ -1,16 +1,20 @@
 package com.dabenxiang.mimi.view.orderresult
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.model.enums.PaymentType
+import com.dabenxiang.mimi.model.vo.mqtt.OrderItem
 import com.dabenxiang.mimi.model.vo.mqtt.OrderPayloadItem
 import com.dabenxiang.mimi.view.base.BaseFragment
 import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
+import com.dabenxiang.mimi.widget.utility.GeneralUtils.openWebView
 import kotlinx.android.synthetic.main.fragment_order_result.*
 import java.util.*
 import kotlin.concurrent.timerTask
@@ -73,6 +77,28 @@ class OrderResultFragment : BaseFragment() {
         return R.layout.fragment_order_result
     }
 
+    private fun navigateToPaymentUrl(item: OrderItem) {
+        val orderPayloadItem = item.orderPayloadItem
+        if (orderPayloadItem?.isSuccessful == true) {
+            when (orderPayloadItem.paymentType) {
+                PaymentType.BANK.value -> {
+                    if (TextUtils.isEmpty(orderPayloadItem.paymentUrl)) {
+                        openWebView(requireContext(), orderPayloadItem.paymentUrl)
+                    }
+                }
+                PaymentType.ALI.value -> {
+                    openWebView(requireContext(), orderPayloadItem.paymentUrl)
+                }
+                PaymentType.WX.value -> {
+                    openWebView(requireContext(), orderPayloadItem.paymentUrl)
+                }
+                PaymentType.TIK_TOK.value -> {
+                    openWebView(requireContext(), orderPayloadItem.paymentUrl)
+                }
+            }
+        }
+    }
+
     override fun setupObservers() {
         mainViewModel?.orderItem?.observe(viewLifecycleOwner, {
             if (it != null) {
@@ -80,6 +106,8 @@ class OrderResultFragment : BaseFragment() {
                 stopTopUpTimer()
 
                 epoxyController.setData(it.orderPayloadItem)
+
+                navigateToPaymentUrl(it)
 
                 if (viewModel.isOpenPaymentWebView(it.orderPayloadItem)) {
                     viewModel.setupOrderPayloadItem(it.orderPayloadItem)

@@ -74,7 +74,5 @@ class ActorViewModel : BaseViewModel() {
         override fun onTotalCount(count: Long) {
             _actorsCount.postValue(count.toInt())
         }
-
     }
-
 }
