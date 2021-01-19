@@ -56,9 +56,12 @@ class TopUpFragment : BaseFragment() {
 
     companion object {
         const val TAG_FRAGMENT = "TAG_FRAGMENT"
-        fun createBundle(tagName: String?): Bundle {
+        const val KEY_DATA = "data"
+
+        fun createBundle(tagName: String?, item: OrderingPackageItem? = null): Bundle {
             return Bundle().also {
                 it.putString(TAG_FRAGMENT, tagName)
+                it.putSerializable(OrderInfoFragment.KEY_DATA, item)
             }
         }
     }
@@ -77,6 +80,18 @@ class TopUpFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tag = arguments?.getString(TAG_FRAGMENT)?.takeIf { it.isNotBlank() } ?: ""
+        val orderingPackageItem = arguments?.getSerializable(OrderInfoFragment.KEY_DATA)
+
+        if (orderingPackageItem != null) {
+            orderingPackageItem as OrderingPackageItem
+            val bundle = OrderInfoFragment.createBundle(orderingPackageItem)
+            navigateTo(
+                NavigateItem.Destination(
+                    R.id.action_to_orderInfoFragment,
+                    bundle
+                )
+            )
+        }
 
         Timber.e("TAG_FRAGMENT: $tag")
 
@@ -244,6 +259,9 @@ class TopUpFragment : BaseFragment() {
 //                    }
 
                     var sortedPaymentTypes = paymentTypes.sortedWith(compareBy({ it.sorting }))
+
+                    tl_type.removeAllTabs()
+                    ll_tab_images.removeAllViews()
 
                     for(type in sortedPaymentTypes)
                         if (type.disabled == false)

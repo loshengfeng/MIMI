@@ -43,6 +43,7 @@ import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -768,12 +769,16 @@ class MainViewModel : BaseViewModel() {
 
     fun setAdUrlToServer(target: String) {
         viewModelScope.launch(context = Dispatchers.IO) {
-            val url = URL(target)
-            val connection = url.openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-            connection.doInput = true
-            val status = connection.responseCode
-            Timber.i("Send AD url to server status: $status")
+            try {
+                val url = URL(target)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.doInput = true
+                val status = connection.responseCode
+                Timber.i("Send AD url to server status: $status")
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
         }
     }
 

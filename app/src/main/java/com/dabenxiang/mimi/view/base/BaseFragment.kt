@@ -42,6 +42,7 @@ import com.dabenxiang.mimi.view.player.ui.ClipPlayerFragment
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_DATA
 import com.dabenxiang.mimi.view.post.BasePostFragment.Companion.POST_TYPE
 import com.dabenxiang.mimi.view.post.utility.PostManager
+import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.showToast
 import com.dabenxiang.mimi.widget.utility.UriUtils
@@ -111,10 +112,10 @@ abstract class BaseFragment : Fragment() {
                     } else if (adItem.custom.contains(PAYMENT)) {
                         val jsonStr = adItem.custom.replace(PAYMENT, "")
                         val selectItem = Gson().fromJson(jsonStr, OrderingPackageItem::class.java)
-                        val bundle = OrderInfoFragment.createBundle(selectItem)
+                        val bundle = TopUpFragment.createBundle(tagName = "TopUpFragment", item = selectItem)
                         navigateTo(
                             NavigateItem.Destination(
-                                R.id.action_to_orderInfoFragment,
+                                R.id.action_to_topUpFragment,
                                 bundle
                             )
                         )

@@ -54,34 +54,38 @@ class OrderInfoFragment : BaseFragment() {
 
         orderingPackageItem = arguments?.getSerializable(KEY_DATA) as OrderingPackageItem
 
-        val productName = getString(
-            R.string.order_detail_content, orderingPackageItem.name,
-            getString(
-                when (orderingPackageItem.paymentType) {
-                    PaymentType.BANK -> R.string.order_detail_payment_bank
-                    PaymentType.ALI -> R.string.order_detail_payment_ali
-                    PaymentType.TIK_TOK -> R.string.order_detail_payment_tiktok
-                    PaymentType.WX -> R.string.order_detail_payment_wx
-                }
+        if (orderingPackageItem.paymentType == null) {
+            navigateTo(NavigateItem.Up)
+        } else {
+            val productName = getString(
+                R.string.order_detail_content, orderingPackageItem.name,
+                getString(
+                    when (orderingPackageItem.paymentType) {
+                        PaymentType.BANK -> R.string.order_detail_payment_bank
+                        PaymentType.ALI -> R.string.order_detail_payment_ali
+                        PaymentType.TIK_TOK -> R.string.order_detail_payment_tiktok
+                        PaymentType.WX -> R.string.order_detail_payment_wx
+                    }
+                )
             )
-        )
 
-        tv_product_name.text = productName
+            tv_product_name.text = productName
 
-        val price = GeneralUtils.getAmountFormat(orderingPackageItem.price)
+            val price = GeneralUtils.getAmountFormat(orderingPackageItem.price)
 
-        tv_product_count.text = StringBuilder("¥ ")
-            .append(price)
-            .append(" x 1")
-            .toString()
+            tv_product_count.text = StringBuilder("¥ ")
+                .append(price)
+                .append(" x 1")
+                .toString()
 
-        tv_total.text = StringBuilder("¥ ")
-            .append(price)
-            .toString()
+            tv_total.text = StringBuilder("¥ ")
+                .append(price)
+                .toString()
 
-        tv_total_amount.text = StringBuilder("¥ ")
-            .append(price)
-            .toString()
+            tv_total_amount.text = StringBuilder("¥ ")
+                .append(price)
+                .toString()
+        }
     }
 
     override fun getLayoutId(): Int {
