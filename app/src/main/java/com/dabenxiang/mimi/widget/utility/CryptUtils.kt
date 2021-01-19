@@ -2,12 +2,20 @@ package com.dabenxiang.mimi.widget.utility
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Base64
+import androidx.annotation.RequiresApi
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import com.coremedia.iso.Hex
+import io.ktor.util.*
+import okio.ByteString.Companion.toByteString
+import timber.log.Timber
 import java.io.File
 import java.security.InvalidKeyException
+import java.util.Base64.getDecoder
+import java.util.Base64.getEncoder
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
@@ -17,6 +25,41 @@ object CryptUtils {
     external fun cEncrypt(str: String?): String?
     external fun cDecrypt(str: String?): String?
     external fun cIsVerify(): Boolean
+
+    external fun jniencrypt(bytes: ByteArray): String?
+
+    external fun jnidecrypt(str: String): ByteArray?
+
+//    external fun pwdMD5(str: String?): String?
+
+    fun encrypt(str: String): String? {
+        return jniencrypt(str.toByteArray())
+            ?.let { base64Str->
+            val decoded: ByteArray = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                getDecoder().decode(base64Str)
+            } else {
+                Base64.decode(base64Str, Base64.DEFAULT)
+            }
+            Hex.encodeHex(decoded)
+        }
+    }
+
+    @OptIn(InternalAPI::class)
+    fun decrypt(str: String): String? {
+        val decryptBase64 = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            getEncoder().encodeToString(Hex.decodeHex(str))
+//            encodeBase64()
+             Hex.decodeHex(str).encodeBase64()
+        } else {
+            Base64.encodeToString(Hex.decodeHex(str), Base64.DEFAULT)
+        }
+//        val decryptBase64 =Hex.decodeHex(str).encodeBase64()
+        Timber.i("Encryption intercept: decryptBase64:$decryptBase64")
+
+        return decryptBase64?.let {
+            String(jnidecrypt(it)!!)
+        } ?: ""
+    }
 
     private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 

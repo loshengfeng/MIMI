@@ -11,21 +11,26 @@ cmake_minimum_required(VERSION 3.4.1)
 # automatically packages shared libraries with your APK.
 
 add_library( # Specifies the name of the library.
-             native-lib
+        native-lib
 
-             # Sets the library as a shared library.
-             SHARED
+        # Sets the library as a shared library.
+        SHARED
 
-             # Provides a relative path to your source file(s).
-            src/main/cpp/aes.h
-            src/main/cpp/aes_cbc.c
-            src/main/cpp/aes_core.c
-            src/main/cpp/aes_ecb.c
-            src/main/cpp/aes_locl.h
-            src/main/cpp/cbc128.c
-            src/main/cpp/main_test.c
-            src/main/cpp/modes.h
-            src/main/cpp/native-lib.cpp)
+        # Provides a relative path to your source file(s).
+        src/main/cpp/aes.h
+        src/main/cpp/aes_cbc.c
+        src/main/cpp/aes_core.c
+        src/main/cpp/aes_ecb.c
+        src/main/cpp/aes_locl.h
+        src/main/cpp/cbc128.c
+        src/main/cpp/main_test.c
+        src/main/cpp/modes.h
+        src/main/cpp/native-lib.cpp
+        src/main/cpp/md5.cpp
+        src/main/cpp/aes.c
+        src/main/cpp/base64.c
+
+        )
 
 find_library( # Sets the name of the path variable.
         log-lib

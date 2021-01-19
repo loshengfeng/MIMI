@@ -56,6 +56,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
         try {
             response = chain.proceed(newRequest)
             Timber.d("AuthInterceptor Response Code: ${response.code}")
+            Timber.d("AuthInterceptor Response  ${response.body}")
             return when (response.code) {
                 HttpURLConnection.HTTP_UNAUTHORIZED -> {
                     response.close()
@@ -69,6 +70,7 @@ class AuthInterceptor(private val pref: Pref) : Interceptor, KoinComponent {
                 else -> response
             }
         } catch (e: Exception) {
+            Timber.d("AuthInterceptor Exception  $e")
             response?.close()
             return when (e) {
                 is UnknownHostException,
