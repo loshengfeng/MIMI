@@ -15,7 +15,7 @@ class HomeListPagingSource(
     private val needAd: Boolean = true
 ): PagingSource<Long, HomeListItem>() {
     companion object {
-        const val PER_LIMIT = 20
+        const val PER_LIMIT = 4
     }
     private var adIndex = 0
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, HomeListItem> {
