@@ -33,22 +33,25 @@ class ApiRepository(private val apiService: ApiService) {
      *
      ***********************************************************/
     suspend fun getToken() = apiService.getToken(
-        "client_credentials",
-        "3770511208570945536",
-        "1d760dedf35a4a508ecd71b5013a1611"
+        TokenRequest(
+            grantType = "client_credentials",
+            clientId = "3770511208570945536",
+            clientSecret = "1d760dedf35a4a508ecd71b5013a1611"
+        )
+
     )
 
     /**
      * 更新Token
      */
-    suspend fun refreshToken(token: String) =
-        apiService.refreshToken(
-            "refresh_token",
-            token,
-            "3770511208570945536",
-            "1d760dedf35a4a508ecd71b5013a1611"
+    suspend fun refreshToken(token: String) =apiService.refreshToken(
+        RefreshTokenRequest(
+            grantType = "refresh_token",
+            refreshToken = token,
+            clientId =  "3770511208570945536",
+            clientSecret =  "1d760dedf35a4a508ecd71b5013a1611",
         )
-
+    )
     /**
      * 登入
      */

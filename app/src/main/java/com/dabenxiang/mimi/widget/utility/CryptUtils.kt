@@ -2,19 +2,63 @@ package com.dabenxiang.mimi.widget.utility
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Base64
+import androidx.annotation.RequiresApi
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import com.coremedia.iso.Hex
+import io.ktor.util.*
+import okio.ByteString.Companion.toByteString
+import timber.log.Timber
 import java.io.File
 import java.security.InvalidKeyException
+import java.util.Base64.getDecoder
+import java.util.Base64.getEncoder
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 object CryptUtils {
+    external fun cEcbEncrypt(str: String?): String?
+    external fun cEcbDecrypt(str: String?): String?
     external fun cEncrypt(str: String?): String?
     external fun cDecrypt(str: String?): String?
     external fun cIsVerify(): Boolean
+
+    external fun jniencrypt(bytes: ByteArray): String?
+
+    external fun jnidecrypt(str: String): ByteArray?
+
+//    external fun pwdMD5(str: String?): String?
+
+    fun encrypt(str: String): String? {
+        return jniencrypt(str.toByteArray())
+            ?.let { base64Str->
+            val decoded: ByteArray = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                getDecoder().decode(base64Str)
+            } else {
+                Base64.decode(base64Str, Base64.DEFAULT)
+            }
+            Hex.encodeHex(decoded)
+        }
+    }
+
+    @OptIn(InternalAPI::class)
+    fun decrypt(str: String): String? {
+        val decryptBase64 =str.chunked(2).map {
+            it.toInt(16).toByte()
+        }.toByteArray().encodeBase64()
+//        val decryptBase64 = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//             Hex.decodeHex(str).encodeBase64()
+//        } else {
+//            Base64.encode(Hex.decodeHex(str), Base64.DEFAULT)
+//        }
+
+        Timber.i("Encryption intercept: decryptBase64:$decryptBase64")
+
+        return String(jnidecrypt(decryptBase64)!!)
+    }
 
     private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 
@@ -80,7 +124,7 @@ object CryptUtils {
         if (file.exists()) file.delete()
     }
 
-    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: ByteArray): ByteArray {
+    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: ByteArray= "1234567890123456".toByteArray()): ByteArray {
         val cipher: Cipher = Cipher.getInstance("AES/ECB/NoPadding")
         return try {
             val secretKey = SecretKeySpec(key, "AES")

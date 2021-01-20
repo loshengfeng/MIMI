@@ -8,23 +8,25 @@ import retrofit2.http.*
 
 interface ApiService {
 
-    @FormUrlEncoded
+//    @FormUrlEncoded
     @Headers("Authorization: basic ZmFkYWNhaV9mcm9udGVuZDo0NGVkMWJiZDI3NDUwOTZkYTI1MmM5NWM0YTQ0NGVkMWJiZA==")
     @POST("/v1/oauth2/token")
     suspend fun getToken(
-        @Field("grant_type") grantType: String,
-        @Field("client_id") clientId: String,
-        @Field("client_secret") clientSecret: String
+//        @Field("grant_type") grantType: String,
+//        @Field("client_id") clientId: String,
+//        @Field("client_secret") clientSecret: String
+        @Body request:TokenRequest
     ): Response<TokenItem>
 
-    @FormUrlEncoded
+//    @FormUrlEncoded
     @Headers("Authorization: basic ZmFkYWNhaV9mcm9udGVuZDo0NGVkMWJiZDI3NDUwOTZkYTI1MmM5NWM0YTQ0NGVkMWJiZA==")
     @POST("/v1/oauth2/token")
     suspend fun refreshToken(
-        @Field("grant_type") grantType: String,
-        @Field("refresh_token") refreshToken: String,
-        @Field("client_id") clientId: String,
-        @Field("client_secret") clientSecret: String
+//        @Field("grant_type") grantType: String,
+//        @Field("refresh_token") refreshToken: String,
+//        @Field("client_id") clientId: String,
+//        @Field("client_secret") clientSecret: String
+        @Body request:RefreshTokenRequest
     ): Response<TokenItem>
 
     @POST("/v1/auth/signin")

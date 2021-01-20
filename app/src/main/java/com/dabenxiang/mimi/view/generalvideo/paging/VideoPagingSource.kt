@@ -29,7 +29,8 @@ class VideoPagingSource(
                 .statisticsHomeVideos(
                     orderByType = orderByType,
                     category = category,
-                    lastId = lastId
+                    lastId = lastId,
+                    limit = 10
                 )
             if (!result.isSuccessful) throw HttpException(result)
 
