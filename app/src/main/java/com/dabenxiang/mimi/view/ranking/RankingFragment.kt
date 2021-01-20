@@ -55,7 +55,17 @@ class RankingFragment : BaseFragment() {
                             )
                         }
                         PostType.SMALL_CLIP -> {
-                            viewModel.getInteractiveHistory(item)
+                            if(viewModel.accountManager.isLogin()){
+                                viewModel.getInteractiveHistory(item)
+                            } else {
+                                navigateTo(
+                                    NavigateItem.Destination(
+                                        R.id.action_to_loginFragment,
+                                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                                    )
+                                )
+                            }
+
                         }
                         PostType.IMAGE -> {
                             if(viewModel.accountManager.isLogin()){
