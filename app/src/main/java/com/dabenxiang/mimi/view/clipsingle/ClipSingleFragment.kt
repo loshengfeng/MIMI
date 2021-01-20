@@ -21,6 +21,7 @@ import com.dabenxiang.mimi.view.base.NavigateItem
 import com.dabenxiang.mimi.view.dialog.MoreDialogFragment
 import com.dabenxiang.mimi.view.dialog.ReportDialogFragment
 import com.dabenxiang.mimi.view.dialog.comment.CommentDialogFragment
+import com.dabenxiang.mimi.view.login.LoginFragment
 import com.dabenxiang.mimi.view.mypost.MyPostFragment
 import com.dabenxiang.mimi.view.player.PlayerViewModel
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
@@ -157,7 +158,17 @@ class ClipSingleFragment : BaseFragment() {
         }
 
         iv_favorite.setOnClickListener {
-            playItem?.run { viewModel.modifyFavorite(this, this.favorite != true) }
+            if(viewModel.accountManager.isLogin()){
+                playItem?.run { viewModel.modifyFavorite(this, this.favorite != true) }
+            } else {
+                navigateTo(
+                    NavigateItem.Destination(
+                        R.id.action_to_loginFragment,
+                        LoginFragment.createBundle(LoginFragment.TYPE_LOGIN)
+                    )
+                )
+            }
+
         }
 
         tv_more.setOnClickListener {
