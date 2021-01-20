@@ -46,19 +46,18 @@ object CryptUtils {
 
     @OptIn(InternalAPI::class)
     fun decrypt(str: String): String? {
-        val decryptBase64 = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//            getEncoder().encodeToString(Hex.decodeHex(str))
-//            encodeBase64()
-             Hex.decodeHex(str).encodeBase64()
-        } else {
-            Base64.encodeToString(Hex.decodeHex(str), Base64.DEFAULT)
-        }
-//        val decryptBase64 =Hex.decodeHex(str).encodeBase64()
+        val decryptBase64 =str.chunked(2).map {
+            it.toInt(16).toByte()
+        }.toByteArray().encodeBase64()
+//        val decryptBase64 = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//             Hex.decodeHex(str).encodeBase64()
+//        } else {
+//            Base64.encode(Hex.decodeHex(str), Base64.DEFAULT)
+//        }
+
         Timber.i("Encryption intercept: decryptBase64:$decryptBase64")
 
-        return decryptBase64?.let {
-            String(jnidecrypt(it)!!)
-        } ?: ""
+        return String(jnidecrypt(decryptBase64)!!)
     }
 
     private val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)

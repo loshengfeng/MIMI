@@ -66,7 +66,7 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
             }
 
             val newResponse = response.newBuilder()
-            var contentType = "application/json"
+            var contentType = "application/json; charset=utf-8"
 
             val responseBodyStr = response.body!!.string()
             val decrypted = CryptUtils.decrypt(responseBodyStr)
