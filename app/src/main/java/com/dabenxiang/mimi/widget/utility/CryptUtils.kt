@@ -30,7 +30,7 @@ object CryptUtils {
 
     external fun jnidecrypt(str: String): ByteArray?
 
-//    external fun pwdMD5(str: String?): String?
+    external fun getAESKey(str: String): String?
 
     fun encrypt(str: String): String? {
         return jniencrypt(str.toByteArray())
@@ -49,11 +49,6 @@ object CryptUtils {
         val decryptBase64 =str.chunked(2).map {
             it.toInt(16).toByte()
         }.toByteArray().encodeBase64()
-//        val decryptBase64 = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//             Hex.decodeHex(str).encodeBase64()
-//        } else {
-//            Base64.encode(Hex.decodeHex(str), Base64.DEFAULT)
-//        }
 
         Timber.i("Encryption intercept: decryptBase64:$decryptBase64")
 
