@@ -7,6 +7,7 @@ import com.dabenxiang.mimi.model.pref.Pref
 import com.dabenxiang.mimi.widget.factory.EnumTypeAdapterFactory
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.GsonBuilder
+import io.ktor.util.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -14,6 +15,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+@OptIn(InternalAPI::class)
 val apiModule = module {
     single { provideAuthInterceptor(get()) }
     single { provideHttpLoggingInterceptor() }
@@ -40,6 +42,7 @@ fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
     return httpLoggingInterceptor
 }
 
+@InternalAPI
 fun provideOkHttpClient(
     authInterceptor: AuthInterceptor,
     encryptionInterceptor  :EncryptionInterceptor,
@@ -80,6 +83,7 @@ fun provideApiLogInterceptor(): ApiLogInterceptor {
     return ApiLogInterceptor()
 }
 
+@OptIn(InternalAPI::class)
 fun provideEncryptionInterceptor(): EncryptionInterceptor {
     return EncryptionInterceptor()
 }

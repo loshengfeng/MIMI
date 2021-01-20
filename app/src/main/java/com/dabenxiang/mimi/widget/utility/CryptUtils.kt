@@ -124,8 +124,8 @@ object CryptUtils {
         if (file.exists()) file.delete()
     }
 
-    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: ByteArray): ByteArray {
-        val cipher: Cipher = Cipher.getInstance("AES/ECB/NoPadding")
+    fun decryptWithCEBNoPadding(byteArray: ByteArray, key: ByteArray= "1234567890123456".toByteArray()): ByteArray {
+        val cipher: Cipher = Cipher.getInstance("AES/ECB/PKCS7Padding")
         return try {
             val secretKey = SecretKeySpec(key, "AES")
             cipher.init(Cipher.DECRYPT_MODE, secretKey)

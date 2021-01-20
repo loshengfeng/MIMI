@@ -1,6 +1,8 @@
 package com.dabenxiang.mimi.model.api
 
+import com.dabenxiang.mimi.widget.AESEncryptor
 import com.dabenxiang.mimi.widget.utility.CryptUtils
+import io.ktor.util.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -10,6 +12,7 @@ import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import kotlin.math.ceil
 
+@InternalAPI
 class EncryptionInterceptor() : Interceptor, KoinComponent {
 
     companion object{
@@ -45,13 +48,13 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
                 Timber.i("Encryption intercept: mediaType:$mediaType")
                 val encryptBodyStr: String = CryptUtils.encrypt(strOldBody) ?: ""
                 Timber.i("Encryption intercept: encryptBodyStr:$encryptBodyStr")
-                Timber.i(
-                    "Encryption intercept: decryptBodyStr test:${
-                        CryptUtils.decrypt(
-                            encryptBodyStr
-                        )
-                    }"
-                )
+//                Timber.i(
+//                    "Encryption intercept: decryptBodyStr test:${
+//                        CryptUtils.decrypt(
+//                            encryptBodyStr
+//                        )
+//                    }"
+//                )
                 encryptBodyStr.toRequestBody(mediaType)
             }?.let {
                 buildRequest(request, it)
@@ -69,7 +72,10 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
             var contentType = "application/json; charset=utf-8"
 
             val responseBodyStr = response.body!!.string()
-            val decrypted = CryptUtils.decrypt(responseBodyStr)
+//            val decrypted = CryptUtils.decrypt(responseBodyStr)
+
+            Timber.i("Encryption intercept: decryptBase64:${responseBodyStr}")
+            val decrypted = AESEncryptor.decryptWithAES(strToDecrypt=responseBodyStr)
             Timber.i("Encryption intercept: decrypted:$decrypted")
             if (decrypted.isNullOrEmpty()) {
                 throw IllegalArgumentException("No decryption strategy!")

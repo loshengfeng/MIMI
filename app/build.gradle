@@ -429,6 +429,8 @@ dependencies {
     // QrCode
     implementation "com.journeyapps:zxing-android-embedded:$zxing_android_embedded_version"
     implementation "com.google.zxing:core:$zxing_core_version"
+
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.65'
 }
 
 class Version {
