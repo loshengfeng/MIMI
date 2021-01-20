@@ -3,6 +3,7 @@ package com.dabenxiang.mimi.view.actor
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.ConcatAdapter
@@ -21,6 +22,8 @@ import com.dabenxiang.mimi.view.search.video.SearchVideoFragment
 import com.dabenxiang.mimi.widget.view.ActorsGridSpaceItemDecoration
 import kotlinx.android.synthetic.main.fragment_actor.*
 import kotlinx.android.synthetic.main.fragment_actor.tv_search
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ActorFragment : BaseFragment() {
@@ -88,8 +91,13 @@ class ActorFragment : BaseFragment() {
             getString(R.string.text_search_classification),
             getString(R.string.actor)
         )
-        viewModel.getActors()
-        viewModel.getData(actorListAdapter)
+        viewModel.viewModelScope.launch {
+            delay(2000)
+            viewModel.getActors()
+
+//            viewModel.getData(actorListAdapter)
+        }
+
     }
 
     override fun setupObservers() {
@@ -99,6 +107,7 @@ class ActorFragment : BaseFragment() {
                 is ApiResult.Loaded -> progressHUD.dismiss()
                 is ApiResult.Success -> {
                     val actorVideos = (it.first as ApiResult.Success).result
+                    viewModel.getData(actorListAdapter)
                     actorVideosAdapter.submitList(actorVideos)
                 }
                 is ApiResult.Error -> onApiError((it.first as ApiResult.Error<ArrayList<ActorCategoriesItem>>).throwable)
@@ -118,7 +127,7 @@ class ActorFragment : BaseFragment() {
         layout_refresh.setOnRefreshListener {
             layout_refresh.isRefreshing = false
             viewModel.getActors()
-            viewModel.getData(actorListAdapter)
+//            viewModel.getData(actorListAdapter)
         }
     }
 
