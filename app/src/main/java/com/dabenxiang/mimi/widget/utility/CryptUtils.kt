@@ -125,7 +125,7 @@ object CryptUtils {
     }
 
     fun decryptWithCEBNoPadding(byteArray: ByteArray, key: ByteArray= "1234567890123456".toByteArray()): ByteArray {
-        val cipher: Cipher = Cipher.getInstance("AES/ECB/PKCS7Padding")
+        val cipher: Cipher = Cipher.getInstance("AES/ECB/NoPadding")
         return try {
             val secretKey = SecretKeySpec(key, "AES")
             cipher.init(Cipher.DECRYPT_MODE, secretKey)
