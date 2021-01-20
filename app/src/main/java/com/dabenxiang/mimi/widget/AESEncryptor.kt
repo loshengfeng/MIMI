@@ -63,8 +63,7 @@ object AESEncryptor {
         try {
             keyBytes = key.toByteArray(charset("UTF8"))
             val skey = SecretKeySpec(keyBytes, "AES")
-            val input = org.bouncycastle.util.encoders.Base64
-                .decode(strToDecrypt?.trim { it <= ' ' }?.toByteArray(charset("UTF8")))
+            val input = Base64.decode(strToDecrypt?.trim { it <= ' ' }?.toByteArray(charset("UTF8")))
 
             synchronized(Cipher::class.java) {
                 val cipher = Cipher.getInstance("AES/ECB/PKCS7Padding")

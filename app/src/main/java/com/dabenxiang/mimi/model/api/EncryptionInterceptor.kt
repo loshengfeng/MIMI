@@ -71,7 +71,9 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
             val newResponse = response.newBuilder()
             var contentType = "application/json; charset=utf-8"
 
-            val responseBodyStr = response.body!!.string()
+            val responseBodyStr = response.body!!.string().chunked(2).map {
+                it.toInt(16).toByte()
+            }.toByteArray().encodeBase64()
 //            val decrypted = CryptUtils.decrypt(responseBodyStr)
 
             Timber.i("Encryption intercept: decryptBase64:${responseBodyStr}")
