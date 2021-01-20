@@ -1,6 +1,6 @@
 package com.dabenxiang.mimi.model.api
 
-import com.dabenxiang.mimi.widget.AESEncryptor
+import com.dabenxiang.mimi.widget.utility.AESEncryptor
 import com.dabenxiang.mimi.widget.utility.CryptUtils
 import io.ktor.util.*
 import okhttp3.*
@@ -10,7 +10,6 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.Buffer
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
-import kotlin.math.ceil
 
 @InternalAPI
 class EncryptionInterceptor() : Interceptor, KoinComponent {

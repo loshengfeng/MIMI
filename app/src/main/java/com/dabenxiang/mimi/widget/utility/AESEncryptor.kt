@@ -1,4 +1,4 @@
-package com.dabenxiang.mimi.widget
+package com.dabenxiang.mimi.widget.utility
 import javax.crypto.ShortBufferException
 import java.security.NoSuchAlgorithmException
 import javax.crypto.NoSuchPaddingException
@@ -9,6 +9,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.util.encoders.Base64
+import com.dabenxiang.mimi.BuildConfig
 import java.security.InvalidKeyException
 import java.security.Security
 
@@ -56,7 +57,7 @@ object AESEncryptor {
         return null
     }
 
-    fun decryptWithAES(key: String= "1234567890123456", strToDecrypt: String?): String? {
+    fun decryptWithAES(key: String=  CryptUtils.getAESKey(BuildConfig.BUILD_TYPE) ?:"", strToDecrypt: String?): String? {
         Security.addProvider(BouncyCastleProvider())
         var keyBytes: ByteArray
 

@@ -152,14 +152,7 @@ class MainActivity : BaseActivity() {
 
     private fun checkValidApp() {
         Timber.i("checkValidApp = ${CryptUtils.cIsVerify()} ")
-        val testStr = "7DD160EE64CA0D9C630AC6316E1AF706E1152A5E45D47D64F8E517F4F9954908050187A0CDE5A9872CBAB091AB73E553"
-        val testDecrypt = CryptUtils.cEcbDecrypt(testStr)
-        Timber.i("checkValidApp cEcbDecrypt =$testDecrypt")
-        val testEncrypt = CryptUtils.cEcbEncrypt(testDecrypt) ?: ""
 
-        Timber.i("checkValidApp cEcbEncrypt =$testEncrypt")
-        val testDecrypt2 = CryptUtils.cEcbDecrypt(testEncrypt)
-        Timber.i("checkValidApp testDecrypt2 =$testDecrypt2")
     }
 
     override fun onResume() {

@@ -112,6 +112,7 @@ static const char *RELEASE_SIGN = "be59241d4601c2b1e92199220c86c587c5ccde1cad70d
                                   "277c5994f5b3d0d2176bbf696d73ddcfeda44b8ced0c1109df1c387e841e3d715b3ea39fb234efaf379ea67e20f15de9ea1277f69448b276e5fd12e8a8f546165";
 
 static const uint8_t AES_CHECK_KEY[] = "1234567890123456";
+static const uint8_t AES_CHECK_KEY_PROD[] = "1234567890123456";
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_dabenxiang_plugin_view_login_LoginViewModel_stringFromJNI(JNIEnv *env, jobject) {
@@ -171,58 +172,6 @@ std::string char2hex(std::string s)
     return ret;
 }
 
-void correctUtfBytes(char* bytes) {
-    char three = 0;
-    while (*bytes != '\0') {
-        unsigned char utf8 = *(bytes++);
-        three = 0;
-        // Switch on the high four bits.
-        switch (utf8 >> 4) {
-            case 0x00:
-            case 0x01:
-            case 0x02:
-            case 0x03:
-            case 0x04:
-            case 0x05:
-            case 0x06:
-            case 0x07:
-                // Bit pattern 0xxx. No need for any extra bytes.
-                break;
-            case 0x08:
-            case 0x09:
-            case 0x0a:
-            case 0x0b:
-            case 0x0f:
-                /*
-                 * Bit pattern 10xx or 1111, which are illegal start bytes.
-                 * Note: 1111 is valid for normal UTF-8, but not the
-                 * modified UTF-8 used here.
-                 */
-                *(bytes-1) = '?';
-                break;
-            case 0x0e:
-                // Bit pattern 1110, so there are two additional bytes.
-                utf8 = *(bytes++);
-                if ((utf8 & 0xc0) != 0x80) {
-                    --bytes;
-                    *(bytes-1) = '?';
-                    break;
-                }
-                three = 1;
-                // Fall through to take care of the final byte.
-            case 0x0c:
-            case 0x0d:
-                // Bit pattern 110x, so there is one additional byte.
-                utf8 = *(bytes++);
-                if ((utf8 & 0xc0) != 0x80) {
-                    --bytes;
-                    if(three)--bytes;
-                    *(bytes-1)='?';
-                }
-                break;
-        }
-    }
-}
 //把十六进制字符串转成字符串
 std::string hex2char(std::string s)
 {
@@ -274,9 +223,7 @@ std::string EncodeEcbAES(const unsigned char *master_key,std::string data){
     AES_set_encrypt_key(master_key, 128, &key);
 
     std::string data_bak = data.c_str();
-    __android_log_print(ANDROID_LOG_DEBUG, "Native lib", "data_bak = %s", data_bak.c_str());
     unsigned int data_length = (unsigned int) data_bak.length();
-    __android_log_print(ANDROID_LOG_DEBUG, "Native lib", "data_length = %d", data_length);
     std::string encryhex;
 
     int padding = 0;
@@ -284,15 +231,7 @@ std::string EncodeEcbAES(const unsigned char *master_key,std::string data){
     {
         padding = (int) (AES_BLOCK_SIZE - data_bak.length() % AES_BLOCK_SIZE);
     }
-    __android_log_print(ANDROID_LOG_DEBUG, "Native lib", "padding = %d", padding);
     data_length += padding;
-    __android_log_print(ANDROID_LOG_DEBUG, "Native lib", "data_length = %d", data_length);
-
-//    while (padding > 0)
-//    {
-//        data_bak += '\0';
-//        padding--;
-//    }
 
     for(unsigned int i = 0; i < data_length/AES_BLOCK_SIZE; i++)
     {
@@ -384,6 +323,23 @@ std::string DecodeAES(const unsigned char *master_key,std::string data,const uns
 
 extern "C"
 JNIEXPORT jstring JNICALL
+Java_com_dabenxiang_mimi_widget_utility_CryptUtils_getAESKey(JNIEnv *env, jobject thiz, jstring flavor_) {
+
+    const char *flavorStr = env->GetStringUTFChars(flavor_, 0);
+
+    if (strcmp(flavorStr, "prod") == 0) {
+        std::string key((char *)AES_CHECK_KEY_PROD);
+        return env->NewStringUTF(key.c_str());
+    } else{
+         std::string key((char *)AES_CHECK_KEY);
+         return env->NewStringUTF(key.c_str());
+    }
+
+}
+
+
+extern "C"
+JNIEXPORT jstring JNICALL
 Java_com_dabenxiang_mimi_widget_utility_CryptUtils_jniencrypt(JNIEnv *env, jobject type, jbyteArray jbArr) {
 
     char *str = NULL;
@@ -413,17 +369,6 @@ Java_com_dabenxiang_mimi_widget_utility_CryptUtils_jnidecrypt(JNIEnv *env, jobje
     env->SetByteArrayRegion(jbArr, 0, len, (jbyte *) result);
     return jbArr;
 }
-
-//extern "C"
-//JNIEXPORT jstring JNICALL
-//Java_com_dabenxiang_mimi_widget_utility_CryptUtils_pwdMD5(JNIEnv *env, jobject type, jstring out_str) {
-//
-//    const char *str = env->GetStringUTFChars(out_str, 0);
-//    string result = MD5(MD5(PWD_MD5_KEY + string(str)).toStr()).toStr();
-//    env->ReleaseStringUTFChars(out_str, str);
-//    return env->NewStringUTF(("###" + result).data());
-//}
-
 
 extern "C"
 JNIEXPORT jstring JNICALL
@@ -464,10 +409,10 @@ Java_com_dabenxiang_mimi_widget_utility_CryptUtils_cEncrypt(JNIEnv *env, jobject
     env->ReleaseStringUTFChars(str_, str);
     return env->NewStringUTF(h.c_str());
 }
+
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_dabenxiang_mimi_widget_utility_CryptUtils_cDecrypt(JNIEnv *env, jobject thiz, jstring str_) {
-
 
     const char *str = env->GetStringUTFChars(str_, 0);
 
