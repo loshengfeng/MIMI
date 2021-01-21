@@ -139,6 +139,11 @@ interface ApiService {
         @Body body: ForgetPasswordRequest
     ): Response<Void>
 
+    @POST("/v1/Members/SignIn")
+    suspend fun signIn(
+        @Body body: SingInRequest
+    ): Response<Void>
+
     @POST("/v1/Members/SignUp")
     suspend fun signUp(
         @Body body: SingUpRequest
@@ -148,11 +153,6 @@ interface ApiService {
     suspend fun signUpGuest(
             @Body body: SingUpGuestRequest
     ): Response<Void>
-
-//    @POST("/v1/Members/SignIn")
-//    suspend fun SignIn(
-//            @Body body: SingUpGuestRequest
-//    ): Response<Void>
 
     @POST("/v1/Members/Me/Email")
     suspend fun resendEmail(

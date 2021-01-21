@@ -212,7 +212,13 @@ class ApiRepository(private val apiService: ApiService) {
         body: ForgetPasswordRequest
     ) = apiService.forgetPassword(body)
 
-    /**
+
+
+    suspend fun signIn(
+        body: SingInRequest
+    ) = apiService.signIn(body)
+
+        /**
      * 建立新使用者
      */
     suspend fun signUp(

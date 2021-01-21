@@ -26,3 +26,14 @@ data class SingUpGuestRequest(
         @SerializedName("deviceId")
         val deviceId: String?=""
 )
+
+data class SingInRequest(
+    @SerializedName("id")
+    val id: Long?=0,
+
+    @SerializedName("username")
+    val username: String?="",
+
+    @SerializedName("code")
+    val code: String?=""
+)
