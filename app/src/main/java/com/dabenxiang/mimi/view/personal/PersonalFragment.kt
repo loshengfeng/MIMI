@@ -27,6 +27,7 @@ import com.dabenxiang.mimi.view.topup.TopUpFragment
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.android.synthetic.main.fragment_personal.*
 import kotlinx.android.synthetic.main.item_personal_is_login.*
+import kotlinx.android.synthetic.main.item_personal_is_login.view.*
 import timber.log.Timber
 import tw.gov.president.manager.submanager.update.callback.DownloadProgressCallback
 import tw.gov.president.manager.submanager.update.data.VersionStatus
@@ -83,11 +84,23 @@ class PersonalFragment : BaseFragment() {
         vip_buy.visibility = View.VISIBLE
         tv_expiry_date.visibility = View.GONE
         img_arrow.visibility = View.INVISIBLE
+        item_is_Login.visibility = View.VISIBLE
         if (viewModel.isLogin()) {
-            item_is_Login.visibility = View.VISIBLE
+            item_is_Login.tv_favorite.visibility = View.VISIBLE
+            item_is_Login.view1.visibility = View.VISIBLE
+            item_is_Login.view2.visibility = View.VISIBLE
+            item_is_Login.view3.visibility = View.VISIBLE
+            item_is_Login.tv_my_post.visibility = View.VISIBLE
+            item_is_Login.tv_exchange.visibility = View.VISIBLE
             tv_logout.visibility = View.GONE
         } else {
-            item_is_Login.visibility = View.GONE
+            item_is_Login.visibility = View.VISIBLE
+            item_is_Login.tv_favorite.visibility = View.GONE
+            item_is_Login.view1.visibility = View.GONE
+            item_is_Login.view2.visibility = View.GONE
+            item_is_Login.view3.visibility = View.GONE
+            item_is_Login.tv_my_post.visibility = View.GONE
+            item_is_Login.tv_exchange.visibility = View.GONE
             tv_logout.visibility = View.GONE
         }
     }
