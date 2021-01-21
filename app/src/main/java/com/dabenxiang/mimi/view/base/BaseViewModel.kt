@@ -29,6 +29,7 @@ import com.dabenxiang.mimi.view.clip.ClipPagerFragment.Companion.pageCodeClipLat
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesPostMediator
 import com.dabenxiang.mimi.view.my_pages.base.MyPagesType
 import com.dabenxiang.mimi.widget.utility.FileUtil
+import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.GeneralUtils.getExceptionDetail
 import com.dabenxiang.mimi.widget.utility.LoadImageUtils
 import com.google.gson.Gson
@@ -58,7 +59,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     val accountManager: AccountManager by inject()
     val domainManager: DomainManager by inject()
     val mqttManager: MQTTManager by inject()
-
+    val clientId = GeneralUtils.getAndroidID()
     var adWidth = 0
     var adHeight = 0
 
@@ -73,6 +74,9 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     private val _bottomAdResult = MutableLiveData<AdItem>()
     val bottomAdResult: LiveData<AdItem> = _bottomAdResult
+
+    private val _signUpResult = MutableLiveData<ApiResult<Nothing>>()
+    val signUpResult: LiveData<ApiResult<Nothing>> = _signUpResult
 
     fun setShowProgress(show: Boolean) {
         _showProgress.value = show
@@ -103,6 +107,10 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
     fun logoutLocal() {
         accountManager.logoutLocal()
+    }
+
+    fun clearToken() {
+        pref.clearToken()
     }
 
     /**
@@ -354,4 +362,46 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             }
         }
     }
+
+    suspend fun checkSignIn() {
+        Timber.i("signUpGuest profileItem =${accountManager.getProfile()}")
+        accountManager.getProfile().userId?.takeIf {
+            it != 0L
+        }?.let {id->
+            Timber.i("signUpGuest signIn id=$id")
+            accountManager.signIn(id).collect {
+                Timber.i("signUpGuest collect $it")
+                _signUpResult.postValue(it)
+            }
+        } ?: run {
+            Timber.i("signUpGuest doSingUpGuestFlow")
+            doSingUpGuestFlow()
+        }
+    }
+
+    private suspend fun doSingUpGuestFlow(){
+            flow {
+                val request = SingUpGuestRequest(
+                        deviceId = clientId
+                )
+                val resp = domainManager.getApiRepository().signUp(request)
+                Timber.i("signUpGuest signUp=$resp")
+                if (!resp.isSuccessful) throw HttpException(resp)
+
+                val guestUserID = resp.body()?.content ?:  throw HttpException(resp)
+
+                Timber.i("signUpGuest guestUserID=$guestUserID")
+                emit(guestUserID.toLong())
+            }
+                    .flowOn(Dispatchers.IO)
+                    .flatMapConcat {id->
+                        Timber.i("signUpGuest flatMapConcat guestUserID=$id")
+                        accountManager.signIn(id)
+                    }
+                    .catch { e -> emit(ApiResult.error(e)) }
+                    .collect {
+                        Timber.i("signUpGuest collect $it")
+                        _signUpResult.postValue(it)
+                    }
+        }
 }

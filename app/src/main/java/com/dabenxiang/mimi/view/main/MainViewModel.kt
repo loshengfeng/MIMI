@@ -56,8 +56,6 @@ class MainViewModel : BaseViewModel() {
 
     val messageListenerMap = hashMapOf<String, MessageListener>()
 
-    private val clientId = GeneralUtils.getAndroidID()
-
     private val _categoriesData = MutableLiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>>()
     val categoriesData: LiveData<ApiResult<ApiBaseItem<RootCategoriesItem>>> = _categoriesData
 
@@ -123,9 +121,6 @@ class MainViewModel : BaseViewModel() {
 
     private val _isShowSnackBar = MutableLiveData<Boolean>()
     val isShowSnackBar: LiveData<Boolean> = _isShowSnackBar
-
-    private val _signUpResult = MutableLiveData<ApiResult<Nothing>>()
-    val signUpResult: LiveData<ApiResult<Nothing>> = _signUpResult
 
     private var _normal: CategoriesItem? = null
     val normal
@@ -862,44 +857,5 @@ class MainViewModel : BaseViewModel() {
 
     }
 
-    fun checkSignIn() {
-        Timber.i("signUpGuest profileItem =${pref.profileItem}")
-        pref.profileItem.userId?.takeIf {
-            it != 0L
-        }?.let {id->
-            Timber.i("signUpGuest signIn id=$id")
-            accountManager.signIn(id)
-        } ?: run {
-            Timber.i("signUpGuest doSingUpGuestFlow")
-            doSingUpGuestFlow()
-        }
-    }
 
-    private fun doSingUpGuestFlow(){
-        viewModelScope.launch {
-            flow {
-                val request = SingUpGuestRequest(
-                    deviceId = clientId
-                )
-                val resp = domainManager.getApiRepository().signUp(request)
-                Timber.i("signUpGuest signUp=$resp")
-                if (!resp.isSuccessful) throw HttpException(resp)
-
-                val guestUserID = resp.body()?.content ?:  throw HttpException(resp)
-
-                Timber.i("signUpGuest guestUserID=$guestUserID")
-                emit(guestUserID.toLong())
-            }
-                .flowOn(Dispatchers.IO)
-                .flatMapConcat {id->
-                    Timber.i("signUpGuest flatMapConcat guestUserID=$id")
-                    accountManager.signIn(id)
-                }
-                .catch { e -> emit(ApiResult.error(e)) }
-                .collect {
-                    Timber.i("signUpGuest collect $it")
-                    _signUpResult.postValue(it)
-                }
-        }
-    }
 }

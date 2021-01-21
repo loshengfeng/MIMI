@@ -143,22 +143,10 @@ class MainActivity : BaseActivity() {
         viewModel.closeAppFromMqtt.observe(this) {
             finish()
         }
-
-
-        viewModel.signUpResult.observe(this) {
-            when (it) {
-                is Empty -> {
-                    Timber.i("signUpGuest Success")
-//                    viewModel.getTotalUnread()
-                }
-            }
-
-        }
-
         viewModel.isNavTransparent.observe(this, { setUiMode(it) })
         viewModel.isStatusBardDark.observe(this, { setupStatusBar(it) })
 
-        viewModel.checkSignIn()
+        viewModel.getTotalUnread()
 
     }
 

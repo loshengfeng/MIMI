@@ -26,8 +26,8 @@ import tw.gov.president.manager.submanager.update.data.VersionStatus
 
 class SplashViewModel : BaseViewModel() {
 
-    private val _autoLoginResult = MutableLiveData<ApiResult<Nothing>>()
-    val autoLoginResult: LiveData<ApiResult<Nothing>> = _autoLoginResult
+//    private val _autoLoginResult = MutableLiveData<ApiResult<Nothing>>()
+//    val autoLoginResult: LiveData<ApiResult<Nothing>> = _autoLoginResult
 
     private val _versionStatus = MutableLiveData<VersionStatus>()
     val versionStatus: LiveData<VersionStatus> = _versionStatus
@@ -44,32 +44,31 @@ class SplashViewModel : BaseViewModel() {
         _apiError.postValue(true)
     }
 
-    fun autoLogin() {
-        if (accountManager.hasMemberToken()) {
-            viewModelScope.launch {
-                val profile = accountManager.getProfile()
-                if (TextUtils.isEmpty(profile.account) || TextUtils.isEmpty(pref.memberToken.refreshToken)) {
-                    accountManager.logoutLocal()
-                    _autoLoginResult.value = ApiResult.success(null)
-                } else {
-                    doRefreshToken()
-//                    signIn(profile.account, profile.password)
-                }
-            }
-        } else {
-            _autoLoginResult.value = ApiResult.success(null)
-        }
-    }
+//    fun autoLogin() {
+//        if (accountManager.hasMemberToken()) {
+//            viewModelScope.launch {
+//                val profile = accountManager.getProfile()
+//                if (TextUtils.isEmpty(profile.account) || TextUtils.isEmpty(pref.memberToken.refreshToken)) {
+//                    accountManager.logoutLocal()
+//                    _autoLoginResult.value = ApiResult.success(null)
+//                } else {
+//                    doRefreshToken()
+//                }
+//            }
+//        } else {
+//            _autoLoginResult.value = ApiResult.success(null)
+//        }
+//    }
 
 //    private suspend fun signIn(account: String, password: String) {
 //        accountManager.signIn(account, password)
 //            .collect { _autoLoginResult.value = it }
 //    }
-
-    private suspend fun doRefreshToken() {
-        accountManager.refreshToken()
-                .collect { _autoLoginResult.value = it }
-    }
+//
+//    private suspend fun doRefreshToken() {
+//        accountManager.refreshToken()
+//                .collect { _autoLoginResult.value = it }
+//    }
 
     fun checkVersion() {
         viewModelScope.launch(handler) {
