@@ -854,8 +854,6 @@ class MainViewModel : BaseViewModel() {
             mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
             mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
         }
-
     }
-
 
 }

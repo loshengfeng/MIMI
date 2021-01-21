@@ -369,7 +369,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             it != 0L
         }?.let {id->
             Timber.i("signUpGuest signIn id=$id")
-            accountManager.signIn(id).collect {
+            accountManager.signIn(id, accountManager.getProfile().userName).collect {
                 Timber.i("signUpGuest collect $it")
                 _signUpResult.postValue(it)
             }
