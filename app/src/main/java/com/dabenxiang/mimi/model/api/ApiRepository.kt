@@ -220,6 +220,13 @@ class ApiRepository(private val apiService: ApiService) {
     ) = apiService.signUp(body)
 
     /**
+     * 建立新訪客使用者
+     */
+    suspend fun signUpGuest(
+            body: SingUpGuestRequest
+    ) = apiService.signUpGuest(body)
+
+    /**
      * 重發驗證信(需登入)
      */
     suspend fun resendEmail(

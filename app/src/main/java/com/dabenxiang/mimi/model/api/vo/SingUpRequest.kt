@@ -18,3 +18,11 @@ data class SingUpRequest(
     @SerializedName("code")
     val code: String?
 )
+
+data class SingUpGuestRequest(
+        @SerializedName("referrerCode")
+        val referrerCode: String?="",
+
+        @SerializedName("deviceId")
+        val deviceId: String?=""
+)

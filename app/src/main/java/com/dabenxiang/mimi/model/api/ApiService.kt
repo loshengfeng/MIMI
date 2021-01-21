@@ -144,6 +144,16 @@ interface ApiService {
         @Body body: SingUpRequest
     ): Response<Void>
 
+    @POST("/v1/Members/SignUpGuest")
+    suspend fun signUpGuest(
+            @Body body: SingUpGuestRequest
+    ): Response<Void>
+
+//    @POST("/v1/Members/SignIn")
+//    suspend fun SignIn(
+//            @Body body: SingUpGuestRequest
+//    ): Response<Void>
+
     @POST("/v1/Members/Me/Email")
     suspend fun resendEmail(
         @Body body: EmailRequest
