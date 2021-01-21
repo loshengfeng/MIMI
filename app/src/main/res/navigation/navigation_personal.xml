@@ -244,7 +244,6 @@
         <action
             android:id="@+id/action_to_postArticleFragment"
             app:destination="@id/postArticleFragment" />
-
         <action
             android:id="@+id/action_to_postVideoFragment"
             app:destination="@+id/postVideoFragment" />
@@ -425,6 +424,9 @@
         <action
             android:id="@+id/action_to_orderInfoFragment"
             app:destination="@id/orderInfoFragment" />
+        <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/navigation_clip_player" />
     </fragment>
 
     <fragment
@@ -488,4 +490,14 @@
         android:id="@+id/postViewerFragment"
         android:name="com.dabenxiang.mimi.view.post.viewer.PostViewerFragment"
         tools:layout="@layout/fragment_post_viewer" />
+
+    <fragment
+        android:id="@+id/editVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.video.EditVideoFragment"
+        android:label="EditVideoFragment"
+        tools:layout="@layout/fragment_edit_video">
+        <action
+            android:id="@+id/action_editVideoFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
+    </fragment>
 </navigation>

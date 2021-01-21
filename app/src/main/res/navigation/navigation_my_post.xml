@@ -170,6 +170,7 @@
         android:label="EditVideoFragment" >
         <action
             android:id="@+id/action_editVideoFragment_to_postVideoFragment"
+            app:popUpToInclusive="true"
             app:destination="@id/postVideoFragment" />
     </fragment>
 
@@ -247,6 +248,9 @@
         <action
             android:id="@+id/action_to_orderInfoFragment"
             app:destination="@id/orderInfoFragment" />
+        <action
+            android:id="@+id/action_to_clipPlayerFragment"
+            app:destination="@id/navigation_clip_player" />
     </fragment>
 
     <fragment
@@ -309,6 +313,16 @@
         <action
             android:id="@+id/action_orderFragment_to_paymentInfoFragment"
             app:destination="@id/paymentInfoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editVideoFragment"
+        android:name="com.dabenxiang.mimi.view.post.video.EditVideoFragment"
+        android:label="EditVideoFragment"
+        tools:layout="@layout/fragment_edit_video">
+        <action
+            android:id="@+id/action_editVideoFragment_to_postVideoFragment"
+            app:destination="@id/postVideoFragment" />
     </fragment>
 
 </navigation>

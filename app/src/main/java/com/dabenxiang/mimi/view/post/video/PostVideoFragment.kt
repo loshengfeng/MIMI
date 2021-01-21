@@ -189,14 +189,14 @@ class PostVideoFragment : BasePostFragment() {
 //                R.id.action_postVideoFragment_to_clipPlayerFragment,
 //                bundle
 //            )
-            findNavController().navigateUp()
+            findNavController().popBackStack(R.id.clipPlayerFragment, false)
         } else if (isEdit && page == TAB) {
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
 
         } else if (isEdit && page == FAVORITE) {
-            findNavController().navigateUp()
+            findNavController().popBackStack(R.id.myCollectionFragment, false)
         } else if (isEdit && page == LIKE) {
-            findNavController().navigateUp()
+            findNavController().popBackStack(R.id.likesListFragment, false)
         } else {
             findNavController().navigate(R.id.action_postVideoFragment_to_clubTabFragment, bundle)
         }
@@ -365,8 +365,12 @@ class PostVideoFragment : BasePostFragment() {
             Navigation.findNavController(requireView()).popBackStack(R.id.searchPostFragment, false)
         } else if (isEdit && page == CLUB) {
             Navigation.findNavController(requireView()).popBackStack(R.id.topicDetailFragment, false)
+        } else if (isEdit && page == LIKE) {
+            findNavController().popBackStack(R.id.likesListFragment, false)
+        } else if (isEdit && page == FAVORITE) {
+            findNavController().popBackStack(R.id.myCollectionFragment, false)
         } else {
-            navigateTo(NavigateItem.PopBackStack(R.id.clubTabFragment, true))
+            navigateTo(NavigateItem.PopBackStack(R.id.clubTabFragment, false))
         }
     }
 
