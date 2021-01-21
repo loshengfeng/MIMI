@@ -59,6 +59,6 @@ data class MeItem(
     val fans: Int? = null,
 
     @SerializedName("isGuest")
-    val isGuest: Boolean =false,
+    val isGuest: Boolean = true,
 )
 

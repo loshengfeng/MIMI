@@ -22,4 +22,5 @@ data class ProfileItem(
     var follows: Int = 0,
     var likes: Int = 0,
     var fans: Int = 0,
+    var isGuest: Boolean =true
 )

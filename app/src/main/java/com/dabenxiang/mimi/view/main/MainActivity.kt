@@ -144,10 +144,22 @@ class MainActivity : BaseActivity() {
             finish()
         }
 
+
+        viewModel.signUpGuest.observe(this) {
+            when (it) {
+                is Success -> {
+                    Timber.i("signUpGuest =${it.result}")
+//                    viewModel.getTotalUnread()
+                }
+            }
+
+        }
+
         viewModel.isNavTransparent.observe(this, { setUiMode(it) })
         viewModel.isStatusBardDark.observe(this, { setupStatusBar(it) })
 
-        viewModel.getTotalUnread()
+        viewModel.checkSignIn()
+
     }
 
     private fun checkValidApp() {

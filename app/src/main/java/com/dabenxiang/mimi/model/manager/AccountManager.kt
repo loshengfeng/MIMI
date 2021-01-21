@@ -1,10 +1,7 @@
 package com.dabenxiang.mimi.model.manager
 
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.ChangePasswordRequest
-import com.dabenxiang.mimi.model.api.vo.MeItem
-import com.dabenxiang.mimi.model.api.vo.SignInRequest
-import com.dabenxiang.mimi.model.api.vo.SingUpRequest
+import com.dabenxiang.mimi.model.api.vo.*
 import com.dabenxiang.mimi.model.enums.TokenResult
 import com.dabenxiang.mimi.model.manager.mqtt.MQTTManager
 import com.dabenxiang.mimi.model.pref.Pref
@@ -42,7 +39,8 @@ class AccountManager(
             videoCount = meItem.videoCount ?: 0,
             videoCountLimit = meItem.videoCountLimit ?: 0,
             videoOnDemandCount = meItem.videoOnDemandCount ?: 0,
-            videoOnDemandCountLimit = meItem.videoOnDemandCountLimit ?: 0
+            videoOnDemandCountLimit = meItem.videoOnDemandCountLimit ?: 0,
+            isGuest = meItem.isGuest
         )
     }
 
@@ -121,9 +119,9 @@ class AccountManager(
             .flowOn(Dispatchers.IO)
             .catch { e -> emit(ApiResult.error(e)) }
 
-    fun signUp(request: SingUpRequest) =
+    fun signUp(request: BindPhoneRequest) =
         flow {
-            val result = domainManager.getApiRepository().signUp(request)
+            val result = domainManager.getApiRepository().bindPhone(request)
             if (!result.isSuccessful) throw HttpException(result)
             emit(ApiResult.success(null))
         }
@@ -132,10 +130,10 @@ class AccountManager(
             .catch { e -> emit(ApiResult.error(e)) }
             .onCompletion { emit(ApiResult.loaded()) }
 
-    fun signIn(userName: String, password: String, code: String) =
+    fun authSignIn(userName: String, password: String, code: String) =
         flow {
-            val request = SignInRequest(userName = userName, password = password, code = code)
-            val result = domainManager.getApiRepository().signIn(request)
+            val request = AuthSignInRequest(userName = userName, password = password, code = code)
+            val result = domainManager.getApiRepository().authSignIn(request)
             if (!result.isSuccessful) throw HttpException(result)
 
             result.body()?.content?.also { item ->
@@ -179,7 +177,7 @@ class AccountManager(
 
     fun signOut() =
         flow {
-            val result = domainManager.getApiRepository().signOut()
+            val result = domainManager.getApiRepository().authSignOut()
             if (!result.isSuccessful) throw HttpException(result)
             logoutLocal()
             emit(ApiResult.success(null))

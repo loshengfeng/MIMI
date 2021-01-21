@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.R
 import com.dabenxiang.mimi.model.api.ApiResult
-import com.dabenxiang.mimi.model.api.vo.SingUpRequest
+import com.dabenxiang.mimi.model.api.vo.BindPhoneRequest
 import com.dabenxiang.mimi.model.api.vo.ValidateMessageRequest
 import com.dabenxiang.mimi.view.base.BaseViewModel
 import com.dabenxiang.mimi.view.login.LoginFragment.Companion.TYPE_LOGIN
@@ -116,10 +116,9 @@ class LoginViewModel : BaseViewModel() {
         ) {
             viewModelScope.launch {
                 accountManager.signUp(
-                        SingUpRequest(
+                    BindPhoneRequest(
                                 username = callPrefix + mobile.value,
                                 friendlyName = account.value,
-//                        password = registerPw.value,
                                 referrerCode = inviteCode.value,
                                 code = verificationCode.value
                         )
@@ -154,7 +153,7 @@ class LoginViewModel : BaseViewModel() {
 
     fun doLogin(userName: String, password: String = "", code: String = "") {
         viewModelScope.launch {
-            accountManager.signIn(userName, password, code)
+            accountManager.authSignIn(userName, password, code)
                     .collect { _loginResult.value = it }
         }
     }

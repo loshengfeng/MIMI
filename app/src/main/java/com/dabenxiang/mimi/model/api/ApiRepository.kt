@@ -55,12 +55,12 @@ class ApiRepository(private val apiService: ApiService) {
     /**
      * 登入
      */
-    suspend fun signIn(request: SignInRequest) = apiService.signIn(request)
+    suspend fun authSignIn(request: AuthSignInRequest) = apiService.authSignIn(request)
 
     /**
      * 登出
      */
-    suspend fun signOut() = apiService.signOut()
+    suspend fun authSignOut() = apiService.authSignOut()
 
     /**********************************************************
      *
@@ -214,23 +214,23 @@ class ApiRepository(private val apiService: ApiService) {
 
 
 
-    suspend fun signIn(
-        body: SingInRequest
-    ) = apiService.signIn(body)
+    suspend fun bindPhone(
+        body: BindPhoneRequest
+    ) = apiService.bindPhone(body)
 
-        /**
-     * 建立新使用者
+     /**
+     * 建立新訪客使用者
      */
     suspend fun signUp(
-        body: SingUpRequest
+        body: SingUpGuestRequest
     ) = apiService.signUp(body)
 
     /**
-     * 建立新訪客使用者
+     * 登入
      */
-    suspend fun signUpGuest(
-            body: SingUpGuestRequest
-    ) = apiService.signUpGuest(body)
+    suspend fun signIn(
+         body: SingInRequest
+    ) = apiService.signIn(body)
 
     /**
      * 重發驗證信(需登入)

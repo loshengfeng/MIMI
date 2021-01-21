@@ -30,10 +30,10 @@ interface ApiService {
     ): Response<TokenItem>
 
     @POST("/v1/auth/signin")
-    suspend fun signIn(@Body request: SignInRequest): Response<ApiBaseItem<SignInItem>>
+    suspend fun authSignIn(@Body request: AuthSignInRequest): Response<ApiBaseItem<SignInItem>>
 
     @GET("/v1/auth/signout")
-    suspend fun signOut(): Response<Void>
+    suspend fun authSignOut(): Response<Void>
 
     /**********************************************************
      *
@@ -139,20 +139,20 @@ interface ApiService {
         @Body body: ForgetPasswordRequest
     ): Response<Void>
 
-    @POST("/v1/Members/SignIn")
-    suspend fun signIn(
-        @Body body: SingInRequest
-    ): Response<Void>
+    @POST("/v1/Members/BindPhone")
+    suspend fun bindPhone(
+        @Body body: BindPhoneRequest
+    ): Response<ApiBaseItem<String>>
 
     @POST("/v1/Members/SignUp")
     suspend fun signUp(
-        @Body body: SingUpRequest
-    ): Response<Void>
+        @Body body: SingUpGuestRequest
+    ): Response<ApiBaseItem<String>>
 
-    @POST("/v1/Members/SignUpGuest")
-    suspend fun signUpGuest(
-            @Body body: SingUpGuestRequest
-    ): Response<Void>
+    @POST("/v1/Members/SignIn")
+    suspend fun signIn(
+            @Body body: SingInRequest
+    ): Response<ApiBaseItem<String>>
 
     @POST("/v1/Members/Me/Email")
     suspend fun resendEmail(

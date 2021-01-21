@@ -123,6 +123,9 @@ class MainViewModel : BaseViewModel() {
     private val _isShowSnackBar = MutableLiveData<Boolean>()
     val isShowSnackBar: LiveData<Boolean> = _isShowSnackBar
 
+    private val _signUpGuest = MutableLiveData<ApiResult<String>>()
+    val signUpGuest: LiveData<ApiResult<String>> = _signUpGuest
+
     private var _normal: CategoriesItem? = null
     val normal
         get() = _normal
@@ -854,6 +857,25 @@ class MainViewModel : BaseViewModel() {
         viewModelScope.launch {
             mimiDB.remoteKeyDao().deleteByPageCode(pageCode)
             mimiDB.postDBItemDao().deleteItemByPageCode(pageCode)
+        }
+
+    }
+
+    fun checkSignIn() {
+        viewModelScope.launch {
+            flow {
+                val request =SingUpGuestRequest(
+                    deviceId = clientId
+                )
+                val resp = domainManager.getApiRepository().signUp(request)
+                if (!resp.isSuccessful) throw HttpException(resp)
+                emit(ApiResult.success(resp.body()?.content))
+            }
+                .flowOn(Dispatchers.IO)
+                .catch { e -> emit(ApiResult.error(e)) }
+                .collect {
+                    _signUpGuest.postValue(it)
+                }
         }
 
     }
