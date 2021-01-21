@@ -85,7 +85,7 @@ class PersonalFragment : BaseFragment() {
         img_arrow.visibility = View.INVISIBLE
         if (viewModel.isLogin()) {
             item_is_Login.visibility = View.VISIBLE
-            tv_logout.visibility = View.VISIBLE
+            tv_logout.visibility = View.GONE
         } else {
             item_is_Login.visibility = View.GONE
             tv_logout.visibility = View.GONE
@@ -151,6 +151,12 @@ class PersonalFragment : BaseFragment() {
             vip_buy.visibility = View.VISIBLE
             tv_expiry_date.visibility = View.GONE
             img_arrow.visibility = View.INVISIBLE
+        }
+
+        if(profile.isGuest) {
+            binding_phone.visibility = View.VISIBLE
+        } else {
+            binding_phone.visibility = View.GONE
         }
     }
 
@@ -250,6 +256,9 @@ class PersonalFragment : BaseFragment() {
                     Glide.with(this).load(R.drawable.default_profile_picture).into(avatar)
                     viewModel.signOut()
                 }
+                R.id.bg_vippromote,
+                R.id.vippromote_top,
+                R.id.vippromote_bottom,
                 R.id.vippromote_now -> {
                     checkStatus {
                         navigateTo(
@@ -313,6 +322,15 @@ class PersonalFragment : BaseFragment() {
                         )
                     }
                 }
+
+                R.id.binding_phone -> {
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_personalFragment_to_loginFragment,
+                            LoginFragment.createBundle(TYPE_LOGIN)
+                        )
+                    )
+                }
             }
         }.also {
             layout_vip_unlimit_unlogin.setOnClickListener(it)
@@ -322,8 +340,13 @@ class PersonalFragment : BaseFragment() {
             setting.setOnClickListener(it)
             tv_old_driver.setOnClickListener(it)
             tv_version_check_text.setOnClickListener(it)
-            tv_logout.setOnClickListener(it)
+//            tv_logout.setOnClickListener(it)
             vippromote_now.setOnClickListener(it)
+            vippromote_bottom.setOnClickListener(it)
+            vippromote_top.setOnClickListener(it)
+            bg_vippromote.setOnClickListener(it)
+
+            binding_phone.setOnClickListener(it)
 
             like_count.setOnClickListener(it)
             like.setOnClickListener(it)
