@@ -125,7 +125,7 @@ class AccountManager(
             .flowOn(Dispatchers.IO)
             .catch { e -> emit(ApiResult.error(e)) }
 
-    fun signUp(request: BindPhoneRequest) =
+    fun bindPhone(request: BindPhoneRequest) =
         flow {
             val result = domainManager.getApiRepository().bindPhone(request)
             if (!result.isSuccessful) throw HttpException(result)

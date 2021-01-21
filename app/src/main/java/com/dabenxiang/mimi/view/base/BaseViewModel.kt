@@ -367,20 +367,23 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    suspend fun checkSignIn() {
-        Timber.i("signUpGuest profileItem =${accountManager.getProfile()}")
-        accountManager.getProfile().userId?.takeIf {
-            it != 0L
-        }?.let {id->
-            Timber.i("signUpGuest signIn id=$id")
-            accountManager.signIn(id, accountManager.getProfile().userName).collect {
-                Timber.i("signUpGuest collect $it")
-                _signUpResult.postValue(it)
+    fun checkSignIn() {
+        viewModelScope.launch {
+            Timber.i("signUpGuest profileItem =${accountManager.getProfile()}")
+            accountManager.getProfile().userId?.takeIf {
+                it != 0L
+            }?.let {id->
+                Timber.i("signUpGuest signIn id=$id")
+                accountManager.signIn(id, accountManager.getProfile().userName).collect {
+                    Timber.i("signUpGuest collect $it")
+                    _signUpResult.postValue(it)
+                }
+            } ?: run {
+                Timber.i("signUpGuest doSingUpGuestFlow")
+                doSingUpGuestFlow()
             }
-        } ?: run {
-            Timber.i("signUpGuest doSingUpGuestFlow")
-            doSingUpGuestFlow()
         }
+
     }
 
     private suspend fun doSingUpGuestFlow(){
