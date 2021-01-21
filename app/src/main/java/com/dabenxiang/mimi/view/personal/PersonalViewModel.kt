@@ -43,35 +43,19 @@ class PersonalViewModel : BaseViewModel() {
 
     fun getMemberInfo() {
         viewModelScope.launch {
-            if (isLogin()) {
-                flow {
-                    val result = domainManager.getApiRepository().getMe()
-                    if (!result.isSuccessful) throw HttpException(result)
-                    val meItem = result.body()?.content
-                    meItem?.let {
-                        accountManager.setupProfile(it)
-                    }
-                    emit(ApiResult.success(meItem))
+            flow {
+                val result = domainManager.getApiRepository().getMe()
+                if (!result.isSuccessful) throw HttpException(result)
+                val meItem = result.body()?.content
+                meItem?.let {
+                    accountManager.setupProfile(it)
                 }
-                    .onStart { emit(ApiResult.loading()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect { _meItem.value = it }
-            } else {
-                flow {
-                    val result = domainManager.getApiRepository().getGuestInfo()
-                    if (!result.isSuccessful) throw HttpException(result)
-                    val meItem = result.body()?.content
-                    meItem?.let {
-                        accountManager.setupProfile(it)
-                    }
-                    emit(ApiResult.success(meItem))
-                }
-                    .onStart { emit(ApiResult.loading()) }
-                    .catch { e -> emit(ApiResult.error(e)) }
-                    .onCompletion { emit(ApiResult.loaded()) }
-                    .collect { _meItem.value = it }
+                emit(ApiResult.success(meItem))
             }
+                .onStart { emit(ApiResult.loading()) }
+                .catch { e -> emit(ApiResult.error(e)) }
+                .onCompletion { emit(ApiResult.loaded()) }
+                .collect { _meItem.value = it }
         }
     }
 
