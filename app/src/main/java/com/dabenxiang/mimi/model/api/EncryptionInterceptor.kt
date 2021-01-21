@@ -25,7 +25,7 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
 
     override fun intercept(chain: Interceptor.Chain): Response  {
 
-        var response: Response? = null
+        var response: Response? =null
         val request = chain.request()
         val domainCheck = request.url.let {url->
             val exclusion =exclusionList.filter {
@@ -44,16 +44,8 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
                 val strOldBody: String = buffer.readUtf8()
                 Timber.i("Encryption intercept: strOldBody:$strOldBody")
                 val mediaType: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
-                Timber.i("Encryption intercept: mediaType:$mediaType")
                 val encryptBodyStr: String = CryptUtils.encrypt(strOldBody) ?: ""
                 Timber.i("Encryption intercept: encryptBodyStr:$encryptBodyStr")
-//                Timber.i(
-//                    "Encryption intercept: decryptBodyStr test:${
-//                        CryptUtils.decrypt(
-//                            encryptBodyStr
-//                        )
-//                    }"
-//                )
                 encryptBodyStr.toRequestBody(mediaType)
             }?.let {
                 buildRequest(request, it)
@@ -70,25 +62,27 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
             val newResponse = response.newBuilder()
             var contentType = "application/json; charset=utf-8"
 
-            val responseBodyStr = response.body!!.string().chunked(2).map {
+            response.body!!.string().chunked(2).map {
                 it.toInt(16).toByte()
-            }.toByteArray().encodeBase64()
-//            val decrypted = CryptUtils.decrypt(responseBodyStr)
-
-            Timber.i("Encryption intercept: decryptBase64:${responseBodyStr}")
-            val decrypted = AESEncryptor.decryptWithAES(strToDecrypt=responseBodyStr)
-            Timber.i("Encryption intercept: decrypted:$decrypted")
-            if (decrypted.isNullOrEmpty()) {
-                throw IllegalArgumentException("No decryption strategy!")
+            }.toByteArray().encodeBase64().takeIf{ it.isNotEmpty() }?.let { responseBodyStr->
+                Timber.i("Encryption intercept: decryptBase64:${responseBodyStr}")
+                val decrypted = AESEncryptor.decryptWithAES(strToDecrypt=responseBodyStr)
+                Timber.i("Encryption intercept: decrypted:$decrypted")
+                if (decrypted.isNullOrEmpty()) {
+                    throw IllegalArgumentException("No decryption strategy!")
+                }
+                newResponse.body(decrypted.toResponseBody(contentType!!.toMediaTypeOrNull()))
+                Timber.i("Encryption intercept: newResponse:$newResponse")
+                return newResponse.build()
             }
-            newResponse.body(decrypted.toResponseBody(contentType!!.toMediaTypeOrNull()))
-            Timber.i("Encryption intercept: newResponse:$newResponse")
-            return newResponse.build()
+
+            return response
+
 
         } catch (e: Exception) {
             response?.close()
             Timber.d("Exception: $e ")
-            return chain.proceed(newRequest)
+            throw e
         }
     }
 
