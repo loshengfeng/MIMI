@@ -41,7 +41,9 @@ class AccountManager(
             videoCountLimit = meItem.videoCountLimit ?: 0,
             videoOnDemandCount = meItem.videoOnDemandCount ?: 0,
             videoOnDemandCountLimit = meItem.videoOnDemandCountLimit ?: 0,
-            isGuest = meItem.isGuest
+            isGuest = meItem.isGuest,
+            isSubscribed = meItem.isSubscribed,
+            expiryDate = meItem.expiryDate ?: Date(),
         )
     }
 
@@ -182,9 +184,13 @@ class AccountManager(
             .onCompletion { emit(ApiResult.loaded()) }
 
 
-    fun signIn(userId:Long, userName: String? ="") =
+    fun signIn(userId:Long, userName: String? ="", code: String? = "") =
         flow {
-            val request = SingInRequest(id = userId, username = userName)
+            val request = if (code?.isNotEmpty() == true) SingInRequest(
+                id = userId,
+                username = userName,
+                code = code
+            ) else SingInRequest(id = userId, username = userName)
             val result = domainManager.getApiRepository().signIn(request)
             if (!result.isSuccessful) throw HttpException(result)
 

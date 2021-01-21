@@ -155,6 +155,8 @@ class LoginViewModel : BaseViewModel() {
         viewModelScope.launch {
 //            accountManager.authSignIn(userName, password, code)
 //                    .collect { _loginResult.value = it }
+            accountManager.signIn(pref.profileItem.userId, userName, code)
+                .collect { _loginResult.value = it }
         }
     }
 

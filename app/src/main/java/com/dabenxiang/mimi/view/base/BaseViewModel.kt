@@ -398,7 +398,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
 
                 val guestUserID = resp.body()?.content ?:  throw HttpException(resp)
 
-                Timber.i("signUpGuest guestUserID=$guestUserID")
+                Timber.i("@@signUpGuest guestUserID=$guestUserID")
                 emit(guestUserID.toLong())
             }
                     .flowOn(Dispatchers.IO)
