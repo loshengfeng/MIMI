@@ -96,14 +96,18 @@ class OrderViewHolder(view: View) : BaseViewHolder(view) {
             OrderType.USER2ONLINE -> {
                 clProxy.visibility = View.GONE
                 ivType.visibility = View.VISIBLE
-                ivType.setBackgroundResource(
-                    when (orderItem.paymentType) {
-                        PaymentType.ALI -> R.drawable.ico_alipay
-                        PaymentType.WX -> R.drawable.ico_wechat_pay
-                        PaymentType.TIK_TOK -> R.drawable.ico_tiktokpay
-                        PaymentType.BANK -> R.drawable.ico_bank
-                    }
-                )
+                if(orderItem.paymentType != null) {
+                    ivType.setBackgroundResource(
+                        when (orderItem.paymentType) {
+                            PaymentType.ALI -> R.drawable.ico_alipay
+                            PaymentType.WX -> R.drawable.ico_wechat_pay
+                            PaymentType.TIK_TOK -> R.drawable.ico_tiktokpay
+                            PaymentType.BANK -> R.drawable.ico_bank
+                        }
+                    )
+                } else {
+                    ivType.background = null
+                }
             }
             else -> {
                 ivType.visibility = View.INVISIBLE
