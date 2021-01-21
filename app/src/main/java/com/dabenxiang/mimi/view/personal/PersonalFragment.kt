@@ -153,6 +153,8 @@ class PersonalFragment : BaseFragment() {
             img_arrow.visibility = View.INVISIBLE
         }
 
+        member_id.text = getString(R.string.member_id).plus(profile.id)
+
         if(profile.isGuest) {
             binding_phone.visibility = View.VISIBLE
         } else {
@@ -284,21 +286,12 @@ class PersonalFragment : BaseFragment() {
                 )
 
                 R.id.layout_vip_unlimit_unlogin -> {
-                    if (viewModel.isLogin()) {
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_personalFragment_to_topupFragment,
-                                TopUpFragment.createBundle(this::class.java.simpleName)
-                            )
+                    navigateTo(
+                        NavigateItem.Destination(
+                            R.id.action_personalFragment_to_topupFragment,
+                            TopUpFragment.createBundle(this::class.java.simpleName)
                         )
-                    } else {
-                        navigateTo(
-                            NavigateItem.Destination(
-                                R.id.action_personalFragment_to_loginFragment,
-                                LoginFragment.createBundle(TYPE_LOGIN)
-                            )
-                        )
-                    }
+                    )
                 }
 
                 R.id.like_count -> likeClick()
