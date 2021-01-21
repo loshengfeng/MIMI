@@ -59,11 +59,12 @@ class AccountManager(
     }
 
     fun isLogin(): Boolean {
-        return when (getMemberTokenResult()) {
-            TokenResult.PASS -> true
-            TokenResult.EXPIRED -> getProfile().userId != 0L
-            else -> false
-        }
+//        return when (getMemberTokenResult()) {
+//            TokenResult.PASS -> true
+//            TokenResult.EXPIRED -> getProfile().userId != 0L
+//            else -> false
+//        }
+        return isVip() || isBindPhone()
     }
 
     fun isBindPhone(): Boolean {

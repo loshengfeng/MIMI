@@ -102,7 +102,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     }
 
     fun isLogin(): Boolean {
-        return accountManager.isVip() || accountManager.isBindPhone()
+        return accountManager.isLogin()
     }
 
     fun logoutLocal() {

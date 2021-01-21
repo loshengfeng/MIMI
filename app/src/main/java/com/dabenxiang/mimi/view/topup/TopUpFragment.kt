@@ -111,7 +111,7 @@ class TopUpFragment : BaseFragment() {
         viewModel.meItem.observe(viewLifecycleOwner, {
             when (it) {
                 is Success -> {
-                    tv_name.text = it.result.friendlyName
+                    tv_name.text = if(it.result.friendlyName == "Guest") getString(R.string.identity) else it.result.friendlyName
                     it.result.expiryDate?.let { date ->
                         tv_expiry_date.visibility = View.VISIBLE
                         tv_expiry_date.text = getString(
@@ -407,7 +407,7 @@ class TopUpFragment : BaseFragment() {
 
         mainViewModel?.clearOrderItem()
 
-        when (viewModel.isLogin()) {
+        when (/*viewModel.isLogin()*/true) {
             true -> {
                 //TODO: 目前先不判斷是否有驗證過
 //                viewModel.checkEmailConfirmed()
