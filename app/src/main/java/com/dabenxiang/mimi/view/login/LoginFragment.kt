@@ -33,6 +33,7 @@ import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.item_login.*
 import kotlinx.android.synthetic.main.item_register.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import timber.log.Timber
 
 class LoginFragment : BaseFragment() {
@@ -593,18 +594,22 @@ class LoginFragment : BaseFragment() {
         ).show(requireActivity().supportFragmentManager)
     }
 
+    @ExperimentalCoroutinesApi
     private fun setCopyText() {
-        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData = clipboard.primaryClip
-        val clipDataItem = clipData?.getItemAt(0)
-        val copyText = clipDataItem?.text.toString() ?: ""
-
-        if (copyText.contains(MIMI_INVITE_CODE)) {
-            edit_invite_code.isFocusable = false
-            edit_invite_code.isClickable = false
-            val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
-            val inviteCode = copyText.substring(startIndex, copyText.length)
-            viewModel.inviteCode.value = inviteCode
-        }
+//        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//        val clipData = clipboard.primaryClip
+//        val clipDataItem = clipData?.getItemAt(0)
+//        val copyText = clipDataItem?.text.toString() ?: ""
+//
+//        if (copyText.contains(MIMI_INVITE_CODE)) {
+//            edit_invite_code.isFocusable = false
+//            edit_invite_code.isClickable = false
+//            val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
+//            val inviteCode = copyText.substring(startIndex, copyText.length)
+//            viewModel.inviteCode.value = inviteCode
+//        }
+        edit_invite_code.isFocusable = false
+        edit_invite_code.isClickable = false
+        viewModel.inviteCode.value = GeneralUtils.parserReferrerCode(requireContext())
     }
 }

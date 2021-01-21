@@ -23,10 +23,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.dabenxiang.mimi.App
-import com.dabenxiang.mimi.BuildConfig
-import com.dabenxiang.mimi.PACKAGE_INSTALLED_ACTION
-import com.dabenxiang.mimi.R
+import com.dabenxiang.mimi.*
 import com.dabenxiang.mimi.model.api.ApiRepository
 import com.dabenxiang.mimi.model.api.vo.error.ErrorItem
 import com.dabenxiang.mimi.model.api.vo.error.HttpExceptionItem
@@ -541,5 +538,18 @@ object GeneralUtils {
             }
             return defaultResult
         }
+    }
+
+    fun parserReferrerCode(context: Context): String {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipboard.primaryClip
+        val clipDataItem = clipData?.getItemAt(0)
+        val copyText = clipDataItem?.text.toString() ?: ""
+
+        return if (copyText.contains(MIMI_INVITE_CODE)) {
+            val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
+            val inviteCode = copyText.substring(startIndex, copyText.length)
+            inviteCode
+        } else ""
     }
 }

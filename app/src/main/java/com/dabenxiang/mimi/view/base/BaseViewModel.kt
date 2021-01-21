@@ -386,6 +386,7 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
     private suspend fun doSingUpGuestFlow(){
             flow {
                 val request = SingUpGuestRequest(
+                        referrerCode = GeneralUtils.parserReferrerCode(app),
                         deviceId = clientId
                 )
                 val resp = domainManager.getApiRepository().signUp(request)
