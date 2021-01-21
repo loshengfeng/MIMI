@@ -153,7 +153,7 @@ class SplashFragment : BaseFragment() {
         viewModel.viewModelScope.launch {
             viewModel.checkSignIn()
         }
-      
+
     }
 
     private fun goToHomePage() {

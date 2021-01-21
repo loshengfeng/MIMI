@@ -4,6 +4,7 @@ import java.util.*
 
 data class ProfileItem(
     var userId: Long = 0,
+    var userName: String = "", //Phone number
     var deviceId: String = "",
     var account: String = "",
     var password: String = "",
