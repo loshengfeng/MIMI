@@ -7,6 +7,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.dabenxiang.mimi.App
 import com.dabenxiang.mimi.MIMI_INVITE_CODE
 import com.dabenxiang.mimi.R
@@ -115,9 +116,25 @@ class SplashFragment : BaseFragment() {
 
     override fun initSettings() {
         super.initSettings()
-        viewModel.autoLoginResult.observe(viewLifecycleOwner, {
+//        viewModel.autoLoginResult.observe(viewLifecycleOwner, {
+//            when (it) {
+//                is Empty -> {
+//                    mainViewModel?.startMQTT()
+//                    deleteCacheFile()
+//                    goToHomePage()
+//                }
+//                is Error -> {
+//                    onApiError(it.throwable)
+//                    viewModel.logoutLocal()
+//                    goToHomePage()
+//                }
+//            }
+//        })
+
+        viewModel.signUpResult.observe(viewLifecycleOwner) {
             when (it) {
                 is Empty -> {
+                    Timber.i("signUpResult success")
                     mainViewModel?.startMQTT()
                     deleteCacheFile()
                     goToHomePage()
@@ -128,10 +145,15 @@ class SplashFragment : BaseFragment() {
                     goToHomePage()
                 }
             }
-        })
+
+        }
 
         viewModel.getDecryptSettingResult()
-        viewModel.autoLogin()
+//        viewModel.autoLogin()
+        viewModel.viewModelScope.launch {
+            viewModel.checkSignIn()
+        }
+      
     }
 
     private fun goToHomePage() {

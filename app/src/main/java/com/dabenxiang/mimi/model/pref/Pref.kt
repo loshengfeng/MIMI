@@ -116,6 +116,10 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
         profilePref.remove()
     }
 
+    fun clearToken() {
+        memberTokenPref.remove()
+    }
+
     fun clearSearchHistory() {
         searchHistoryPref.remove()
     }
