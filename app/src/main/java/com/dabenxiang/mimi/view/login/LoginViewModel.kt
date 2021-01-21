@@ -115,7 +115,7 @@ class LoginViewModel : BaseViewModel() {
                 "" == _validateCodeError.value
         ) {
             viewModelScope.launch {
-                accountManager.signUp(
+                accountManager.bindPhone(
                     BindPhoneRequest(
                                 username = callPrefix + mobile.value,
                                 friendlyName = account.value,
@@ -152,10 +152,10 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun doLogin(userName: String, password: String = "", code: String = "") {
-//        viewModelScope.launch {
+        viewModelScope.launch {
 //            accountManager.authSignIn(userName, password, code)
 //                    .collect { _loginResult.value = it }
-//        }
+        }
     }
 
     private fun isValidateFriendlyName(name: String): String {

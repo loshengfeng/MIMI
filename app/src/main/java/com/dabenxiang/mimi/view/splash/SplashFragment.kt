@@ -150,9 +150,8 @@ class SplashFragment : BaseFragment() {
 
         viewModel.getDecryptSettingResult()
 //        viewModel.autoLogin()
-        viewModel.viewModelScope.launch {
-            viewModel.checkSignIn()
-        }
+
+        viewModel.checkSignIn()
 
     }
 
