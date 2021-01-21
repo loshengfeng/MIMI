@@ -142,7 +142,13 @@ class PostVideoFragment : BasePostFragment() {
 
         setVideoTime()
 
-        val postClubItem = PostClubItem(type = PostType.VIDEO.value, title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList, memberPostItem = memberPostItem)
+        var postClubItem = PostClubItem()
+
+        if (page == "") {
+            postClubItem = PostClubItem(type = PostType.VIDEO.value, title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList)
+        } else {
+            postClubItem = PostClubItem(type = PostType.VIDEO.value, title = title, tags = getTags(), uploadVideo = videoAttachmentList, deleteVideo = deleteVideoList, memberPostItem = memberPostItem)
+        }
 
         val bundle = Bundle()
         bundle.putSerializable(POST_DATA, postClubItem)
@@ -151,6 +157,7 @@ class PostVideoFragment : BasePostFragment() {
             val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
             bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
         }
+
         mainViewModel?.uploadData?.value = bundle
 
         if (isEdit && page == MY_POST) {
@@ -188,7 +195,6 @@ class PostVideoFragment : BasePostFragment() {
 
         } else if (isEdit && page == FAVORITE) {
             findNavController().navigateUp()
-
         } else if (isEdit && page == LIKE) {
             findNavController().navigateUp()
         } else {
@@ -242,12 +248,20 @@ class PostVideoFragment : BasePostFragment() {
             bundle.putString(EditVideoFragment.BUNDLE_VIDEO_URI, myUri.toString())
             bundle.putString(PAGE, page)
 
-            if (isEdit) {
-                val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
 
-                bundle.putBoolean(MyPostFragment.EDIT, true)
-                bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+            var memberPostItem = MemberPostItem()
+            val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA)
+
+            if (item != null) {
+                item as MemberPostItem
+                memberPostItem = item
             }
+
+            memberPostItem.title = edt_title.text.toString()
+            memberPostItem.tags = getTags()
+
+            bundle.putBoolean(MyPostFragment.EDIT, true)
+            bundle.putSerializable(MyPostFragment.MEMBER_DATA, memberPostItem)
 
             findNavController().navigate(
                 R.id.action_postVideoFragment_to_editVideoFragment,
