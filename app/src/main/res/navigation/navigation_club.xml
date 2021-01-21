@@ -278,4 +278,5 @@
             android:id="@+id/action_orderFragment_to_paymentInfoFragment"
             app:destination="@id/paymentInfoFragment" />
     </fragment>
+
 </navigation>
