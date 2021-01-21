@@ -66,6 +66,10 @@ class AccountManager(
         }
     }
 
+    fun isBindPhone(): Boolean {
+        return !getProfile().isGuest
+    }
+
     fun getMemberTokenResult(): TokenResult {
         val tokenData = pref.memberToken
         return when {
