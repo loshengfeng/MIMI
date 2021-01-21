@@ -145,10 +145,10 @@ class MainActivity : BaseActivity() {
         }
 
 
-        viewModel.signUpGuest.observe(this) {
+        viewModel.signUpResult.observe(this) {
             when (it) {
-                is Success -> {
-                    Timber.i("signUpGuest =${it.result}")
+                is Empty -> {
+                    Timber.i("signUpGuest Success")
 //                    viewModel.getTotalUnread()
                 }
             }

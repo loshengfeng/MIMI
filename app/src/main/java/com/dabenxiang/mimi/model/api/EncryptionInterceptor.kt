@@ -31,10 +31,9 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
             val exclusion =exclusionList.filter {
                 url.toString().toLowerCase().contains(it)
             }
-            Timber.i("Encryption intercept: url:$url")
             exclusion.isNotEmpty()
         }
-        Timber.i("Encryption intercept: domainCheck:$domainCheck")
+        Timber.v("Encryption intercept: domainCheck:$domainCheck")
         val newRequest = if (domainCheck) request
         else {
             val oldBody = request.body
@@ -42,10 +41,9 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
                 val buffer = Buffer()
                 oldBody.writeTo(buffer)
                 val strOldBody: String = buffer.readUtf8()
-                Timber.i("Encryption intercept: strOldBody:$strOldBody")
                 val mediaType: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
                 val encryptBodyStr: String = CryptUtils.encrypt(strOldBody) ?: ""
-                Timber.i("Encryption intercept: encryptBodyStr:$encryptBodyStr")
+//                Timber.i("Encryption intercept: encryptBodyStr:$encryptBodyStr")
                 encryptBodyStr.toRequestBody(mediaType)
             }?.let {
                 buildRequest(request, it)
@@ -72,7 +70,6 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
                     throw IllegalArgumentException("No decryption strategy!")
                 }
                 newResponse.body(decrypted.toResponseBody(contentType!!.toMediaTypeOrNull()))
-                Timber.i("Encryption intercept: newResponse:$newResponse")
                 return newResponse.build()
             }
 

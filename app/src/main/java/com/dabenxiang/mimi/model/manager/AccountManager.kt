@@ -11,6 +11,7 @@ import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
+import timber.log.Timber
 import java.util.*
 
 class AccountManager(
@@ -174,6 +175,51 @@ class AccountManager(
             .onStart { emit(ApiResult.loading()) }
             .catch { e -> emit(ApiResult.error(e)) }
             .onCompletion { emit(ApiResult.loaded()) }
+
+
+    fun signIn(userId:Long, userName: String? ="") =
+        flow {
+            val request = SingInRequest(id = userId, username = userName)
+            val result = domainManager.getApiRepository().signIn(request)
+            if (!result.isSuccessful) throw HttpException(result)
+
+            result.body()?.content?.also { item ->
+                pref.memberToken = TokenItem(
+                        accessToken = item.accessToken,
+                        refreshToken = item.refreshToken,
+                        expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
+                )
+            }
+
+            if (getProfile().userId == 0L || getProfile().account != userName) {
+                val meResult = domainManager.getApiRepository().getMe()
+                if (!meResult.isSuccessful) throw HttpException(meResult)
+
+                val meItem = meResult.body()?.content
+                setupProfile(
+                    ProfileItem(
+                        userId = meItem?.id ?: 0,
+                        deviceId = GeneralUtils.getAndroidID(),
+                        account = userName ?: "",
+                        password = "",
+                        friendlyName = meItem?.friendlyName ?: "",
+                        avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
+                        isEmailConfirmed = meItem?.isEmailConfirmed ?: false,
+                        isSubscribed = meItem?.isSubscribed ?: false,
+                        expiryDate = meItem?.expiryDate ?: Date(),
+                        videoCount = meItem?.videoCount ?: 0,
+                        videoOnDemandCount = meItem?.videoOnDemandCount ?: 0,
+                        creationDate = meItem?.creationDate ?: Date(),
+                        isDailyCheckIn = meItem?.isDailyCheckIn ?: false,
+                        isGuest = meItem?.isGuest ?: true
+                    )
+                )
+                Timber.i("signUpGuest signIn getProfile() = ${getProfile()}")
+            }
+            emit(ApiResult.success(null))
+        }
+            .flowOn(Dispatchers.IO)
+            .catch { e -> emit(ApiResult.error(e)) }
 
     fun signOut() =
         flow {

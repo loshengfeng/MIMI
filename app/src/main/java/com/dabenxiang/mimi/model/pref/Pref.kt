@@ -7,6 +7,7 @@ import com.dabenxiang.mimi.model.vo.SearchHistoryItem
 import com.dabenxiang.mimi.model.vo.TokenItem
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import timber.log.Timber
 import java.lang.reflect.Type
 
 class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean) :
@@ -77,6 +78,7 @@ class Pref(private val gson: Gson, preferenceFileName: String, isDebug: Boolean)
             try {
                 gson.fromJson(profilePref.get(), ProfileItem::class.java)
             } catch (e: Exception) {
+                Timber.i("signUpGuest profileItem Exception=$e")
                 ProfileItem()
             }
         set(value) {

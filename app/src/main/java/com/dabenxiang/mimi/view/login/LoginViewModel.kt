@@ -152,10 +152,10 @@ class LoginViewModel : BaseViewModel() {
     }
 
     fun doLogin(userName: String, password: String = "", code: String = "") {
-        viewModelScope.launch {
-            accountManager.authSignIn(userName, password, code)
-                    .collect { _loginResult.value = it }
-        }
+//        viewModelScope.launch {
+//            accountManager.authSignIn(userName, password, code)
+//                    .collect { _loginResult.value = it }
+//        }
     }
 
     private fun isValidateFriendlyName(name: String): String {
