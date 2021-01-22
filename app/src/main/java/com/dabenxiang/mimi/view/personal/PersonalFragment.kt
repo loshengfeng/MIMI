@@ -166,7 +166,7 @@ class PersonalFragment : BaseFragment() {
             img_arrow.visibility = View.INVISIBLE
         }
 
-        member_id.text = getString(R.string.member_id).plus(profile.id)
+        member_id.text = getString(R.string.member_id).plus(profile.promoCode)
 
         if(profile.isGuest) {
             binding_phone.visibility = View.VISIBLE

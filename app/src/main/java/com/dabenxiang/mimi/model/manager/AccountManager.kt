@@ -191,21 +191,23 @@ class AccountManager(
                 username = userName,
                 code = code
             ) else SingInRequest(id = userId, username = userName)
-            val result = domainManager.getApiRepository().signIn(request)
-            if (!result.isSuccessful) throw HttpException(result)
 
-            result.body()?.content?.also { item ->
-                pref.memberToken = TokenItem(
+            if(pref.memberToken.refreshToken.isEmpty() || userName?.isNotEmpty() == true) {
+                val result = domainManager.getApiRepository().signIn(request)
+                if (!result.isSuccessful) throw HttpException(result)
+
+                result.body()?.content?.also { item ->
+                    pref.memberToken = TokenItem(
                         accessToken = item.accessToken,
                         refreshToken = item.refreshToken,
                         expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
-                )
+                    )
+                }
             }
 
             if (getProfile().userId == 0L || getProfile().account != userName) {
                 val meResult = domainManager.getApiRepository().getMe()
                 if (!meResult.isSuccessful) throw HttpException(meResult)
-
                 val meItem = meResult.body()?.content
                 setupProfile(
                     ProfileItem(

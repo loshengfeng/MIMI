@@ -373,11 +373,12 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
             accountManager.getProfile().userId?.takeIf {
                 it != 0L
             }?.let {id->
-                Timber.i("signUpGuest signIn id=$id")
-                accountManager.signIn(id, accountManager.getProfile().userName).collect {
-                    Timber.i("signUpGuest collect $it")
-                    _signUpResult.postValue(it)
-                }
+                Timber.i("signUpGuest signIn id=$id, user name = ${accountManager.getProfile().userName}")
+                accountManager.signIn(id, accountManager.getProfile().userName)
+                    .collect {
+                        Timber.i("signUpGuest collect $it")
+                        _signUpResult.postValue(it)
+                    }
             } ?: run {
                 Timber.i("signUpGuest doSingUpGuestFlow")
                 doSingUpGuestFlow()
