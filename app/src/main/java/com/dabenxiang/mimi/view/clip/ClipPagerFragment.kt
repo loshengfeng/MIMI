@@ -176,9 +176,7 @@ class ClipPagerFragment(private val orderByType: StatisticsOrderType) : BaseFrag
 
     private fun onVipClick() {
         viewModel.rechargeVip()
-        checkStatus {
-            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
-        }
+        navigateTo(NavigateItem.Destination(R.id.action_to_topup))
     }
 
     private fun onFavoriteClick(item: VideoItem, isFavorite: Boolean, update: (Boolean, Int) -> Unit) {

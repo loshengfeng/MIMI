@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_settingFragment_to_changePasswordFragment"
             app:destination="@id/changePasswordFragment" />
+        <action
+            android:id="@+id/action_to_loginFragment"
+            app:destination="@id/loginFragment" />
 
     </fragment>
 
@@ -29,5 +32,11 @@
         android:id="@+id/changePasswordFragment"
         android:name="com.dabenxiang.mimi.view.changepassword.ChangePasswordFragment"
         tools:layout="@layout/fragment_change_password"/>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.dabenxiang.mimi.view.login.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login"/>
 
 </navigation>

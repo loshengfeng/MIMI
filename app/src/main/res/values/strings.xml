@@ -204,6 +204,7 @@
     <string name="file_type_not_supported">不支援的档案格式，请重新上传</string>
     <string name="binding_phone">注册登录</string>
     <string name="member_id">蜜蜜编号： </string>
+    <string name="setting_bind_phone">绑定手机号</string>
 
     <string name="topup_refresh_payment_prompt">下拉刷新支付状态</string>
     <string name="topup_all">全部</string>

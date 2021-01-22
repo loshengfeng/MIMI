@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
+import androidx.compose.ui.graphics.Color
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
@@ -67,8 +68,14 @@ class SettingFragment : BaseFragment() {
         viewModel.profileItem.observe(this, {
             when (it) {
                 is Success -> {
+                    if(viewModel.isBindPhone()) {
+                        tv_account_phone.text = viewModel.profileData?.username
+                        tv_account_phone.setTextColor(context.getColor(R.color.color_black_1))
+                    } else {
+                        tv_account_phone.text = getString(R.string.setting_bind_phone)
+                        tv_account_phone.setTextColor(context.getColor(R.color.color_blue_2))
+                    }
                     tv_name.text = viewModel.profileData?.friendlyName
-                    tv_account_phone.text = viewModel.profileData?.username
                     tv_account_phone.visibility =View.VISIBLE
                     gender_info.text = getString(viewModel.profileData!!.getGenderRes())
 
@@ -200,6 +207,11 @@ class SettingFragment : BaseFragment() {
                             })
                     )
                 }
+                R.id.tv_account_phone -> {
+                    if(!viewModel.isBindPhone()) {
+                        navigateTo(NavigateItem.Destination(R.id.action_to_loginFragment))
+                    }
+                }
 //                R.id.btn_binding_invitation -> {
 //                    showInvitationEditorDialog(requireContext())
 //                }
@@ -215,6 +227,7 @@ class SettingFragment : BaseFragment() {
             view_field_name.setOnClickListener(it)
             view_field_birthday.setOnClickListener(it)
             view_field_gender.setOnClickListener(it)
+            tv_account_phone.setOnClickListener(it)
 //            btn_binding_invitation.setOnClickListener(it)
         }
 
