@@ -185,10 +185,10 @@ abstract class BasePlayerFragment : BaseFragment(), AnalyticsListener, Player.Ev
         }
 
         btn_vip.setOnClickListener {
-            checkStatus {
+//            checkStatus {
                 val bundle = TopUpFragment.createBundle(this::class.java.simpleName)
                 navigateTo(NavigateItem.Destination(R.id.action_to_topup, bundle))
-            }
+//            }
         }
 
         btn_promote.setOnClickListener {
