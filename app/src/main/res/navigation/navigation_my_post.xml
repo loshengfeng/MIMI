@@ -315,14 +315,4 @@
             app:destination="@id/paymentInfoFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/editVideoFragment"
-        android:name="com.dabenxiang.mimi.view.post.video.EditVideoFragment"
-        android:label="EditVideoFragment"
-        tools:layout="@layout/fragment_edit_video">
-        <action
-            android:id="@+id/action_editVideoFragment_to_postVideoFragment"
-            app:destination="@id/postVideoFragment" />
-    </fragment>
-
 </navigation>
