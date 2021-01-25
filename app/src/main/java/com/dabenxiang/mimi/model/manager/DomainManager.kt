@@ -112,7 +112,7 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
         }
     }
 
-    fun getMqttDomain(): String {
+    fun getMqttDomain(isReconnection:Boolean =false): String {
         return when {
             BuildConfig.BUILD_TYPE.contains(BUILDTYPE_DEV) -> {
                 BuildConfig.MQTT_HOST
@@ -121,7 +121,10 @@ class DomainManager(private val gson: Gson, private val okHttpClient: OkHttpClie
                 BuildConfig.MQTT_HOST
             }
             else -> {
-                StringBuilder("wss://mqtt.").append(getDomain()).toString()
+                if(isReconnection) changeApiDomainIndex()
+                val url = getDomain()
+                Timber.i("reconnection currentDomainIndex =$currentDomainIndex  url=$url")
+                StringBuilder("wss://mqtt.").append(url).toString()
             }
         }
     }

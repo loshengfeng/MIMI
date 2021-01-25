@@ -132,6 +132,7 @@ class AccountManager(
             val result = domainManager.getApiRepository().bindPhone(request)
             if (!result.isSuccessful) throw HttpException(result)
             Timber.i("signUpGuest bindPhone = ${result?.body()?.content}")
+            mqttManager.disconnect()
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
@@ -222,7 +223,7 @@ class AccountManager(
     fun logoutLocal() {
         pref.clearMemberToken()
         pref.clearSearchHistory()
-        if (!keepAccount) pref.clearProfile()
+//        if (!keepAccount) pref.clearProfile()
         mqttManager.disconnect()
     }
 }
