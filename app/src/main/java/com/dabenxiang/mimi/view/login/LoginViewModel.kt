@@ -142,7 +142,7 @@ class LoginViewModel : BaseViewModel() {
             val pwd: String = if (isPwd) loginPw.value ?: "" else ""
             val code: String = loginVerificationCode.value ?: ""
 
-            doLogin(callPrefix , password = pwd, code = code)
+            doLogin(callPrefix + account , password = pwd, code = code)
         }
     }
 

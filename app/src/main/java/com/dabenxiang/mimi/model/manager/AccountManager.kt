@@ -141,13 +141,13 @@ class AccountManager(
 
     fun signIn(userId:Long, userName: String? ="", code: String? = "") =
         flow {
+
+            Timber.i("signUpGuest signIn userName:$userName   code:$code")
             val request = SingInRequest(
                 id = userId,
                 username = if(userName.isNullOrEmpty()) null else userName,
                 code = if(code.isNullOrEmpty()) null else code
             )
-
-            Timber.i("signUpGuest signIn userName:$userName")
 
             val result = domainManager.getApiRepository().signIn(request)
             if (!result.isSuccessful) throw HttpException(result)
@@ -159,6 +159,7 @@ class AccountManager(
                     expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
                 )
             }
+            Timber.i("doRegisterValidateAndSubmit friendlyName =${ pref.memberToken}")
             refreshUserInfo(userName)
 
             emit(ApiResult.success(null))

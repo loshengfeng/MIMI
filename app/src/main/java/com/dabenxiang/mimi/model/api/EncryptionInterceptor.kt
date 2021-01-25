@@ -43,7 +43,7 @@ class EncryptionInterceptor() : Interceptor, KoinComponent {
                 val strOldBody: String = buffer.readUtf8()
                 val mediaType: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
                 val encryptBodyStr: String = CryptUtils.encrypt(strOldBody) ?: ""
-//                Timber.i("Encryption intercept: encryptBodyStr:$encryptBodyStr")
+                Timber.i("Encryption intercept: encryptBodyStr:$encryptBodyStr")
                 encryptBodyStr.toRequestBody(mediaType)
             }?.let {
                 buildRequest(request, it)
