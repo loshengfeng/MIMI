@@ -102,19 +102,14 @@ class LoginViewModel : BaseViewModel() {
         clickType = TYPE_REGISTER
         _accountError.value = isValidateFriendlyName(account.value ?: "")
         _mobileError.value = isValidateMobile(mobile.value ?: "", callPrefix)
-//        _registerAccountError.value = isValidateAccount(registerAccount.value ?: "")
         _validateCodeError.value = isValidateValidateCode(verificationCode.value ?: "")
-//        _registerPasswordError.value = isValidatePassword(registerPw.value ?: "")
-//        _confirmPasswordError.value =
-//            isValidateConfirmPassword(registerPw.value ?: "", confirmPw.value ?: "")
 
         if ("" == _accountError.value &&
                 "" == _mobileError.value &&
-//            "" == _registerPasswordError.value &&
-//            "" == _confirmPasswordError.value &&
                 "" == _validateCodeError.value
         ) {
             viewModelScope.launch {
+                Timber.i("doRegisterValidateAndSubmit friendlyName =${account.value}")
                 accountManager.bindPhone(
                     BindPhoneRequest(
                                 username = callPrefix + mobile.value,
@@ -147,7 +142,7 @@ class LoginViewModel : BaseViewModel() {
             val pwd: String = if (isPwd) loginPw.value ?: "" else ""
             val code: String = loginVerificationCode.value ?: ""
 
-            doLogin(callPrefix + account, password = pwd, code = code)
+            doLogin(callPrefix , password = pwd, code = code)
         }
     }
 
@@ -155,6 +150,7 @@ class LoginViewModel : BaseViewModel() {
         viewModelScope.launch {
 //            accountManager.authSignIn(userName, password, code)
 //                    .collect { _loginResult.value = it }
+            Timber.i("signUpGuest doLogin userName$userName")
             accountManager.signIn(pref.profileItem.userId, userName, code)
                 .collect { _loginResult.value = it }
         }

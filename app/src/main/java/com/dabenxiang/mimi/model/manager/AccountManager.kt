@@ -131,6 +131,7 @@ class AccountManager(
         flow {
             val result = domainManager.getApiRepository().bindPhone(request)
             if (!result.isSuccessful) throw HttpException(result)
+            Timber.i("signUpGuest bindPhone = ${result?.body()?.content}")
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
@@ -138,101 +139,58 @@ class AccountManager(
             .catch { e -> emit(ApiResult.error(e)) }
             .onCompletion { emit(ApiResult.loaded()) }
 
-    fun authSignIn(userName: String, password: String, code: String) =
+    fun signIn(userId:Long, userName: String? ="", code: String? = "") =
         flow {
-            val request = AuthSignInRequest(userName = userName, password = password, code = code)
-            val result = domainManager.getApiRepository().authSignIn(request)
+            val request = SingInRequest(
+                id = userId,
+                username = if(userName.isNullOrEmpty()) null else userName,
+                code = if(code.isNullOrEmpty()) null else code
+            )
+
+            Timber.i("signUpGuest signIn userName:$userName")
+
+            val result = domainManager.getApiRepository().signIn(request)
             if (!result.isSuccessful) throw HttpException(result)
 
             result.body()?.content?.also { item ->
                 pref.memberToken = TokenItem(
                     accessToken = item.accessToken,
                     refreshToken = item.refreshToken,
-                    // 提前2分鐘過期
                     expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
                 )
             }
+            refreshUserInfo(userName)
 
-            if (getProfile().userId == 0L || getProfile().account != userName) {
-                val meResult = domainManager.getApiRepository().getMe()
-                if (!meResult.isSuccessful) throw HttpException(meResult)
-
-                val meItem = meResult.body()?.content
-                setupProfile(
-                    ProfileItem(
-                        userId = meItem?.id ?: 0,
-                        deviceId = GeneralUtils.getAndroidID(),
-                        account = userName,
-                        password = "",
-                        friendlyName = meItem?.friendlyName ?: "",
-                        avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
-                        isEmailConfirmed = meItem?.isEmailConfirmed ?: false,
-                        isSubscribed = meItem?.isSubscribed ?: false,
-                        expiryDate = meItem?.expiryDate ?: Date(),
-                        videoCount = meItem?.videoCount ?: 0,
-                        videoOnDemandCount = meItem?.videoOnDemandCount ?: 0,
-                        creationDate = meItem?.creationDate ?: Date(),
-                        isDailyCheckIn = meItem?.isDailyCheckIn ?: false
-                    )
-                )
-            }
-            emit(ApiResult.success(null))
-        }
-            .flowOn(Dispatchers.IO)
-            .onStart { emit(ApiResult.loading()) }
-            .catch { e -> emit(ApiResult.error(e)) }
-            .onCompletion { emit(ApiResult.loaded()) }
-
-
-    fun signIn(userId:Long, userName: String? ="", code: String? = "") =
-        flow {
-            val request = if (code?.isNotEmpty() == true) SingInRequest(
-                id = userId,
-                username = userName,
-                code = code
-            ) else SingInRequest(id = userId, username = userName)
-
-            if(pref.memberToken.refreshToken.isEmpty() || userName?.isNotEmpty() == true) {
-                val result = domainManager.getApiRepository().signIn(request)
-                if (!result.isSuccessful) throw HttpException(result)
-
-                result.body()?.content?.also { item ->
-                    pref.memberToken = TokenItem(
-                        accessToken = item.accessToken,
-                        refreshToken = item.refreshToken,
-                        expiresTimestamp = Date().time + (item.expiresIn - 120) * 1000
-                    )
-                }
-            }
-
-            if (getProfile().userId == 0L || getProfile().account != userName) {
-                val meResult = domainManager.getApiRepository().getMe()
-                if (!meResult.isSuccessful) throw HttpException(meResult)
-                val meItem = meResult.body()?.content
-                setupProfile(
-                    ProfileItem(
-                        userId = meItem?.id ?: 0,
-                        deviceId = GeneralUtils.getAndroidID(),
-                        account = userName ?: "",
-                        password = "",
-                        friendlyName = meItem?.friendlyName ?: "",
-                        avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
-                        isEmailConfirmed = meItem?.isEmailConfirmed ?: false,
-                        isSubscribed = meItem?.isSubscribed ?: false,
-                        expiryDate = meItem?.expiryDate ?: Date(),
-                        videoCount = meItem?.videoCount ?: 0,
-                        videoOnDemandCount = meItem?.videoOnDemandCount ?: 0,
-                        creationDate = meItem?.creationDate ?: Date(),
-                        isDailyCheckIn = meItem?.isDailyCheckIn ?: false,
-                        isGuest = meItem?.isGuest ?: true
-                    )
-                )
-                Timber.i("signUpGuest signIn getProfile() = ${getProfile()}")
-            }
             emit(ApiResult.success(null))
         }
             .flowOn(Dispatchers.IO)
             .catch { e -> emit(ApiResult.error(e)) }
+
+    private suspend fun refreshUserInfo(userName:String?){
+        val meResult = domainManager.getApiRepository().getMe()
+        if (!meResult.isSuccessful) throw HttpException(meResult)
+        val meItem = meResult.body()?.content
+
+        setupProfile(
+            ProfileItem(
+                userId = meItem?.id ?: 0,
+                deviceId = GeneralUtils.getAndroidID(),
+                account = userName ?: "",
+                userName = userName ?: "",
+                password = "",
+                friendlyName = meItem?.friendlyName ?: "",
+                avatarAttachmentId = meItem?.avatarAttachmentId ?: 0,
+                isEmailConfirmed = meItem?.isEmailConfirmed ?: false,
+                isSubscribed = meItem?.isSubscribed ?: false,
+                expiryDate = meItem?.expiryDate ?: Date(),
+                videoCount = meItem?.videoCount ?: 0,
+                videoOnDemandCount = meItem?.videoOnDemandCount ?: 0,
+                creationDate = meItem?.creationDate ?: Date(),
+                isDailyCheckIn = meItem?.isDailyCheckIn ?: false,
+                isGuest = meItem?.isGuest ?: true
+            )
+        )
+    }
 
     fun signOut() =
         flow {

@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import timber.log.Timber
 
 class OrderInfoViewModel : BaseViewModel() {
 
@@ -27,10 +28,19 @@ class OrderInfoViewModel : BaseViewModel() {
                 emit(ApiResult.success(null))
             }
                 .flowOn(Dispatchers.IO)
+                .flatMapConcat {
+                    accountManager.signIn(accountManager.getProfile().userId,
+                        accountManager.getProfile().userName)
+
+                }
                 .onStart { emit(ApiResult.loading()) }
                 .onCompletion { emit(ApiResult.loaded()) }
                 .catch { e -> emit(ApiResult.error(e)) }
-                .collect { _createOrderResult.value = it }
+                .collect {
+
+                    Timber.i("signUpGuest collect $it")
+                    _createOrderResult.value = it
+                }
         }
     }
 }

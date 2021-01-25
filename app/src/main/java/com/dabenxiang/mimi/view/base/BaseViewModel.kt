@@ -394,7 +394,6 @@ abstract class BaseViewModel : ViewModel(), KoinComponent {
                         deviceId = clientId
                 )
                 val resp = domainManager.getApiRepository().signUp(request)
-                Timber.i("signUpGuest signUp=$resp")
                 if (!resp.isSuccessful) throw HttpException(resp)
 
                 val guestUserID = resp.body()?.content ?:  throw HttpException(resp)

@@ -106,6 +106,8 @@ class PersonalFragment : BaseFragment() {
     }
 
     private fun updateUi(profile: MeItem) {
+        Timber.i("updateUi isLogin =${viewModel.isLogin()}")
+        Timber.i("updateUi profile =$profile")
         if (viewModel.isLogin()) {
             id_personal.text = profile.friendlyName
             like_count.text = profile.likes.toString()
