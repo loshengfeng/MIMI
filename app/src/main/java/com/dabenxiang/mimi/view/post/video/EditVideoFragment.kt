@@ -181,13 +181,12 @@ class EditVideoFragment : BaseFragment() {
 
             if (isEdit != null && isEdit) {
                 val item = arguments?.getSerializable(MyPostFragment.MEMBER_DATA) as MemberPostItem
-                val mediaItem = Gson().fromJson(item.postContent, MediaItem::class.java)
-                mediaItem.videoParameter = VideoParameter()
-                mediaItem.picParameter = ArrayList(mutableListOf(PicParameter()))
+                val page = arguments?.getString(BasePostFragment.PAGE, "")
+                val mediaItem = MediaItem()
                 item.postContent = Gson().toJson(mediaItem)
-
                 bundle.putBoolean(MyPostFragment.EDIT, true)
                 bundle.putSerializable(MyPostFragment.MEMBER_DATA, item)
+                bundle.putString(BasePostFragment.PAGE, page)
             }
 
             findNavController().navigate(R.id.action_editVideoFragment_to_postVideoFragment, bundle)

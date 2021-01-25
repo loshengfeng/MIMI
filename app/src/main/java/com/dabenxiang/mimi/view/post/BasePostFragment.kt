@@ -335,9 +335,9 @@ open class BasePostFragment : BaseFragment() {
                 enableHastEditText()
             }
             chipGroup.addView(chip)
-            setTagCount()
         }
 
+        setTagCount()
         enableHastEditText()
     }
 
