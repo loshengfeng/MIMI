@@ -28,10 +28,19 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     private var extendedCallback: ExtendedCallback? = null
 
     fun init(serverUrl: String, clientId: String, callback: ExtendedCallback) {
+        if(client!=null) {
+            client?.disconnect()
+            client?.setCallback(null)
+            client =null
+            options =null
+            extendedCallback= null
+        }
         extendedCallback = callback
+
         client = MqttAndroidClient(context, serverUrl, clientId, MqttAndroidClient.Ack.MANUAL_ACK)
         client?.setCallback(object : MqttCallbackExtended {
             override fun connectComplete(reconnect: Boolean, serverURI: String) {
+                Timber.i("MQTT - connectComplete")
                 extendedCallback?.onConnectComplete(reconnect, serverURI)
             }
 
@@ -57,7 +66,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         options = MqttConnectOptions()
         options?.password = pref.memberToken.accessToken.toCharArray()
         options?.userName = pref.profileItem.userId.toString()
-        options?.isAutomaticReconnect = true
+        options?.isAutomaticReconnect = false
         options?.isCleanSession = false
 
     }
@@ -82,7 +91,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
                 disconnectedBufferOptions.isPersistBuffer = false
                 disconnectedBufferOptions.isDeleteOldestMessages = false
                 client?.setBufferOpts(disconnectedBufferOptions)
-
+                Timber.i("MQTT - connect onSuccess")
                 connectCallback.onSuccess(asyncActionToken)
             }
 
@@ -96,6 +105,8 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         isMqttConnect().takeIf { it }?.let {
             client?.disconnect()
         }
+
+
     }
 
     fun subscribeToTopic(subscriptionTopic: String, subscribeCallback: SubscribeCallback) {

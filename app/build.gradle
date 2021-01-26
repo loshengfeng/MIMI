@@ -387,7 +387,7 @@ dependencies {
     // Domain GoLib
 //    implementation project(path: ':domain_libs')
 
-    implementation 'com.silkrode.android:nbk_lib:1.4.3'
+    implementation 'com.silkrode.android:nbk_lib:1.4.6'
     
     // Video Editor
     implementation "org.cks.ffmpeg:FFmpegAndroid:$video_ffmpeg"

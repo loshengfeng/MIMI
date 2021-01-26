@@ -29,12 +29,9 @@ import com.dabenxiang.mimi.view.mypost.MyPostViewModel
 import com.dabenxiang.mimi.widget.utility.FileUtil
 import com.dabenxiang.mimi.widget.utility.GeneralUtils
 import com.dabenxiang.mimi.widget.utility.UriUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ticker
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttMessage
@@ -320,25 +317,42 @@ class MainViewModel : BaseViewModel() {
     fun startMQTT(isReconnection:Boolean =false) {
 
         if (!isMqttConnect() || isReconnection) {
-            mqttManager.disconnect()
+            Timber.d("MQTT -startMQTT init  isReconnection: $isReconnection")
             // test serverUrl use: tcp://172.x.x.x:1883 // mqttManager.init("tcp://172.x.x.x:1883", clientId, extendedCallback)
             mqttManager.init(domainManager.getMqttDomain(isReconnection), clientId, extendedCallback)
-            mqttManager.connect(connectCallback)
+            mqttManager.connect(object : ConnectCallback {
+                override fun onSuccess(asyncActionToken: IMqttToken) {
+                    Timber.d("MQTT -Connection onSuccess")
+                    SendLogManager.v(PROJECT_NAME, "MQTT - Connection onSuccess")
+                    val topic = getNotificationTopic()
+                    messageListenerMap[topic] = messageListener
+                    subscribeToTopic(topic)
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
+                    Timber.e("MQTT -Connection onFailure: $exception")
+                    SendLogManager.e(PROJECT_NAME, "MQTT - Connection onFailure: $exception")
+                    reconnection()
+                }
+            })
         }
 
+
+
+    }
+
+    fun testMqtt(){
         //Test
-//        if(!isReconnection){
-//            val tickerChannel = ticker(delayMillis = 10_000, initialDelayMillis = 0)
-//
-//            viewModelScope.launch {
-//                repeat(10) {
-//                    Timber.d("reconnection repeat$it")
-//                    tickerChannel.receive()
-//                    reconnection()
-//                    tickerChannel.cancel()
-//                }
-//            }
-//        }
+        val tickerChannel = ticker(delayMillis = 10_000, initialDelayMillis = 0)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            repeat(10) {
+                Timber.d("reconnection repeat$it")
+                tickerChannel.receive()
+                reconnection()
+            }
+
+        }
     }
 
     fun subscribeToTopic(topic: String) {
@@ -372,7 +386,7 @@ class MainViewModel : BaseViewModel() {
 
     private val extendedCallback = object : ExtendedCallback {
         override fun onConnectComplete(reconnect: Boolean, serverURI: String) {
-            Timber.d("Reconnect: $reconnect, ServerURI: $serverURI")
+            Timber.d("MQTT -Reconnect: $reconnect, ServerURI: $serverURI")
             SendLogManager.v(
                 PROJECT_NAME,
                 "MQTT - Reconnect: $reconnect, ServerURI: $serverURI"
@@ -380,8 +394,8 @@ class MainViewModel : BaseViewModel() {
         }
 
         override fun onMessageArrived(topic: String, message: MqttMessage) {
-            Timber.d("Incoming topic: $topic")
-            Timber.d("Incoming message: ${String(message.payload)}")
+            Timber.d("MQTT -Incoming topic: $topic")
+            Timber.d("MQTT -Incoming message: ${String(message.payload)}")
 
             SendLogManager.v(
                 PROJECT_NAME,
@@ -391,7 +405,7 @@ class MainViewModel : BaseViewModel() {
         }
 
         override fun onConnectionLost(cause: Throwable?) {
-            Timber.e("The Connection was lost: $cause")
+            Timber.e("MQTT -The Connection was lost: $cause")
             SendLogManager.e(
                 PROJECT_NAME,
                 "MQTT - The Connection was lost: $cause"
@@ -400,7 +414,7 @@ class MainViewModel : BaseViewModel() {
         }
 
         override fun onDeliveryComplete(token: IMqttDeliveryToken) {
-            Timber.d("DeliveryComplete message: ${String(token.message.payload)}")
+            Timber.d("MQTT -DeliveryComplete message: ${String(token.message.payload)}")
             SendLogManager.e(
                 PROJECT_NAME,
                 "MQTT - DeliveryComplete message:: ${String(token.message.payload)}"
@@ -408,34 +422,18 @@ class MainViewModel : BaseViewModel() {
         }
 
         override fun onInvalidHandle(cause: Throwable?) {
-            SendLogManager.e(PROJECT_NAME,"IllegalArgumentException:$cause")
+            SendLogManager.e(PROJECT_NAME,"MQTT -IllegalArgumentException:$cause")
             closeAppFromMqtt.postValue(cause?.toString() ?: "")
         }
     }
 
-    private val connectCallback = object : ConnectCallback {
-        override fun onSuccess(asyncActionToken: IMqttToken) {
-            Timber.d("Connection onSuccess")
-            SendLogManager.v(PROJECT_NAME, "MQTT - Connection onSuccess")
-            val topic = getNotificationTopic()
-            messageListenerMap[topic] = messageListener
-            subscribeToTopic(topic)
-        }
-
-        override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
-            Timber.e("Connection onFailure: $exception")
-            SendLogManager.e(PROJECT_NAME, "MQTT - Connection onFailure: $exception")
-            reconnection()
-        }
-    }
-
-    fun reconnection(){
-        viewModelScope.launch {
-            Timber.d("reconnection startMQTT")
+    fun reconnection()  {
+        Timber.d("MQTT -reconnection startMQTT")
+        CoroutineScope(Dispatchers.Main).launch {
             startMQTT(true)
         }
-    }
 
+    }
 
     private val messageListener = object : MessageListener {
         override fun onMsgReceive(message: MqttMessage) {

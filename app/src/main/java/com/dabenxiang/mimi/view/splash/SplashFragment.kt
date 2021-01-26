@@ -136,6 +136,7 @@ class SplashFragment : BaseFragment() {
                 is Empty -> {
                     Timber.i("signUpResult success")
                     mainViewModel?.startMQTT()
+//                    mainViewModel?.testMqtt()
                     deleteCacheFile()
                     goToHomePage()
                 }
