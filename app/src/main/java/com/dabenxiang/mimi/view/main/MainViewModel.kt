@@ -320,10 +320,6 @@ class MainViewModel : BaseViewModel() {
         if (!isMqttConnect() || isReconnection) {
             Timber.d("MQTT -startMQTT init  isReconnection: $isReconnection")
             // test serverUrl use: tcp://172.x.x.x:1883 // mqttManager.init("tcp://172.x.x.x:1883", clientId, extendedCallback)
-//            if(isReconnection){
-//                mqttManager.destroyConnection()
-//            }
-
             mqttManager.init(domainManager.getMqttDomain(isReconnection), clientId, extendedCallback)
             mqttManager.connect(object : ConnectCallback {
                 override fun onSuccess(asyncActionToken: IMqttToken) {

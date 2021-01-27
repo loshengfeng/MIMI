@@ -120,8 +120,6 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         try {
             client?.unregisterResources()
             client?.close()
-
-//            client?.disconnectForcibly()
             client?.disconnect(0)
             client?.setCallback(null)
         } catch (e: Exception) {
