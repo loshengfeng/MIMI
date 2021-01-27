@@ -1,7 +1,6 @@
 package com.dabenxiang.mimi.model.manager.mqtt
 
 import android.content.Context
-import com.dabenxiang.mimi.PROJECT_NAME
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ConnectCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.ExtendedCallback
 import com.dabenxiang.mimi.model.manager.mqtt.callback.SubscribeCallback
@@ -10,8 +9,7 @@ import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.android.service.ParcelableMqttMessage
 import org.eclipse.paho.client.mqttv3.*
 import timber.log.Timber
-import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
-import java.util.logging.LogManager
+
 
 class MQTTManager(val context: Context, private val pref: Pref) {
 
@@ -28,13 +26,8 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     private var extendedCallback: ExtendedCallback? = null
 
     fun init(serverUrl: String, clientId: String, callback: ExtendedCallback) {
-        if(client!=null) {
-            client?.disconnect()
-            client?.setCallback(null)
-            client =null
-            options =null
-            extendedCallback= null
-        }
+        Timber.i("MQTT - client =$client")
+
         extendedCallback = callback
 
         client = MqttAndroidClient(context, serverUrl, clientId, MqttAndroidClient.Ack.MANUAL_ACK)
@@ -74,7 +67,7 @@ class MQTTManager(val context: Context, private val pref: Pref) {
     fun isMqttConnect(): Boolean {
         return try {
             client?.isConnected ?: false
-        }catch (e:IllegalArgumentException){
+        }catch (e: IllegalArgumentException){
             Timber.v("IllegalArgumentException:$e")
             extendedCallback?.onInvalidHandle(e.cause)
             false
@@ -108,8 +101,9 @@ class MQTTManager(val context: Context, private val pref: Pref) {
 
 
     }
-
+    var topicTag:String = ""
     fun subscribeToTopic(subscriptionTopic: String, subscribeCallback: SubscribeCallback) {
+        topicTag = subscriptionTopic
         client?.subscribe(subscriptionTopic, 1, null, object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 subscribeCallback.onSuccess(asyncActionToken)
@@ -121,6 +115,20 @@ class MQTTManager(val context: Context, private val pref: Pref) {
         })
     }
 
+    fun destroyConnection(){
+        if (client == null) return
+        try {
+            client?.unregisterResources()
+            client?.close()
+
+//            client?.disconnectForcibly()
+            client?.disconnect(0)
+            client?.setCallback(null)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        client=null
+    }
 
     private val defaultMqttCallback by lazy {
         object : IMqttActionListener {

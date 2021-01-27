@@ -34,6 +34,7 @@ import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.flow.*
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
+import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -319,6 +320,10 @@ class MainViewModel : BaseViewModel() {
         if (!isMqttConnect() || isReconnection) {
             Timber.d("MQTT -startMQTT init  isReconnection: $isReconnection")
             // test serverUrl use: tcp://172.x.x.x:1883 // mqttManager.init("tcp://172.x.x.x:1883", clientId, extendedCallback)
+//            if(isReconnection){
+//                mqttManager.destroyConnection()
+//            }
+
             mqttManager.init(domainManager.getMqttDomain(isReconnection), clientId, extendedCallback)
             mqttManager.connect(object : ConnectCallback {
                 override fun onSuccess(asyncActionToken: IMqttToken) {
@@ -354,6 +359,7 @@ class MainViewModel : BaseViewModel() {
 
         }
     }
+
 
     fun subscribeToTopic(topic: String) {
         mqttManager.subscribeToTopic(topic, object : SubscribeCallback {
@@ -429,7 +435,9 @@ class MainViewModel : BaseViewModel() {
 
     fun reconnection()  {
         Timber.d("MQTT -reconnection startMQTT")
-        CoroutineScope(Dispatchers.Main).launch {
+        mqttManager.destroyConnection()
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(1000)
             startMQTT(true)
         }
 
