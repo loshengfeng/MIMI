@@ -47,6 +47,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
+import tw.gov.president.manager.submanager.logmoniter.di.SendLogManager
 import java.io.*
 import java.lang.reflect.Method
 import java.text.DecimalFormat
@@ -541,15 +542,26 @@ object GeneralUtils {
     }
 
     fun parserReferrerCode(context: Context): String {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData = clipboard.primaryClip
-        val clipDataItem = clipData?.getItemAt(0)
-        val copyText = clipDataItem?.text.toString() ?: ""
+        try {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = clipboard.primaryClip
+            val clipDataItem = clipData?.getItemAt(0)
+            val copyText = clipDataItem?.text.toString() ?: ""
 
-        return if (copyText.contains(MIMI_INVITE_CODE)) {
-            val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
-            val inviteCode = copyText.substring(startIndex, copyText.length)
-            inviteCode
-        } else ""
+            return if (copyText.contains(MIMI_INVITE_CODE)) {
+                val startIndex = copyText.lastIndexOf(MIMI_INVITE_CODE) + MIMI_INVITE_CODE.length
+                val inviteCode = copyText.substring(startIndex, copyText.length)
+                inviteCode
+            } else ""
+
+        } catch (e:Exception){
+            Timber.e("parserReferrerCode Exception:$e")
+            SendLogManager.v(
+                PROJECT_NAME,
+                "parserReferrerCode Exception:$e"
+            )
+            return ""
+        }
+
     }
 }
