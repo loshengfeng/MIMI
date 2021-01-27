@@ -62,7 +62,7 @@ class LoginFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.isLogin()) {
+        if (viewModel.isBindPhone()) {
             navigateTo(NavigateItem.Up)
         }
 
