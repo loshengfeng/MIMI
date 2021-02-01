@@ -191,15 +191,11 @@ class ClipSingleFragment : BaseFragment() {
         }
 
         btn_vip.setOnClickListener {
-            checkStatus {
-                navigateTo(NavigateItem.Destination(R.id.action_to_topup))
-            }
+            navigateTo(NavigateItem.Destination(R.id.action_to_topup))
         }
 
         btn_promote.setOnClickListener {
-            checkStatus {
-                navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
-            }
+            navigateTo(NavigateItem.Destination(R.id.action_to_inviteVipFragment))
         }
     }
 
@@ -222,6 +218,7 @@ class ClipSingleFragment : BaseFragment() {
                         is NotDeductedException -> recharge_reminder.visibility = View.VISIBLE
                         else -> onApiError(it.throwable)
                     }
+                    onApiError(it.throwable)
                 }
                 else -> {
                 }
