@@ -147,7 +147,7 @@ class RecommendFragment : BaseFragment() {
     private val bannerFuncItem by lazy {
         BannerFuncItem(
             { banner -> GeneralUtils.openWebView(requireContext(), banner.url) },
-            { id, imageView -> viewModel.loadImage(id, imageView, LoadImageType.PICTURE_THUMBNAIL) }
+            { id, imageView -> viewModel.loadImage(id, imageView, LoadImageType.PICTURE_FULL) }
         )
     }
 
